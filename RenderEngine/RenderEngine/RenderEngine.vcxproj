@@ -129,6 +129,7 @@
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\DeferredNodeCallbacks.h" />
     <ClInclude Include="include\DeferredRenderObject.h" />
+    <ClInclude Include="include\InputImpl.h" />
     <ClInclude Include="include\KeyboardHandler.h" />
     <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\CustomMaths.h" />
@@ -153,6 +154,7 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\DeferredNodeCallbacks.cpp" />
     <ClCompile Include="src\DeferredRenderObject.cpp" />
+    <ClCompile Include="src\InputImpl.cpp" />
     <ClCompile Include="src\KeyboardHandler.cpp" />
     <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\main.cpp" />

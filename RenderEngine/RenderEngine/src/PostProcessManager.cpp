@@ -11,6 +11,7 @@
 #include "PostProcessProgram.h"
 #include "DeferredNodeCallbacks.h"
 #include "KeyboardHandler.h"
+#include "InputImpl.h"
 
 #include <iostream>
 
@@ -147,7 +148,11 @@ PostProcessChainNode * Engine::DefaultDeferredConfiguration::createGaussianBlur(
 
 	if (addConvolutionControl)
 	{
-		KeyboardHandlersTable::getInstance().registerHandler(new ConvolutionMaskManagement(dynamic_cast<GaussianBlurProgram *>(node->postProcessProgram)));
+		Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
+		if (table != NULL)
+		{
+			table->registerHandler(new Engine::TestImplementation::ConvolutionMaskManagement(dynamic_cast<GaussianBlurProgram *>(node->postProcessProgram)));
+		}
 	}
 
 	float maskFactor = 1.0f / 14.0f;
@@ -218,9 +223,14 @@ PostProcessChainNode * Engine::DefaultDeferredConfiguration::create5x5GaussianBl
 	Program * gaussianBlur = ProgramTable::getInstance().getProgramByName("gaussian_blur_post_processing_program");
 	node->postProcessProgram = new GaussianBlurProgram(*dynamic_cast<GaussianBlurProgram *>(gaussianBlur));
 
+
 	if (addConvolutionControl)
 	{
-		KeyboardHandlersTable::getInstance().registerHandler(new ConvolutionMaskManagement(dynamic_cast<GaussianBlurProgram *>(node->postProcessProgram)));
+		Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
+		if (table != NULL)
+		{
+			table->registerHandler(new Engine::TestImplementation::ConvolutionMaskManagement(dynamic_cast<GaussianBlurProgram *>(node->postProcessProgram)));
+		}
 	}
 
 	glm::vec2 texIdx[25] = {
@@ -263,12 +273,20 @@ PostProcessChainNode * Engine::DefaultDeferredConfiguration::createDepthOfField(
 
 	if (addDofControl)
 	{
-		KeyboardHandlersTable::getInstance().registerHandler(new DepthOfFieldManagement(dynamic_cast<DepthOfFieldProgram *>(node->postProcessProgram)));
+		Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
+		if (table != NULL)
+		{
+			table->registerHandler(new Engine::TestImplementation::DepthOfFieldManagement(dynamic_cast<DepthOfFieldProgram *>(node->postProcessProgram)));
+		}
 	}
 
 	if (addConvolutionControl)
 	{
-		KeyboardHandlersTable::getInstance().registerHandler(new ConvolutionMaskManagement(dynamic_cast<GaussianBlurProgram *>(node->postProcessProgram)));
+		Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
+		if (table != NULL)
+		{
+			table->registerHandler(new Engine::TestImplementation::ConvolutionMaskManagement(dynamic_cast<GaussianBlurProgram *>(node->postProcessProgram)));
+		}
 	}
 
 	float maskFactor = 1.0f / 50.0f;
@@ -343,7 +361,11 @@ PostProcessChainNode * Engine::DefaultDeferredConfiguration::createFinalLink(boo
 
 		if (addMBControl)
 		{
-			KeyboardHandlersTable::getInstance().registerHandler(new MotionBlurManagement(mbi));
+			Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
+			if (table != NULL)
+			{
+				table->registerHandler(new Engine::TestImplementation::MotionBlurManagement(mbi));
+			}
 		}
 	}
 

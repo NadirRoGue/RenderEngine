@@ -9,6 +9,8 @@
 #include "Program.h"
 #include "Object.h"
 #include "Light.h"
+#include "KeyboardHandler.h"
+#include "MouseHandler.h"
 
 #include <map>
 #include <list>
@@ -27,6 +29,9 @@ namespace Engine
 	class Scene
 	{
 	private:
+		KeyboardHandlersTable * keyboardHandlers;
+		MouseEventManager * mouseHandlers;
+
 		Camera * camera;
 
 		std::map<std::string, ProgramRenderables *> renders;
@@ -66,6 +71,9 @@ namespace Engine
 		const glm::vec3 & getClearColor() const;
 
 		void onViewportResize(int width, int height);
+
+		KeyboardHandlersTable * getKeyboardHandler() const;
+		MouseEventManager * getMouseHandler() const;
 	private:
 		void configureNewProgramLights(Program * p);
 	};

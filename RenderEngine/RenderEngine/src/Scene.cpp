@@ -15,11 +15,22 @@ using namespace Engine;
 Scene::Scene()
 {
 	clearColor = glm::vec3(0, 0, 0);
+
+	keyboardHandlers = new KeyboardHandlersTable();
+	mouseHandlers = new MouseEventManager();
 }
 
 Scene::~Scene()
 {
+	if (keyboardHandlers != NULL)
+	{
+		delete keyboardHandlers;
+	}
 
+	if (mouseHandlers != NULL)
+	{
+		delete mouseHandlers;
+	}
 }
 
 void Scene::setClearColor(glm::vec3 cc)
@@ -208,6 +219,16 @@ const std::map<std::string, DirectionalLight *> Scene::getDirectionalLight() con
 void Scene::onViewportResize(int width, int height)
 {
 	camera->onWindowResize(width, height);
+}
+
+KeyboardHandlersTable * Scene::getKeyboardHandler() const
+{
+	return keyboardHandlers;
+}
+
+MouseEventManager * Scene::getMouseHandler() const
+{
+	return mouseHandlers;
 }
 
 // ===========================================================================================

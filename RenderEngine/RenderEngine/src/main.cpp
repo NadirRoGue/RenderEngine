@@ -27,6 +27,7 @@
 #include "Renderer.h"
 #include "PostProcessManager.h"
 #include "DeferredRenderObject.h"
+#include "InputImpl.h"
 
 
 //////////////////////////////////////////////////////////////
@@ -343,18 +344,20 @@ void initSceneObj()
 void initHandlers()
 {
 	Engine::PointLight * pl = Engine::SceneManager::getInstance().getActiveScene()->getLightByName("point_light_1");
-	Engine::LightMovement * lm = new Engine::LightMovement(pl);
-	Engine::LightIntensityMod * lim = new Engine::LightIntensityMod(pl);
-	Engine::CameraMovement * cm = new Engine::CameraMovement(Engine::SceneManager::getInstance().getActiveScene()->getCamera());
+	Engine::TestImplementation::LightMovement * lm = new Engine::TestImplementation::LightMovement(pl);
+	Engine::TestImplementation::LightIntensityMod * lim = new Engine::TestImplementation::LightIntensityMod(pl);
+	Engine::TestImplementation::CameraMovement * cm = new Engine::TestImplementation::CameraMovement(Engine::SceneManager::getInstance().getActiveScene()->getCamera());
 
-	Engine::KeyboardHandlersTable::getInstance().registerHandler(lm);
-	Engine::KeyboardHandlersTable::getInstance().registerHandler(lim);
-	Engine::KeyboardHandlersTable::getInstance().registerHandler(cm);
-	Engine::KeyboardHandlersTable::getInstance().registerHandler(new Engine::RendererSwitcher());
+	Engine::KeyboardHandlersTable * handlers = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
+	handlers->registerHandler(lm);
+	handlers->registerHandler(lim);
+	handlers->registerHandler(cm);
+	handlers->registerHandler(new Engine::TestImplementation::RendererSwitcher());
 
-	Engine::CameraMotion * camMotion = new Engine::CameraMotion("camera_motion", Engine::SceneManager::getInstance().getActiveScene()->getCamera());
+	Engine::TestImplementation::CameraMotion * camMotion = new Engine::TestImplementation::CameraMotion("camera_motion", Engine::SceneManager::getInstance().getActiveScene()->getCamera());
 	
-	Engine::MouseEventManager::getInstance().registerMouseMotionHandler(camMotion);
+	Engine::MouseEventManager * mouseHandler = Engine::SceneManager::getInstance().getActiveScene()->getMouseHandler();
+	mouseHandler->registerMouseMotionHandler(camMotion);
 }
 
 void initRenderEngine()
@@ -393,7 +396,11 @@ void idleFunc()
 
 void keyboardFunc(unsigned char key, int x, int y)
 {
-	Engine::KeyboardHandlersTable::getInstance().handleKeyPress(key, x, y);
+	Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
+	if (table != NULL)
+	{
+		table->handleKeyPress(key, x, y);
+	}
 }
 
 void mouseFunc(int button, int state, int x, int y)
@@ -401,12 +408,20 @@ void mouseFunc(int button, int state, int x, int y)
 	// Left button = 0
 	// Pressed = 0
 	// Released = 0
-	Engine::MouseEventManager::getInstance().handleMouseClick(button, state, x, y);
+	Engine::MouseEventManager * manager = Engine::SceneManager::getInstance().getActiveScene()->getMouseHandler();
+	if (manager != NULL)
+	{
+		manager->handleMouseClick(button, state, x, y);
+	}
 }
 
 void motionFunc(int x, int y)
 {
 	// xMin, yMin = 0,0 (top-left corner)
 	// xMax, yMax = width,height (bottom-right corner)
-	Engine::MouseEventManager::getInstance().handleMouseMotion(x, y);
+	Engine::MouseEventManager * manager = Engine::SceneManager::getInstance().getActiveScene()->getMouseHandler();
+	if (manager != NULL)
+	{
+		manager->handleMouseMotion(x, y);
+	}
 }

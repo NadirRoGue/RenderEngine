@@ -7,19 +7,17 @@
 
 using namespace Engine;
 
-MouseEventManager * MouseEventManager::INSTANCE = new MouseEventManager();
-
-MouseEventManager & MouseEventManager::getInstance()
-{
-	return *INSTANCE;
-}
-
 MouseEventManager::MouseEventManager()
 {
 	lastButtonPressed = -1;
 
 	activeMouseHandler[0] = activeMouseHandler[1] = activeMouseHandler[2] = nullptr;
 	activeMotionHandler[0] = activeMotionHandler[1] = activeMotionHandler[2] = nullptr;
+}
+
+MouseEventManager::~MouseEventManager()
+{
+
 }
 
 void MouseEventManager::registerMouseHandler(MouseHandler * handler)
@@ -196,48 +194,4 @@ void MouseMotionHandler::handleMotion(int x, int y)
 void MouseMotionHandler::finishMotion()
 {
 
-}
-
-// =========================================================================
-
-CameraMotion::CameraMotion(std::string nam, Camera * cam)
-	:MouseMotionHandler(nam)
-{
-	camera = cam;
-	previousX = previousY = -1;
-
-	horizontalSpeed = 0.01f;
-	verticalSpeed = 0.01f;
-
-	usedButtons = { 0 };
-}
-
-void CameraMotion::handleMotion(int x, int y)
-{
-	if (camera != nullptr)
-	{
-		if (previousX == -1 && previousY == -1)
-		{
-			previousX = x;
-			previousY = y;
-		}
-		else
-		{
-			int deltaX = x - previousX;
-			int deltaY = y - previousY;
-
-			previousX = x;
-			previousY = y;
-
-			float hAngle = deltaX * horizontalSpeed;
-			float vAngle = deltaY * verticalSpeed;
-
-			camera->rotateView(glm::vec3(vAngle, hAngle, 0.0f));
-		}
-	}
-}
-
-void CameraMotion::finishMotion()
-{
-	previousX = previousY = -1;
 }

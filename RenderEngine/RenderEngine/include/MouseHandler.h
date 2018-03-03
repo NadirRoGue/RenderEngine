@@ -8,8 +8,6 @@
 #include <map>
 #include <list>
 
-#include "Camera.h"
-
 namespace Engine
 {
 	// =========================================================================
@@ -51,30 +49,8 @@ namespace Engine
 
 	// =========================================================================
 
-	class CameraMotion : public MouseMotionHandler
-	{
-	private:
-		Camera * camera;
-
-		int previousX, previousY;
-
-		float horizontalSpeed;
-		float verticalSpeed;
-	public:
-		CameraMotion(std::string nam, Camera * cam);
-		
-		void handleMotion(int x, int y);
-		void finishMotion();
-	};
-
-	// =========================================================================
-	// =========================================================================
-
 	class MouseEventManager
 	{
-	private:
-		static MouseEventManager * INSTANCE;
-
 	private:
 		MouseHandler * activeMouseHandler[3];
 		MouseMotionHandler * activeMotionHandler[3];
@@ -84,10 +60,8 @@ namespace Engine
 
 		int lastButtonPressed;
 
-	private:
-		MouseEventManager();
 	public:
-		static MouseEventManager & getInstance();
+		MouseEventManager();
 		~MouseEventManager();
 
 		void registerMouseHandler(MouseHandler * handler);
