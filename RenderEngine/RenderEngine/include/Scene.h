@@ -9,8 +9,10 @@
 #include "Program.h"
 #include "Object.h"
 #include "Light.h"
+
 #include "KeyboardHandler.h"
 #include "MouseHandler.h"
+#include "Animation.h"
 
 #include <map>
 #include <list>
@@ -31,6 +33,7 @@ namespace Engine
 	private:
 		KeyboardHandlersTable * keyboardHandlers;
 		MouseEventManager * mouseHandlers;
+		AnimationTable * animations;
 
 		Camera * camera;
 
@@ -74,6 +77,7 @@ namespace Engine
 
 		KeyboardHandlersTable * getKeyboardHandler() const;
 		MouseEventManager * getMouseHandler() const;
+		AnimationTable * getAnimationHandler() const;
 	private:
 		void configureNewProgramLights(Program * p);
 	};

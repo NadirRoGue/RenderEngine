@@ -10,17 +10,16 @@
 
 #include "ProgramTable.h"
 
-using namespace Engine;
-
-Scene::Scene()
+Engine::Scene::Scene()
 {
 	clearColor = glm::vec3(0, 0, 0);
 
-	keyboardHandlers = new KeyboardHandlersTable();
-	mouseHandlers = new MouseEventManager();
+	keyboardHandlers = new Engine::KeyboardHandlersTable();
+	mouseHandlers = new Engine::MouseEventManager();
+	animations = new Engine::AnimationTable();
 }
 
-Scene::~Scene()
+Engine::Scene::~Scene()
 {
 	if (keyboardHandlers != NULL)
 	{
@@ -31,33 +30,38 @@ Scene::~Scene()
 	{
 		delete mouseHandlers;
 	}
+
+	if (animations != NULL)
+	{
+		delete animations;
+	}
 }
 
-void Scene::setClearColor(glm::vec3 cc)
+void Engine::Scene::setClearColor(glm::vec3 cc)
 {
 	clearColor = cc;
-	std::map<std::string, ProgramRenderables *>::const_iterator renderableIt;
+	std::map<std::string, Engine::ProgramRenderables *>::const_iterator renderableIt;
 	for (renderableIt = renders.cbegin(); renderableIt != renders.cend(); renderableIt++)
 	{
 		renderableIt->second->program->configureClearColor(clearColor);
 	}
 }
 
-const glm::vec3 & Scene::getClearColor() const
+const glm::vec3 & Engine::Scene::getClearColor() const
 {
 	return clearColor;
 }
 
-void Scene::addObject(Object *obj)
+void Engine::Scene::addObject(Engine::Object *obj)
 {
 	std::string material = obj->getMeshInstance()->getMaterial();
 	unsigned int vaoIndex = obj->getMeshInstance()->vao;
 
-	std::map<std::string, ProgramRenderables *>::iterator renderIt = renders.find(material);
+	std::map<std::string, Engine::ProgramRenderables *>::iterator renderIt = renders.find(material);
 
 	if (renderIt == renders.end())
 	{
-		Program * prog = ProgramTable::getInstance().getProgramByName(material);
+		Program * prog = Engine::ProgramTable::getInstance().getProgramByName(material);
 
 		if(prog == nullptr)
 		{
@@ -66,7 +70,7 @@ void Scene::addObject(Object *obj)
 
 		configureNewProgramLights(prog);
 
-		ProgramRenderables * renderable = new ProgramRenderables(prog);
+		Engine::ProgramRenderables * renderable = new Engine::ProgramRenderables(prog);
 		renderable->objects[vaoIndex].push_back(obj);
 		renders[material] = renderable;
 	}
@@ -76,28 +80,28 @@ void Scene::addObject(Object *obj)
 	}
 }
 
-void Scene::addLightDependentProgram(Program * prog)
+void Engine::Scene::addLightDependentProgram(Engine::Program * prog)
 {
 	lightDependentPrograms.push_back(prog);
 }
 
-void Scene::configureNewProgramLights(Program * p)
+void Engine::Scene::configureNewProgramLights(Engine::Program * p)
 {
-	std::map<std::string, PointLight *>::iterator it = pointLights.begin();
+	std::map<std::string, Engine::PointLight *>::iterator it = pointLights.begin();
 	while (it != pointLights.end())
 	{
 		p->configurePointLightBuffer(it->second);
 		it++;
 	}
 
-	std::map<std::string, SpotLight *>::iterator sIt = spotLights.begin();
+	std::map<std::string, Engine::SpotLight *>::iterator sIt = spotLights.begin();
 	while (sIt != spotLights.end())
 	{
 		p->configureSpotLightBuffer(sIt->second);
 		sIt++;
 	}
 
-	std::map<std::string, DirectionalLight *>::iterator dIt = directionalLights.begin();
+	std::map<std::string, Engine::DirectionalLight *>::iterator dIt = directionalLights.begin();
 	while (dIt != directionalLights.end())
 	{
 		p->configureDirectionalLightBuffer(dIt->second);
@@ -105,18 +109,18 @@ void Scene::configureNewProgramLights(Program * p)
 	}
 }
 
-void Scene::addPointLight(PointLight * pl)
+void Engine::Scene::addPointLight(Engine::PointLight * pl)
 {
 	pointLights[pl->getName()] = pl;
 
 	triggerLightUpdate(pl);
 }
 
-void Scene::addSpotLight(SpotLight * sl)
+void Engine::Scene::addSpotLight(Engine::SpotLight * sl)
 {
 	spotLights[sl->getName()] = sl;
 
-	std::map<std::string, ProgramRenderables *>::iterator it = renders.begin();
+	std::map<std::string, Engine::ProgramRenderables *>::iterator it = renders.begin();
 	while (it != renders.end())
 	{
 		it->second->program->configureSpotLightBuffer(sl);
@@ -124,11 +128,11 @@ void Scene::addSpotLight(SpotLight * sl)
 	}
 }
 
-void Scene::addDirectionalLight(DirectionalLight * dl)
+void Engine::Scene::addDirectionalLight(Engine::DirectionalLight * dl)
 {
 	directionalLights[dl->getName()] = dl;
 
-	std::map<std::string, ProgramRenderables *>::iterator it = renders.begin();
+	std::map<std::string, Engine::ProgramRenderables *>::iterator it = renders.begin();
 	while (it != renders.end())
 	{
 		it->second->program->configureDirectionalLightBuffer(dl);
@@ -136,16 +140,16 @@ void Scene::addDirectionalLight(DirectionalLight * dl)
 	}
 }
 
-void Scene::triggerLightUpdate(PointLight *pl)
+void Engine::Scene::triggerLightUpdate(PointLight *pl)
 {
-	std::map<std::string, ProgramRenderables *>::iterator it = renders.begin();
+	std::map<std::string, Engine::ProgramRenderables *>::iterator it = renders.begin();
 	while (it != renders.end())
 	{
 		it->second->program->configurePointLightBuffer(pl);
 		it++;
 	}
 
-	std::list<Program *>::iterator it2 = lightDependentPrograms.begin();
+	std::list<Engine::Program *>::iterator it2 = lightDependentPrograms.begin();
 	while (it2 != lightDependentPrograms.end())
 	{
 		(*it2)->configurePointLightBuffer(pl);
@@ -153,9 +157,9 @@ void Scene::triggerLightUpdate(PointLight *pl)
 	}
 }
 
-PointLight * Scene::getLightByName(std::string name)
+Engine::PointLight * Engine::Scene::getLightByName(std::string name)
 {
-	std::map<std::string, PointLight *>::iterator it = pointLights.find(name);
+	std::map<std::string, Engine::PointLight *>::iterator it = pointLights.find(name);
 	if (it != pointLights.end())
 	{
 		return it->second;
@@ -164,9 +168,9 @@ PointLight * Scene::getLightByName(std::string name)
 	return NULL;
 }
 
-SpotLight * Scene::getSpotLightByName(std::string name)
+Engine::SpotLight * Engine::Scene::getSpotLightByName(std::string name)
 {
-	std::map<std::string, SpotLight *>::iterator it = spotLights.find(name);
+	std::map<std::string, Engine::SpotLight *>::iterator it = spotLights.find(name);
 	if (it != spotLights.end())
 	{
 		return it->second;
@@ -175,9 +179,9 @@ SpotLight * Scene::getSpotLightByName(std::string name)
 	return NULL;
 }
 
-DirectionalLight * Scene::getDirectionalLightByName(std::string name)
+Engine::DirectionalLight * Engine::Scene::getDirectionalLightByName(std::string name)
 {
-	std::map<std::string, DirectionalLight *>::iterator it = directionalLights.find(name);
+	std::map<std::string, Engine::DirectionalLight *>::iterator it = directionalLights.find(name);
 	if (it != directionalLights.end())
 	{
 		return it->second;
@@ -186,77 +190,82 @@ DirectionalLight * Scene::getDirectionalLightByName(std::string name)
 	return NULL;
 }
 
-void Scene::setCamera(Camera * cam)
+void Engine::Scene::setCamera(Engine::Camera * cam)
 {
 	camera = cam;
 }
 
-Camera * Scene::getCamera()
+Engine::Camera * Engine::Scene::getCamera()
 {
 	return camera;
 }
 
-const std::map<std::string, ProgramRenderables *> & Scene::getObjects() const
+const std::map<std::string, Engine::ProgramRenderables *> & Engine::Scene::getObjects() const
 {
 	return renders;
 }
 
-const std::map<std::string, PointLight *> & Scene::getPointLights() const
+const std::map<std::string, Engine::PointLight *> & Engine::Scene::getPointLights() const
 {
 	return pointLights;
 }
 
-const std::map<std::string, SpotLight *> & Scene::getSpotLights() const
+const std::map<std::string, Engine::SpotLight *> & Engine::Scene::getSpotLights() const
 {
 	return spotLights;
 }
 
-const std::map<std::string, DirectionalLight *> Scene::getDirectionalLight() const
+const std::map<std::string, Engine::DirectionalLight *> Engine::Scene::getDirectionalLight() const
 {
 	return directionalLights;
 }
 
-void Scene::onViewportResize(int width, int height)
+void Engine::Scene::onViewportResize(int width, int height)
 {
 	camera->onWindowResize(width, height);
 }
 
-KeyboardHandlersTable * Scene::getKeyboardHandler() const
+Engine::KeyboardHandlersTable * Engine::Scene::getKeyboardHandler() const
 {
 	return keyboardHandlers;
 }
 
-MouseEventManager * Scene::getMouseHandler() const
+Engine::MouseEventManager * Engine::Scene::getMouseHandler() const
 {
 	return mouseHandlers;
 }
 
+Engine::AnimationTable * Engine::Scene::getAnimationHandler() const
+{
+	return animations;
+}
+
 // ===========================================================================================
 
-ProgramRenderables::ProgramRenderables(Program * prog)
+Engine::ProgramRenderables::ProgramRenderables(Program * prog)
 {
 	program = prog;
 }
 
 // ===========================================================================================
 
-SceneManager * SceneManager::INSTANCE = new SceneManager();
+Engine::SceneManager * Engine::SceneManager::INSTANCE = new Engine::SceneManager();
 
-SceneManager & SceneManager::getInstance()
+Engine::SceneManager & Engine::SceneManager::getInstance()
 {
 	return *INSTANCE;
 }
 
-SceneManager::SceneManager()
+Engine::SceneManager::SceneManager()
 {
 	activeScene = 0;
 }
 
-SceneManager::~SceneManager()
+Engine::SceneManager::~SceneManager()
 {
 }
 
-bool SceneManager::registerScene(std::string name, Scene * s)
+bool Engine::SceneManager::registerScene(std::string name, Engine::Scene * s)
 {
 	std::map<std::string, Scene *>::iterator it = scenes.find(name);
 	if (it != scenes.end())
@@ -268,9 +277,9 @@ bool SceneManager::registerScene(std::string name, Scene * s)
 	return true;
 }
 
-Scene * SceneManager::getScene(std::string name)
+Engine::Scene * Engine::SceneManager::getScene(std::string name)
 {
-	std::map<std::string, Scene *>::iterator it = scenes.find(name);
+	std::map<std::string, Engine::Scene *>::iterator it = scenes.find(name);
 	if (it != scenes.end())
 	{
 		return NULL;
@@ -279,16 +288,16 @@ Scene * SceneManager::getScene(std::string name)
 	return scenes[name];
 }
 
-void SceneManager::activateScene(std::string name)
+void Engine::SceneManager::activateScene(std::string name)
 {
-	std::map<std::string, Scene *>::iterator it = scenes.find(name);
+	std::map<std::string, Engine::Scene *>::iterator it = scenes.find(name);
 	if (it != scenes.end())
 	{
 		activeScene = it->second;
 	}
 }
 
-Scene * SceneManager::getActiveScene()
+Engine::Scene * Engine::SceneManager::getActiveScene()
 {
 	return activeScene;
 }

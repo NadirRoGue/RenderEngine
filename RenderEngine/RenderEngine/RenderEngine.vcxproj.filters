@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Archivos de encabezado\testimplementation">
+      <UniqueIdentifier>{2d0c34cd-cbac-422f-a6cc-739d9d2f8e7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\testimplementation">
+      <UniqueIdentifier>{2b047032-e0d7-4d67-9221-4c62e3056afe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Animation.h">
@@ -84,8 +90,11 @@
     <ClInclude Include="include\CustomMaths.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="include\InputImpl.h">
-      <Filter>Archivos de encabezado</Filter>
+    <ClInclude Include="testimplementation\InputImpl.h">
+      <Filter>Archivos de encabezado\testimplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="testimplementation\AnimImpl.h">
+      <Filter>Archivos de encabezado\testimplementation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -155,8 +164,11 @@
     <ClCompile Include="src\CustomMaths.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="src\InputImpl.cpp">
-      <Filter>Archivos de origen</Filter>
+    <ClCompile Include="testimplementation\InputImpl.cpp">
+      <Filter>Archivos de origen\testimplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="testimplementation\AnimImpl.cpp">
+      <Filter>Archivos de origen\testimplementation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

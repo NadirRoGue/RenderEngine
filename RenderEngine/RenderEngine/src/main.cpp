@@ -23,11 +23,12 @@
 #include "Light.h"
 #include "KeyboardHandler.h"
 #include "MouseHandler.h"
-#include "Animation.h"
 #include "Renderer.h"
 #include "PostProcessManager.h"
 #include "DeferredRenderObject.h"
+
 #include "InputImpl.h"
+#include "AnimImpl.h"
 
 
 //////////////////////////////////////////////////////////////
@@ -129,7 +130,6 @@ void destroy()
 	Engine::MeshInstanceTable::getInstance().destroy();
 	Engine::ProgramTable::getInstance().destroyAllPrograms();
 	Engine::TextureTable::getInstance().destroy();
-	Engine::AnimationTable::getInstance().destroy();
 }
 
 void initScene()
@@ -269,12 +269,12 @@ void initSceneObj()
 		Engine::Object * obj1 = new Engine::Object(mi);
 		scene->addObject(obj1);
 
-		Engine::AnimationTable::getInstance().registerAnimation(new Engine::DefaultCubeSpin("cube1_anim", obj1));
+		scene->getAnimationHandler()->registerAnimation(new Engine::TestImplementation::DefaultCubeSpin("cube1_anim", obj1));
 
 		Engine::Object * obj2 = new Engine::Object(mi);
 		obj2->translate(glm::vec3(-5, 0, 0));
 
-		Engine::AnimationTable::getInstance().registerAnimation(new Engine::OrbitingCube("cube2_anim", obj2));
+		scene->getAnimationHandler()->registerAnimation(new Engine::TestImplementation::OrbitingCube("cube2_anim", obj2));
 
 		scene->addObject(obj2);
 
@@ -294,7 +294,7 @@ void initSceneObj()
 		textureObject->setNormalMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/normal.png"));
 		textureObject->setSpecularMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/specMap.png"));
 
-		Engine::AnimationTable::getInstance().registerAnimation(new Engine::DefaultCubeSpin("textured_cube_anim", textureObject));
+		scene->getAnimationHandler()->registerAnimation(new Engine::TestImplementation::DefaultCubeSpin("textured_cube_anim", textureObject));
 
 		scene->addObject(textureObject);
 
@@ -305,7 +305,7 @@ void initSceneObj()
 		textureObject2->setNormalMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/normal.png"));
 		textureObject2->setSpecularMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/specMap.png"));
 
-		Engine::AnimationTable::getInstance().registerAnimation(new Engine::BezierOrbitingCube("bezier_curve_anim", textureObject2));
+		scene->getAnimationHandler()->registerAnimation(new Engine::TestImplementation::BezierOrbitingCube("bezier_curve_anim", textureObject2));
 
 		scene->addObject(textureObject2);
 	}
@@ -390,7 +390,7 @@ void resizeFunc(int width, int height)
 
 void idleFunc()
 {
-	Engine::AnimationTable::getInstance().tick();
+	Engine::SceneManager::getInstance().getActiveScene()->getAnimationHandler()->tick();
 	glutPostRedisplay();
 }
 
