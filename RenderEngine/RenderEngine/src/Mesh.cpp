@@ -10,15 +10,13 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-using namespace Engine;
-
-Mesh::Mesh()
+Engine::Mesh::Mesh()
 {
 	faces = 0;
 	vertices = colors = normals = tangents = uvs = 0;
 }
 
-Mesh::Mesh(aiMesh * mesh) 
+Engine::Mesh::Mesh(aiMesh * mesh)
 {
 	faces = 0;
 	vertices = colors = normals = tangents = uvs = 0;
@@ -26,7 +24,7 @@ Mesh::Mesh(aiMesh * mesh)
 	loadFromMesh(mesh);
 }
 
-Mesh::Mesh(const Mesh &other)
+Engine::Mesh::Mesh(const Engine::Mesh &other)
 {
 	faces = 0;
 	vertices = colors = normals = tangents = uvs = 0;
@@ -74,7 +72,7 @@ Mesh::Mesh(const Mesh &other)
 	}
 }
 
-Mesh::Mesh(const unsigned int numF, const unsigned int numV, const unsigned int *f, const float *v, const float *c, const float *n, const float *uv, const float *t)
+Engine::Mesh::Mesh(const unsigned int numF, const unsigned int numV, const unsigned int *f, const float *v, const float *c, const float *n, const float *uv, const float *t)
 	:numFaces(numF), numVertices(numV)
 {
 	faces = 0;
@@ -124,7 +122,7 @@ Mesh::Mesh(const unsigned int numF, const unsigned int numV, const unsigned int 
 	}
 }
 
-void Mesh::loadFromMesh(aiMesh * mesh)
+void Engine::Mesh::loadFromMesh(aiMesh * mesh)
 {
 	extractTopology(mesh);
 	extractGeometry(mesh);
@@ -132,7 +130,7 @@ void Mesh::loadFromMesh(aiMesh * mesh)
 	computeTangents();
 }
 
-Mesh::~Mesh()
+Engine::Mesh::~Mesh()
 {
 	if(faces != nullptr)
 		delete[] faces;
@@ -153,7 +151,7 @@ Mesh::~Mesh()
 		delete[] tangents;
 }
 
-void Mesh::extractTopology(aiMesh * mesh)
+void Engine::Mesh::extractTopology(aiMesh * mesh)
 {
 	numFaces = mesh->mNumFaces;
 
@@ -166,7 +164,7 @@ void Mesh::extractTopology(aiMesh * mesh)
 	}
 }
 
-void Mesh::extractGeometry(aiMesh * mesh)
+void Engine::Mesh::extractGeometry(aiMesh * mesh)
 {
 	numVertices = mesh->mNumVertices;
 
@@ -190,7 +188,7 @@ void Mesh::extractGeometry(aiMesh * mesh)
 	}
 }
 
-void Mesh::computeNormals()
+void Engine::Mesh::computeNormals()
 {
 	std::vector<glm::vec3> perfaceNormals;
 	perfaceNormals.resize(numVertices, glm::vec3(0, 0, 0));
@@ -243,7 +241,7 @@ void Mesh::computeNormals()
 	}
 }
 
-void Mesh::computeTangents()
+void Engine::Mesh::computeTangents()
 {
 	std::vector<glm::vec3> perFaceTangents;
 	perFaceTangents.resize(numVertices, glm::vec3(0, 0, 0));
@@ -311,42 +309,42 @@ void Mesh::computeTangents()
 	}
 }
 
-unsigned int Mesh::getNumFaces()
+unsigned int Engine::Mesh::getNumFaces()
 {
 	return numFaces;
 }
 
-unsigned int Mesh::getNumVertices()
+unsigned int Engine::Mesh::getNumVertices()
 {
 	return numVertices;
 }
 
-unsigned int * Mesh::getFaces()
+unsigned int * Engine::Mesh::getFaces()
 {
 	return faces;
 }
 
-float * Mesh::getVertices()
+float * Engine::Mesh::getVertices()
 {
 	return vertices;
 }
 
-float * Mesh::getColor()
+float * Engine::Mesh::getColor()
 {
 	return colors;
 }
 
-float * Mesh::getNormals()
+float * Engine::Mesh::getNormals()
 {
 	return normals;
 }
 
-float * Mesh::getUVs()
+float * Engine::Mesh::getUVs()
 {
 	return uvs;
 }
 
-float * Mesh::getTangetns()
+float * Engine::Mesh::getTangetns()
 {
 	return tangents;
 }

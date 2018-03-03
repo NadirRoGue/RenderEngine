@@ -6,9 +6,7 @@
 
 #include <iostream>
 
-using namespace Engine;
-
-GLenum DeferredRenderObject::COLOR_ATTACHMENTS[8] =
+GLenum Engine::DeferredRenderObject::COLOR_ATTACHMENTS[8] =
 {
 	GL_COLOR_ATTACHMENT0,
 	GL_COLOR_ATTACHMENT1,
@@ -20,20 +18,20 @@ GLenum DeferredRenderObject::COLOR_ATTACHMENTS[8] =
 	GL_COLOR_ATTACHMENT7
 };
 
-DeferredRenderObject::DeferredRenderObject(unsigned int numBuffers, bool renderDepth)
+Engine::DeferredRenderObject::DeferredRenderObject(unsigned int numBuffers, bool renderDepth)
 	:colorBuffersSize(numBuffers),renderDepth(renderDepth)
 {
 	colorBuffers = 0;
 	if (numBuffers > 0)
 	{
-		colorBuffers = new BufferInfo[numBuffers];
+		colorBuffers = new Engine::BufferInfo[numBuffers];
 	}
 	usedColorBuffers = 0;
 
 	depthBuffer.texture = 0;
 }
 
-DeferredRenderObject::~DeferredRenderObject()
+Engine::DeferredRenderObject::~DeferredRenderObject()
 {
 	if (colorBuffers != 0)
 	{
@@ -41,12 +39,12 @@ DeferredRenderObject::~DeferredRenderObject()
 	}
 }
 
-unsigned int DeferredRenderObject::getFrameBufferId()
+unsigned int Engine::DeferredRenderObject::getFrameBufferId()
 {
 	return fbo;
 }
 
-void DeferredRenderObject::addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, float filterMethod)
+void Engine::DeferredRenderObject::addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, float filterMethod)
 {
 	if (index < 0 || index > colorBuffersSize || usedColorBuffers >= 8)
 		exit(-1);
@@ -54,13 +52,13 @@ void DeferredRenderObject::addColorBuffer(unsigned int index, GLenum gpuTextureF
 	GLenum colorAttachment = COLOR_ATTACHMENTS[usedColorBuffers];
 	usedColorBuffers++;
 
-	Texture * texture = new Texture("", 0, w, h);
+	Engine::Texture * texture = new Engine::Texture("", 0, w, h);
 	texture->setGenerateMipMaps(false);
 	texture->setMemoryLayoutFormat(gpuTextureFormat);
 	texture->setImageFormatType(inputTextureFormat);
 	texture->setPixelFormatType(pixelFormat);
 
-	TextureInstance * ti = new TextureInstance(texture);
+	Engine::TextureInstance * ti = new Engine::TextureInstance(texture);
 	ti->setMagnificationFilterType(filterMethod);
 	ti->setMinificationFilterType(filterMethod);
 	ti->setAnisotropicFilterEnabled(false);
@@ -71,7 +69,7 @@ void DeferredRenderObject::addColorBuffer(unsigned int index, GLenum gpuTextureF
 	colorBuffers[index].texture = ti;
 }
 
-void DeferredRenderObject::addDepthBuffer24(unsigned int w, unsigned int h)
+void Engine::DeferredRenderObject::addDepthBuffer24(unsigned int w, unsigned int h)
 {
 	if (depthBuffer.texture != 0)
 	{
@@ -79,13 +77,13 @@ void DeferredRenderObject::addDepthBuffer24(unsigned int w, unsigned int h)
 		delete depthBuffer.texture;
 	}
 
-	Texture * texture = new Texture("", 0, w, h);
+	Engine::Texture * texture = new Engine::Texture("", 0, w, h);
 	texture->setGenerateMipMaps(false);
 	texture->setMemoryLayoutFormat(GL_DEPTH_COMPONENT24);
 	texture->setImageFormatType(GL_DEPTH_COMPONENT);
 	texture->setPixelFormatType(GL_UNSIGNED_BYTE);
 	
-	TextureInstance * textureInstance = new TextureInstance(texture);
+	Engine::TextureInstance * textureInstance = new Engine::TextureInstance(texture);
 	textureInstance->setAnisotropicFilterEnabled(false);
 	textureInstance->setMagnificationFilterType(GL_NEAREST);
 	textureInstance->setMinificationFilterType(GL_NEAREST);
@@ -94,21 +92,20 @@ void DeferredRenderObject::addDepthBuffer24(unsigned int w, unsigned int h)
 	depthBuffer.texture = textureInstance;
 }
 
-void DeferredRenderObject::addDepthBuffer32(unsigned int w, unsigned int h)
+void Engine::DeferredRenderObject::addDepthBuffer32(unsigned int w, unsigned int h)
 {
 	if (depthBuffer.texture != 0)
 	{
-		depthBuffer.texture->~TextureInstance();
 		delete depthBuffer.texture;
 	}
 
-	Texture * texture = new Texture("", 0, w, h);
+	Engine::Texture * texture = new Engine::Texture("", 0, w, h);
 	texture->setGenerateMipMaps(false);
 	texture->setMemoryLayoutFormat(GL_DEPTH_COMPONENT32);
 	texture->setImageFormatType(GL_DEPTH_COMPONENT);
 	texture->setPixelFormatType(GL_UNSIGNED_BYTE);
 
-	TextureInstance * textureInstance = new TextureInstance(texture);
+	Engine::TextureInstance * textureInstance = new Engine::TextureInstance(texture);
 	textureInstance->setAnisotropicFilterEnabled(false);
 	textureInstance->setMagnificationFilterType(GL_NEAREST);
 	textureInstance->setMinificationFilterType(GL_NEAREST);
@@ -117,7 +114,7 @@ void DeferredRenderObject::addDepthBuffer32(unsigned int w, unsigned int h)
 	depthBuffer.texture = textureInstance;
 }
 
-void DeferredRenderObject::initialize()
+void Engine::DeferredRenderObject::initialize()
 {
 	glGenFramebuffers(1, &fbo);
 	for (unsigned int i = 0; i < colorBuffersSize; i++)
@@ -128,7 +125,7 @@ void DeferredRenderObject::initialize()
 	depthBuffer.texture->generateTexture();
 }
 
-void DeferredRenderObject::resizeFBO(unsigned int w, unsigned int h)
+void Engine::DeferredRenderObject::resizeFBO(unsigned int w, unsigned int h)
 {
 	for (unsigned int i = 0; i < colorBuffersSize; i++)
 	{
@@ -158,7 +155,7 @@ void DeferredRenderObject::resizeFBO(unsigned int w, unsigned int h)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void DeferredRenderObject::populateDeferredObject(Object * object)
+void Engine::DeferredRenderObject::populateDeferredObject(Engine::Object * object)
 {
 	for (unsigned int i = 0; i < colorBuffersSize; i++)
 	{

@@ -11,29 +11,26 @@
 #include "MeshLoader.h"
 #include "ProgramTable.h"
 
+Engine::MeshInstanceTable * Engine::MeshInstanceTable::INSTANCE = new Engine::MeshInstanceTable();
 
-using namespace Engine;
-
-MeshInstanceTable * MeshInstanceTable::INSTANCE = new MeshInstanceTable();
-
-MeshInstanceTable::MeshInstanceTable()
+Engine::MeshInstanceTable::MeshInstanceTable()
 {
 
 }
 
-MeshInstanceTable::~MeshInstanceTable()
+Engine::MeshInstanceTable::~MeshInstanceTable()
 {
 
 }
 
-MeshInstanceTable & MeshInstanceTable::getInstance()
+Engine::MeshInstanceTable & Engine::MeshInstanceTable::getInstance()
 {
 	return *INSTANCE;
 }
 
-bool MeshInstanceTable::instantiateMesh(std::string meshName, std::string programName)
+bool Engine::MeshInstanceTable::instantiateMesh(std::string meshName, std::string programName)
 {
-	Mesh * mesh = MeshLoader::getInstance().getMesh(meshName);
+	Engine::Mesh * mesh = Engine::MeshLoader::getInstance().getMesh(meshName);
 
 	if (mesh == NULL)
 	{
@@ -41,26 +38,26 @@ bool MeshInstanceTable::instantiateMesh(std::string meshName, std::string progra
 		return false;
 	}
 
-	Program * prog = ProgramTable::getInstance().getProgramByName(programName);
+	Engine::Program * prog = Engine::ProgramTable::getInstance().getProgramByName(programName);
 	if (prog == nullptr)
 	{
 		std::cout << "MeshInstanceTable: Could not create instance of mesh " << meshName << " -> Could not find program: " << programName << std::endl;
 		return false;
 	}
 
-	MeshInstance * mi = new MeshInstance(mesh, programName);
+	Engine::MeshInstance * mi = new Engine::MeshInstance(mesh, programName);
 	prog->configureMeshBuffers(mi);
 	addMeshInstanceToCache(meshName, mi);
 
 	return true;
 }
 
-void MeshInstanceTable::addMeshInstanceToCache(std::string meshName, MeshInstance * mi)
+void Engine::MeshInstanceTable::addMeshInstanceToCache(std::string meshName, Engine::MeshInstance * mi)
 {
-	std::map<std::string, std::map<std::string, MeshInstance *>>::iterator it = instanceTable.find(meshName);
+	std::map<std::string, std::map<std::string, Engine::MeshInstance *>>::iterator it = instanceTable.find(meshName);
 	if (it != instanceTable.end())
 	{
-		std::map<std::string, MeshInstance *>::iterator it2 = it->second.find(mi->getMaterial());
+		std::map<std::string, Engine::MeshInstance *>::iterator it2 = it->second.find(mi->getMaterial());
 		if (it2 != it->second.end())
 		{
 			//instanceTable[meshName][mi->getMaterial()] = mi;
@@ -77,17 +74,17 @@ void MeshInstanceTable::addMeshInstanceToCache(std::string meshName, MeshInstanc
 	}
 }
 
-MeshInstance * MeshInstanceTable::getMeshInstance(std::string meshName, std::string program)
+Engine::MeshInstance * Engine::MeshInstanceTable::getMeshInstance(std::string meshName, std::string program)
 {
-	std::map<std::string, std::map<std::string, MeshInstance *>>::iterator it = instanceTable.find(meshName);
+	std::map<std::string, std::map<std::string, Engine::MeshInstance *>>::iterator it = instanceTable.find(meshName);
 	if (it == instanceTable.end())
 	{
 		return NULL;
 	}
 	else
 	{
-		std::map<std::string, MeshInstance *> & meshCache = it->second;
-		std::map<std::string, MeshInstance *>::iterator it2 = meshCache.find(program);
+		std::map<std::string, Engine::MeshInstance *> & meshCache = it->second;
+		std::map<std::string, Engine::MeshInstance *>::iterator it2 = meshCache.find(program);
 
 		if (it2 == meshCache.end())
 		{
@@ -100,20 +97,20 @@ MeshInstance * MeshInstanceTable::getMeshInstance(std::string meshName, std::str
 	}
 }
 
-void MeshInstanceTable::destroy()
+void Engine::MeshInstanceTable::destroy()
 {
-	std::map<std::string, std::map<std::string, MeshInstance *>>::iterator it;
+	std::map<std::string, std::map<std::string, Engine::MeshInstance *>>::iterator it;
 
 	// Iterate over all the different meshes
 	for (it = instanceTable.begin(); it != instanceTable.end(); it++)
 	{
-		std::map<std::string, MeshInstance *> meshInstances = it->second;
-		std::map<std::string, MeshInstance *>::iterator instancesIt;
+		std::map<std::string, Engine::MeshInstance *> meshInstances = it->second;
+		std::map<std::string, Engine::MeshInstance *>::iterator instancesIt;
 
 		// Iterate over all the used shaders for this mesh
 		for (instancesIt = meshInstances.begin(); instancesIt != meshInstances.end(); instancesIt++)
 		{
-			Program * prog = ProgramTable::getInstance().getProgramByName(instancesIt->first);
+			Engine::Program * prog = Engine::ProgramTable::getInstance().getProgramByName(instancesIt->first);
 
 			if (prog != nullptr)
 			{

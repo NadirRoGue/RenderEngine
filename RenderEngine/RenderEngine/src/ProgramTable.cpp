@@ -7,25 +7,23 @@
 
 #include <iostream>
 
-using namespace Engine;
+Engine::ProgramTable * Engine::ProgramTable::INSTANCE = new Engine::ProgramTable();
 
-ProgramTable * ProgramTable::INSTANCE = new ProgramTable();
-
-ProgramTable & ProgramTable::getInstance()
+Engine::ProgramTable & Engine::ProgramTable::getInstance()
 {
 	return *INSTANCE;
 }
 
-ProgramTable::ProgramTable()
+Engine::ProgramTable::ProgramTable()
 {
 }
 
-ProgramTable::~ProgramTable()
+Engine::ProgramTable::~ProgramTable()
 {
 	//delete INSTANCE;
 }
 
-bool ProgramTable::createProgram(Program * program, const char *vertexShader, const char *fragmentShader)
+bool Engine::ProgramTable::createProgram(Engine::Program * program, const char *vertexShader, const char *fragmentShader)
 {
 	// Duplicate program name
 	if (table.find(program->getName()) != table.end())
@@ -41,9 +39,9 @@ bool ProgramTable::createProgram(Program * program, const char *vertexShader, co
 	return true;
 }
 
-Program * ProgramTable::getProgramByName(std::string name)
+Engine::Program * Engine::ProgramTable::getProgramByName(std::string name)
 {
-	std::map<std::string, Program *>::iterator it = table.find(name);
+	std::map<std::string, Engine::Program *>::iterator it = table.find(name);
 
 	if (it == table.end())
 	{
@@ -54,7 +52,7 @@ Program * ProgramTable::getProgramByName(std::string name)
 	return it->second;
 }
 
-int ProgramTable::getProgramIdByName(std::string & name)
+int Engine::ProgramTable::getProgramIdByName(std::string & name)
 {
 	std::map<std::string, Program *>::iterator it = table.find(name);
 
@@ -66,9 +64,9 @@ int ProgramTable::getProgramIdByName(std::string & name)
 	return it->second->getProgramId();
 }
 
-void ProgramTable::destroyAllPrograms()
+void Engine::ProgramTable::destroyAllPrograms()
 {
-	std::map<std::string, Program *>::iterator it = table.begin();
+	std::map<std::string, Engine::Program *>::iterator it = table.begin();
 	while (it != table.end())
 	{
 		it->second->destroy();

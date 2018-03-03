@@ -8,34 +8,30 @@
 #include <assimp\cimport.h>
 #include <assimp\postprocess.h>
 
-using namespace Engine;
+Engine::MeshLoader * Engine::MeshLoader::INSTANCE = new Engine::MeshLoader();
 
-MeshLoader * MeshLoader::INSTANCE = new MeshLoader();
-
-MeshLoader & MeshLoader::getInstance()
+Engine::MeshLoader & Engine::MeshLoader::getInstance()
 {
 	return *INSTANCE;
 }
 
-MeshLoader::MeshLoader() 
+Engine::MeshLoader::MeshLoader()
 {
 }
 
-MeshLoader::~MeshLoader()
+Engine::MeshLoader::~MeshLoader()
 {
-	for (std::map<std::string, Mesh*>::iterator it = meshCache.begin(); it != meshCache.end(); it++)
+	for (std::map<std::string, Engine::Mesh*>::iterator it = meshCache.begin(); it != meshCache.end(); it++)
 	{
 		it->second->~Mesh();
 	}
 
 	meshCache.clear();
-
-	//delete INSTANCE;
 }
 
-Mesh * MeshLoader::getMesh(std::string filename)
+Engine::Mesh * Engine::MeshLoader::getMesh(std::string filename)
 {
-	std::map<std::string, Mesh *>::iterator it = meshCache.find(filename);
+	std::map<std::string, Engine::Mesh *>::iterator it = meshCache.find(filename);
 	if (it != meshCache.end())
 	{
 		return meshCache[filename];
@@ -65,18 +61,18 @@ Mesh * MeshLoader::getMesh(std::string filename)
 	return NULL;
 }
 
-void MeshLoader::addMeshToCache(std::string name, Mesh & mesh)
+void Engine::MeshLoader::addMeshToCache(std::string name, Engine::Mesh & mesh)
 {
-	std::map<std::string, Mesh* >::iterator it = meshCache.find(name);
+	std::map<std::string, Engine::Mesh* >::iterator it = meshCache.find(name);
 	if (it == meshCache.end())
 	{
-		meshCache[name] = new Mesh(mesh);
+		meshCache[name] = new Engine::Mesh(mesh);
 	}
 }
 
-void MeshLoader::destroy()
+void Engine::MeshLoader::destroy()
 {
-	std::map<std::string, Mesh* >::iterator it = meshCache.begin();
+	std::map<std::string, Engine::Mesh* >::iterator it = meshCache.begin();
 	while (it != meshCache.end())
 	{
 		delete it->second;

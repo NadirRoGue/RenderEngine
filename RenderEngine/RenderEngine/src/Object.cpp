@@ -9,14 +9,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-using namespace Engine;
+std::string Engine::Object::ALBEDO_TEX = "albedo";
+std::string Engine::Object::NORMAL_TEX = "normal";
+std::string Engine::Object::EMISSIVE_TEX = "emissive";
+std::string Engine::Object::SPECULAR_TEX = "specular";
 
-std::string Object::ALBEDO_TEX = "albedo";
-std::string Object::NORMAL_TEX = "normal";
-std::string Object::EMISSIVE_TEX = "emissive";
-std::string Object::SPECULAR_TEX = "specular";
-
-Object::Object(MeshInstance * mi)
+Engine::Object::Object(Engine::MeshInstance * mi)
 	:meshInstance(mi)
 {
 	modelMatrix = glm::mat4(1.0f);
@@ -28,72 +26,54 @@ Object::Object(MeshInstance * mi)
 	albedo = normal = specular = emissive = 0;
 }
 
-Object::~Object()
+Engine::Object::~Object()
 {
 
 }
 
-const glm::mat4 & Object::getModelMatrix() const
+const glm::mat4 & Engine::Object::getModelMatrix() const
 {
 	return modelMatrix;
 }
 
-MeshInstance * Object::getMeshInstance()
+Engine::MeshInstance * Engine::Object::getMeshInstance()
 {
 	return meshInstance;
 }
 
-Mesh * Object::getMesh()
+Engine::Mesh * Engine::Object::getMesh()
 {
 	return meshInstance->getMesh();
 }
 
-void Object::rotate(float angle, glm::vec3 r)
+void Engine::Object::rotate(float angle, glm::vec3 r)
 {
 	rotation += r;
 	angleR = angle;
 
-	/*modelMatrix = glm::mat4(1.0f);
-	glm::mat4 transMat = glm::translate(glm::mat4(1.0f), translation);
-	glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), angleR, rotation);
-
-	modelMatrix = transMat * rotMat;*/
 	updateModelMatrix();
 }
 
-void Object::translate(glm::vec3 t)
+void Engine::Object::translate(glm::vec3 t)
 {
 	translation += t;
 
-	/*modelMatrix = glm::mat4(1.0f);
-	glm::mat4 transMat = glm::translate(glm::mat4(1.0f), translation);
-	glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), angleR, rotation);
-
-	modelMatrix = transMat * rotMat;*/
 	updateModelMatrix();
 }
 
-void Object::scale(glm::vec3 s)
+void Engine::Object::scale(glm::vec3 s)
 {
 	scaleVector = s;
 	updateModelMatrix();
 }
 
-void Object::setModelMatrix(const glm::mat4 & matrix)
+void Engine::Object::setModelMatrix(const glm::mat4 & matrix)
 {
 	modelMatrix = glm::mat4(matrix);
 }
 
-void Object::updateModelMatrix()
+void Engine::Object::updateModelMatrix()
 {
-	/*glm::quat q = glm::quat(rotation);
-	q = glm::normalize(q);
-	glm::mat4 rotMat = glm::mat4_cast(q);
-
-	glm::mat4 transMat = glm::translate(glm::mat4(1.0f), translation);
-	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), scaleVector);
-
-	modelMatrix = transMat * rotMat * scaleMat;*/
 	modelMatrix = glm::mat4(1.0f);
 
 	glm::mat4 transMat = glm::translate(glm::mat4(1.0f), translation);
@@ -103,12 +83,12 @@ void Object::updateModelMatrix()
 	modelMatrix = transMat * rotMat * scaleMat;
 }
 
-void Object::addTexture(std::string name, TextureInstance * t)
+void Engine::Object::addTexture(std::string name, Engine::TextureInstance * t)
 {
-	std::map<std::string, TextureInstance *>::iterator it = textures.find(name);
+	std::map<std::string, Engine::TextureInstance *>::iterator it = textures.find(name);
 	if (it != textures.end())
 	{
-		TextureInstance * t2 = it->second;
+		Engine::TextureInstance * t2 = it->second;
 		t2->~TextureInstance();
 		delete t2;
 	}
@@ -116,9 +96,9 @@ void Object::addTexture(std::string name, TextureInstance * t)
 	textures[name] = t;
 }
 
-TextureInstance * Object::getTexture(std::string name)
+Engine::TextureInstance * Engine::Object::getTexture(std::string name)
 {
-	std::map<std::string, TextureInstance *>::iterator it = textures.find(name);
+	std::map<std::string, Engine::TextureInstance *>::iterator it = textures.find(name);
 	if (it != textures.end())
 	{
 		return NULL;
@@ -127,12 +107,12 @@ TextureInstance * Object::getTexture(std::string name)
 	return textures[name];
 }
 
-const std::map<std::string, TextureInstance *> & Object::getAllCustomTextures() const
+const std::map<std::string, Engine::TextureInstance *> & Engine::Object::getAllCustomTextures() const
 {
 	return textures;
 }
 
-void Object::setAlbedoTexture(TextureInstance * t)
+void Engine::Object::setAlbedoTexture(Engine::TextureInstance * t)
 {
 	if (albedo != 0)
 	{
@@ -143,55 +123,52 @@ void Object::setAlbedoTexture(TextureInstance * t)
 	albedo = t;
 }
 
-void Object::setEmissiveTexture(TextureInstance * t)
+void Engine::Object::setEmissiveTexture(Engine::TextureInstance * t)
 {
 	if (emissive != 0)
 	{
-		emissive->~TextureInstance();
 		delete emissive;
 	}
 
 	emissive = t;
 }
 
-void Object::setNormalMapTexture(TextureInstance * t)
+void Engine::Object::setNormalMapTexture(Engine::TextureInstance * t)
 {
 	if (normal != 0)
 	{
-		normal->~TextureInstance();
 		delete normal;
 	}
 
 	normal = t;
 }
 
-void Object::setSpecularMapTexture(TextureInstance * t)
+void Engine::Object::setSpecularMapTexture(TextureInstance * t)
 {
 	if (specular != 0)
 	{
-		specular->~TextureInstance();
 		delete specular;
 	}
 
 	specular = t;
 }
 
-const TextureInstance * Object::getAlbedoTexture() const
+const Engine::TextureInstance * Engine::Object::getAlbedoTexture() const
 {
 	return albedo;
 }
 
-const TextureInstance * Object::getEmissiveTexture() const
+const Engine::TextureInstance * Engine::Object::getEmissiveTexture() const
 {
 	return emissive;
 }
 
-const TextureInstance * Object::getNormalMapTexture() const
+const Engine::TextureInstance * Engine::Object::getNormalMapTexture() const
 {
 	return normal;
 }
 
-const TextureInstance * Object::getSpecularMapTexture() const
+const Engine::TextureInstance * Engine::Object::getSpecularMapTexture() const
 {
 	return specular;
 }

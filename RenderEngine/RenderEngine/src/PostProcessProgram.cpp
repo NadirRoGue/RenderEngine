@@ -9,15 +9,13 @@
 
 #include <iostream>
 
-using namespace Engine;
-
-PostProcessProgram::PostProcessProgram(std::string name)
-	:Program(name)
+Engine::PostProcessProgram::PostProcessProgram(std::string name)
+	:Engine::Program(name)
 {
 }
 
-PostProcessProgram::PostProcessProgram(const PostProcessProgram & other)
-	:Program(other)
+Engine::PostProcessProgram::PostProcessProgram(const Engine::PostProcessProgram & other)
+	: Engine::Program(other)
 {
 	planeVAO = other.planeVAO;
 	planeVerticesVBO = other.planeVerticesVBO;
@@ -27,11 +25,11 @@ PostProcessProgram::PostProcessProgram(const PostProcessProgram & other)
 	memcpy(uRenderedTextures, other.uRenderedTextures, 9 * sizeof(unsigned int));
 }
 
-PostProcessProgram::~PostProcessProgram()
+Engine::PostProcessProgram::~PostProcessProgram()
 {
 }
 
-void PostProcessProgram::configureProgram()
+void Engine::PostProcessProgram::configureProgram()
 {
 	for (int i = 0; i < 9; i++)
 	{
@@ -43,7 +41,7 @@ void PostProcessProgram::configureProgram()
 	inTexCoord = glGetAttribLocation(glProgram, "inTexCoord");
 }
 
-void PostProcessProgram::configureMeshBuffers(MeshInstance * mesh)
+void Engine::PostProcessProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
 {
 	glGenVertexArrays(1, &mesh->vao);
 	glBindVertexArray(mesh->vao);
@@ -66,36 +64,36 @@ void PostProcessProgram::configureMeshBuffers(MeshInstance * mesh)
 	glEnableVertexAttribArray(inTexCoord);
 }
 
-void PostProcessProgram::configureClearColor(const glm::vec3 & cc)
+void Engine::PostProcessProgram::configureClearColor(const glm::vec3 & cc)
 {
 	// Does nothing
 }
 
-void PostProcessProgram::onRenderLight(const glm::mat4 & model, const glm::mat4 & view)
+void Engine::PostProcessProgram::onRenderLight(const glm::mat4 & model, const glm::mat4 & view)
 {
 }
 
-void PostProcessProgram::onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view)
+void Engine::PostProcessProgram::onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view)
 {
 }
 
-void PostProcessProgram::onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view)
+void Engine::PostProcessProgram::onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view)
 {
 }
 
-void PostProcessProgram::configurePointLightBuffer(const PointLight *pl)
+void Engine::PostProcessProgram::configurePointLightBuffer(const Engine::PointLight *pl)
 {
 }
 
-void PostProcessProgram::configureSpotLightBuffer(const SpotLight *sl)
+void Engine::PostProcessProgram::configureSpotLightBuffer(const Engine::SpotLight *sl)
 {
 }
 
-void PostProcessProgram::configureDirectionalLightBuffer(const DirectionalLight *dl)
+void Engine::PostProcessProgram::configureDirectionalLightBuffer(const Engine::DirectionalLight *dl)
 {
 }
 
-void PostProcessProgram::onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
 {
 
 	std::map<std::string, TextureInstance *> all = obj->getAllCustomTextures();
@@ -115,7 +113,7 @@ void PostProcessProgram::onRenderObject(const Object * obj, const glm::mat4 & vi
 	}
 }
 
-void PostProcessProgram::releaseProgramBuffers(MeshInstance * mi)
+void Engine::PostProcessProgram::releaseProgramBuffers(Engine::MeshInstance * mi)
 {
 	if (inPos != -1) glDeleteBuffers(1, &mi->vboVertices);
 	glDeleteVertexArrays(1, &mi->vao);
@@ -123,13 +121,13 @@ void PostProcessProgram::releaseProgramBuffers(MeshInstance * mi)
 
 // ==========================================================================
 
-GaussianBlurProgram::GaussianBlurProgram(std::string name)
-	:PostProcessProgram(name)
+Engine::GaussianBlurProgram::GaussianBlurProgram(std::string name)
+	:Engine::PostProcessProgram(name)
 {
 	affectedTexels = kernel = 0;
 }
 
-GaussianBlurProgram::GaussianBlurProgram(const GaussianBlurProgram & other)
+Engine::GaussianBlurProgram::GaussianBlurProgram(const Engine::GaussianBlurProgram & other)
 	:PostProcessProgram(other)
 {
 	uAffetedTexels = other.uAffetedTexels;
@@ -140,7 +138,7 @@ GaussianBlurProgram::GaussianBlurProgram(const GaussianBlurProgram & other)
 	affectedTexels = kernel = 0;
 }
 
-GaussianBlurProgram::~GaussianBlurProgram()
+Engine::GaussianBlurProgram::~GaussianBlurProgram()
 {
 	if (affectedTexels != 0)
 	{
@@ -148,7 +146,7 @@ GaussianBlurProgram::~GaussianBlurProgram()
 	}
 }
 
-void GaussianBlurProgram::configureProgram()
+void Engine::GaussianBlurProgram::configureProgram()
 {
 	PostProcessProgram::configureProgram();
 
@@ -158,12 +156,12 @@ void GaussianBlurProgram::configureProgram()
 	uTexelSize = glGetUniformLocation(glProgram, "texelSize");
 }
 
-void GaussianBlurProgram::setMaskSize(unsigned int ms)
+void Engine::GaussianBlurProgram::setMaskSize(unsigned int ms)
 {
 	maskSize = ms;
 }
 
-void GaussianBlurProgram::setKernel(float * k)
+void Engine::GaussianBlurProgram::setKernel(float * k)
 {
 	if (kernel != 0)
 	{
@@ -175,7 +173,7 @@ void GaussianBlurProgram::setKernel(float * k)
 	memcpy(kernel, k, sizeof(float) * maskSize);
 }
 
-void GaussianBlurProgram::setAffectedTexels(glm::vec2 * at)
+void Engine::GaussianBlurProgram::setAffectedTexels(glm::vec2 * at)
 {
 	if (affectedTexels != 0)
 	{
@@ -193,9 +191,9 @@ void GaussianBlurProgram::setAffectedTexels(glm::vec2 * at)
 	}
 }
 
-void GaussianBlurProgram::onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::GaussianBlurProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
 {
-	PostProcessProgram::onRenderObject(obj, view, proj);
+	Engine::PostProcessProgram::onRenderObject(obj, view, proj);
 
 	glUniform1ui(uMaskSize, maskSize);
 	glUniform1fv(uMask, maskSize, &kernel[0]);
@@ -209,35 +207,35 @@ void GaussianBlurProgram::onRenderObject(const Object * obj, const glm::mat4 & v
 
 // ==========================================================================
 
-DepthOfFieldProgram::DepthOfFieldProgram(std::string name)
-	:GaussianBlurProgram(name)
+Engine::DepthOfFieldProgram::DepthOfFieldProgram(std::string name)
+	:Engine::GaussianBlurProgram(name)
 {
 }
 
-DepthOfFieldProgram::DepthOfFieldProgram(const DepthOfFieldProgram & other)
-	:GaussianBlurProgram(other)
+Engine::DepthOfFieldProgram::DepthOfFieldProgram(const Engine::DepthOfFieldProgram & other)
+	: Engine::GaussianBlurProgram(other)
 {
 	uFocalDistance = other.uFocalDistance;
 	uMaxDistanceFactor = other.uMaxDistanceFactor;
 	uInverseProj = other.uInverseProj;
 }
 
-DepthOfFieldProgram::~DepthOfFieldProgram()
+Engine::DepthOfFieldProgram::~DepthOfFieldProgram()
 {
 }
 
-void DepthOfFieldProgram::configureProgram()
+void Engine::DepthOfFieldProgram::configureProgram()
 {
-	GaussianBlurProgram::configureProgram();
+	Engine::GaussianBlurProgram::configureProgram();
 
 	uFocalDistance = glGetUniformLocation(glProgram, "focalDistance");
 	uMaxDistanceFactor = glGetUniformLocation(glProgram, "maxDistanceFactor");
 	uInverseProj = glGetUniformLocation(glProgram, "invProj");
 }
 
-void DepthOfFieldProgram::onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::DepthOfFieldProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
 {
-	GaussianBlurProgram::onRenderObject(obj, view, proj);
+	Engine::GaussianBlurProgram::onRenderObject(obj, view, proj);
 
 	glm::mat4 invProj = glm::inverse(proj);
 
@@ -246,53 +244,53 @@ void DepthOfFieldProgram::onRenderObject(const Object * obj, const glm::mat4 & v
 	glUniformMatrix4fv(uInverseProj, 1, GL_FALSE, &invProj[0][0]);
 }
 
-void DepthOfFieldProgram::setFocalDistance(float fd)
+void Engine::DepthOfFieldProgram::setFocalDistance(float fd)
 {
 	focalDistance = fd;
 }
 
-void DepthOfFieldProgram::setMaxDistanceFactor(float mdf)
+void Engine::DepthOfFieldProgram::setMaxDistanceFactor(float mdf)
 {
 	maxDistanceFactor = mdf;
 }
 
-float DepthOfFieldProgram::getFocalDistance()
+float Engine::DepthOfFieldProgram::getFocalDistance()
 {
 	return focalDistance;
 }
 
-float DepthOfFieldProgram::getMaxDistanceFactor()
+float Engine::DepthOfFieldProgram::getMaxDistanceFactor()
 {
 	return maxDistanceFactor;
 }
 
 // ==========================================================================
 
-DepthRenderProgram::DepthRenderProgram(std::string name)
-	:PostProcessProgram(name)
+Engine::DepthRenderProgram::DepthRenderProgram(std::string name)
+	:Engine::PostProcessProgram(name)
 {
 }
 
-DepthRenderProgram::DepthRenderProgram(const DepthRenderProgram & other)
-	:PostProcessProgram(other)
+Engine::DepthRenderProgram::DepthRenderProgram(const Engine::DepthRenderProgram & other)
+	: Engine::PostProcessProgram(other)
 {
 	uInverseProj = other.uInverseProj;
 }
 
-DepthRenderProgram::~DepthRenderProgram()
+Engine::DepthRenderProgram::~DepthRenderProgram()
 {
 }
 
-void DepthRenderProgram::configureProgram()
+void Engine::DepthRenderProgram::configureProgram()
 {
-	PostProcessProgram::configureProgram();
+	Engine::PostProcessProgram::configureProgram();
 
 	uInverseProj = glGetUniformLocation(glProgram, "invProj");
 }
 
-void DepthRenderProgram::onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::DepthRenderProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
 {
-	PostProcessProgram::onRenderObject(obj, view, proj);
+	Engine::PostProcessProgram::onRenderObject(obj, view, proj);
 
 	glm::mat4 invProj = glm::inverse(proj);
 	glUniformMatrix4fv(uInverseProj, 1, GL_FALSE, &invProj[0][0]);
@@ -300,14 +298,14 @@ void DepthRenderProgram::onRenderObject(const Object * obj, const glm::mat4 & vi
 
 // ==========================================================================
 
-DeferredShadingProgram::DeferredShadingProgram(std::string name)
-	:PostProcessProgram(name)
+Engine::DeferredShadingProgram::DeferredShadingProgram(std::string name)
+	:Engine::PostProcessProgram(name)
 {
 
 }
 
-DeferredShadingProgram::DeferredShadingProgram(const DeferredShadingProgram & other)
-	:PostProcessProgram(other)
+Engine::DeferredShadingProgram::DeferredShadingProgram(const Engine::DeferredShadingProgram & other)
+	: Engine::PostProcessProgram(other)
 {
 	uPointLightPos = other.uPointLightPos;
 	uIa = other.uIa;
@@ -332,7 +330,7 @@ DeferredShadingProgram::DeferredShadingProgram(const DeferredShadingProgram & ot
 	uBackground = other.uBackground;
 }
 
-void DeferredShadingProgram::onRenderLight(const glm::mat4 & model, const glm::mat4 & view)
+void Engine::DeferredShadingProgram::onRenderLight(const glm::mat4 & model, const glm::mat4 & view)
 {
 	glm::mat4 result = view * model;
 	float position[3];
@@ -343,7 +341,7 @@ void DeferredShadingProgram::onRenderLight(const glm::mat4 & model, const glm::m
 	glUniform3fv(uPointLightPos, 1, &position[0]);
 }
 
-void DeferredShadingProgram::onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view)
+void Engine::DeferredShadingProgram::onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view)
 {
 	glm::mat4 resultPos = view * modelPos;
 	float position[3];
@@ -362,7 +360,7 @@ void DeferredShadingProgram::onRenderSpotLight(const glm::mat4 & modelPos, const
 	glUniform3fv(uSpotLightDir, 1, &direction[0]);
 }
 
-void DeferredShadingProgram::onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view)
+void Engine::DeferredShadingProgram::onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view)
 {
 	glm::mat4 modelCopy = model;
 	modelCopy[3][3] = 0.0f;
@@ -379,9 +377,9 @@ void DeferredShadingProgram::onRenderDirectionalLight(const glm::mat4 & model, c
 	glUniform3fv(uDirectionalLightDir, 1, &position[0]);
 }
 
-void DeferredShadingProgram::configureProgram()
+void Engine::DeferredShadingProgram::configureProgram()
 {
-	PostProcessProgram::configureProgram();
+	Engine::PostProcessProgram::configureProgram();
 
 	uBackground = glGetUniformLocation(glProgram, "backgroundColor");
 
@@ -406,7 +404,7 @@ void DeferredShadingProgram::configureProgram()
 	uDirectionalLightDir = glGetUniformLocation(glProgram, "DLdir");
 }
 
-void DeferredShadingProgram::configurePointLightBuffer(const PointLight *pl)
+void Engine::DeferredShadingProgram::configurePointLightBuffer(const Engine::PointLight *pl)
 {
 	glUseProgram(glProgram);
 	glUniform3fv(uIa, 1, pl->getAmbientIntensity());
@@ -415,7 +413,7 @@ void DeferredShadingProgram::configurePointLightBuffer(const PointLight *pl)
 	glUniform3fv(uPLattenuation, 1, pl->getAttenuationFactor());
 }
 
-void DeferredShadingProgram::configureSpotLightBuffer(const SpotLight *sl)
+void Engine::DeferredShadingProgram::configureSpotLightBuffer(const Engine::SpotLight *sl)
 {
 	glUseProgram(glProgram);
 	glUniform3fv(uSLIa, 1, sl->getAmbientIntensity());
@@ -426,7 +424,7 @@ void DeferredShadingProgram::configureSpotLightBuffer(const SpotLight *sl)
 	glUniform3fv(uSLattenuation, 1, sl->getAttenuationFactor());
 }
 
-void DeferredShadingProgram::configureDirectionalLightBuffer(const DirectionalLight *dl)
+void Engine::DeferredShadingProgram::configureDirectionalLightBuffer(const Engine::DirectionalLight *dl)
 {
 	glUseProgram(glProgram);
 	glUniform3fv(uDLIa, 1, dl->getAmbientIntensity());
@@ -434,7 +432,7 @@ void DeferredShadingProgram::configureDirectionalLightBuffer(const DirectionalLi
 	glUniform3fv(uDLIs, 1, dl->getSpecularIntensity());
 }
 
-void DeferredShadingProgram::configureClearColor(const glm::vec3 & cc)
+void Engine::DeferredShadingProgram::configureClearColor(const glm::vec3 & cc)
 {
 	glUseProgram(glProgram);
 	float backgroundColor[3] = { cc.x, cc.y, cc.z };
@@ -443,33 +441,33 @@ void DeferredShadingProgram::configureClearColor(const glm::vec3 & cc)
 
 // =============================================================================
 
-EdgeBasedProgram::EdgeBasedProgram(std::string name)
-	:PostProcessProgram(name)
+Engine::EdgeBasedProgram::EdgeBasedProgram(std::string name)
+	:Engine::PostProcessProgram(name)
 {
 
 }
 
-EdgeBasedProgram::EdgeBasedProgram(const EdgeBasedProgram & other)
-	: PostProcessProgram(other)
+Engine::EdgeBasedProgram::EdgeBasedProgram(const Engine::EdgeBasedProgram & other)
+	: Engine::PostProcessProgram(other)
 {
 	uTexelSize = other.uTexelSize;
 }
 
-EdgeBasedProgram::~EdgeBasedProgram()
+Engine::EdgeBasedProgram::~EdgeBasedProgram()
 {
 
 }
 
-void EdgeBasedProgram::configureProgram()
+void Engine::EdgeBasedProgram::configureProgram()
 {
-	PostProcessProgram::configureProgram();
+	Engine::PostProcessProgram::configureProgram();
 
 	uTexelSize = glGetUniformLocation(glProgram, "texelSize");
 }
 
-void EdgeBasedProgram::onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::EdgeBasedProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
 {
-	PostProcessProgram::onRenderObject(obj, view, proj);
+	Engine::PostProcessProgram::onRenderObject(obj, view, proj);
 
 	float texelSize[2];
 	texelSize[0] = 1.0f / ScreenManager::SCREEN_WIDTH;

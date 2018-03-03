@@ -12,16 +12,14 @@
 
 #include <math.h>
 
-using namespace Engine;
-
-Camera::Camera(float n, float f, float fy, float fx) :nearPlane(n), farPlane(f), fovy(fy), fovx(fx)
+Engine::Camera::Camera(float n, float f, float fy, float fx) :nearPlane(n), farPlane(f), fovy(fy), fovx(fx)
 {
 	// Initialize projection matrix
 	initProjectionMatrix();
 	initViewMatrix();
 }
 
-Camera::Camera(const Camera & other)
+Engine::Camera::Camera(const Engine::Camera & other)
 {
 	farPlane = other.farPlane;
 	nearPlane = other.nearPlane;
@@ -33,11 +31,11 @@ Camera::Camera(const Camera & other)
 	viewMatrix = other.viewMatrix;
 }
 
-Camera::~Camera() 
+Engine::Camera::~Camera()
 {
 }
 
-void Camera::initProjectionMatrix()
+void Engine::Camera::initProjectionMatrix()
 {
 	projMatrix = glm::mat4(0.0f);
 	projMatrix[0].x = 1.0f / tan(fovx*3.14159f / 180.0f);
@@ -47,12 +45,12 @@ void Camera::initProjectionMatrix()
 	projMatrix[2].w = -1.0;
 }
 
-void Camera::initViewMatrix()
+void Engine::Camera::initViewMatrix()
 {
 	updateViewMatrix();
 }
 
-void Camera::translateView(glm::vec3 t)
+void Engine::Camera::translateView(glm::vec3 t)
 {
 	float forwardDelta = t.z;
 	float strafeDelta = t.x;
@@ -68,13 +66,13 @@ void Camera::translateView(glm::vec3 t)
 	updateViewMatrix();
 }
 
-void Camera::rotateView(glm::vec3 rot)
+void Engine::Camera::rotateView(glm::vec3 rot)
 {
 	rotation += rot;
 	updateViewMatrix();
 }
 
-void Camera::updateViewMatrix()
+void Engine::Camera::updateViewMatrix()
 {
 	glm::mat4 identity(1.0f);
 
@@ -89,7 +87,7 @@ void Camera::updateViewMatrix()
 	viewMatrix = pitchMat * yawMat * glm::translate(identity, translation);
 }
 
-void Camera::onWindowResize(int width, int height)
+void Engine::Camera::onWindowResize(int width, int height)
 {
 	float fWidth = (float)width;
 	float fHeight = (float)height;
@@ -114,12 +112,12 @@ void Camera::onWindowResize(int width, int height)
 	projMatrix[2].w = -1.0f;
 }
 
-glm::mat4 & Camera::getProjectionMatrix()
+glm::mat4 & Engine::Camera::getProjectionMatrix()
 {
 	return projMatrix;
 }
 
-glm::mat4 & Camera::getViewMatrix()
+glm::mat4 & Engine::Camera::getViewMatrix()
 {
 	return viewMatrix;
 }

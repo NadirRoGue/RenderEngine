@@ -12,22 +12,19 @@
 
 #include <iostream>
 
-using namespace Engine;
-
-
-Program::Program(std::string name)
+Engine::Program::Program(std::string name)
 {
 	this->name = std::string(name);
 }
 
-Program::Program(const Program & other)
+Engine::Program::Program(const Engine::Program & other)
 {
 	glProgram = other.glProgram;
 	vShader = other.vShader;
 	fShader = other.fShader;
 }
 
-void Program::initialize(std::string vertexShader, std::string fragmentShader)
+void Engine::Program::initialize(std::string vertexShader, std::string fragmentShader)
 {
 	// Creamos el shader de vértices
 	vShader = loadShader(vertexShader, GL_VERTEX_SHADER);
@@ -65,16 +62,16 @@ void Program::initialize(std::string vertexShader, std::string fragmentShader)
 	configureProgram();
 }
 
-Program::~Program()
+Engine::Program::~Program()
 {
 }
 
-unsigned int Program::getProgramId() const
+unsigned int Engine::Program::getProgramId() const
 {
 	return glProgram;
 }
 
-unsigned int Program::loadShader(std::string fileName, GLenum type)
+unsigned int Engine::Program::loadShader(std::string fileName, GLenum type)
 {
 	unsigned int fileLen;
 	// Cargamos en memoria el código del shader
@@ -111,24 +108,24 @@ unsigned int Program::loadShader(std::string fileName, GLenum type)
 	return shader;
 }
 
-void Program::configureDirectionalLightBuffer(const DirectionalLight *dl)
+void Engine::Program::configureDirectionalLightBuffer(const Engine::DirectionalLight *dl)
 {
 }
 
-void Program::configurePointLightBuffer(const PointLight *pl)
+void Engine::Program::configurePointLightBuffer(const Engine::PointLight *pl)
 {
 }
 
-void Program::configureSpotLightBuffer(const SpotLight *sl)
+void Engine::Program::configureSpotLightBuffer(const Engine::SpotLight *sl)
 {
 }
 
-std::string Program::getName() const
+std::string Engine::Program::getName() const
 {
 	return name;
 }
 
-void Program::destroy()
+void Engine::Program::destroy()
 {
 	glDetachShader(glProgram, vShader);
 	glDeleteShader(vShader);
@@ -142,13 +139,13 @@ void Program::destroy()
 // ==============================================================================
 // ==============================================================================
 
-StandarProgram::StandarProgram(std::string name)
-	:Program(name)
+Engine::StandarProgram::StandarProgram(std::string name)
+	:Engine::Program(name)
 {
 }
 
-StandarProgram::StandarProgram(const StandarProgram & other)
-	: Program(other)
+Engine::StandarProgram::StandarProgram(const Engine::StandarProgram & other)
+	: Engine::Program(other)
 {
 	uPointLightPos = other.uPointLightPos;
 	uIa = other.uIa;
@@ -173,7 +170,7 @@ StandarProgram::StandarProgram(const StandarProgram & other)
 	uBackground = other.uBackground;
 }
 
-void StandarProgram::configureProgram()
+void Engine::StandarProgram::configureProgram()
 {
 	// Obtenemos el identificador para las variables uniformes
 	uNormalMat = glGetUniformLocation(glProgram, "normal");
@@ -210,7 +207,7 @@ void StandarProgram::configureProgram()
 	inTangent = glGetAttribLocation(glProgram, "inTangent");
 }
 
-void StandarProgram::onRenderLight(const glm::mat4 & model, const glm::mat4 & view)
+void Engine::StandarProgram::onRenderLight(const glm::mat4 & model, const glm::mat4 & view)
 {
 	glm::mat4 result = view * model;
 	float position[3];
@@ -221,7 +218,7 @@ void StandarProgram::onRenderLight(const glm::mat4 & model, const glm::mat4 & vi
 	glUniform3fv(uPointLightPos, 1, &position[0]);
 }
 
-void StandarProgram::onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view)
+void Engine::StandarProgram::onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view)
 {
 	glm::mat4 resultPos = view * modelPos;
 	float position[3];
@@ -240,7 +237,7 @@ void StandarProgram::onRenderSpotLight(const glm::mat4 & modelPos, const glm::ma
 	glUniform3fv(uSpotLightDir, 1, &direction[0]);
 }
 
-void StandarProgram::onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view)
+void Engine::StandarProgram::onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view)
 {
 	glm::mat4 modelCopy = model;
 	modelCopy[3][3] = 0.0f;
@@ -257,7 +254,7 @@ void StandarProgram::onRenderDirectionalLight(const glm::mat4 & model, const glm
 	glUniform3fv(uDirectionalLightDir, 1, &position[0]);
 }
 
-void StandarProgram::onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::StandarProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
 {
 	glm::mat4 modelView = view * obj->getModelMatrix();
 	glm::mat4 modelViewProj = proj * view * obj->getModelMatrix();
@@ -270,7 +267,7 @@ void StandarProgram::onRenderObject(const Object * obj, const glm::mat4 & view, 
 	glUniformMatrix4fv(uNormalMat, 1, GL_FALSE, &(normal[0][0]));
 }
 
-void StandarProgram::configureMeshBuffers(MeshInstance * mesh)
+void Engine::StandarProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
 {
 	// Generamos el VAO
 	glGenVertexArrays(1, &mesh->vao);
@@ -334,7 +331,7 @@ void StandarProgram::configureMeshBuffers(MeshInstance * mesh)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numFaces * sizeof(unsigned int) * 3, mesh->getMesh()->getFaces(), GL_STATIC_DRAW);
 }
 
-void StandarProgram::configurePointLightBuffer(const PointLight *pl)
+void Engine::StandarProgram::configurePointLightBuffer(const Engine::PointLight *pl)
 {
 	glUseProgram(glProgram);
 	glUniform3fv(uIa, 1, pl->getAmbientIntensity());
@@ -343,7 +340,7 @@ void StandarProgram::configurePointLightBuffer(const PointLight *pl)
 	glUniform3fv(uPLattenuation, 1, pl->getAttenuationFactor());
 }
 
-void StandarProgram::configureSpotLightBuffer(const SpotLight *sl)
+void Engine::StandarProgram::configureSpotLightBuffer(const Engine::SpotLight *sl)
 {
 	glUseProgram(glProgram);
 	glUniform3fv(uSLIa, 1, sl->getAmbientIntensity());
@@ -354,7 +351,7 @@ void StandarProgram::configureSpotLightBuffer(const SpotLight *sl)
 	glUniform3fv(uSLattenuation, 1, sl->getAttenuationFactor());
 }
 
-void StandarProgram::configureDirectionalLightBuffer(const DirectionalLight *dl)
+void Engine::StandarProgram::configureDirectionalLightBuffer(const Engine::DirectionalLight *dl)
 {
 	glUseProgram(glProgram);
 	glUniform3fv(uDLIa, 1, dl->getAmbientIntensity());
@@ -362,7 +359,7 @@ void StandarProgram::configureDirectionalLightBuffer(const DirectionalLight *dl)
 	glUniform3fv(uDLIs, 1, dl->getSpecularIntensity());
 }
 
-void StandarProgram::releaseProgramBuffers(MeshInstance * mi)
+void Engine::StandarProgram::releaseProgramBuffers(Engine::MeshInstance * mi)
 {
 	if (inPos != -1) glDeleteBuffers(1, &mi->vboVertices);
 	if (inColor != -1) glDeleteBuffers(1, &mi->vboColors);
@@ -372,7 +369,7 @@ void StandarProgram::releaseProgramBuffers(MeshInstance * mi)
 	glDeleteVertexArrays(1, &mi->vao);
 }
 
-void StandarProgram::configureClearColor(const glm::vec3 & cc)
+void Engine::StandarProgram::configureClearColor(const glm::vec3 & cc)
 {
 	glUseProgram(glProgram);
 	float backgroundColor[3] = { cc.x, cc.y, cc.z };
@@ -381,25 +378,25 @@ void StandarProgram::configureClearColor(const glm::vec3 & cc)
 
 // ============================================================================
 
-TextureProgram::TextureProgram(std::string name)
-	:StandarProgram(name)
+Engine::TextureProgram::TextureProgram(std::string name)
+	:Engine::StandarProgram(name)
 {
 }
 
-TextureProgram::TextureProgram(const TextureProgram & other)
-	: StandarProgram(other)
+Engine::TextureProgram::TextureProgram(const Engine::TextureProgram & other)
+	:Engine::StandarProgram(other)
 {
 
 }
 
-void TextureProgram::onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
+void Engine::TextureProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
 {
-	StandarProgram::onRenderObject(obj, view, proj);
+	Engine::StandarProgram::onRenderObject(obj, view, proj);
 
-	const TextureInstance * albedo = obj->getAlbedoTexture();
-	const TextureInstance * normal = obj->getNormalMapTexture();
-	const TextureInstance * specular = obj->getSpecularMapTexture();
-	const TextureInstance * emissive = obj->getEmissiveTexture();
+	const Engine::TextureInstance * albedo = obj->getAlbedoTexture();
+	const Engine::TextureInstance * normal = obj->getNormalMapTexture();
+	const Engine::TextureInstance * specular = obj->getSpecularMapTexture();
+	const Engine::TextureInstance * emissive = obj->getEmissiveTexture();
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, albedo->getTexture()->getTextureId());
@@ -422,9 +419,9 @@ void TextureProgram::onRenderObject(const Object * obj, const glm::mat4 & view, 
 	glUniform1i(uNormalTex, 3);
 }
 
-void TextureProgram::configureMeshBuffers(MeshInstance * mesh)
+void Engine::TextureProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
 {
-	StandarProgram::configureMeshBuffers(mesh);
+	Engine::StandarProgram::configureMeshBuffers(mesh);
 
 	uAlbedoTex = glGetUniformLocation(glProgram, "colorTex");
 	uEmissiveTex = glGetUniformLocation(glProgram, "emiTex");

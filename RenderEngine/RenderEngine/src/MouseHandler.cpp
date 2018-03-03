@@ -5,9 +5,7 @@
 
 #include "MouseHandler.h"
 
-using namespace Engine;
-
-MouseEventManager::MouseEventManager()
+Engine::MouseEventManager::MouseEventManager()
 {
 	lastButtonPressed = -1;
 
@@ -15,14 +13,14 @@ MouseEventManager::MouseEventManager()
 	activeMotionHandler[0] = activeMotionHandler[1] = activeMotionHandler[2] = nullptr;
 }
 
-MouseEventManager::~MouseEventManager()
+Engine::MouseEventManager::~MouseEventManager()
 {
 
 }
 
-void MouseEventManager::registerMouseHandler(MouseHandler * handler)
+void Engine::MouseEventManager::registerMouseHandler(Engine::MouseHandler * handler)
 {
-	std::map <std::string, MouseHandler *>::iterator it = mouseHandlers.find(handler->getName());
+	std::map <std::string, Engine::MouseHandler *>::iterator it = mouseHandlers.find(handler->getName());
 	if (it != mouseHandlers.end())
 	{
 		delete mouseHandlers[handler->getName()];
@@ -33,9 +31,9 @@ void MouseEventManager::registerMouseHandler(MouseHandler * handler)
 	activateMouseHandler(handler);
 }
 
-void MouseEventManager::registerMouseMotionHandler(MouseMotionHandler * handler)
+void Engine::MouseEventManager::registerMouseMotionHandler(Engine::MouseMotionHandler * handler)
 {
-	std::map <std::string, MouseMotionHandler *>::iterator it = motionHandlers.find(handler->getName());
+	std::map <std::string, Engine::MouseMotionHandler *>::iterator it = motionHandlers.find(handler->getName());
 	if (it != motionHandlers.end())
 	{
 		delete mouseHandlers[handler->getName()];
@@ -46,16 +44,16 @@ void MouseEventManager::registerMouseMotionHandler(MouseMotionHandler * handler)
 	activateMouseMotionHandler(handler);
 }
 
-void MouseEventManager::activateMouseHandler(const std::string & name)
+void Engine::MouseEventManager::activateMouseHandler(const std::string & name)
 {
-	std::map<std::string, MouseHandler *>::iterator it = mouseHandlers.find(name);
+	std::map<std::string, Engine::MouseHandler *>::iterator it = mouseHandlers.find(name);
 	if (it != mouseHandlers.end())
 	{
 		activateMouseHandler(it->second);
 	}
 }
 
-void MouseEventManager::activateMouseHandler(MouseHandler * handler)
+void Engine::MouseEventManager::activateMouseHandler(Engine::MouseHandler * handler)
 {
 	if (handler == nullptr)
 	{
@@ -78,16 +76,16 @@ void MouseEventManager::activateMouseHandler(MouseHandler * handler)
 	}
 }
 
-void MouseEventManager::activateMouseMotionHandler(const std::string & name)
+void Engine::MouseEventManager::activateMouseMotionHandler(const std::string & name)
 {
-	std::map<std::string, MouseMotionHandler *>::iterator it = motionHandlers.find(name);
+	std::map<std::string, Engine::MouseMotionHandler *>::iterator it = motionHandlers.find(name);
 	if (it != motionHandlers.end())
 	{
 		activateMouseMotionHandler(it->second);
 	}
 }
 
-void MouseEventManager::activateMouseMotionHandler(MouseMotionHandler * handler)
+void Engine::MouseEventManager::activateMouseMotionHandler(Engine::MouseMotionHandler * handler)
 {
 	if (handler == nullptr)
 	{
@@ -110,7 +108,7 @@ void MouseEventManager::activateMouseMotionHandler(MouseMotionHandler * handler)
 	}
 }
 
-void MouseEventManager::handleMouseClick(int button, int state, int x, int y)
+void Engine::MouseEventManager::handleMouseClick(int button, int state, int x, int y)
 {
 	if (button < 0 || button > 2)
 		return;
@@ -133,7 +131,7 @@ void MouseEventManager::handleMouseClick(int button, int state, int x, int y)
 	}
 }
 
-void MouseEventManager::handleMouseMotion(int x, int y)
+void Engine::MouseEventManager::handleMouseMotion(int x, int y)
 {
 	if (lastButtonPressed > -1 && activeMotionHandler[lastButtonPressed] != nullptr)
 	{
@@ -143,55 +141,55 @@ void MouseEventManager::handleMouseMotion(int x, int y)
 
 // =========================================================================
 
-MouseHandler::MouseHandler(std::string nam)
+Engine::MouseHandler::MouseHandler(std::string nam)
 {
 	name = std::string(nam);
 }
 
-MouseHandler::~MouseHandler()
+Engine::MouseHandler::~MouseHandler()
 {
 }
 
-const std::string & MouseHandler::getName() const
+const std::string & Engine::MouseHandler::getName() const
 {
 	return name;
 }
 
-const std::list<int> & MouseHandler::getUsedButtons() const
+const std::list<int> & Engine::MouseHandler::getUsedButtons() const
 {
 	return usedButtons;
 }
 
-void MouseHandler::handleMouseClick(int button, int state, int x, int y)
+void Engine::MouseHandler::handleMouseClick(int button, int state, int x, int y)
 {
 }
 
 // =========================================================================
 
-MouseMotionHandler::MouseMotionHandler(std::string nam)
+Engine::MouseMotionHandler::MouseMotionHandler(std::string nam)
 {
 	name = std::string(nam);
 }
 
-MouseMotionHandler::~MouseMotionHandler()
+Engine::MouseMotionHandler::~MouseMotionHandler()
 {
 }
 
-const std::string & MouseMotionHandler::getName() const
+const std::string & Engine::MouseMotionHandler::getName() const
 {
 	return name;
 }
 
-const std::list<int> & MouseMotionHandler::getUsedButtons() const
+const std::list<int> & Engine::MouseMotionHandler::getUsedButtons() const
 {
 	return usedButtons;
 }
 
-void MouseMotionHandler::handleMotion(int x, int y)
+void Engine::MouseMotionHandler::handleMotion(int x, int y)
 {
 }
 
-void MouseMotionHandler::finishMotion()
+void Engine::MouseMotionHandler::finishMotion()
 {
 
 }

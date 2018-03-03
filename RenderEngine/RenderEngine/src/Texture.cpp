@@ -7,9 +7,7 @@
 
 #include <iostream>
 
-using namespace Engine;
-
-Texture::Texture(std::string name, unsigned char *data, unsigned int width, unsigned int height)
+Engine::Texture::Texture(std::string name, unsigned char *data, unsigned int width, unsigned int height)
 	:fileName(name), width(width), height(height), data(data)
 {
 	// Default settings
@@ -19,7 +17,7 @@ Texture::Texture(std::string name, unsigned char *data, unsigned int width, unsi
 	generateMipMaps = true;
 }
 
-Texture::~Texture()
+Engine::Texture::~Texture()
 {
 	if (data != 0)
 	{
@@ -27,78 +25,78 @@ Texture::~Texture()
 	}
 }
 
-const std::string & Texture::getName() const
+const std::string & Engine::Texture::getName() const
 {
 	return fileName;
 }
 
-const unsigned char * Texture::getTexturePixels() const
+const unsigned char * Engine::Texture::getTexturePixels() const
 {
 	return data;
 }
 
-const unsigned int Texture::getWidth() const
+const unsigned int Engine::Texture::getWidth() const
 {
 	return width;
 }
 
-const unsigned int Texture::getHeight() const
+const unsigned int Engine::Texture::getHeight() const
 {
 	return height;
 }
 
-const unsigned int Texture::getTextureId() const
+const unsigned int Engine::Texture::getTextureId() const
 {
 	return textureId;
 }
 
-void Texture::setMemoryLayoutFormat(const int format)
+void Engine::Texture::setMemoryLayoutFormat(const int format)
 {
 	internalFormat = format;
 }
 
-void Texture::setImageFormatType(const GLenum type)
+void Engine::Texture::setImageFormatType(const GLenum type)
 {
 	formatType = type;
 }
 
-void Texture::setPixelFormatType(const GLenum type)
+void Engine::Texture::setPixelFormatType(const GLenum type)
 {
 	pixelType = type;
 }
 
-void Texture::setGenerateMipMaps(bool val)
+void Engine::Texture::setGenerateMipMaps(bool val)
 {
 	generateMipMaps = val;
 }
 
-const int Texture::getMemoryLayoutFormat() const
+const int Engine::Texture::getMemoryLayoutFormat() const
 {
 	return internalFormat;
 }
 
-const GLenum Texture::getImageFormat() const
+const GLenum Engine::Texture::getImageFormat() const
 {
 	return formatType;
 }
 
-const GLenum Texture::getPixelFormat() const
+const GLenum Engine::Texture::getPixelFormat() const
 {
 	return pixelType;
 }
 
-void Texture::generateTexture()
+void Engine::Texture::generateTexture()
 {
 	glGenTextures(1, &textureId);
 }
 
-void Texture::setSize(unsigned int w, unsigned int h)
+void Engine::Texture::setSize(unsigned int w, unsigned int h)
 {
 	width = w;
 	height = h;
 }
 
-void Texture::uploadTexture()
+void Engine::Texture::uploadTexture()
 {
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, formatType, pixelType, (GLvoid*)data);
@@ -116,7 +114,7 @@ void Texture::uploadTexture()
 
 // ========================================================================
 
-TextureInstance::TextureInstance(Texture * texture)
+Engine::TextureInstance::TextureInstance(Engine::Texture * texture)
 	:texture(texture)
 {
 	minificationFilter = GL_LINEAR_MIPMAP_LINEAR;
@@ -127,94 +125,94 @@ TextureInstance::TextureInstance(Texture * texture)
 	applyAnisotropicFiltering = TextureTable::getInstance().isAnisotropicFilteringSupported();
 }
 
-TextureInstance::~TextureInstance()
+Engine::TextureInstance::~TextureInstance()
 {
 
 }
 
-const Texture * TextureInstance::getTexture() const
+const Engine::Texture * Engine::TextureInstance::getTexture() const
 {
 	return texture;
 }
 
-void TextureInstance::generateTexture()
+void Engine::TextureInstance::generateTexture()
 {
 	texture->generateTexture();
 }
 
-void TextureInstance::uploadTexture()
+void Engine::TextureInstance::uploadTexture()
 {
 	texture->uploadTexture();
 }
 
-void TextureInstance::setMinificationFilterType(const float min)
+void Engine::TextureInstance::setMinificationFilterType(const float min)
 {
 	minificationFilter = min;
 }
 
-void TextureInstance::setMagnificationFilterType(const float mag)
+void Engine::TextureInstance::setMagnificationFilterType(const float mag)
 {
 	magnificationFilter = mag;
 }
 
-void TextureInstance::setTComponentWrapType(const float wrapT)
+void Engine::TextureInstance::setTComponentWrapType(const float wrapT)
 {
 	tComponentWrapType = wrapT;
 }
 
-void TextureInstance::setSComponentWrapType(const float wrapS)
+void Engine::TextureInstance::setSComponentWrapType(const float wrapS)
 {
 	sComponentWrapType = wrapS;
 }
 
-void TextureInstance::setTextureIndex(unsigned int index)
+void Engine::TextureInstance::setTextureIndex(unsigned int index)
 {
 	textureIndex = index;
 }
 
-void TextureInstance::setAnisotropicFilterEnabled(bool val)
+void Engine::TextureInstance::setAnisotropicFilterEnabled(bool val)
 {
 	applyAnisotropicFiltering = applyAnisotropicFiltering && val;
 }
 
-const float TextureInstance::getMificationFilterType() const
+const float Engine::TextureInstance::getMificationFilterType() const
 {
 	return minificationFilter;
 }
 
-const float TextureInstance::getMagnificationFilterType() const
+const float Engine::TextureInstance::getMagnificationFilterType() const
 {
 	return magnificationFilter;
 }
 
-const float TextureInstance::getTWrapType() const
+const float Engine::TextureInstance::getTWrapType() const
 {
 	return tComponentWrapType;
 }
 
-const float TextureInstance::getSWrapType() const
+const float Engine::TextureInstance::getSWrapType() const
 {
 	return sComponentWrapType;
 }
 
-const unsigned int TextureInstance::getTextureIndex() const
+const unsigned int Engine::TextureInstance::getTextureIndex() const
 {
 	return textureIndex;
 }
 
-const bool TextureInstance::isAnisotropicFilteringEnabled() const
+const bool Engine::TextureInstance::isAnisotropicFilteringEnabled() const
 {
 	return applyAnisotropicFiltering;
 }
 
-void TextureInstance::reseize(unsigned int w, unsigned int h)
+void Engine::TextureInstance::reseize(unsigned int w, unsigned int h)
 {
 	texture->setSize(w, h);
 	texture->uploadTexture();
 	configureTexture();
 }
 
-void TextureInstance::configureTexture() const
+void Engine::TextureInstance::configureTexture() const
 {
 	//glBindTexture(GL_TEXTURE_2D, texture->getTextureId());
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minificationFilter); 
@@ -224,30 +222,30 @@ void TextureInstance::configureTexture() const
 
 	if (applyAnisotropicFiltering)
 	{
-		float level = 1.0f * TextureTable::getInstance().getMaxAnisotropicFilterLevel();
+		float level = 1.0f * Engine::TextureTable::getInstance().getMaxAnisotropicFilterLevel();
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, level);
 	}
 }
 
 // ========================================================================
 
-TextureTable * TextureTable::INSTANCE = new TextureTable();
+Engine::TextureTable * Engine::TextureTable::INSTANCE = new Engine::TextureTable();
 
-TextureTable & TextureTable::getInstance()
+Engine::TextureTable & Engine::TextureTable::getInstance()
 {
 	return *INSTANCE;
 }
 
-TextureTable::TextureTable()
+Engine::TextureTable::TextureTable()
 {
 }
 
-TextureTable::~TextureTable()
+Engine::TextureTable::~TextureTable()
 {
 	destroy();
 }
 
-void TextureTable::checkForAnisotropicFilterSupport()
+void Engine::TextureTable::checkForAnisotropicFilterSupport()
 {
 	maxAnisotropicFilterLevel = 0.0f;
 	anisotropicFilteringSupport = glewIsSupported("GL_EXT_texture_filter_anisotropic");
@@ -262,9 +260,9 @@ void TextureTable::checkForAnisotropicFilterSupport()
 	}
 }
 
-void TextureTable::cacheTexture(std::string filename)
+void Engine::TextureTable::cacheTexture(std::string filename)
 {
-	std::map<std::string, Texture *>::iterator it = textureTable.find(filename);
+	std::map<std::string, Engine::Texture *>::iterator it = textureTable.find(filename);
 	if (it != textureTable.end())
 	{
 		std::cout << "TextureTable: attempt to load duplicate texture " << filename << std::endl;
@@ -280,15 +278,15 @@ void TextureTable::cacheTexture(std::string filename)
 		return;
 	}
 
-	Texture * texture = new Texture(filename, data, width, height);
+	Engine::Texture * texture = new Engine::Texture(filename, data, width, height);
 	texture->generateTexture();
 	texture->uploadTexture();
 	textureTable[filename] = texture;
 }
 
-TextureInstance * TextureTable::instantiateTexture(std::string fileName)
+Engine::TextureInstance * Engine::TextureTable::instantiateTexture(std::string fileName)
 {
-	std::map<std::string, Texture *>::iterator it = textureTable.find(fileName);
+	std::map<std::string, Engine::Texture *>::iterator it = textureTable.find(fileName);
 
 	if (it == textureTable.end())
 	{
@@ -296,22 +294,22 @@ TextureInstance * TextureTable::instantiateTexture(std::string fileName)
 		return NULL;
 	}
 
-	return new TextureInstance(it->second);
+	return new Engine::TextureInstance(it->second);
 }
 
-const bool TextureTable::isAnisotropicFilteringSupported() const
+const bool Engine::TextureTable::isAnisotropicFilteringSupported() const
 {
 	return anisotropicFilteringSupport;
 }
 
-const float TextureTable::getMaxAnisotropicFilterLevel() const
+const float Engine::TextureTable::getMaxAnisotropicFilterLevel() const
 {
 	return maxAnisotropicFilterLevel;
 }
 
-void TextureTable::destroy()
+void Engine::TextureTable::destroy()
 {
-	std::map<std::string, Texture *>::iterator it = textureTable.begin();
+	std::map<std::string, Engine::Texture *>::iterator it = textureTable.begin();
 	while (it != textureTable.end())
 	{
 		unsigned int id = it->second->getTextureId();

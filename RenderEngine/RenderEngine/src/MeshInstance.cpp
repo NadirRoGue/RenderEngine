@@ -5,24 +5,22 @@
 
 #include "MeshInstance.h"
 
-using namespace Engine;
-
-MeshInstance::MeshInstance(Mesh * m, std::string materialName)
+Engine::MeshInstance::MeshInstance(Engine::Mesh * m, std::string materialName)
 	:mesh(m)
 {
 	material = std::string(materialName);
 }
 
-MeshInstance::~MeshInstance()
+Engine::MeshInstance::~MeshInstance()
 {
 }
 
-std::string & MeshInstance::getMaterial()
+std::string & Engine::MeshInstance::getMaterial()
 {
 	return material;
 }
 
-Mesh * MeshInstance::getMesh()
+Engine::Mesh * Engine::MeshInstance::getMesh()
 {
 	return mesh;
 }

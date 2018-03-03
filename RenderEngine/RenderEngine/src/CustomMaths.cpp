@@ -5,8 +5,6 @@
 
 #include "CustomMaths.h"
 
-using namespace Engine;
-
 glm::vec3 Engine::voronoiTriangleAreas(const glm::vec3 &A, const glm::vec3 &B, const glm::vec3 &C)
 {
 	float aArea, bArea, cArea;

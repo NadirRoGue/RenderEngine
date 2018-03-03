@@ -7,20 +7,18 @@
 
 #include <iostream>
 
-using namespace Engine;
-
-KeyboardHandlersTable::KeyboardHandlersTable()
+Engine::KeyboardHandlersTable::KeyboardHandlersTable()
 {
 	for (int i = 0; i < 256; i++)
 		handlers[i] = 0;
 }
 
-KeyboardHandlersTable::~KeyboardHandlersTable()
+Engine::KeyboardHandlersTable::~KeyboardHandlersTable()
 {
 	destroy();
 }
 
-void KeyboardHandlersTable::registerHandler(KeyboardHandler *handler)
+void Engine::KeyboardHandlersTable::registerHandler(Engine::KeyboardHandler *handler)
 {
 	if (handler == nullptr)
 		return;
@@ -34,11 +32,11 @@ void KeyboardHandlersTable::registerHandler(KeyboardHandler *handler)
 	}
 }
 
-void KeyboardHandlersTable::handleKeyPress(unsigned char key, int x, int y)
+void Engine::KeyboardHandlersTable::handleKeyPress(unsigned char key, int x, int y)
 {
 	key = tolower(key);
 
-	KeyboardHandler * handler = handlers[key];
+	Engine::KeyboardHandler * handler = handlers[key];
 	
 	if (handler != 0)
 	{
@@ -46,7 +44,7 @@ void KeyboardHandlersTable::handleKeyPress(unsigned char key, int x, int y)
 	}
 }
 
-void KeyboardHandlersTable::destroy()
+void Engine::KeyboardHandlersTable::destroy()
 {
 	for (int i = 0; i < 256; i++)
 	{
@@ -56,15 +54,15 @@ void KeyboardHandlersTable::destroy()
 
 // ======================================================================================
 
-KeyboardHandler::KeyboardHandler()
+Engine::KeyboardHandler::KeyboardHandler()
 {
 }
 
-const std::list<unsigned char> & KeyboardHandler::getUsedKeys() const
+const std::list<unsigned char> & Engine::KeyboardHandler::getUsedKeys() const
 {
 	return usedKeys;
 }
 
-void KeyboardHandler::onKeyPressed(unsigned char key, int x, int y)
+void Engine::KeyboardHandler::onKeyPressed(unsigned char key, int x, int y)
 {
 }

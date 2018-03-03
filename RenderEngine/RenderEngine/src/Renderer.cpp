@@ -10,87 +10,86 @@
 
 #include <iostream>
 
-using namespace Engine;
 
-unsigned int ScreenManager::SCREEN_HEIGHT = 500;
-unsigned int ScreenManager::SCREEN_WIDTH = 500;
+unsigned int Engine::ScreenManager::SCREEN_HEIGHT = 500;
+unsigned int Engine::ScreenManager::SCREEN_WIDTH = 500;
 
-unsigned int ScreenManager::REAL_SCREEN_HEIGHT = 500;
-unsigned int ScreenManager::REAL_SCREEN_WIDTH = 500;
+unsigned int Engine::ScreenManager::REAL_SCREEN_HEIGHT = 500;
+unsigned int Engine::ScreenManager::REAL_SCREEN_WIDTH = 500;
 
 // ==================================================================
 
-Renderer::Renderer()
+Engine::Renderer::Renderer()
 {
 	activeCam = 0;
 }
 
-Renderer::~Renderer()
+Engine::Renderer::~Renderer()
 {
 }
 
-void Renderer::initialize()
+void Engine::Renderer::initialize()
 {
-	renderFromCamera(SceneManager::getInstance().getActiveScene()->getCamera());
+	renderFromCamera(Engine::SceneManager::getInstance().getActiveScene()->getCamera());
 }
 
-void Renderer::renderFromCamera(Camera * cam)
+void Engine::Renderer::renderFromCamera(Engine::Camera * cam)
 {
 	activeCam = cam;
 }
 
 // ==================================================================
 
-ForwardRenderer::ForwardRenderer()
-	:Renderer()
+Engine::ForwardRenderer::ForwardRenderer()
+	:Engine::Renderer()
 {
 }
 
-ForwardRenderer::~ForwardRenderer()
+Engine::ForwardRenderer::~ForwardRenderer()
 {
 }
 
-void ForwardRenderer::doRender()
+void Engine::ForwardRenderer::doRender()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	Scene * scene = SceneManager::getInstance().getActiveScene();
+	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
 
 	if (scene == 0)
 		return;
 
-	Camera * camera = activeCam;
+	Engine::Camera * camera = activeCam;
 
-	const std::map<std::string, ProgramRenderables *> renders = scene->getObjects();
+	const std::map<std::string, Engine::ProgramRenderables *> renders = scene->getObjects();
 
-	const std::map<std::string, PointLight *> pointLights = scene->getPointLights();
-	const std::map<std::string, SpotLight *> spotLights = scene->getSpotLights();
-	const std::map<std::string, DirectionalLight *> directionalLights = scene->getDirectionalLight();
+	const std::map<std::string, Engine::PointLight *> pointLights = scene->getPointLights();
+	const std::map<std::string, Engine::SpotLight *> spotLights = scene->getSpotLights();
+	const std::map<std::string, Engine::DirectionalLight *> directionalLights = scene->getDirectionalLight();
 
-	std::map<std::string, ProgramRenderables *>::const_iterator renderableIt;
+	std::map<std::string, Engine::ProgramRenderables *>::const_iterator renderableIt;
 	for (renderableIt = renders.cbegin(); renderableIt != renders.cend(); renderableIt++)
 	{
 		// Stablish program to use
 		// changing program is expensive -> https://www.opengl.org/discussion_boards/showthread.php/185615-cheep-expensive-calls
 		glUseProgram(renderableIt->second->program->getProgramId());
 
-		if (RenderManager::getInstance().isForwardRendering())
+		if (Engine::RenderManager::getInstance().isForwardRendering())
 		{
-			std::map<std::string, PointLight *>::const_iterator it = pointLights.cbegin();
+			std::map<std::string, Engine::PointLight *>::const_iterator it = pointLights.cbegin();
 			while (it != pointLights.end())
 			{
 				renderableIt->second->program->onRenderLight(it->second->getModelMatrix(), camera->getViewMatrix());
 				it++;
 			}
 
-			std::map<std::string, SpotLight *>::const_iterator slIt = spotLights.cbegin();
+			std::map<std::string, Engine::SpotLight *>::const_iterator slIt = spotLights.cbegin();
 			while (slIt != spotLights.end())
 			{
 				renderableIt->second->program->onRenderSpotLight(slIt->second->getModelMatrix(), slIt->second->getDirModelMatrix(), camera->getViewMatrix());
 				slIt++;
 			}
 
-			std::map<std::string, DirectionalLight *>::const_iterator dlIt = directionalLights.cbegin();
+			std::map<std::string, Engine::DirectionalLight *>::const_iterator dlIt = directionalLights.cbegin();
 			while (dlIt != directionalLights.end())
 			{
 				renderableIt->second->program->onRenderDirectionalLight(dlIt->second->getModelMatrix(), camera->getViewMatrix());
@@ -102,21 +101,21 @@ void ForwardRenderer::doRender()
 	}
 }
 
-void ForwardRenderer::renderProgram(Camera * camera, ProgramRenderables * renderables)
+void Engine::ForwardRenderer::renderProgram(Engine::Camera * camera, Engine::ProgramRenderables * renderables)
 {
 	glm::mat4 & viewMatrix = camera->getViewMatrix();
 	glm::mat4 & projMatrix = camera->getProjectionMatrix();
 
-	Program * program = renderables->program;
+	Engine::Program * program = renderables->program;
 
-	std::map<unsigned int, std::list<Object *>>::const_iterator it;
+	std::map<unsigned int, std::list<Engine::Object *>>::const_iterator it;
 	for (it = renderables->objects.cbegin(); it != renderables->objects.cend(); it++)
 	{
 		// Stablish vao to use
 		glBindVertexArray(it->first);
 
-		std::list<Object *> meshes = it->second;
-		std::list<Object *>::iterator listIt;
+		std::list<Engine::Object *> meshes = it->second;
+		std::list<Engine::Object *>::iterator listIt;
 
 		// foreach texture change (set a texture and render all object with that texture)
 
@@ -129,21 +128,21 @@ void ForwardRenderer::renderProgram(Camera * camera, ProgramRenderables * render
 	}
 }
 
-void ForwardRenderer::onResize(unsigned int w, unsigned int h)
+void Engine::ForwardRenderer::onResize(unsigned int w, unsigned int h)
 {
 
 }
 
 // ==================================================================
 
-DeferredRenderer::DeferredRenderer()
-	:Renderer()
+Engine::DeferredRenderer::DeferredRenderer()
+	:Engine::Renderer()
 {
-	forwardPass = new ForwardRenderer();
+	forwardPass = new Engine::ForwardRenderer();
 	initialized = false;
 }
 
-DeferredRenderer::~DeferredRenderer()
+Engine::DeferredRenderer::~DeferredRenderer()
 {
 	if (forwardPass != 0)
 	{
@@ -151,24 +150,24 @@ DeferredRenderer::~DeferredRenderer()
 	}
 }
 
-void DeferredRenderer::setForwardPassBuffers(DeferredRenderObject * buffers)
+void Engine::DeferredRenderer::setForwardPassBuffers(Engine::DeferredRenderObject * buffers)
 {
 	forwardPassBuffer = buffers;
 }
 
-void DeferredRenderer::addPostProcess(PostProcessChainNode * object)
+void Engine::DeferredRenderer::addPostProcess(Engine::PostProcessChainNode * object)
 {
 	postProcessChain.push_back(object);
 }
 
-void DeferredRenderer::setFinalPostProcess(PostProcessChainNode * object)
+void Engine::DeferredRenderer::setFinalPostProcess(Engine::PostProcessChainNode * object)
 {
 	finalLink = object;
 }
 
-void DeferredRenderer::initialize()
+void Engine::DeferredRenderer::initialize()
 {
-	Renderer::initialize();
+	Engine::Renderer::initialize();
 
 	if (initialized)
 		return;
@@ -177,11 +176,11 @@ void DeferredRenderer::initialize()
 
 	forwardPassBuffer->initialize();
 
-	std::list<PostProcessChainNode *>::iterator it = postProcessChain.begin();
-	DeferredRenderObject * previousLink = forwardPassBuffer;
+	std::list<Engine::PostProcessChainNode *>::iterator it = postProcessChain.begin();
+	Engine::DeferredRenderObject * previousLink = forwardPassBuffer;
 	while (it != postProcessChain.end())
 	{
-		PostProcessChainNode * node = (*it);
+		Engine::PostProcessChainNode * node = (*it);
 		// Initialize FBO and textures
 		node->renderBuffer->initialize();
 		// Set the output of the previous pass as the input of the next
@@ -200,33 +199,31 @@ void DeferredRenderer::initialize()
 	previousLink->populateDeferredObject(finalLink->obj);
 }
 
-void DeferredRenderer::doRender()
+void Engine::DeferredRenderer::doRender()
 {
-	Scene * scene = SceneManager::getInstance().getActiveScene();
+	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
 
 	if (scene == 0)
 		return;
 
-	Camera * cam = activeCam;
+	Engine::Camera * cam = activeCam;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, forwardPassBuffer->getFrameBufferId());
 	
 	forwardPass->renderFromCamera(cam);
 	forwardPass->doRender();
 
-	//glDisable(GL_CULL_FACE);
-	//glDisable(GL_DEPTH_TEST);
-	std::list<PostProcessChainNode *>::iterator it = postProcessChain.begin();
+	std::list<Engine::PostProcessChainNode *>::iterator it = postProcessChain.begin();
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 	while (it != postProcessChain.end())
 	{
-		PostProcessChainNode * node = (*it);
+		Engine::PostProcessChainNode * node = (*it);
 
-		DeferredRenderObject * buffer = node->renderBuffer;
+		Engine::DeferredRenderObject * buffer = node->renderBuffer;
 		glBindFramebuffer(GL_FRAMEBUFFER, buffer->getFrameBufferId());
 
-		Program * prog = node->postProcessProgram;
+		Engine::Program * prog = node->postProcessProgram;
 		glUseProgram(prog->getProgramId());
 
 		if (node->callBack != 0)
@@ -263,11 +260,11 @@ void DeferredRenderer::doRender()
 	glDisable(GL_BLEND);
 }
 
-void DeferredRenderer::onResize(unsigned int w, unsigned int h)
+void Engine::DeferredRenderer::onResize(unsigned int w, unsigned int h)
 {
 	forwardPassBuffer->resizeFBO(w, h);
 
-	std::list<PostProcessChainNode *>::iterator it = postProcessChain.begin();
+	std::list<Engine::PostProcessChainNode *>::iterator it = postProcessChain.begin();
 	while (it != postProcessChain.end())
 	{
 		(*it)->renderBuffer->resizeFBO(w, h);
@@ -277,17 +274,17 @@ void DeferredRenderer::onResize(unsigned int w, unsigned int h)
 
 // =========================================================================
 
-SideBySideRenderer::SideBySideRenderer()
-	:Renderer()
+Engine::SideBySideRenderer::SideBySideRenderer()
+	:Engine::Renderer()
 {
-	leftRenderer = new DeferredRenderer();
-	rightRenderer = new DeferredRenderer();
+	leftRenderer = new Engine::DeferredRenderer();
+	rightRenderer = new Engine::DeferredRenderer();
 	initialized = false;
 	clearScreen = true;
 	c = 0;
 }
 
-SideBySideRenderer::~SideBySideRenderer()
+Engine::SideBySideRenderer::~SideBySideRenderer()
 {
 	if (leftRenderer != 0)
 	{
@@ -300,62 +297,62 @@ SideBySideRenderer::~SideBySideRenderer()
 	}
 }
 
-void SideBySideRenderer::setLeftForwardPassBuffer(DeferredRenderObject * buffer)
+void Engine::SideBySideRenderer::setLeftForwardPassBuffer(Engine::DeferredRenderObject * buffer)
 {
 	leftRenderer->setForwardPassBuffers(buffer);
 }
 
-void SideBySideRenderer::setRightForwardPassBuffer(DeferredRenderObject * buffer)
+void Engine::SideBySideRenderer::setRightForwardPassBuffer(Engine::DeferredRenderObject * buffer)
 {
 	rightRenderer->setForwardPassBuffers(buffer);
 }
 
-void SideBySideRenderer::addLeftPostProcess(PostProcessChainNode * node)
+void Engine::SideBySideRenderer::addLeftPostProcess(Engine::PostProcessChainNode * node)
 {
 	leftRenderer->addPostProcess(node);
 }
 
-void SideBySideRenderer::addRightPostProcess(PostProcessChainNode * node)
+void Engine::SideBySideRenderer::addRightPostProcess(Engine::PostProcessChainNode * node)
 {
 	rightRenderer->addPostProcess(node);
 }
 
-void SideBySideRenderer::setClearScreen(bool val)
+void Engine::SideBySideRenderer::setClearScreen(bool val)
 {
 	clearScreen = val;
 }
 
-void SideBySideRenderer::initialize()
+void Engine::SideBySideRenderer::initialize()
 {
 	if (initialized)
 		return;
 
 	initialized = true;
 
-	Program * sourcePostProcess = ProgramTable::getInstance().getProgramByName("post_processing_program");
-	MeshInstance * mi = MeshInstanceTable::getInstance().getMeshInstance("left_plane", "post_processing_program");
+	Engine::Program * sourcePostProcess = Engine::ProgramTable::getInstance().getProgramByName("post_processing_program");
+	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("left_plane", "post_processing_program");
 
-	PostProcessChainNode * lNode = new PostProcessChainNode;
-	lNode->postProcessProgram = new PostProcessProgram(*dynamic_cast<PostProcessProgram*>(sourcePostProcess));
+	Engine::PostProcessChainNode * lNode = new Engine::PostProcessChainNode;
+	lNode->postProcessProgram = new Engine::PostProcessProgram(*dynamic_cast<Engine::PostProcessProgram*>(sourcePostProcess));
 	lNode->renderBuffer = 0;
-	lNode->callBack = new MotionBlurImpl();
-	lNode->obj = new Object(mi);
+	lNode->callBack = new Engine::MotionBlurImpl();
+	lNode->obj = new Engine::Object(mi);
 
 	leftRenderer->setFinalPostProcess(lNode);
 	leftRenderer->initialize();
 
-	MeshInstance * miR = MeshInstanceTable::getInstance().getMeshInstance("right_plane", "post_processing_program");
-	PostProcessChainNode * rNode = new PostProcessChainNode;
-	rNode->postProcessProgram = new PostProcessProgram(*dynamic_cast<PostProcessProgram*>(sourcePostProcess));
+	Engine::MeshInstance * miR = Engine::MeshInstanceTable::getInstance().getMeshInstance("right_plane", "post_processing_program");
+	Engine::PostProcessChainNode * rNode = new Engine::PostProcessChainNode;
+	rNode->postProcessProgram = new Engine::PostProcessProgram(*dynamic_cast<Engine::PostProcessProgram*>(sourcePostProcess));
 	rNode->renderBuffer = 0;
-	rNode->callBack = new MotionBlurImpl();
-	rNode->obj = new Object(miR);
+	rNode->callBack = new Engine::MotionBlurImpl();
+	rNode->obj = new Engine::Object(miR);
 	
 	rightRenderer->setFinalPostProcess(rNode);
 	rightRenderer->initialize();
 }
 
-void SideBySideRenderer::doRender()
+void Engine::SideBySideRenderer::doRender()
 {
 	if (clearScreen)
 	{
@@ -370,9 +367,9 @@ void SideBySideRenderer::doRender()
 		c++;
 	}
 
-	Camera * leftCam = SceneManager::getInstance().getActiveScene()->getCamera();
+	Engine::Camera * leftCam = Engine::SceneManager::getInstance().getActiveScene()->getCamera();
 
-	Camera rightCamera(*leftCam);
+	Engine::Camera rightCamera(*leftCam);
 	rightCamera.translateView(glm::vec3(-0.4f, 0.0f, 0.0f));
 
 	leftRenderer->renderFromCamera(leftCam);
@@ -382,7 +379,7 @@ void SideBySideRenderer::doRender()
 	rightRenderer->doRender();
 }
 
-void SideBySideRenderer::onResize(unsigned int w, unsigned int h)
+void Engine::SideBySideRenderer::onResize(unsigned int w, unsigned int h)
 {
 	leftRenderer->onResize(w, h);
 	rightRenderer->onResize(w, h);
@@ -391,14 +388,14 @@ void SideBySideRenderer::onResize(unsigned int w, unsigned int h)
 // =========================================================================
 // =========================================================================
 
-RenderManager * RenderManager::INSTANCE = new RenderManager();
+Engine::RenderManager * Engine::RenderManager::INSTANCE = new Engine::RenderManager();
 
-RenderManager & RenderManager::getInstance()
+Engine::RenderManager & Engine::RenderManager::getInstance()
 {
 	return *INSTANCE;
 }
 
-RenderManager::RenderManager()
+Engine::RenderManager::RenderManager()
 {
 	forwardRenderer = 0;
 	deferredRenderer = 0;
@@ -406,7 +403,7 @@ RenderManager::RenderManager()
 	activeRender = 0;
 }
 
-RenderManager::~RenderManager()
+Engine::RenderManager::~RenderManager()
 {
 	if (forwardRenderer != 0)
 		delete forwardRenderer;
@@ -417,12 +414,12 @@ RenderManager::~RenderManager()
 	activeRender = 0;
 }
 
-void RenderManager::doRender()
+void Engine::RenderManager::doRender()
 {
 	activeRender->doRender();
 }
 
-void RenderManager::forwardRender()
+void Engine::RenderManager::forwardRender()
 {
 	if (forwardRenderer != 0)
 	{
@@ -431,7 +428,7 @@ void RenderManager::forwardRender()
 	}
 }
 
-void RenderManager::deferredRender()
+void Engine::RenderManager::deferredRender()
 {
 	if (deferredRenderer != 0)
 	{
@@ -440,7 +437,7 @@ void RenderManager::deferredRender()
 	}
 }
 
-void RenderManager::sideBySideRender()
+void Engine::RenderManager::sideBySideRender()
 {
 	if (sideBySideRenderer != 0)
 	{
@@ -450,45 +447,45 @@ void RenderManager::sideBySideRender()
 	}
 }
 
-void RenderManager::setForwardRenderer(ForwardRenderer * fr)
+void Engine::RenderManager::setForwardRenderer(Engine::ForwardRenderer * fr)
 {
 	forwardRenderer = fr;
 	forwardRenderer->initialize();
 	forwardRenderer->onResize(ScreenManager::REAL_SCREEN_WIDTH, ScreenManager::REAL_SCREEN_HEIGHT);
 }
 
-void RenderManager::setDeferredRenderer(DeferredRenderer * dr)
+void Engine::RenderManager::setDeferredRenderer(Engine::DeferredRenderer * dr)
 {
 	deferredRenderer = dr;
 	deferredRenderer->initialize();
 	deferredRenderer->onResize(ScreenManager::REAL_SCREEN_WIDTH, ScreenManager::REAL_SCREEN_HEIGHT);
 }
 
-void RenderManager::setSideBySideRenderer(SideBySideRenderer * renderer)
+void Engine::RenderManager::setSideBySideRenderer(Engine::SideBySideRenderer * renderer)
 {
 	sideBySideRenderer = renderer;
 	sideBySideRenderer->initialize();
 	sideBySideRenderer->onResize(ScreenManager::REAL_SCREEN_WIDTH, ScreenManager::REAL_SCREEN_HEIGHT);
 }
 
-void RenderManager::doResize(unsigned int w, unsigned int h)
+void Engine::RenderManager::doResize(unsigned int w, unsigned int h)
 {
-	ScreenManager::SCREEN_WIDTH = ScreenManager::REAL_SCREEN_WIDTH = w;
-	ScreenManager::SCREEN_HEIGHT = ScreenManager::REAL_SCREEN_HEIGHT = h;
+	Engine::ScreenManager::SCREEN_WIDTH = Engine::ScreenManager::REAL_SCREEN_WIDTH = w;
+	Engine::ScreenManager::SCREEN_HEIGHT = Engine::ScreenManager::REAL_SCREEN_HEIGHT = h;
 	activeRender->onResize(w, h);
 }
 
-bool RenderManager::isForwardRendering()
+bool Engine::RenderManager::isForwardRendering()
 {
 	return forwardRendering;
 }
 
-DeferredRenderer * RenderManager::getCurrentDeferredRenderer()
+Engine::DeferredRenderer * Engine::RenderManager::getCurrentDeferredRenderer()
 {
 	return deferredRenderer;
 }
 
-ForwardRenderer * RenderManager::getCurrentForwardRenderer()
+Engine::ForwardRenderer * Engine::RenderManager::getCurrentForwardRenderer()
 {
 	return forwardRenderer;
 }
