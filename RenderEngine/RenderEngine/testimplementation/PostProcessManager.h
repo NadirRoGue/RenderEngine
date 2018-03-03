@@ -10,7 +10,7 @@
 
 namespace Engine
 {
-	namespace DefaultDeferredConfiguration
+	namespace TestImplementation
 	{
 		DeferredRenderer * createDeferredRendererWithDoF();
 		DeferredRenderer * createDeferredDepthRenderer();

@@ -275,11 +275,11 @@ Engine::TestImplementation::RendererSwitcher::RendererSwitcher()
 	standarFR = RenderManager::getInstance().getCurrentForwardRenderer();
 	standarDR = RenderManager::getInstance().getCurrentDeferredRenderer();
 
-	depthDR = Engine::DefaultDeferredConfiguration::createDeferredDepthRenderer();
-	colorDR = Engine::DefaultDeferredConfiguration::createColorRenderer();
-	normalDR = Engine::DefaultDeferredConfiguration::createNormalRenderer();
-	specularDR = Engine::DefaultDeferredConfiguration::createSpecularRenderer();
-	toonDR = Engine::DefaultDeferredConfiguration::createToonShaderRenderer();
+	depthDR = Engine::TestImplementation::createDeferredDepthRenderer();
+	colorDR = Engine::TestImplementation::createColorRenderer();
+	normalDR = Engine::TestImplementation::createNormalRenderer();
+	specularDR = Engine::TestImplementation::createSpecularRenderer();
+	toonDR = Engine::TestImplementation::createToonShaderRenderer();
 
 	initialize3GaussRenderer();
 	initializeFullPPRenderer();
@@ -336,12 +336,12 @@ void Engine::TestImplementation::RendererSwitcher::initializeFullPPRenderer()
 {
 	fullPostProcessDR = new Engine::DeferredRenderer();
 
-	Engine::DeferredRenderObject * start = Engine::DefaultDeferredConfiguration::createForwardBuffer();
+	Engine::DeferredRenderObject * start = Engine::TestImplementation::createForwardBuffer();
 
-	Engine::PostProcessChainNode * dS = Engine::DefaultDeferredConfiguration::createDeferredShadingNode();
-	Engine::PostProcessChainNode * toon = Engine::DefaultDeferredConfiguration::createToonShadingNode();
-	Engine::PostProcessChainNode * dof = Engine::DefaultDeferredConfiguration::createDepthOfField(false, false);
-	Engine::PostProcessChainNode * end = Engine::DefaultDeferredConfiguration::createFinalLink(false, false);
+	Engine::PostProcessChainNode * dS = Engine::TestImplementation::createDeferredShadingNode();
+	Engine::PostProcessChainNode * toon = Engine::TestImplementation::createToonShadingNode();
+	Engine::PostProcessChainNode * dof = Engine::TestImplementation::createDepthOfField(false, false);
+	Engine::PostProcessChainNode * end = Engine::TestImplementation::createFinalLink(false, false);
 
 	fullPostProcessDR->setForwardPassBuffers(start);
 	fullPostProcessDR->addPostProcess(dS);
@@ -354,7 +354,7 @@ void Engine::TestImplementation::RendererSwitcher::initialize3GaussRenderer()
 {
 	threeGaussFilterDR = new Engine::DeferredRenderer();
 
-	Engine::DeferredRenderObject * start = Engine::DefaultDeferredConfiguration::createForwardBuffer();
+	Engine::DeferredRenderObject * start = Engine::TestImplementation::createForwardBuffer();
 
 	float maskFactor = 1.0f / 20.0f;
 	float tempMask3[] =
@@ -366,11 +366,11 @@ void Engine::TestImplementation::RendererSwitcher::initialize3GaussRenderer()
 		0.0f*maskFactor, 0.0f*maskFactor, 5.0f*maskFactor,0.0f*maskFactor, 0.0f*maskFactor
 	};
 
-	Engine::PostProcessChainNode * dS = Engine::DefaultDeferredConfiguration::createDeferredShadingNode();
-	Engine::PostProcessChainNode * gauss1 = Engine::DefaultDeferredConfiguration::create5x5GaussianBlur(tempMask3, false);
-	Engine::PostProcessChainNode * gauss2 = Engine::DefaultDeferredConfiguration::create5x5GaussianBlur(tempMask3, false);
-	Engine::PostProcessChainNode * gauss3 = Engine::DefaultDeferredConfiguration::create5x5GaussianBlur(tempMask3, false);
-	Engine::PostProcessChainNode * end = Engine::DefaultDeferredConfiguration::createFinalLink(false, false);
+	Engine::PostProcessChainNode * dS = Engine::TestImplementation::createDeferredShadingNode();
+	Engine::PostProcessChainNode * gauss1 = Engine::TestImplementation::create5x5GaussianBlur(tempMask3, false);
+	Engine::PostProcessChainNode * gauss2 = Engine::TestImplementation::create5x5GaussianBlur(tempMask3, false);
+	Engine::PostProcessChainNode * gauss3 = Engine::TestImplementation::create5x5GaussianBlur(tempMask3, false);
+	Engine::PostProcessChainNode * end = Engine::TestImplementation::createFinalLink(false, false);
 
 	threeGaussFilterDR->setForwardPassBuffers(start);
 	threeGaussFilterDR->addPostProcess(dS);
@@ -384,14 +384,14 @@ void Engine::TestImplementation::RendererSwitcher::initializeSideBySideRenderer(
 {
 	sideBySideRenderer = new Engine::SideBySideRenderer();
 
-	Engine::DeferredRenderObject * startL = DefaultDeferredConfiguration::createForwardBufferWithDepth();
-	Engine::DeferredRenderObject * startR = DefaultDeferredConfiguration::createForwardBufferWithDepth();
-	Engine::PostProcessChainNode * leftAA = DefaultDeferredConfiguration::createScreenAntiAliasing();
-	Engine::PostProcessChainNode * rightAA = DefaultDeferredConfiguration::createScreenAntiAliasing();
-	Engine::PostProcessChainNode * dSR = DefaultDeferredConfiguration::createDeferredShadingNode();
-	Engine::PostProcessChainNode * dSL = DefaultDeferredConfiguration::createDeferredShadingNode();
-	Engine::PostProcessChainNode * gaussL = DefaultDeferredConfiguration::createDepthOfField(false, false);
-	Engine::PostProcessChainNode * gaussR = DefaultDeferredConfiguration::createDepthOfField(false, false);
+	Engine::DeferredRenderObject * startL = TestImplementation::createForwardBufferWithDepth();
+	Engine::DeferredRenderObject * startR = TestImplementation::createForwardBufferWithDepth();
+	Engine::PostProcessChainNode * leftAA = TestImplementation::createScreenAntiAliasing();
+	Engine::PostProcessChainNode * rightAA = TestImplementation::createScreenAntiAliasing();
+	Engine::PostProcessChainNode * dSR = TestImplementation::createDeferredShadingNode();
+	Engine::PostProcessChainNode * dSL = TestImplementation::createDeferredShadingNode();
+	Engine::PostProcessChainNode * gaussL = TestImplementation::createDepthOfField(false, false);
+	Engine::PostProcessChainNode * gaussR = TestImplementation::createDepthOfField(false, false);
 
 	sideBySideRenderer->setLeftForwardPassBuffer(startL);
 	sideBySideRenderer->addLeftPostProcess(dSL);

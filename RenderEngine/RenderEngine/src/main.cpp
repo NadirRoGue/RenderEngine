@@ -362,7 +362,7 @@ void initHandlers()
 
 void initRenderEngine()
 {
-	Engine::DeferredRenderer * dr = Engine::DefaultDeferredConfiguration::createDeferredRendererWithDoF();
+	Engine::DeferredRenderer * dr = Engine::TestImplementation::createDeferredRendererWithDoF();
 
 	Engine::RenderManager::getInstance().setForwardRenderer(new Engine::ForwardRenderer());
 	Engine::RenderManager::getInstance().setDeferredRenderer(dr);

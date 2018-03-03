@@ -139,7 +139,6 @@
     <ClInclude Include="include\MouseHandler.h" />
     <ClInclude Include="include\Object.h" />
     <ClInclude Include="include\PLANE.h" />
-    <ClInclude Include="include\PostProcessManager.h" />
     <ClInclude Include="include\PostProcessProgram.h" />
     <ClInclude Include="include\Program.h" />
     <ClInclude Include="include\ProgramTable.h" />
@@ -148,6 +147,7 @@
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="testimplementation\AnimImpl.h" />
     <ClInclude Include="testimplementation\InputImpl.h" />
+    <ClInclude Include="testimplementation\PostProcessManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp" />
@@ -165,7 +165,6 @@
     <ClCompile Include="src\MeshLoader.cpp" />
     <ClCompile Include="src\MouseHandler.cpp" />
     <ClCompile Include="src\Object.cpp" />
-    <ClCompile Include="src\PostProcessManager.cpp" />
     <ClCompile Include="src\PostProcessProgram.cpp" />
     <ClCompile Include="src\Program.cpp" />
     <ClCompile Include="src\ProgramTable.cpp" />
@@ -174,6 +173,7 @@
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="testimplementation\AnimImpl.cpp" />
     <ClCompile Include="testimplementation\InputImpl.cpp" />
+    <ClCompile Include="testimplementation\PostProcessManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

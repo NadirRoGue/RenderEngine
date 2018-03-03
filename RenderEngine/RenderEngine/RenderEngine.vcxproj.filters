@@ -66,9 +66,6 @@
     <ClInclude Include="include\PLANE.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="include\PostProcessManager.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="include\PostProcessProgram.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
@@ -94,6 +91,9 @@
       <Filter>Archivos de encabezado\testimplementation</Filter>
     </ClInclude>
     <ClInclude Include="testimplementation\AnimImpl.h">
+      <Filter>Archivos de encabezado\testimplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="testimplementation\PostProcessManager.h">
       <Filter>Archivos de encabezado\testimplementation</Filter>
     </ClInclude>
   </ItemGroup>
@@ -140,9 +140,6 @@
     <ClCompile Include="src\Object.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="src\PostProcessManager.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
     <ClCompile Include="src\PostProcessProgram.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
@@ -168,6 +165,9 @@
       <Filter>Archivos de origen\testimplementation</Filter>
     </ClCompile>
     <ClCompile Include="testimplementation\AnimImpl.cpp">
+      <Filter>Archivos de origen\testimplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="testimplementation\PostProcessManager.cpp">
       <Filter>Archivos de origen\testimplementation</Filter>
     </ClCompile>
   </ItemGroup>
