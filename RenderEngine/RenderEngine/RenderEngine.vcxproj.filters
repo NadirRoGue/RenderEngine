@@ -96,6 +96,9 @@
     <ClInclude Include="testimplementation\PostProcessManager.h">
       <Filter>Archivos de encabezado\testimplementation</Filter>
     </ClInclude>
+    <ClInclude Include="include\Material.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -169,6 +172,9 @@
     </ClCompile>
     <ClCompile Include="testimplementation\PostProcessManager.cpp">
       <Filter>Archivos de origen\testimplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Material.cpp">
+      <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

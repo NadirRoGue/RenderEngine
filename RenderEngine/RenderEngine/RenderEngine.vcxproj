@@ -140,6 +140,7 @@
     <ClInclude Include="include\KeyboardHandler.h" />
     <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\CustomMaths.h" />
+    <ClInclude Include="include\Material.h" />
     <ClInclude Include="include\Mesh.h" />
     <ClInclude Include="include\MeshInstance.h" />
     <ClInclude Include="include\MeshInstanceTable.h" />
@@ -167,6 +168,7 @@
     <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\CustomMaths.cpp" />
+    <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MeshInstance.cpp" />
     <ClCompile Include="src\MeshInstanceTable.cpp" />
