@@ -1,0 +1,100 @@
+#version 400
+
+layout(triangles, equal_spacing, ccw) in;
+
+layout(location=2) in vec3 inNormal[];
+layout(location=3) in vec2 inUV[];
+
+#ifndef AUTOLOD
+layout (location=1) out vec3 outPos;
+#endif
+
+layout (location=2) out vec3 outNormal;
+layout (location=3) out vec2 outUV;
+
+#ifndef AUTOLOD
+uniform mat4 modelViewProj;
+uniform mat4 modelView;
+uniform mat4 normal;
+#endif
+
+void main()
+{
+	float u = gl_TessCoord.x;
+	float v = gl_TessCoord.y;
+	float w = gl_TessCoord.z;
+
+	vec3 a = gl_in[0].gl_Position.xyz;
+	vec3 b = gl_in[1].gl_Position.xyz;
+	vec3 c = gl_in[2].gl_Position.xyz;
+
+	vec3 n1 = inNormal[0];
+	vec3 n2 = inNormal[1];
+	vec3 n3 = inNormal[2];
+
+	vec2 aUv = inUV[0];
+	vec2 bUv = inUV[1];
+	vec2 cUv = inUV[2];
+
+	vec2 uv1 = mix(aUv, bUv, u);
+
+	//outUV = aUv * u + bUv * v + cUv * w;
+	outUV = aUv * w + bUv * u + cUv * v;
+
+	vec3 p0 = a;
+	vec3 p1 = b;
+	vec3 p2 = c;
+
+	vec3 b300 = p0;
+	vec3 b030 = p1;
+	vec3 b003 = p2;
+
+	float w12 = dot(p1 - p0, n1);
+	float w21 = dot(p0 - p1, n2);
+	float w13 = dot(p2 - p0, n1);
+	float w31 = dot(p0 - p2, n3);
+	float w23 = dot(p2 - p1, n2);
+	float w32 = dot(p1 - p2, n3);
+
+	vec3 b210 = (2.*p0 + p1 - w12*n1) / 3.;
+	vec3 b120 = (2.*p1 + p0 - w21*n2) / 3.;
+	vec3 b021 = (2.*p1 + p2 - w23*n2) / 3.;
+	vec3 b012 = (2.*p2 + p1 - w32*n3) / 3.;
+	vec3 b102 = (2.*p2 + p0 - w31*n3) / 3.;
+	vec3 b201 = (2.*p0 + p2 - w13*n1) / 3.;
+
+	vec3 ee = (b210 + b120 + b021 + b012 + b102 + b201) / 6.;
+	vec3 vv = (p0 + p1 + p2) / 3.;
+	vec3 b111 = ee + (ee - vv) / 2.;
+
+	vec3 xyz = b300*w*w*w + b030*u*u*u + b003*v*v*v +
+				3.*b210*u*w*w + 3.*b120*u*u*w + 3.*b201*v*w*w +
+				3.*b021*u*u*v + 3.*b102*v*v*w + 3.*b012*u*v*v +
+				6.*b111*u*v*w;
+
+	#ifdef AUTOLOD
+	gl_Position = vec4(xyz, 1.0);
+	#else
+	gl_Position = modelViewProj * vec4(xyz, 1.0);
+	outPos = (modelView * vec4(xyz, 1.0)).xyz
+	#endif
+	
+	vec3 n200 = n1;
+	vec3 n020 = n2;
+	vec3 n002 = n3;
+
+	float v12 = 2. * dot(p1 - p0, n1 + n2) / dot(p1 - p0, p1 - p0);
+	float v23 = 2. * dot(p2 - p1, n2 + n3) / dot(p2 - p1, p2 - p1);
+	float v31 = 2. * dot(p0 - p2, n3 + n1) / dot(p0 - p2, p0 - p2);
+
+	vec3 n110 = normalize(n1 + n2 - v12*(p1-p0));
+	vec3 n011 = normalize(n2 + n3 - v23*(p2-p1));
+	vec3 n101 = normalize(n3 + n1 - v31*(p0-p2));
+
+	vec3 computedNormal = n200*w*w + n020*u*u + n002*v*v + n110*w*u + n011*u*v + n101*w*v;
+	#ifdef AUTOLOD
+	outNormal = computedNormal;
+	#else
+	outNormal = (normal * vec4(computedNormal, 1.0)).xyz;
+	#endif
+}

@@ -24,6 +24,7 @@ Engine::Program::Program(const Engine::Program & other)
 	fShader = other.fShader;
 }
 
+/*
 void Engine::Program::initialize(std::string vertexShader, std::string fragmentShader)
 {
 	// Creamos el shader de vértices
@@ -61,7 +62,7 @@ void Engine::Program::initialize(std::string vertexShader, std::string fragmentS
 
 	configureProgram();
 }
-
+*/
 Engine::Program::~Program()
 {
 }
@@ -71,37 +72,35 @@ unsigned int Engine::Program::getProgramId() const
 	return glProgram;
 }
 
-unsigned int Engine::Program::loadShader(std::string fileName, GLenum type)
+unsigned int Engine::Program::loadShader(std::string fileName, GLenum type, std::string config)
 {
 	unsigned int fileLen;
-	// Cargamos en memoria el código del shader
-	char *source = loadStringFromFile(fileName.c_str(), fileLen);
+	char * source = loadStringFromFile(fileName.c_str(), fileLen);
 
-	//////////////////////////////////////////////
-	//Creación y compilación del Shader
-	GLuint shader;
-	// Creamos un objecto de tipo shader en el contexto (obtenemos su identificador)
-	shader = glCreateShader(type);
-	// Establecemos el código del shader
-	glShaderSource(shader, 1, (const GLchar **)&source, (const GLint *)&fileLen);
-	// Compilamos el shader
-	glCompileShader(shader);
-	// Liberamos la memoria de la cadena del código
+	char * finalSource = new char[strlen(source) + config.length];
+	strcpy(finalSource, config.c_str());
+	strcat(finalSource, source);
+	fileLen += config.length;
+
 	delete[] source;
 
-	//Comprobamos que se compiló bien
+	GLuint shader = glCreateShader(type);
+	glShaderSource(shader, 1, (const GLchar **)&finalSource, (const GLint *)&fileLen);
+	glCompileShader(shader);
+	
+	delete[] finalSource;
+
 	GLint compiled;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
 	if (!compiled)
 	{
-		//Calculamos una cadena de error
 		GLint logLen;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLen);
 		char *logString = new char[logLen];
 		glGetShaderInfoLog(shader, logLen, NULL, logString);
 		std::cout << "Error: " << logString << std::endl;
 		delete[] logString;
-		glDeleteShader(shader); // No necesario, pues después salimos de la aplicación
+		glDeleteShader(shader);
 		exit(-1);
 	}
 
@@ -125,28 +124,51 @@ std::string Engine::Program::getName() const
 	return name;
 }
 
-void Engine::Program::destroy()
+void Engine::Program::onRenderLight(const glm::mat4 & model, const glm::mat4 & view)
 {
-	glDetachShader(glProgram, vShader);
-	glDeleteShader(vShader);
 
-	glDetachShader(glProgram, fShader);
-	glDeleteShader(fShader);
+}
 
-	glDeleteProgram(glProgram);
+void Engine::Program::onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view)
+{
+
+}
+
+void Engine::Program::onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view)
+{
+
+}
+
+void Engine::Program::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+{
+
 }
 
 // ==============================================================================
 // ==============================================================================
 
-Engine::StandarProgram::StandarProgram(std::string name)
+Engine::StandarProgram::StandarProgram(std::string name, unsigned long flags)
 	:Engine::Program(name)
 {
+	this->flags = flags;
 }
 
 Engine::StandarProgram::StandarProgram(const Engine::StandarProgram & other)
 	: Engine::Program(other)
 {
+	flags = other.flags;
+
+	tcsShader = other.tcsShader;
+	tevalShader = other.tevalShader;
+	gShader = other.gShader;
+
+	inPos = other.inPos;
+	inNormal = other.inNormal;
+	inTexCoord = other.inTexCoord;
+	inColor = other.inColor;
+	inTangent = other.inTangent;
+	
+	/*
 	uPointLightPos = other.uPointLightPos;
 	uIa = other.uIa;
 	uId = other.uId;
@@ -168,6 +190,101 @@ Engine::StandarProgram::StandarProgram(const Engine::StandarProgram & other)
 	uDLIs = other.uDLIs;
 
 	uBackground = other.uBackground;
+	*/
+}
+
+Engine::StandarProgram::~StandarProgram()
+{
+
+}
+
+std::string Engine::StandarProgram::createConfigString()
+{
+	std::string configStr = "";
+
+	if (flags & Engine::StandarProgram::ALBEDO_BIT)
+	{
+		configStr += "#define ALBEDO_MAPPING\n";
+	}
+
+	if (flags & Engine::StandarProgram::NORMAL_MAP_BIT)
+	{
+		configStr += "#define NORMAL_MAPPING\n";
+	}
+
+	if (flags & Engine::StandarProgram::SPECULAR_MAP_BIT)
+	{
+		configStr += "#define SPECULAR_MAPPING\n";
+	}
+
+	if (flags & Engine::StandarProgram::EMISSIVE_MAP_BIT)
+	{
+		configStr += "#define EMISSIVE_MAPPING\n";
+	}
+
+	if (flags & Engine::StandarProgram::OCCLUSION_MAP_BIT)
+	{
+		configStr += "#define OCCLUSION_MAPPING\n";
+	}
+
+	if (flags & Engine::StandarProgram::DISPLACEMENT_MAP_BIT)
+	{
+		configStr += "#define DISPLACEMENT_MAPPING\n";
+	}
+
+	if (flags & Engine::StandarProgram::AUTOLOD_BIT)
+	{
+		configStr += "#define AUTOLOD\n";
+	}
+
+	return configStr;
+}
+
+void Engine::StandarProgram::initialize()
+{
+	glProgram = glCreateProgram();
+
+	std::string config = createConfigString();
+
+	vShader = loadShader("shaders/standard.vert", GL_VERTEX_SHADER, config);
+	glAttachShader(glProgram, vShader);
+
+	if (flags & Engine::StandarProgram::AUTOLOD_BIT)
+	{
+		tcsShader = loadShader("shaders/standard.tessctrl", GL_TESS_CONTROL_SHADER, config);
+		glAttachShader(glProgram, tcsShader);
+
+		tevalShader = loadShader("shaders/standard.tesseval", GL_TESS_EVALUATION_SHADER, config);
+		glAttachShader(glProgram, tevalShader);
+	}
+
+	if (flags & Engine::StandarProgram::DISPLACEMENT_MAP_BIT)
+	{
+		gShader = loadShader("shaders/standard.geom", GL_GEOMETRY_SHADER, config);
+		glAttachShader(glProgram, gShader);
+	}
+	
+	fShader = loadShader("shaders/standard.frag", GL_FRAGMENT_SHADER, config);
+	glAttachShader(glProgram, fShader);
+
+	glLinkProgram(glProgram);
+
+	int linked;
+	glGetProgramiv(glProgram, GL_LINK_STATUS, &linked);
+	if (!linked)
+	{
+		GLint logLen;
+		glGetProgramiv(glProgram, GL_INFO_LOG_LENGTH, &logLen);
+		char *logString = new char[logLen];
+		glGetProgramInfoLog(glProgram, logLen, NULL, logString);
+		std::cout << "Error: " << logString << std::endl;
+		delete[] logString;
+		glDeleteProgram(glProgram);
+		glProgram = 0;
+		exit(-1);
+	}
+
+	configureProgram();
 }
 
 void Engine::StandarProgram::configureProgram()
@@ -177,6 +294,7 @@ void Engine::StandarProgram::configureProgram()
 	uModelViewMat = glGetUniformLocation(glProgram, "modelView");
 	uModelViewProjMat = glGetUniformLocation(glProgram, "modelViewProj");
 
+	/*
 	uComputeShading = glGetUniformLocation(glProgram, "computeShading");
 	uBackground = glGetUniformLocation(glProgram, "backgroundColor");
 
@@ -199,98 +317,29 @@ void Engine::StandarProgram::configureProgram()
 	uDLId = glGetUniformLocation(glProgram, "DLId");
 	uDLIs = glGetUniformLocation(glProgram, "DLIs");
 	uDirectionalLightDir = glGetUniformLocation(glProgram, "DLdir");
+	*/
 
 	inPos = glGetAttribLocation(glProgram, "inPos");
 	inColor = glGetAttribLocation(glProgram, "inColor");
 	inNormal = glGetAttribLocation(glProgram, "inNormal");
-	inTexCoord = glGetAttribLocation(glProgram, "inTexCoord");
+	inTexCoord = glGetAttribLocation(glProgram, "inUV");
 	inTangent = glGetAttribLocation(glProgram, "inTangent");
-}
-
-void Engine::StandarProgram::onRenderLight(const glm::mat4 & model, const glm::mat4 & view)
-{
-	glm::mat4 result = view * model;
-	float position[3];
-	position[0] = result[3][0];
-	position[1] = result[3][1];
-	position[2] = result[3][2];
-
-	glUniform3fv(uPointLightPos, 1, &position[0]);
-}
-
-void Engine::StandarProgram::onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view)
-{
-	glm::mat4 resultPos = view * modelPos;
-	float position[3];
-	position[0] = resultPos[3][0];
-	position[1] = resultPos[3][1];
-	position[2] = resultPos[3][2];
-
-	glUniform3fv(uSpotLightPos, 1, &position[0]);
-
-	glm::mat4 resultDir = view * modelDir;
-	float direction[3];
-	direction[0] = resultDir[3][0];
-	direction[1] = resultDir[3][1];
-	direction[2] = resultDir[3][2];
-
-	glUniform3fv(uSpotLightDir, 1, &direction[0]);
-}
-
-void Engine::StandarProgram::onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view)
-{
-	glm::mat4 modelCopy = model;
-	modelCopy[3][3] = 0.0f;
-	glm::mat4 resultPos = view * modelCopy;
-
-	glm::vec3 direction(resultPos[3][0], resultPos[3][1], resultPos[3][2]);
-	direction = glm::normalize(direction);
-
-	float position[3];
-	position[0] = direction.x;
-	position[1] = direction.y;
-	position[2] = direction.z;
-
-	glUniform3fv(uDirectionalLightDir, 1, &position[0]);
-}
-
-void Engine::StandarProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
-{
-	glm::mat4 modelView = view * obj->getModelMatrix();
-	glm::mat4 modelViewProj = proj * view * obj->getModelMatrix();
-	glm::mat4 normal = glm::transpose(glm::inverse(modelView));
-
-	glUniform1i(uComputeShading, RenderManager::getInstance().isForwardRendering() ? 1 : 0);
-
-	glUniformMatrix4fv(uModelViewMat, 1, GL_FALSE, &(modelView[0][0]));
-	glUniformMatrix4fv(uModelViewProjMat, 1, GL_FALSE, &(modelViewProj[0][0]));
-	glUniformMatrix4fv(uNormalMat, 1, GL_FALSE, &(normal[0][0]));
 }
 
 void Engine::StandarProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
 {
-	// Generamos el VAO
 	glGenVertexArrays(1, &mesh->vao);
-	// Activamos el VAO para poder modificarlo
-	// Tras activarlo, cada llamada a la configuración de un vao se hará
-	// sobre el VAO activo
 	glBindVertexArray(mesh->vao);
 
 	unsigned int numFaces = mesh->getMesh()->getNumFaces();
 	unsigned int numVertex = mesh->getMesh()->getNumVertices();
 
-	// Generamos los distintos VBOs
 	if (inPos != -1)
 	{
-		// Creo
 		glGenBuffers(1, &mesh->vboVertices);
-		// Activo
 		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboVertices);
-		// Subimos los datos a la tarjeta gráfica
 		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getVertices(), GL_STATIC_DRAW);
-		// Configuramos el VAO (le decimos que este buffer va en la posición inPos en le VAO activo)
 		glVertexAttribPointer(inPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		// Activamos el atributo inPos para que lo utilice
 		glEnableVertexAttribArray(inPos);
 	}
 	if (inColor != -1)
@@ -359,6 +408,73 @@ void Engine::StandarProgram::configureDirectionalLightBuffer(const Engine::Direc
 	glUniform3fv(uDLIs, 1, dl->getSpecularIntensity());
 }
 
+void Engine::StandarProgram::configureClearColor(const glm::vec3 & cc)
+{
+	glUseProgram(glProgram);
+	float backgroundColor[3] = { cc.x, cc.y, cc.z };
+	glUniform3fv(uBackground, 1, &backgroundColor[0]);
+}
+
+void Engine::StandarProgram::onRenderLight(const glm::mat4 & model, const glm::mat4 & view)
+{
+	glm::mat4 result = view * model;
+	float position[3];
+	position[0] = result[3][0];
+	position[1] = result[3][1];
+	position[2] = result[3][2];
+
+	glUniform3fv(uPointLightPos, 1, &position[0]);
+}
+
+void Engine::StandarProgram::onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view)
+{
+	glm::mat4 resultPos = view * modelPos;
+	float position[3];
+	position[0] = resultPos[3][0];
+	position[1] = resultPos[3][1];
+	position[2] = resultPos[3][2];
+
+	glUniform3fv(uSpotLightPos, 1, &position[0]);
+
+	glm::mat4 resultDir = view * modelDir;
+	float direction[3];
+	direction[0] = resultDir[3][0];
+	direction[1] = resultDir[3][1];
+	direction[2] = resultDir[3][2];
+
+	glUniform3fv(uSpotLightDir, 1, &direction[0]);
+}
+
+void Engine::StandarProgram::onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view)
+{
+	glm::mat4 modelCopy = model;
+	modelCopy[3][3] = 0.0f;
+	glm::mat4 resultPos = view * modelCopy;
+
+	glm::vec3 direction(resultPos[3][0], resultPos[3][1], resultPos[3][2]);
+	direction = glm::normalize(direction);
+
+	float position[3];
+	position[0] = direction.x;
+	position[1] = direction.y;
+	position[2] = direction.z;
+
+	glUniform3fv(uDirectionalLightDir, 1, &position[0]);
+}
+
+void Engine::StandarProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+{
+	glm::mat4 modelView = view * obj->getModelMatrix();
+	glm::mat4 modelViewProj = proj * view * obj->getModelMatrix();
+	glm::mat4 normal = glm::transpose(glm::inverse(modelView));
+
+	glUniform1i(uComputeShading, RenderManager::getInstance().isForwardRendering() ? 1 : 0);
+
+	glUniformMatrix4fv(uModelViewMat, 1, GL_FALSE, &(modelView[0][0]));
+	glUniformMatrix4fv(uModelViewProjMat, 1, GL_FALSE, &(modelViewProj[0][0]));
+	glUniformMatrix4fv(uNormalMat, 1, GL_FALSE, &(normal[0][0]));
+}
+
 void Engine::StandarProgram::releaseProgramBuffers(Engine::MeshInstance * mi)
 {
 	if (inPos != -1) glDeleteBuffers(1, &mi->vboVertices);
@@ -367,13 +483,6 @@ void Engine::StandarProgram::releaseProgramBuffers(Engine::MeshInstance * mi)
 	if (inTexCoord != -1) glDeleteBuffers(1, &mi->vboUVs);
 	glDeleteBuffers(1, &mi->vboFaces);
 	glDeleteVertexArrays(1, &mi->vao);
-}
-
-void Engine::StandarProgram::configureClearColor(const glm::vec3 & cc)
-{
-	glUseProgram(glProgram);
-	float backgroundColor[3] = { cc.x, cc.y, cc.z };
-	glUniform3fv(uBackground, 1, &backgroundColor[0]);
 }
 
 // ============================================================================

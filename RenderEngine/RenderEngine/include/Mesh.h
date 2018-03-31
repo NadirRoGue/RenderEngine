@@ -45,6 +45,7 @@ namespace Engine
 	private:
 		void extractTopology(aiMesh * mesh);
 		void extractGeometry(aiMesh * mesh);
+		void extractColors(aiMesh * mesh);
 
 		void computeNormals();
 		void computeTangents();

@@ -29,9 +29,10 @@ glm::vec3 Engine::Material::StandardMaterial::DEFAULT_COLOR = glm::vec3(0.6, 0.6
 Engine::Material::StandardMaterial::StandardMaterial()
 	:Engine::Material::AbstractMaterial()
 {
+	flags = 0;
 	name = "StandardMaterial";
-	albedo = normalMap = specularMap = occlusionMap = displacementMap = NULL;
-	unlit = autoLOD = false;
+	albedo = normalMap = emissiveMap = specularMap = occlusionMap = displacementMap = NULL;
+	autoLOD = false;
 	specularCoefficent = 0.0f;
 }
 
@@ -45,6 +46,11 @@ Engine::Material::StandardMaterial::~StandardMaterial()
 	if (normalMap != NULL)
 	{
 		delete normalMap;
+	}
+
+	if (emissiveMap != NULL) 
+	{
+		delete emissiveMap;
 	}
 
 	if (specularMap != NULL)
@@ -71,6 +77,14 @@ void Engine::Material::StandardMaterial::setAlbedo(Engine::TextureInstance * alb
 	}
 
 	this->albedo = albedo;
+	if (this->albedo == NULL)
+	{
+		flags &= ~Engine::StandarProgram::ALBEDO_BIT;
+	}
+	else
+	{
+		flags |= Engine::StandarProgram::ALBEDO_BIT;
+	}
 }
 
 void Engine::Material::StandardMaterial::setNormalMap(Engine::TextureInstance * normalMap)
@@ -81,6 +95,32 @@ void Engine::Material::StandardMaterial::setNormalMap(Engine::TextureInstance * 
 	}
 
 	this->normalMap = normalMap;
+	if (this->normalMap == NULL)
+	{
+		flags &= ~Engine::StandarProgram::NORMAL_MAP_BIT;
+	}
+	else
+	{
+		flags |= Engine::StandarProgram::NORMAL_MAP_BIT;
+	}
+}
+
+void Engine::Material::StandardMaterial::setEmissiveMap(Engine::TextureInstance * emissiveMap)
+{
+	if (this->emissiveMap != NULL)
+	{
+		delete this->emissiveMap;
+	}
+
+	this->emissiveMap = emissiveMap;
+	if (this->emissiveMap == NULL)
+	{
+		flags &= ~Engine::StandarProgram::EMISSIVE_MAP_BIT;
+	}
+	else
+	{
+		flags |= Engine::StandarProgram::EMISSIVE_MAP_BIT;
+	}
 }
 
 void Engine::Material::StandardMaterial::setSpecularMap(Engine::TextureInstance * specularMap)
@@ -91,6 +131,14 @@ void Engine::Material::StandardMaterial::setSpecularMap(Engine::TextureInstance 
 	}
 
 	this->specularMap = specularMap;
+	if (this->specularMap == NULL)
+	{
+		flags &= ~Engine::StandarProgram::SPECULAR_MAP_BIT;
+	}
+	else
+	{
+		flags |= Engine::StandarProgram::SPECULAR_MAP_BIT;
+	}
 }
 
 void Engine::Material::StandardMaterial::setOcclusionMap(Engine::TextureInstance * occlusionMap)
@@ -101,6 +149,14 @@ void Engine::Material::StandardMaterial::setOcclusionMap(Engine::TextureInstance
 	}
 
 	this->occlusionMap = occlusionMap;
+	if (this->occlusionMap == NULL)
+	{
+		flags &= ~Engine::StandarProgram::OCCLUSION_MAP_BIT;
+	}
+	else
+	{
+		flags |= Engine::StandarProgram::OCCLUSION_MAP_BIT;
+	}
 }
 
 void Engine::Material::StandardMaterial::setDisplacementMap(Engine::TextureInstance * displacementMap)
@@ -111,6 +167,14 @@ void Engine::Material::StandardMaterial::setDisplacementMap(Engine::TextureInsta
 	}
 
 	this->displacementMap = displacementMap;
+	if (this->displacementMap == NULL)
+	{
+		flags &= ~Engine::StandarProgram::DISPLACEMENT_MAP_BIT;
+	}
+	else
+	{
+		flags |= Engine::StandarProgram::DISPLACEMENT_MAP_BIT;
+	}
 }
 
 void Engine::Material::StandardMaterial::setSpecularCoefficent(float coefficent)
@@ -119,14 +183,17 @@ void Engine::Material::StandardMaterial::setSpecularCoefficent(float coefficent)
 	this->specularCoefficent = coefficent;
 }
 
-void Engine::Material::StandardMaterial::setUnlit(bool unlit)
-{
-	this->unlit = unlit;
-}
-
 void Engine::Material::StandardMaterial::setAutoLOD(bool autolod)
 {
 	this->autoLOD = autolod;
+	if (this->autoLOD)
+	{
+		flags |= Engine::StandarProgram::AUTOLOD_BIT;
+	}
+	else
+	{
+		flags &= ~Engine::StandarProgram::AUTOLOD_BIT;
+	}
 }
 
 Engine::Program * Engine::Material::StandardMaterial::compile()

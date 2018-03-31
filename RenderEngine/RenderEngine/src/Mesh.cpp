@@ -126,6 +126,7 @@ void Engine::Mesh::loadFromMesh(aiMesh * mesh)
 {
 	extractTopology(mesh);
 	extractGeometry(mesh);
+	extractColors(mesh);
 	computeNormals();
 	computeTangents();
 }
@@ -185,6 +186,26 @@ void Engine::Mesh::extractGeometry(aiMesh * mesh)
 		const aiVector3D uvVector = mesh->mTextureCoords[0][i];
 		uvs[uvStart]		= uvVector.x;
 		uvs[uvStart + 1]	= uvVector.y;
+	}
+}
+
+void Engine::Mesh::extractColors(aiMesh * mesh)
+{
+	if (mesh->GetNumColorChannels() > 0)
+	{
+		numVertices = mesh->mNumVertices;
+
+		colors = new float[numVertices * 3];
+		aiColor4D * colors = mesh->mColors[0];
+		
+		for (unsigned int i = 0; i < numVertices; i++)
+		{
+			aiColor4D color = colors[i];
+			const int vStart = i * 3;
+			colors[vStart] = color.r;
+			colors[vStart + 1] = color.g;
+			colors[vStart + 2] = color.b;
+		}
 	}
 }
 
