@@ -37,12 +37,12 @@ namespace Engine
 
 			TextureInstance * albedo;
 			TextureInstance * normalMap;
-			TextureInstance * emissiveMap;
 			TextureInstance * specularMap;
 			TextureInstance * occlusionMap;
 			TextureInstance * displacementMap;
 
 			float specularCoefficent;
+			bool unlit;
 			bool autoLOD;
 
 		protected:
@@ -53,11 +53,11 @@ namespace Engine
 
 			void setAlbedo(TextureInstance * albedo);
 			void setNormalMap(TextureInstance * normalMap);
-			void setEmissiveMap(TextureInstance * emissiveMap);
 			void setSpecularMap(TextureInstance * specularMap);
 			void setOcclusionMap(TextureInstance * occlusionMap);
 			void setDisplacementMap(TextureInstance * displacementMap);
 			void setSpecularCoefficent(float coefficent);
+			void setUnlit(bool unlit);
 			void setAutoLOD(bool autolod);
 
 			void populateProgram(Program * prog);

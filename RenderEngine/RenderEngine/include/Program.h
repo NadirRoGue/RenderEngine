@@ -19,10 +19,10 @@ namespace Engine
 	{
 	protected:
 		unsigned int glProgram;
-
+	private:
 		unsigned int vShader;
 		unsigned int fShader;
-	private:
+
 		std::string name;
 
 	public:
@@ -32,45 +32,34 @@ namespace Engine
 
 		std::string getName() const;
 		unsigned int getProgramId() const;
+		void initialize(std::string vShaderFile, std::string fShaderFile);
+
+		virtual void configureProgram() = 0;
+		virtual void configureMeshBuffers(MeshInstance * mesh) = 0;
 
 		virtual void configurePointLightBuffer(const PointLight *pl);
 		virtual void configureSpotLightBuffer(const SpotLight *pl);
 		virtual void configureDirectionalLightBuffer(const DirectionalLight *dl);
 		virtual void configureClearColor(const glm::vec3 & cc) = 0;
 
-		virtual void onRenderLight(const glm::mat4 & model, const glm::mat4 & view);
-		virtual void onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view);
-		virtual void onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view);
-		virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
+		virtual void onRenderLight(const glm::mat4 & model, const glm::mat4 & view) = 0;
+		virtual void onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view) = 0;
+		virtual void onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view) = 0;
+		virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj) = 0;
 
-		virtual void initialize() = 0;
-		virtual void configureProgram() = 0;
-		virtual void configureMeshBuffers(MeshInstance * mesh) = 0;
+		
 		virtual void releaseProgramBuffers(MeshInstance * mi) = 0;
-		virtual void destroy() = 0;
-	protected:
-		unsigned int loadShader(std::string fileName, GLenum type, std::string config);
+
+		void destroy();
+	private:
+		unsigned int loadShader(std::string fileName, GLenum type);
 	};
 
 	// =============================================================================
 
 	class StandarProgram : public Program
 	{
-	public:
-		static unsigned long ALBEDO_BIT;
-		static unsigned long NORMAL_MAP_BIT;
-		static unsigned long EMISSIVE_MAP_BIT;
-		static unsigned long SPECULAR_MAP_BIT;
-		static unsigned long OCCLUSION_MAP_BIT;
-		static unsigned long DISPLACEMENT_MAP_BIT;
-		static unsigned long AUTOLOD_BIT;
 	private:
-		unsigned long flags;
-
-		unsigned int tcsShader;
-		unsigned int tevalShader;
-		unsigned int gShader;
-
 		// Uniform variables
 		unsigned int uNormalMat;
 		unsigned int uModelViewMat;
@@ -107,13 +96,8 @@ namespace Engine
 		unsigned int inTangent;
 
 	public:
-		StandarProgram(std::string name, unsigned long flags);
+		StandarProgram(std::string name);
 		StandarProgram(const StandarProgram & other);
-		~StandarProgram();
-
-		void initialize();
-		void destroy();
-
 		void configureProgram();
 		void onRenderLight(const glm::mat4 & model, const glm::mat4 & view);
 		void onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view);
@@ -127,8 +111,6 @@ namespace Engine
 		void configureDirectionalLightBuffer(const DirectionalLight *dl);
 
 		void releaseProgramBuffers(MeshInstance *mi);
-	private:
-		std::string createConfigString();
 	};
 
 	// =============================================================================
