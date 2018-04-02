@@ -9,6 +9,7 @@
 
 #include <glm/glm.hpp>
 #include <vector>
+#include <iostream>
 
 Engine::Mesh::Mesh()
 {
@@ -155,11 +156,18 @@ void Engine::Mesh::extractTopology(aiMesh * mesh)
 {
 	numFaces = mesh->mNumFaces;
 
-	faces = new unsigned int[numFaces * 3];
+	if (numFaces == 0)
+	{
+		return;
+	}
+	
+	verticesPerFace = mesh->mFaces[0].mNumIndices;
+
+	faces = new unsigned int[numFaces * verticesPerFace];
 
 	for (unsigned int i = 0; i < numFaces; i++)
 	{
-		const int start = i * 3;
+		const int start = i * verticesPerFace;
 		memcpy(faces + start, mesh->mFaces[i].mIndices, sizeof(unsigned int) * 3);
 	}
 }
@@ -312,6 +320,11 @@ void Engine::Mesh::computeTangents()
 unsigned int Engine::Mesh::getNumFaces()
 {
 	return numFaces;
+}
+
+unsigned int Engine::Mesh::getNumVerticesPerFace()
+{
+	return verticesPerFace;
 }
 
 unsigned int Engine::Mesh::getNumVertices()

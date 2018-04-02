@@ -14,6 +14,7 @@ namespace Engine
 	private:
 		unsigned int numFaces;
 		unsigned int numVertices;
+		unsigned int verticesPerFace;
 
 		unsigned int *faces;
 		float *vertices;
@@ -34,6 +35,7 @@ namespace Engine
 
 		unsigned int getNumFaces();
 		unsigned int getNumVertices();
+		unsigned int getNumVerticesPerFace();
 
 		unsigned int * getFaces();
 		float * getVertices();

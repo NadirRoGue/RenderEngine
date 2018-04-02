@@ -123,7 +123,9 @@ void Engine::ForwardRenderer::renderProgram(Engine::Camera * camera, Engine::Pro
 		{
 			program->onRenderObject(*listIt, viewMatrix, projMatrix);
 
-			glDrawElements(GL_TRIANGLES, (*listIt)->getMesh()->getNumFaces() * 3, GL_UNSIGNED_INT, (void*)0);
+			glPatchParameteri(GL_PATCH_VERTICES, 4);
+			//glDrawElements(GL_TRIANGLES, (*listIt)->getMesh()->getNumFaces() * 4, GL_UNSIGNED_INT, (void*)0);
+			//glDrawElements(GL_PATCHES, (*listIt)->getMesh()->getNumFaces() * (*listIt)->getMesh()->getNumVerticesPerFace(), GL_UNSIGNED_INT, (void*)0);
 		}
 	}
 }
@@ -236,13 +238,12 @@ void Engine::DeferredRenderer::doRender()
 		prog->onRenderObject(node->obj, cam->getViewMatrix(), cam->getProjectionMatrix());
 
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
 		it++;
 	}
 
 	// Enable default framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+	glClear(GL_COLOR_BUFFER_BIT);
 	if (finalLink->callBack != 0)
 	{
 		finalLink->callBack->execute(finalLink->obj, finalLink->postProcessProgram, finalLink->renderBuffer, cam);

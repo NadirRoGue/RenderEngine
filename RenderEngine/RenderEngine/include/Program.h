@@ -32,7 +32,7 @@ namespace Engine
 
 		std::string getName() const;
 		unsigned int getProgramId() const;
-		void initialize(std::string vShaderFile, std::string fShaderFile);
+		virtual void initialize(std::string vShaderFile, std::string fShaderFile);
 
 		virtual void configureProgram() = 0;
 		virtual void configureMeshBuffers(MeshInstance * mesh) = 0;
@@ -40,18 +40,18 @@ namespace Engine
 		virtual void configurePointLightBuffer(const PointLight *pl);
 		virtual void configureSpotLightBuffer(const SpotLight *pl);
 		virtual void configureDirectionalLightBuffer(const DirectionalLight *dl);
-		virtual void configureClearColor(const glm::vec3 & cc) = 0;
+		virtual void configureClearColor(const glm::vec3 & cc) {};
 
-		virtual void onRenderLight(const glm::mat4 & model, const glm::mat4 & view) = 0;
-		virtual void onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view) = 0;
-		virtual void onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view) = 0;
+		virtual void onRenderLight(const glm::mat4 & model, const glm::mat4 & view) {};
+		virtual void onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view) {};
+		virtual void onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view) {};
 		virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj) = 0;
 
 		
-		virtual void releaseProgramBuffers(MeshInstance * mi) = 0;
+		virtual void releaseProgramBuffers(MeshInstance * mi) {};
 
 		void destroy();
-	private:
+	protected:
 		unsigned int loadShader(std::string fileName, GLenum type);
 	};
 
@@ -131,5 +131,30 @@ namespace Engine
 
 	// =============================================================================
 
-	
+	class ProceduralTerrainProgram : public Program
+	{
+	private:
+		unsigned int uInPos;
+		unsigned int uInNormal;
+		unsigned int uInUV;
+
+		unsigned int uModelView;
+		unsigned int uModelViewProj;
+		unsigned int uNormal;
+		unsigned int uNoiseTexture;
+
+		unsigned int uTextureWidth;
+		unsigned int uTextureHeight;
+		unsigned int uTexelSize;
+
+		TextureInstance * noise;
+
+	public:
+		ProceduralTerrainProgram(std::string name);
+		ProceduralTerrainProgram(const ProceduralTerrainProgram & other);
+		void initialize(std::string vShader, std::string fShader);
+		void configureProgram();
+		void configureMeshBuffers(MeshInstance * mesh);
+		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
+	};
 }

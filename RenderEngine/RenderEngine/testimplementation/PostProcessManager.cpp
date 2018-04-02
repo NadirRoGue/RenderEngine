@@ -22,13 +22,13 @@ Engine::DeferredRenderer * Engine::TestImplementation::createDeferredRendererWit
 	Engine::DeferredRenderObject * start = createForwardBufferWithDepth();
 	Engine::PostProcessChainNode * dS = createDeferredShadingNode();
 	Engine::PostProcessChainNode * AA = createScreenAntiAliasing();
-	Engine::PostProcessChainNode * gauss = createDepthOfField(true, true);
+	//Engine::PostProcessChainNode * gauss = createDepthOfField(true, true);
 	Engine::PostProcessChainNode * end = createFinalLink(true, true);
 
 	renderer->setForwardPassBuffers(start);
 	renderer->addPostProcess(dS);
 	renderer->addPostProcess(AA);
-	renderer->addPostProcess(gauss);
+	//renderer->addPostProcess(gauss);
 	renderer->setFinalPostProcess(end);
 
 	return renderer;

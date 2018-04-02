@@ -1,0 +1,92 @@
+#version 450 core
+
+layout(quads, equal_spacing, ccw) in;
+
+//layout (location=0) in vec3 inNormal[];
+//layout (location=1) in vec2 inUV[];
+
+in vec3 tcNormal[];
+in vec2 tcUV[];
+
+//layout (location=0) out vec3 outPos;
+//layout (location=1) out vec3 outNormal;
+//layout (location=2) out vec2 outUV;
+
+out vec3 tesNormal;
+out vec2 tesUV;
+
+uniform sampler2D noise;
+/*
+uniform vec2 TexelSize;
+
+vec2 getNearNormalUVs(int i, int j, float u, float v)
+{
+	float newU = max(0.0, min(1.0, TexelSize.x * i + u));
+	float newV = max(0.0, min(1.0, TexelSize.y * j + v));
+
+	return vec2(newU, newV);
+}
+
+vec3 getNearNormal(float u, float v)
+{
+	float noiseVal = texture(noise, vec2(u, v)).r;
+	return normalize(vec3(u, noiseVal, v));
+}
+*/
+void main()
+{
+/*
+	float u = gl_TessCoord.x;
+	float v = gl_TessCoord.y;
+	
+	vec3 a = gl_in[0].gl_Position.xyz;
+	vec3 ba = gl_in[1].gl_Position.xyz - a;
+	vec3 ca = gl_in[3].gl_Position.xyz - a;
+
+	outPos = a + ba * v + ca * u;
+
+	outUV = vec2(u, v);
+	outNormal = vec3(0,1,0);
+
+	gl_Position = vec4(outPos, 1);
+	*/
+	/*
+	vec3 resultNormal;
+	vec3 up = vec3(0,1,0);//normalize(inNormal[0] * w + inNormal[1] * u + inNormal[2] * c);
+	for(int i = -1; i < 2; i++)
+	{
+		for(int j = -1; j < 2; j++)
+		{
+			if(i != j)
+			{
+				vec2 nextNormalUV = getNearNormalUVs(i, j, u, v);
+				vec3 testNormal = normalize(getNearNormal(nextNormalUV.x, nextNormalUV.y));
+				resultNormal += testNormal - (up * dot(up, testNormal) * 2);
+			}
+		}
+	}
+	*/
+
+	float v = gl_TessCoord.y;
+	float u = gl_TessCoord.x;
+
+	vec3 a = gl_in[0].gl_Position.xyz;
+	vec3 ba = gl_in[1].gl_Position.xyz - a;
+	vec3 ca = gl_in[3].gl_Position.xyz - a;
+
+	float L0 = length(ba);
+	float L1 = length(ca);
+
+	vec3 p0 = normalize(ba) * (L0 * v);
+	vec3 p1 = normalize(ca) * (L1 * u);
+
+	vec3 final = a + p0 + p1;
+	//outPosT = final;
+
+	tesUV = vec2(u, v);
+
+	tesNormal = tcNormal[0];
+
+	gl_Position = vec4(final, 1);
+	
+}

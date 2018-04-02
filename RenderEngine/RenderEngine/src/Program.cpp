@@ -7,7 +7,7 @@
 
 #include "auxiliar.h"
 #include "Mesh.h"
-
+#include "Texture.h"
 #include "Renderer.h"
 
 #include <iostream>
@@ -99,7 +99,7 @@ unsigned int Engine::Program::loadShader(std::string fileName, GLenum type)
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLen);
 		char *logString = new char[logLen];
 		glGetShaderInfoLog(shader, logLen, NULL, logString);
-		std::cout << "Error: " << logString << std::endl;
+		std::cout << "Error on " << fileName << ": " << logString << std::endl;
 		delete[] logString;
 		glDeleteShader(shader); // No necesario, pues después salimos de la aplicación
 		exit(-1);
@@ -427,4 +427,152 @@ void Engine::TextureProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
 	uEmissiveTex = glGetUniformLocation(glProgram, "emiTex");
 	uSpecTex = glGetUniformLocation(glProgram, "specTex");
 	uNormalTex = glGetUniformLocation(glProgram, "normalTex");
+}
+
+// =================================================================================
+
+Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(std::string name) :Program(name)
+{
+	noise = NULL;
+}
+
+Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerrainProgram & other)
+	: Program(other)
+{
+	noise = other.noise;
+
+	uModelView = other.uModelView;
+	uModelViewProj = other.uModelViewProj;
+	uNormal = other.uNormal;
+
+	uNoiseTexture = other.uNoiseTexture;
+	uTextureWidth = other.uTextureWidth;
+	uTextureHeight = other.uTextureHeight;
+	uTexelSize = other.uTexelSize;
+}
+
+void Engine::ProceduralTerrainProgram::initialize(std::string vertexShader, std::string fragmentShader)
+{
+	unsigned int vShader = loadShader("shaders/terrain/terrain.vert", GL_VERTEX_SHADER);
+	unsigned int tcsShader = loadShader("shaders/terrain/terrain.tesctrl", GL_TESS_CONTROL_SHADER);
+	unsigned int tevalShader = loadShader("shaders/terrain/terrain.teseval", GL_TESS_EVALUATION_SHADER);
+	unsigned int gShader = loadShader("shaders/terrain/terrain.geom", GL_GEOMETRY_SHADER);
+	unsigned int fShader = loadShader("shaders/terrain/terrain.frag", GL_FRAGMENT_SHADER);
+
+	// Creamos un programa para enlazar los shader anteriores
+	glProgram = glCreateProgram();
+
+	// Enlacamos los shader
+	glAttachShader(glProgram, vShader);
+	//glAttachShader(glProgram, tcsShader);
+	//glAttachShader(glProgram, tevalShader);
+	glAttachShader(glProgram, gShader);
+	glAttachShader(glProgram, fShader);
+
+	// Linkamos el programa
+	glLinkProgram(glProgram);
+
+	// Comprobamos errores de linkado (E.G., una varaible in que usamos en el shader 
+	// de fragmentos pero que no existe en el de vértices)
+	int linked;
+	glGetProgramiv(glProgram, GL_LINK_STATUS, &linked);
+	if (!linked)
+	{
+		//Calculamos una cadena de error
+		GLint logLen;
+		glGetProgramiv(glProgram, GL_INFO_LOG_LENGTH, &logLen);
+		char *logString = new char[logLen];
+		glGetProgramInfoLog(glProgram, logLen, NULL, logString);
+		std::cout << "Error: " << logString << std::endl;
+		delete[] logString;
+		//glDeleteProgram(program);
+		//program = 0;
+		exit(-1);
+	}
+
+	configureProgram();
+}
+
+void Engine::ProceduralTerrainProgram::configureProgram()
+{
+	uModelView = glGetUniformLocation(glProgram, "modelView");
+	uModelViewProj = glGetUniformLocation(glProgram, "modelViewProj");
+	uNormal = glGetUniformLocation(glProgram, "normal");
+	
+	uNoiseTexture = glGetUniformLocation(glProgram, "noise");
+	//uTextureWidth = glGetUniformLocation(glProgram, "noiseWidth");
+	//uTextureWidth = glGetUniformLocation(glProgram, "noiseHeight");
+	uTexelSize = glGetUniformLocation(glProgram, "TexelSize");
+
+	uInPos = glGetAttribLocation(glProgram, "inPos");
+	uInNormal = glGetAttribLocation(glProgram, "inNormal");
+	uInUV = glGetAttribLocation(glProgram, "inUV");
+
+	noise = Engine::TextureTable::getInstance().instantiateTexture("img/noise.png");
+	noise->setAnisotropicFilterEnabled(false);
+	noise->setMagnificationFilterType(GL_NEAREST);
+	noise->setMinificationFilterType(GL_NEAREST);
+}
+
+void Engine::ProceduralTerrainProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
+{
+	glGenVertexArrays(1, &mesh->vao);
+	glBindVertexArray(mesh->vao);
+
+	unsigned int numFaces = mesh->getMesh()->getNumFaces();
+	unsigned int numVertex = mesh->getMesh()->getNumVertices();
+
+	if (uInPos != -1)
+	{
+		glGenBuffers(1, &mesh->vboVertices);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboVertices);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getVertices(), GL_STATIC_DRAW);
+		glVertexAttribPointer(uInPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(uInPos);
+	}
+	if (uInNormal != -1)
+	{
+		glGenBuffers(1, &mesh->vboNormals);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboNormals);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getNormals(), GL_STATIC_DRAW);
+		glVertexAttribPointer(uInNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(uInNormal);
+	}
+	if (uInUV != -1)
+	{
+		glGenBuffers(1, &mesh->vboUVs);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboUVs);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 2, mesh->getMesh()->getUVs(), GL_STATIC_DRAW);
+		glVertexAttribPointer(uInUV, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(uInUV);
+	}
+
+	glGenBuffers(1, &mesh->vboFaces);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->vboFaces);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numFaces * sizeof(unsigned int) * mesh->getMesh()->getNumVerticesPerFace(), mesh->getMesh()->getFaces(), GL_STATIC_DRAW);
+}
+
+void Engine::ProceduralTerrainProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+{
+	glm::mat4 modelView = view * obj->getModelMatrix();
+	glm::mat4 modelViewProj = proj * view * obj->getModelMatrix();
+	glm::mat4 normal = glm::transpose(glm::inverse(modelView));
+
+	glUniformMatrix4fv(uModelView, 1, GL_FALSE, &(modelView[0][0]));
+	glUniformMatrix4fv(uModelViewProj, 1, GL_FALSE, &(modelViewProj[0][0]));
+	glUniformMatrix4fv(uNormal, 1, GL_FALSE, &(normal[0][0]));
+
+	unsigned int w = noise->getTexture()->getWidth();
+	unsigned int h = noise->getTexture()->getHeight();
+
+	//glUniform1f(uTextureWidth, w);
+	//glUniform1f(uTextureHeight, h);
+	//glUniform2f(uTexelSize, 1.0f / w, 1.0f / h);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, noise->getTexture()->getTextureId());
+	noise->configureTexture();
+	glUniform1i(uNoiseTexture, 0);
+
+	//std::cout << "HERE" << std::endl;
 }
