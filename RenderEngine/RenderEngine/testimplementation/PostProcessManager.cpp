@@ -21,13 +21,13 @@ Engine::DeferredRenderer * Engine::TestImplementation::createDeferredRendererWit
 
 	Engine::DeferredRenderObject * start = createForwardBufferWithDepth();
 	Engine::PostProcessChainNode * dS = createDeferredShadingNode();
-	Engine::PostProcessChainNode * AA = createScreenAntiAliasing();
+	//Engine::PostProcessChainNode * AA = createScreenAntiAliasing();
 	//Engine::PostProcessChainNode * gauss = createDepthOfField(true, true);
-	Engine::PostProcessChainNode * end = createFinalLink(true, true);
+	Engine::PostProcessChainNode * end = createFinalLink(false, false);
 
 	renderer->setForwardPassBuffers(start);
 	renderer->addPostProcess(dS);
-	renderer->addPostProcess(AA);
+	//renderer->addPostProcess(AA);
 	//renderer->addPostProcess(gauss);
 	renderer->setFinalPostProcess(end);
 
@@ -179,7 +179,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createGaussianBlur(bo
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "gaussian_blur_post_processing_program");
 	if (mi != 0)
 	{
-		node->obj = new Engine::Object(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
 	{
@@ -204,7 +204,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createScreenAntiAlias
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "screen_space_anti_aliasing");
 	if (mi != 0)
 	{
-		node->obj = new Engine::Object(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
 	{
@@ -251,7 +251,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::create5x5GaussianBlur
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "gaussian_blur_post_processing_program");
 	if (mi != 0)
 	{
-		node->obj = new Engine::Object(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
 	{
@@ -323,7 +323,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createDepthOfField(bo
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "depth_of_field_post_processing_program");
 	if (mi != 0)
 	{
-		node->obj = new Engine::Object(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
 	{
@@ -343,7 +343,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createFinalLink(bool 
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "post_processing_program");
 	if (mi != 0)
 	{
-		node->obj = new Engine::Object(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
 	{
@@ -380,7 +380,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createDepthRenderNode
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "depth_render_post_processing_program");
 	if (mi != 0)
 	{
-		node->obj = new Engine::Object(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
 	{
@@ -401,7 +401,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createNormalRenderNod
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "normal_render_post_processing_program");
 	if (mi != 0)
 	{
-		node->obj = new Engine::Object(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
 	{
@@ -422,7 +422,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createColorRenderNode
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "color_render_post_processing_program");
 	if (mi != 0)
 	{
-		node->obj = new Engine::Object(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
 	{
@@ -443,7 +443,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createSpecularRenderN
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "specular_render_post_processing_program");
 	if (mi != 0)
 	{
-		node->obj = new Engine::Object(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
 	{
@@ -470,7 +470,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createDeferredShading
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "deferred_shading");
 	if (mi != 0)
 	{
-		node->obj = new Engine::Object(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
 	{
@@ -497,7 +497,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createToonShadingNode
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "toon_shading_program");
 	if (mi != 0)
 	{
-		node->obj = new Engine::Object(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
 	{

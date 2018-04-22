@@ -7,6 +7,7 @@
 
 #include <assimp\cimport.h>
 #include <assimp\postprocess.h>
+#include <iostream>
 
 Engine::MeshLoader * Engine::MeshLoader::INSTANCE = new Engine::MeshLoader();
 
@@ -52,6 +53,7 @@ Engine::Mesh * Engine::MeshLoader::getMesh(std::string filename)
 			Mesh * m = new Mesh(rawMesh);
 
 			meshCache[filename] = m;
+			aiReleaseImport(scene);
 			return meshCache[filename];
 		}
 
@@ -61,7 +63,7 @@ Engine::Mesh * Engine::MeshLoader::getMesh(std::string filename)
 	return NULL;
 }
 
-void Engine::MeshLoader::addMeshToCache(std::string name, Engine::Mesh & mesh)
+void Engine::MeshLoader::addMeshToCache(std::string name, Engine::Mesh  &mesh)
 {
 	std::map<std::string, Engine::Mesh* >::iterator it = meshCache.find(name);
 	if (it == meshCache.end())

@@ -26,6 +26,7 @@
 #include "Renderer.h"
 #include "PostProcessManager.h"
 #include "DeferredRenderObject.h"
+#include "Terrain.h"
 
 #include "InputImpl.h"
 #include "AnimImpl.h"
@@ -71,8 +72,8 @@ int main(int argc, char** argv)
 	initScene();
 	initShaderTable();
 	initMeshesAssets();
-	initSceneObj();
 	initRenderEngine();
+	initSceneObj();
 	initHandlers();
 	
 	glutMainLoop();
@@ -92,7 +93,7 @@ void initContext(int argc, char** argv)
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-	glutInitWindowSize(500, 500);
+	glutInitWindowSize(1024, 1024);
 	glutInitWindowPosition(0, 0);
 	glutCreateWindow("Prácticas GLSL");
 
@@ -118,7 +119,7 @@ void initContext(int argc, char** argv)
 void initOGL()
 {
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
+	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 	glFrontFace(GL_CCW);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
@@ -135,30 +136,17 @@ void destroy()
 void initScene()
 {
 	Engine::Camera * camera = new Engine::Camera(0.1f, 50.0f, 45.0f, 45.0f);
-	camera->translateView(glm::vec3(5.0f, -5.0f, -6.0f));
+	camera->translateView(glm::vec3(0.0f, -5.0f, 0.0f));
 	camera->rotateView(glm::vec3(glm::radians(30.0f), glm::radians(60.0f), 0.0f));
 
-	// Parameters: name, position, attenuation
-	/*Engine::PointLight * pl = new Engine::PointLight("point_light_1", glm::vec3(0, 0, 6), glm::vec3(1.0f,0.5f,0.0f));
-	pl->setAmbientIntensity(0.0f, 0.0f, 0.0f);
-	pl->setDiffuseIntensity(1.0f, 1.0f, 1.0f);
-	pl->setSpecularIntensity(1.0f, 1.0f, 1.0f);*/
-
 	// Parameters: name, direction
-	Engine::DirectionalLight * dl = new Engine::DirectionalLight("directional_light", glm::vec3(1,0.2,0));
+	Engine::DirectionalLight * dl = new Engine::DirectionalLight("directional_light", glm::vec3(1,1,0));
 	dl->setAmbientIntensity(0.1f, 0.1f, 0.1f);
 	dl->setDiffuseIntensity(1.0f, 1.0f, 1.0f);
 	dl->setSpecularIntensity(0.0f, 0.0f, 0.0f);
 
-	/*Engine::SpotLight * sl = new Engine::SpotLight("spot_light", glm::vec3(-3, 3, 0), glm::vec3(1, 0, 0), 20.0f, 10.0f, glm::vec3(1.0f,0.0f,0.0f));
-	sl->setAmbientIntensity(0.0f, 0.0f, 0.0f);
-	sl->setDiffuseIntensity(1.0f, 0.0f, 0.0f);
-	sl->setSpecularIntensity(0.0f, 0.0f,0.0f);*/
-
 	Engine::Scene * scene = new Engine::Scene();
 	scene->setCamera(camera);
-	//scene->addPointLight(pl);
-	//scene->addSpotLight(sl);
 	scene->addDirectionalLight(dl);
 
 	Engine::SceneManager::getInstance().registerScene("scene_0", scene);
@@ -167,141 +155,88 @@ void initScene()
 
 void initShaderTable()
 {
+	
 	Engine::TextureTable::getInstance().checkForAnisotropicFilterSupport();
-	Engine::TextureTable::getInstance().cacheTexture("img/color2.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/emissive.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/normal.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/specMap.png");
-
-	Engine::TextureTable::getInstance().cacheTexture("img/batman_d.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/batman_s.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/batman_n.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/batman_e.png");
-
-	Engine::TextureTable::getInstance().cacheTexture("img/Rock_10_d.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/Rock_10_e.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/Rock_10_s.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/Rock_10_n.png");
-
-	Engine::TextureTable::getInstance().cacheTexture("img/noise.png");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::StandarProgram("full_color_material"),
-		"shaders/shader.full_color.vert", "shaders/shader.full_color.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::TextureProgram("full_texture_material"),
-		"shaders/shader.full_texture.vert", "shaders/shader.full_texture.frag");
 
 	Engine::ProgramTable::getInstance().createProgram(new Engine::PostProcessProgram("post_processing_program"),
 		"shaders/postProcessing.v0.vert", "shaders/postProcessing.v0.frag");
 
-	Engine::ProgramTable::getInstance().createProgram(new Engine::GaussianBlurProgram("gaussian_blur_post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.GaussianBlur.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::DepthOfFieldProgram("depth_of_field_post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.DepthOfFieldZbuffer.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::DepthRenderProgram("depth_render_post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.DepthZBuffer.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::PostProcessProgram("color_render_post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.ColorRender.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::PostProcessProgram("normal_render_post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.NormalRender.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::PostProcessProgram("specular_render_post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.SpecularRender.frag");
-
 	Engine::ProgramTable::getInstance().createProgram(new Engine::DeferredShadingProgram("deferred_shading"),
 		"shaders/postProcessing.v0.vert", "shaders/DeferredShading.frag");
 
-	Engine::ProgramTable::getInstance().createProgram(new Engine::EdgeBasedProgram("toon_shading_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.ToonShading.frag");
-
 	Engine::ProgramTable::getInstance().createProgram(new Engine::EdgeBasedProgram("screen_space_anti_aliasing"),
 		"shaders/postProcessing.v0.vert", "shaders/postProcessing.SSAA.frag");
-
+		
 	Engine::ProgramTable::getInstance().createProgram(new Engine::ProceduralTerrainProgram("ProceduralTerrainProgram"), "", "");
+
+	Engine::ProgramTable::getInstance().createProgram(new Engine::PerlinGeneratorProgram("PerlinGeneratorProgram"),
+		"shaders/postProcessing.v0.vert", "shaders/terrain/perlin.frag");
 }
 
 void initMeshesAssets()
 {
+	
 	Engine::Mesh cubeMesh = Engine::Mesh((unsigned int)cubeNTriangleIndex, (unsigned int)cubeNVertex,
 		cubeTriangleIndex, cubeVertexPos, cubeVertexColor, cubeVertexNormal, cubeVertexTexCoord, cubeVertexTangent);
 	Engine::MeshLoader::getInstance().addMeshToCache("cube", cubeMesh);
-
+	
 	Engine::Mesh plane = Engine::Mesh(0, (unsigned int)planeNVertex, 0, planeVertexPos, 0, 0, planeUVs, 0);
 	Engine::MeshLoader::getInstance().addMeshToCache("plane", plane);
-
+	
 	Engine::Mesh leftPlane = Engine::Mesh(0, (unsigned int)planeNVertex, 0, leftSmallPlaneVertex, 0, 0, planeUVs, 0);
 	Engine::MeshLoader::getInstance().addMeshToCache("left_plane", leftPlane);
 
 	Engine::Mesh rightPlane = Engine::Mesh(0, (unsigned int)planeNVertex, 0, rightSmallPlaneVertex, 0, 0, planeUVs, 0);
 	Engine::MeshLoader::getInstance().addMeshToCache("right_plane", rightPlane);
 
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("cube", "full_color_material");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("cube", "full_texture_material");
+	//Engine::MeshInstanceTable::getInstance().instantiateMesh("cube", "full_color_material");
+	//Engine::MeshInstanceTable::getInstance().instantiateMesh("cube", "full_texture_material");
 
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("models/batman.obj", "full_texture_material");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("models/Rock_10.obj", "full_texture_material");
+	//Engine::MeshInstanceTable::getInstance().instantiateMesh("models/Rock_10.obj", "full_texture_material");
 
 	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "gaussian_blur_post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "depth_of_field_post_processing_program");
-
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "depth_render_post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "color_render_post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "normal_render_post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "specular_render_post_processing_program");
 	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "deferred_shading");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "toon_shading_program");
 	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "screen_space_anti_aliasing");
-	
-	// Side by side render
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("left_plane", "post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("right_plane", "post_processing_program");
-
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("models/quad.obj", "ProceduralTerrainProgram");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("models/plane.obj", "full_texture_material");
+		
+	//Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "PerlinGeneratorProgram");
+	//Engine::MeshInstanceTable::getInstance().instantiateMesh("models/quad.obj", "ProceduralTerrainProgram");
+	//Engine::MeshInstanceTable::getInstance().instantiateMesh("models/plane.obj", "ProceduralTerrainProgram");
 }
 
 void initSceneObj()
 {
+	/*
+	Engine::PostProcessChainNode * perlinGenerator = new Engine::PostProcessChainNode;
+	Engine::MeshInstance * pp = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "PerlinGeneratorProgram");
+	Engine::DeferredRenderObject * buffer = new Engine::DeferredRenderObject(1, true);
+	buffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 1024, 1024, GL_NEAREST);
+	buffer->addDepthBuffer24(1024, 1024);
+
+	buffer->initialize();
+	buffer->resizeFBO(1024, 1024);
+
+	Engine::Program * perlinProgram = Engine::ProgramTable::getInstance().getProgramByName("PerlinGeneratorProgram");
+	Engine::PerlinGeneratorProgram * finalProgram = new Engine::PerlinGeneratorProgram(*dynamic_cast<Engine::PerlinGeneratorProgram*>(perlinProgram));
+
+	perlinGenerator->obj = new Engine::PostProcessObject(pp);
+	perlinGenerator->renderBuffer = buffer;
+	perlinGenerator->postProcessProgram = finalProgram;
+
+	Engine::RenderManager::getInstance().getCurrentDeferredRenderer()->setPreProcess(perlinGenerator);
+	*/
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
-	
-	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("models/quad.obj", "ProceduralTerrainProgram");
+	scene->setTerrain(new Engine::Terrain(5.0f, 7));
+	/*
+	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("models/plane.obj", "ProceduralTerrainProgram");
 	if (mi != NULL)
 	{
 		Engine::Object * obj = new Engine::Object(mi);
+		obj->setRenderMode(GL_PATCHES);
+		//buffer->populateDeferredObject(obj);
 		scene->addObject(obj);
-	}
+	}*/
 	
-	/*Engine::MeshInstance * colorPlane = Engine::MeshInstanceTable::getInstance().getMeshInstance("models/plane.obj", "full_texture_material");
-	if (colorPlane != 0)
-	{
-		Engine::Object * batmanObj = new Engine::Object(colorPlane);
-		batmanObj->setAlbedoTexture(Engine::TextureTable::getInstance().instantiateTexture("img/color2.png"));
-		batmanObj->setNormalMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/normal.png"));
-		batmanObj->setSpecularMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/specMap.png"));
-		batmanObj->setEmissiveTexture(Engine::TextureTable::getInstance().instantiateTexture("img/emissive.png"));
-		scene->addObject(batmanObj);
-	}
-	
-	Engine::MeshInstance * RockInst = Engine::MeshInstanceTable::getInstance().getMeshInstance("models/Rock_10.obj", "full_texture_material");
-	if (RockInst != 0)
-	{
-		Engine::Object * rockObj = new Engine::Object(RockInst);
-		rockObj->scale(glm::vec3(0.5f, 0.5f, 0.5f));
-		rockObj->translate(glm::vec3(-3, 0, 3));
-		rockObj->setAlbedoTexture(Engine::TextureTable::getInstance().instantiateTexture("img/Rock_10_d.png"));
-		rockObj->setNormalMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/Rock_10_n.png"));
-		rockObj->setSpecularMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/Rock_10_s.png"));
-		rockObj->setEmissiveTexture(Engine::TextureTable::getInstance().instantiateTexture("img/Rock_10_e.png"));
-
-		scene->addObject(rockObj);
-	}
-	*/
-	scene->setClearColor(glm::vec3(1, 0, 0));
+	scene->setClearColor(glm::vec3(1, 1, 1));
 }
 
 void initHandlers()
@@ -315,7 +250,6 @@ void initHandlers()
 	handlers->registerHandler(lm);
 	handlers->registerHandler(lim);
 	handlers->registerHandler(cm);
-	handlers->registerHandler(new Engine::TestImplementation::RendererSwitcher());
 
 	Engine::TestImplementation::CameraMotion * camMotion = new Engine::TestImplementation::CameraMotion("camera_motion", Engine::SceneManager::getInstance().getActiveScene()->getCamera());
 	
@@ -331,14 +265,13 @@ void initRenderEngine()
 	Engine::RenderManager::getInstance().setDeferredRenderer(dr);
 
 	Engine::RenderManager::getInstance().deferredRender();
-
-	Engine::RenderManager::getInstance().doResize(500, 500);
+	
+	Engine::RenderManager::getInstance().doResize(1024, 1024);
 }
 
 void renderFunc()
 {
 	Engine::RenderManager::getInstance().doRender();
-	// Intercambiamos buffer front and back
 	glutSwapBuffers();
 }
 
@@ -347,8 +280,6 @@ void resizeFunc(int width, int height)
 	Engine::SceneManager::getInstance().getActiveScene()->onViewportResize(width, height);
 	Engine::RenderManager::getInstance().doResize(width, height);
 	glViewport(0, 0, width, height);
-	// No necesario porque glViewport ya genera los eventos de pintar
-	//glutPostRedisplay();
 }
 
 void idleFunc()

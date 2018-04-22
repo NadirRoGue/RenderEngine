@@ -8,6 +8,7 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <iostream>
 
 std::string Engine::Object::ALBEDO_TEX = "albedo";
 std::string Engine::Object::NORMAL_TEX = "normal";
@@ -24,6 +25,8 @@ Engine::Object::Object(Engine::MeshInstance * mi)
 	angleR = 0.0f;
 
 	albedo = normal = specular = emissive = 0;
+
+	renderMode = GL_TRIANGLES;
 }
 
 Engine::Object::~Object()
@@ -41,7 +44,7 @@ Engine::MeshInstance * Engine::Object::getMeshInstance()
 	return meshInstance;
 }
 
-Engine::Mesh * Engine::Object::getMesh()
+Engine::Mesh * Engine::Object::getMesh() const
 {
 	return meshInstance->getMesh();
 }
@@ -63,6 +66,18 @@ void Engine::Object::translate(glm::vec3 t)
 
 void Engine::Object::scale(glm::vec3 s)
 {
+	scaleVector += s;
+	updateModelMatrix();
+}
+
+void Engine::Object::setTranslation(glm::vec3 t)
+{
+	translation = t;
+	updateModelMatrix();
+}
+
+void Engine::Object::setScale(glm::vec3 s)
+{
 	scaleVector = s;
 	updateModelMatrix();
 }
@@ -83,33 +98,14 @@ void Engine::Object::updateModelMatrix()
 	modelMatrix = transMat * rotMat * scaleMat;
 }
 
-void Engine::Object::addTexture(std::string name, Engine::TextureInstance * t)
+void Engine::Object::setRenderMode(GLenum renderMode)
 {
-	std::map<std::string, Engine::TextureInstance *>::iterator it = textures.find(name);
-	if (it != textures.end())
-	{
-		Engine::TextureInstance * t2 = it->second;
-		t2->~TextureInstance();
-		delete t2;
-	}
-
-	textures[name] = t;
+	this->renderMode = renderMode;
 }
 
-Engine::TextureInstance * Engine::Object::getTexture(std::string name)
+GLenum Engine::Object::getRenderMode()
 {
-	std::map<std::string, Engine::TextureInstance *>::iterator it = textures.find(name);
-	if (it != textures.end())
-	{
-		return NULL;
-	}
-
-	return textures[name];
-}
-
-const std::map<std::string, Engine::TextureInstance *> & Engine::Object::getAllCustomTextures() const
-{
-	return textures;
+	return renderMode;
 }
 
 void Engine::Object::setAlbedoTexture(Engine::TextureInstance * t)
@@ -173,3 +169,31 @@ const Engine::TextureInstance * Engine::Object::getSpecularMapTexture() const
 	return specular;
 }
 
+// ======================================================================================================
+
+Engine::PostProcessObject::PostProcessObject(MeshInstance * mi)
+	:Object(mi)
+{
+
+}
+
+void Engine::PostProcessObject::addTexture(std::string name, Engine::TextureInstance * instance)
+{
+	inputBuffers[name] = instance;
+}
+
+Engine::TextureInstance * Engine::PostProcessObject::getTexture(std::string name)
+{
+	std::map<std::string, Engine::TextureInstance *>::iterator it = inputBuffers.find(name);
+	if (it == inputBuffers.end())
+	{
+		return NULL;
+	}
+
+	return inputBuffers[name];
+}
+
+const std::map<std::string, Engine::TextureInstance *> & Engine::PostProcessObject::getAllCustomTextures() const
+{
+	return inputBuffers;
+}

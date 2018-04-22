@@ -43,20 +43,18 @@ void Engine::PostProcessProgram::configureProgram()
 
 void Engine::PostProcessProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
 {
-	glGenVertexArrays(1, &mesh->vao);
-	glBindVertexArray(mesh->vao);
+	Engine::Mesh * data = mesh->getMesh();
+	//glGenVertexArrays(1, &data->vao);
+	glBindVertexArray(data->vao);
 
-	glGenBuffers(1, &mesh->vboVertices);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->vboVertices);
-	glBufferData(GL_ARRAY_BUFFER, mesh->getMesh()->getNumVertices() * sizeof(float) * 3,
-		mesh->getMesh()->getVertices(), GL_STATIC_DRAW);
-
+	//glGenBuffers(1, &mesh->vboVertices);
+	glBindBuffer(GL_ARRAY_BUFFER, data->vboVertices);
+	//glBufferData(GL_ARRAY_BUFFER, mesh->getMesh()->getNumVertices() * sizeof(float) * 3, mesh->getMesh()->getVertices(), GL_STATIC_DRAW);
 	glVertexAttribPointer(inPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glGenBuffers(1, &mesh->vboUVs);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->vboUVs);
-	glBufferData(GL_ARRAY_BUFFER, mesh->getMesh()->getNumVertices() * sizeof(float) * 2, 
-		mesh->getMesh()->getUVs(), GL_STATIC_DRAW);
+	//glGenBuffers(1, &mesh->vboUVs);
+	glBindBuffer(GL_ARRAY_BUFFER, data->vboUVs);
+	//glBufferData(GL_ARRAY_BUFFER, mesh->getMesh()->getNumVertices() * sizeof(float) * 2,  mesh->getMesh()->getUVs(), GL_STATIC_DRAW);
 
 	glVertexAttribPointer(inTexCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
@@ -96,7 +94,7 @@ void Engine::PostProcessProgram::configureDirectionalLightBuffer(const Engine::D
 void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
 {
 
-	std::map<std::string, TextureInstance *> all = obj->getAllCustomTextures();
+	std::map<std::string, TextureInstance *> all = ((PostProcessObject*)obj)->getAllCustomTextures();
 	std::map<std::string, TextureInstance *>::const_iterator it = all.cbegin();
 	
 	int start = 0;
@@ -115,8 +113,10 @@ void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, cons
 
 void Engine::PostProcessProgram::releaseProgramBuffers(Engine::MeshInstance * mi)
 {
+	/*
 	if (inPos != -1) glDeleteBuffers(1, &mi->vboVertices);
 	glDeleteVertexArrays(1, &mi->vao);
+	*/
 }
 
 // ==========================================================================
@@ -474,4 +474,52 @@ void Engine::EdgeBasedProgram::onRenderObject(const Engine::Object * obj, const 
 	texelSize[1] = 1.0f / ScreenManager::SCREEN_HEIGHT;
 
 	glUniform2fv(uTexelSize, 1, &texelSize[0]);
+}
+
+// =====================================================================================
+
+Engine::PerlinGeneratorProgram::PerlinGeneratorProgram(std::string name)
+	:PostProcessProgram(name)
+{
+	scale = 5.0f;
+	frequency = 1.0f;
+	amplitude = 0.5f;
+	octaves = 8;
+}
+
+Engine::PerlinGeneratorProgram::PerlinGeneratorProgram(const PerlinGeneratorProgram & other)
+	: PostProcessProgram(other)
+{
+	perlinAmplitude = other.perlinAmplitude;
+	perlinFrequency = other.perlinFrequency;
+	perlinScale = other.perlinScale;
+	perlinOctaves = other.perlinOctaves;
+
+	scale = other.scale;
+	frequency = other.frequency;
+	amplitude = other.amplitude;
+	octaves = other.octaves;
+}
+
+Engine::PerlinGeneratorProgram::~PerlinGeneratorProgram()
+{
+
+}
+
+void Engine::PerlinGeneratorProgram::configureProgram()
+{
+	Engine::PostProcessProgram::configureProgram();
+	perlinAmplitude = glGetUniformLocation(glProgram, "amplitude");
+	perlinFrequency = glGetUniformLocation(glProgram, "frecuency");
+	perlinScale = glGetUniformLocation(glProgram, "scale");
+	perlinOctaves = glGetUniformLocation(glProgram, "octaves");
+}
+
+void Engine::PerlinGeneratorProgram::onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+{
+	Engine::PostProcessProgram::onRenderObject(obj, view, proj);
+	glUniform1f(perlinAmplitude, amplitude);
+	glUniform1f(perlinFrequency, frequency);
+	glUniform1f(perlinOctaves, octaves);
+	glUniform1f(perlinScale, scale);
 }

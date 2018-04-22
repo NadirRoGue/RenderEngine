@@ -35,6 +35,16 @@ namespace Engine
 		void translateView(glm::vec3 translation);
 		void rotateView(glm::vec3 rotation);
 
+		const glm::vec3 & getPosition() const
+		{
+			return translation;
+		}
+
+		const glm::vec3 & getRotation() const
+		{
+			return rotation;
+		}
+
 	private:
 		void initProjectionMatrix();
 		void initViewMatrix();

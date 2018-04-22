@@ -158,4 +158,6 @@ void Engine::DeferredShadingLightPopulation::execute(Engine::Object * obj, Engin
 		dSP->onRenderDirectionalLight(dlIt->second->getModelMatrix(), camera->getViewMatrix());
 		dlIt++;
 	}
+
+	dSP->configureClearColor(scene->getClearColor());
 }

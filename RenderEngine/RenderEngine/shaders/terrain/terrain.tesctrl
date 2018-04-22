@@ -1,29 +1,62 @@
-#version 450 core
+#version 410 core
 
-layout( vertices=4 ) out; 
+layout( vertices=3 ) out; 
 
-//layout (location=0) in vec3 inNormal[];
-//layout (location=1) in vec2 inUV[];
+// INPUT
+layout (location=0) in vec2 inUV[];
 
-//layout (location=0) out vec3 outNormal[];
-//layout (location=1) out vec2 outUV[];
+// OUTPUT
+layout (location=0) out vec2 outUV[];
 
-in vec3 vNormal[];
-in vec2 vUV[];
-
-out vec3 tcNormal[];
-out vec2 tcUV[];
+uniform mat4 modelView;
 
 void main()
 {
-	tcUV[gl_InvocationID] = vUV[gl_InvocationID];
-	tcNormal[gl_InvocationID] = vNormal[gl_InvocationID];
+	outUV[gl_InvocationID] = inUV[gl_InvocationID];
 	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 
-	gl_TessLevelOuter[0] = 20;
-	gl_TessLevelOuter[1] = 20;
-	gl_TessLevelOuter[2] = 20;
-	gl_TessLevelOuter[3] = 20;
-	gl_TessLevelInner[0] = 20;
-	gl_TessLevelInner[1] = 20;
+	// AUTOLOD
+	if(gl_InvocationID == 0)
+	{
+		vec3 a = (modelView * gl_in[0].gl_Position).xyz;
+		vec3 b = (modelView * gl_in[1].gl_Position).xyz;
+		vec3 c = (modelView * gl_in[2].gl_Position).xyz;
+
+		float la = length(a) * 0.25;
+		//la *= la;
+		float lb = length(b) * 0.25;
+		//lb *= lb;
+		float lc = length(c) * 0.25;
+		//lc *= lc;
+
+		float closer = la < lb && la < lc ? la : lb < lc ? lb : lc;
+		
+		closer = max(closer, 1.0);
+
+		float lod0Factor = (la * lc);
+		lod0Factor = max(lod0Factor, 1.0);
+
+		float lod1Factor = (la * lb);
+		lod1Factor = max(lod1Factor, 1.0);
+
+		float lod2Factor = (lb * lc);
+		lod2Factor = max(lod2Factor, 1.0);
+
+		float ilodFactor = (closer * closer);
+		ilodFactor = max(ilodFactor, 1.0);
+
+		float LOD0 = max(floor(400.0 / lod0Factor), 5.0);
+		float LOD1 = max(floor(400.0 / lod1Factor), 5.0);
+		float LOD2 = max(floor(400.0 / lod2Factor), 5.0);
+		float ILOD = max(floor(400.0 / ilodFactor), 5.0);
+
+		// 0 : a - c
+		// 1 : a - b
+		// 2 : b - c
+
+		gl_TessLevelOuter[0] = LOD0;
+		gl_TessLevelOuter[1] = LOD1;
+		gl_TessLevelOuter[2] = LOD2;
+		gl_TessLevelInner[0] = ILOD;
+	}
 }

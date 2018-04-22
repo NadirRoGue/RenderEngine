@@ -8,7 +8,9 @@
 #include <list>
 #include <glm/glm.hpp>
 #include <GL/glew.h>
+#include <memory>
 
+#include "Defines.h"
 #include "MeshInstance.h"
 #include "Light.h"
 #include "Object.h"
@@ -50,10 +52,53 @@ namespace Engine
 		
 		virtual void releaseProgramBuffers(MeshInstance * mi) {};
 
-		void destroy();
+		virtual void destroy();
 	protected:
-		unsigned int loadShader(std::string fileName, GLenum type);
+		virtual unsigned int loadShader(std::string fileName, GLenum type);
 	};
+
+	/*
+	template<class T, typename std::enable_if<std::is_base_of<Program, T>::value>::type* = nullptr>
+	class ProgramFactory
+	{
+	private:
+		std::map<ulong, std::unique_ptr<T>> cache;
+
+	public:
+		ProgramFactory()
+		{
+		}
+
+		~ProgramFactory()
+		{
+		}
+
+		T * create(ulong params)
+		{
+			std::map<ulong, T*>::iterator it = cache.find(params);
+			if (it != cache.end())
+			{
+				return it->second.get();
+			}
+			else
+			{
+				return (cache[params] = make_unique<T>(params)).get();
+			}
+		}
+
+		void destroy()
+		{
+			std::map<ulong, T *>::iterator it = cache.begin();
+			while (it != cache.end())
+			{
+				it->second->destroy();
+				it++;
+			}
+
+			cache.clear();
+		}
+	};
+	*/
 
 	// =============================================================================
 
@@ -134,27 +179,25 @@ namespace Engine
 	class ProceduralTerrainProgram : public Program
 	{
 	private:
+
+		unsigned int vShader, tcsShader, tevalShader, gShader, fShader;
+
 		unsigned int uInPos;
-		unsigned int uInNormal;
 		unsigned int uInUV;
 
 		unsigned int uModelView;
 		unsigned int uModelViewProj;
 		unsigned int uNormal;
-		unsigned int uNoiseTexture;
-
-		unsigned int uTextureWidth;
-		unsigned int uTextureHeight;
-		unsigned int uTexelSize;
-
-		TextureInstance * noise;
+		unsigned int uGridPos;
 
 	public:
 		ProceduralTerrainProgram(std::string name);
 		ProceduralTerrainProgram(const ProceduralTerrainProgram & other);
 		void initialize(std::string vShader, std::string fShader);
 		void configureProgram();
+		void setUniformGridPosition(unsigned int i, unsigned int j);
 		void configureMeshBuffers(MeshInstance * mesh);
 		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
+		void destroy();
 	};
 }

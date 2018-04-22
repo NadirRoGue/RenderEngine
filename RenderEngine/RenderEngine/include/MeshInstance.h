@@ -18,15 +18,6 @@ namespace Engine
 		Mesh * mesh;
 
 	public:
-		unsigned int vao;
-		unsigned int vboFaces;
-		unsigned int vboVertices;
-		unsigned int vboNormals;
-		unsigned int vboColors;
-		unsigned int vboUVs;
-		unsigned int vboTangents;
-
-	public:
 		MeshInstance(Mesh * mesh, std::string materialName);
 		~MeshInstance();
 

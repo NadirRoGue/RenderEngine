@@ -270,24 +270,23 @@ void Engine::StandarProgram::onRenderObject(const Engine::Object * obj, const gl
 void Engine::StandarProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
 {
 	// Generamos el VAO
-	glGenVertexArrays(1, &mesh->vao);
+	//glGenVertexArrays(1, &mesh->vao);
 	// Activamos el VAO para poder modificarlo
 	// Tras activarlo, cada llamada a la configuración de un vao se hará
 	// sobre el VAO activo
-	glBindVertexArray(mesh->vao);
+	Engine::Mesh * data = mesh->getMesh();
 
-	unsigned int numFaces = mesh->getMesh()->getNumFaces();
-	unsigned int numVertex = mesh->getMesh()->getNumVertices();
+	glBindVertexArray(data->vao);
 
 	// Generamos los distintos VBOs
 	if (inPos != -1)
 	{
 		// Creo
-		glGenBuffers(1, &mesh->vboVertices);
+		//glGenBuffers(1, &mesh->vboVertices);
 		// Activo
-		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboVertices);
+		glBindBuffer(GL_ARRAY_BUFFER, data->vboVertices);
 		// Subimos los datos a la tarjeta gráfica
-		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getVertices(), GL_STATIC_DRAW);
+		//glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getVertices(), GL_STATIC_DRAW);
 		// Configuramos el VAO (le decimos que este buffer va en la posición inPos en le VAO activo)
 		glVertexAttribPointer(inPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		// Activamos el atributo inPos para que lo utilice
@@ -295,40 +294,40 @@ void Engine::StandarProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
 	}
 	if (inColor != -1)
 	{
-		glGenBuffers(1, &mesh->vboColors);
-		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboColors);
-		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getColor(), GL_STATIC_DRAW);
+		//glGenBuffers(1, &mesh->vboColors);
+		glBindBuffer(GL_ARRAY_BUFFER, data->vboColors);
+		//glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getColor(), GL_STATIC_DRAW);
 		glVertexAttribPointer(inColor, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(inColor);
 	}
 	if (inNormal != -1)
 	{
-		glGenBuffers(1, &mesh->vboNormals);
-		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboNormals);
-		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getNormals(), GL_STATIC_DRAW);
+		//glGenBuffers(1, &mesh->vboNormals);
+		glBindBuffer(GL_ARRAY_BUFFER, data->vboNormals);
+		//glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getNormals(), GL_STATIC_DRAW);
 		glVertexAttribPointer(inNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(inNormal);
 	}
 	if (inTexCoord != -1)
 	{
-		glGenBuffers(1, &mesh->vboUVs);
-		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboUVs);
-		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 2, mesh->getMesh()->getUVs(), GL_STATIC_DRAW);
+		//glGenBuffers(1, &mesh->vboUVs);
+		glBindBuffer(GL_ARRAY_BUFFER, data->vboUVs);
+		//glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 2, mesh->getMesh()->getUVs(), GL_STATIC_DRAW);
 		glVertexAttribPointer(inTexCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(inTexCoord);
 	}
 	if (inTangent != -1)
 	{
-		glGenBuffers(1, &mesh->vboTangents);
-		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboTangents);
-		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getTangetns(), GL_STATIC_DRAW);
+		//glGenBuffers(1, &mesh->vboTangents);
+		glBindBuffer(GL_ARRAY_BUFFER, data->vboTangents);
+		//glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getTangetns(), GL_STATIC_DRAW);
 		glVertexAttribPointer(inTangent, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(inTangent);
 	}
 
-	glGenBuffers(1, &mesh->vboFaces);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->vboFaces);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numFaces * sizeof(unsigned int) * 3, mesh->getMesh()->getFaces(), GL_STATIC_DRAW);
+	//glGenBuffers(1, &mesh->vboFaces);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->vboFaces);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, numFaces * sizeof(unsigned int) * 3, mesh->getMesh()->getFaces(), GL_STATIC_DRAW);
 }
 
 void Engine::StandarProgram::configurePointLightBuffer(const Engine::PointLight *pl)
@@ -361,12 +360,14 @@ void Engine::StandarProgram::configureDirectionalLightBuffer(const Engine::Direc
 
 void Engine::StandarProgram::releaseProgramBuffers(Engine::MeshInstance * mi)
 {
+	/*
 	if (inPos != -1) glDeleteBuffers(1, &mi->vboVertices);
 	if (inColor != -1) glDeleteBuffers(1, &mi->vboColors);
 	if (inNormal != -1) glDeleteBuffers(1, &mi->vboNormals);
 	if (inTexCoord != -1) glDeleteBuffers(1, &mi->vboUVs);
 	glDeleteBuffers(1, &mi->vboFaces);
 	glDeleteVertexArrays(1, &mi->vao);
+	*/
 }
 
 void Engine::StandarProgram::configureClearColor(const glm::vec3 & cc)
@@ -433,60 +434,49 @@ void Engine::TextureProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
 
 Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(std::string name) :Program(name)
 {
-	noise = NULL;
 }
 
 Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerrainProgram & other)
 	: Program(other)
 {
-	noise = other.noise;
-
 	uModelView = other.uModelView;
 	uModelViewProj = other.uModelViewProj;
 	uNormal = other.uNormal;
 
-	uNoiseTexture = other.uNoiseTexture;
-	uTextureWidth = other.uTextureWidth;
-	uTextureHeight = other.uTextureHeight;
-	uTexelSize = other.uTexelSize;
+	uInPos = other.uInPos;
+	uInUV = other.uInUV;
+
+	uGridPos = other.uGridPos;
 }
 
 void Engine::ProceduralTerrainProgram::initialize(std::string vertexShader, std::string fragmentShader)
 {
-	unsigned int vShader = loadShader("shaders/terrain/terrain.vert", GL_VERTEX_SHADER);
-	unsigned int tcsShader = loadShader("shaders/terrain/terrain.tesctrl", GL_TESS_CONTROL_SHADER);
-	unsigned int tevalShader = loadShader("shaders/terrain/terrain.teseval", GL_TESS_EVALUATION_SHADER);
-	unsigned int gShader = loadShader("shaders/terrain/terrain.geom", GL_GEOMETRY_SHADER);
-	unsigned int fShader = loadShader("shaders/terrain/terrain.frag", GL_FRAGMENT_SHADER);
+	vShader = loadShader("shaders/terrain/terrain.vert", GL_VERTEX_SHADER);
+	tcsShader = loadShader("shaders/terrain/terrain.tesctrl", GL_TESS_CONTROL_SHADER);
+	tevalShader = loadShader("shaders/terrain/terrain.teseval", GL_TESS_EVALUATION_SHADER);
+	gShader = loadShader("shaders/terrain/terrain.geom", GL_GEOMETRY_SHADER);
+	fShader = loadShader("shaders/terrain/terrain.frag", GL_FRAGMENT_SHADER);
 
-	// Creamos un programa para enlazar los shader anteriores
 	glProgram = glCreateProgram();
 
-	// Enlacamos los shader
 	glAttachShader(glProgram, vShader);
-	//glAttachShader(glProgram, tcsShader);
-	//glAttachShader(glProgram, tevalShader);
+	glAttachShader(glProgram, tcsShader);
+	glAttachShader(glProgram, tevalShader);
 	glAttachShader(glProgram, gShader);
 	glAttachShader(glProgram, fShader);
 
-	// Linkamos el programa
 	glLinkProgram(glProgram);
 
-	// Comprobamos errores de linkado (E.G., una varaible in que usamos en el shader 
-	// de fragmentos pero que no existe en el de vértices)
 	int linked;
 	glGetProgramiv(glProgram, GL_LINK_STATUS, &linked);
 	if (!linked)
 	{
-		//Calculamos una cadena de error
 		GLint logLen;
 		glGetProgramiv(glProgram, GL_INFO_LOG_LENGTH, &logLen);
 		char *logString = new char[logLen];
 		glGetProgramInfoLog(glProgram, logLen, NULL, logString);
 		std::cout << "Error: " << logString << std::endl;
 		delete[] logString;
-		//glDeleteProgram(program);
-		//program = 0;
 		exit(-1);
 	}
 
@@ -498,58 +488,42 @@ void Engine::ProceduralTerrainProgram::configureProgram()
 	uModelView = glGetUniformLocation(glProgram, "modelView");
 	uModelViewProj = glGetUniformLocation(glProgram, "modelViewProj");
 	uNormal = glGetUniformLocation(glProgram, "normal");
-	
-	uNoiseTexture = glGetUniformLocation(glProgram, "noise");
-	//uTextureWidth = glGetUniformLocation(glProgram, "noiseWidth");
-	//uTextureWidth = glGetUniformLocation(glProgram, "noiseHeight");
-	uTexelSize = glGetUniformLocation(glProgram, "TexelSize");
+	uGridPos = glGetUniformLocation(glProgram, "gridPos");
 
 	uInPos = glGetAttribLocation(glProgram, "inPos");
-	uInNormal = glGetAttribLocation(glProgram, "inNormal");
 	uInUV = glGetAttribLocation(glProgram, "inUV");
-
-	noise = Engine::TextureTable::getInstance().instantiateTexture("img/noise.png");
-	noise->setAnisotropicFilterEnabled(false);
-	noise->setMagnificationFilterType(GL_NEAREST);
-	noise->setMinificationFilterType(GL_NEAREST);
 }
 
 void Engine::ProceduralTerrainProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
 {
-	glGenVertexArrays(1, &mesh->vao);
-	glBindVertexArray(mesh->vao);
+	//glGenVertexArrays(1, &mesh->vao);
+	Engine::Mesh * data = mesh->getMesh();
+	glBindVertexArray(data->vao);
 
 	unsigned int numFaces = mesh->getMesh()->getNumFaces();
 	unsigned int numVertex = mesh->getMesh()->getNumVertices();
 
 	if (uInPos != -1)
 	{
-		glGenBuffers(1, &mesh->vboVertices);
-		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboVertices);
-		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getVertices(), GL_STATIC_DRAW);
+		//glGenBuffers(1, &mesh->vboVertices);
+		glBindBuffer(GL_ARRAY_BUFFER, data->vboVertices);
+		//glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getVertices(), GL_STATIC_DRAW);
 		glVertexAttribPointer(uInPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(uInPos);
 	}
-	if (uInNormal != -1)
-	{
-		glGenBuffers(1, &mesh->vboNormals);
-		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboNormals);
-		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, mesh->getMesh()->getNormals(), GL_STATIC_DRAW);
-		glVertexAttribPointer(uInNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(uInNormal);
-	}
+
 	if (uInUV != -1)
 	{
-		glGenBuffers(1, &mesh->vboUVs);
-		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboUVs);
-		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 2, mesh->getMesh()->getUVs(), GL_STATIC_DRAW);
+		//glGenBuffers(1, &mesh->vboUVs);
+		glBindBuffer(GL_ARRAY_BUFFER, data->vboUVs);
+		//glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 2, mesh->getMesh()->getUVs(), GL_STATIC_DRAW);
 		glVertexAttribPointer(uInUV, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(uInUV);
 	}
 
-	glGenBuffers(1, &mesh->vboFaces);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->vboFaces);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numFaces * sizeof(unsigned int) * mesh->getMesh()->getNumVerticesPerFace(), mesh->getMesh()->getFaces(), GL_STATIC_DRAW);
+	//glGenBuffers(1, &mesh->vboFaces);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->vboFaces);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, numFaces * sizeof(unsigned int) * mesh->getMesh()->getNumVerticesPerFace(), mesh->getMesh()->getFaces(), GL_STATIC_DRAW);
 }
 
 void Engine::ProceduralTerrainProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
@@ -562,17 +536,31 @@ void Engine::ProceduralTerrainProgram::onRenderObject(const Engine::Object * obj
 	glUniformMatrix4fv(uModelViewProj, 1, GL_FALSE, &(modelViewProj[0][0]));
 	glUniformMatrix4fv(uNormal, 1, GL_FALSE, &(normal[0][0]));
 
-	unsigned int w = noise->getTexture()->getWidth();
-	unsigned int h = noise->getTexture()->getHeight();
+	unsigned int vertexPerFace = obj->getMesh()->getNumVerticesPerFace();
+	glPatchParameteri(GL_PATCH_VERTICES, vertexPerFace);
+}
 
-	//glUniform1f(uTextureWidth, w);
-	//glUniform1f(uTextureHeight, h);
-	//glUniform2f(uTexelSize, 1.0f / w, 1.0f / h);
+void Engine::ProceduralTerrainProgram::setUniformGridPosition(unsigned int i, unsigned int j)
+{
+	glUniform2i(uGridPos, i, j);
+}
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, noise->getTexture()->getTextureId());
-	noise->configureTexture();
-	glUniform1i(uNoiseTexture, 0);
+void Engine::ProceduralTerrainProgram::destroy()
+{
+	glDetachShader(glProgram, vShader);
+	glDeleteShader(vShader);
 
-	//std::cout << "HERE" << std::endl;
+	glDetachShader(glProgram, tcsShader);
+	glDeleteShader(tcsShader);
+
+	glDetachShader(glProgram, tevalShader);
+	glDeleteShader(tevalShader);
+
+	glDetachShader(glProgram, gShader);
+	glDeleteShader(gShader);
+
+	glDetachShader(glProgram, fShader);
+	glDeleteShader(fShader);
+
+	glDeleteProgram(glProgram);
 }

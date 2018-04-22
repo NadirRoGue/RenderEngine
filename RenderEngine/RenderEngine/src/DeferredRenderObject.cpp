@@ -44,7 +44,7 @@ unsigned int Engine::DeferredRenderObject::getFrameBufferId()
 	return fbo;
 }
 
-void Engine::DeferredRenderObject::addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, float filterMethod)
+Engine::TextureInstance * Engine::DeferredRenderObject::addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, float filterMethod)
 {
 	if (index < 0 || index > colorBuffersSize || usedColorBuffers >= 8)
 		exit(-1);
@@ -67,9 +67,11 @@ void Engine::DeferredRenderObject::addColorBuffer(unsigned int index, GLenum gpu
 
 	colorBuffers[index].bufferType = colorAttachment;
 	colorBuffers[index].texture = ti;
+
+	return ti;
 }
 
-void Engine::DeferredRenderObject::addDepthBuffer24(unsigned int w, unsigned int h)
+Engine::TextureInstance * Engine::DeferredRenderObject::addDepthBuffer24(unsigned int w, unsigned int h)
 {
 	if (depthBuffer.texture != 0)
 	{
@@ -90,9 +92,11 @@ void Engine::DeferredRenderObject::addDepthBuffer24(unsigned int w, unsigned int
 	
 	depthBuffer.bufferType = GL_DEPTH_ATTACHMENT;
 	depthBuffer.texture = textureInstance;
+
+	return textureInstance;
 }
 
-void Engine::DeferredRenderObject::addDepthBuffer32(unsigned int w, unsigned int h)
+Engine::TextureInstance * Engine::DeferredRenderObject::addDepthBuffer32(unsigned int w, unsigned int h)
 {
 	if (depthBuffer.texture != 0)
 	{
@@ -112,6 +116,8 @@ void Engine::DeferredRenderObject::addDepthBuffer32(unsigned int w, unsigned int
 
 	depthBuffer.bufferType = GL_DEPTH_ATTACHMENT;
 	depthBuffer.texture = textureInstance;
+	
+	return textureInstance;
 }
 
 void Engine::DeferredRenderObject::initialize()
@@ -155,7 +161,7 @@ void Engine::DeferredRenderObject::resizeFBO(unsigned int w, unsigned int h)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Engine::DeferredRenderObject::populateDeferredObject(Engine::Object * object)
+void Engine::DeferredRenderObject::populateDeferredObject(Engine::PostProcessObject * object)
 {
 	for (unsigned int i = 0; i < colorBuffersSize; i++)
 	{

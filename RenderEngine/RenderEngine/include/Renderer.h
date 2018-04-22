@@ -58,7 +58,7 @@ namespace Engine
 	struct PostProcessChainNode
 	{
 		Program *postProcessProgram;
-		Object * obj;
+		PostProcessObject * obj;
 
 		DeferredRenderObject * renderBuffer;
 
@@ -73,6 +73,7 @@ namespace Engine
 		ForwardRenderer * forwardPass;
 		DeferredRenderObject * forwardPassBuffer;
 
+		PostProcessChainNode * preProcess;
 		std::list<PostProcessChainNode *> postProcessChain;
 		PostProcessChainNode * finalLink;
 
@@ -85,6 +86,7 @@ namespace Engine
 		~DeferredRenderer();
 
 		void setForwardPassBuffers(DeferredRenderObject * buffers);
+		void setPreProcess(PostProcessChainNode * node);
 		void addPostProcess(PostProcessChainNode * object);
 		void setFinalPostProcess(PostProcessChainNode * object);
 

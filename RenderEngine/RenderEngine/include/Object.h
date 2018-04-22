@@ -7,6 +7,7 @@
 
 #include <glm/glm.hpp>
 #include <map>
+#include <gl\glew.h>
 
 #include "MeshInstance.h"
 #include "Texture.h"
@@ -25,33 +26,34 @@ namespace Engine
 
 		glm::mat4 modelMatrix;
 
-		glm::vec3 rotation;
 		float angleR;
+		glm::vec3 rotation;
 		glm::vec3 translation;
-
 		glm::vec3 scaleVector;
+
+		GLenum renderMode;
 
 		TextureInstance * albedo;
 		TextureInstance * emissive;
 		TextureInstance * normal;
 		TextureInstance * specular;
-		std::map<std::string, TextureInstance *> textures;
 	public:
 		Object(MeshInstance * mi);
 		~Object();
 
 		const glm::mat4 & getModelMatrix() const;
 		MeshInstance * getMeshInstance();
-		Mesh * getMesh();
+		Mesh * getMesh() const;
 
 		void rotate(float angle, glm::vec3 r);
 		void translate(glm::vec3 t);
 		void scale(glm::vec3 s);
+		void setTranslation(glm::vec3 t);
+		void setScale(glm::vec3 s);
 		void setModelMatrix(const glm::mat4 & matrix);
 
-		void addTexture(std::string name, TextureInstance * instance);
-		TextureInstance * getTexture(std::string name);
-		const std::map<std::string, TextureInstance *> & getAllCustomTextures() const;
+		void setRenderMode(GLenum renderMode);
+		GLenum getRenderMode();
 
 		void setAlbedoTexture(TextureInstance * t);
 		void setNormalMapTexture(TextureInstance * t);
@@ -65,5 +67,17 @@ namespace Engine
 		
 	private:
 		void updateModelMatrix();
+	};
+
+	class PostProcessObject: public Object
+	{
+	private:
+		std::map<std::string, TextureInstance *> inputBuffers;
+	public:
+		PostProcessObject(MeshInstance * mi);
+
+		void addTexture(std::string name, TextureInstance * instance);
+		TextureInstance * getTexture(std::string name);
+		const std::map<std::string, TextureInstance *> & getAllCustomTextures() const;
 	};
 }

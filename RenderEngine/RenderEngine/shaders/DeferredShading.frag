@@ -132,7 +132,7 @@ vec3 shade()
 	float d = length(pos);
 	float alfa = 1/exp(0.005*d*d);
 
-	vec3 finalColor = mix(backgroundColor, c, alfa);//alfa*I+(1-alfa)*cf;
+	//alfa*I+(1-alfa)*cf;
 
-	return finalColor;
+	return mix(backgroundColor, c, alfa);
 }

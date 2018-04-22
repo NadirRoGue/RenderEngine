@@ -22,6 +22,14 @@ namespace Engine
 		float *colors;
 		float *uvs;
 		float *tangents;
+	public:
+		unsigned int vao;
+		unsigned int vboFaces;
+		unsigned int vboVertices;
+		unsigned int vboNormals;
+		unsigned int vboColors;
+		unsigned int vboUVs;
+		unsigned int vboTangents;
 
 	public:
 		Mesh();
@@ -50,5 +58,7 @@ namespace Engine
 
 		void computeNormals();
 		void computeTangents();
+
+		void syncGPU();
 	};
 }

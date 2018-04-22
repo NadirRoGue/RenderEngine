@@ -19,6 +19,18 @@
     <Filter Include="Archivos de origen\testimplementation">
       <UniqueIdentifier>{2b047032-e0d7-4d67-9221-4c62e3056afe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de encabezado\programs">
+      <UniqueIdentifier>{9def421f-ef6e-43a5-9c1e-d3d460e130d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\programs">
+      <UniqueIdentifier>{8a4e8fa6-8e4a-4b0b-911c-90a6576599df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\materials">
+      <UniqueIdentifier>{3ecf64e0-fe08-4ccd-b481-5125c079ab85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\materials">
+      <UniqueIdentifier>{4b9c98d2-d364-486c-b040-ac1b1f06b214}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Animation.h">
@@ -99,6 +111,24 @@
     <ClInclude Include="include\Material.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="include\Terrain.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Defines.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\programs\ProceduralTerrainProgram.h">
+      <Filter>Archivos de encabezado\programs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\programs\StandardProgram.h">
+      <Filter>Archivos de encabezado\programs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Materials\ProceduralTerrainMaterial.h">
+      <Filter>Archivos de encabezado\materials</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Materials\StandardMaterial.h">
+      <Filter>Archivos de encabezado\materials</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -175,6 +205,21 @@
     </ClCompile>
     <ClCompile Include="src\Material.cpp">
       <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Terrain.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\programs\ProceduralTerrainProgram.cpp">
+      <Filter>Archivos de origen\programs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\programs\StandardProgram.cpp">
+      <Filter>Archivos de origen\programs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Materials\ProceduralTerrainMaterial.cpp">
+      <Filter>Archivos de origen\materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Materials\StandardMaterial.cpp">
+      <Filter>Archivos de origen\materials</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

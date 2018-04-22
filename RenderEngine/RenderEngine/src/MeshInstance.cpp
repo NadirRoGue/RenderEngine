@@ -4,6 +4,7 @@
 */
 
 #include "MeshInstance.h"
+#include <gl\glew.h>
 
 Engine::MeshInstance::MeshInstance(Engine::Mesh * m, std::string materialName)
 	:mesh(m)

@@ -40,13 +40,13 @@ namespace Engine
 
 		unsigned int getFrameBufferId();
 
-		void addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, float filterMethod = GL_NEAREST);
-		void addDepthBuffer24(unsigned int w, unsigned int h);
-		void addDepthBuffer32(unsigned int w, unsigned int h);
+		TextureInstance * addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, float filterMethod = GL_NEAREST);
+		TextureInstance * addDepthBuffer24(unsigned int w, unsigned int h);
+		TextureInstance * addDepthBuffer32(unsigned int w, unsigned int h);
 
 		void initialize();
 		void resizeFBO(unsigned int w, unsigned int h);
 
-		void populateDeferredObject(Object * obj);
+		void populateDeferredObject(PostProcessObject * obj);
 	};
 }

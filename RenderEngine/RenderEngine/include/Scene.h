@@ -13,6 +13,7 @@
 #include "KeyboardHandler.h"
 #include "MouseHandler.h"
 #include "Animation.h"
+#include "Terrain.h"
 
 #include <map>
 #include <list>
@@ -42,6 +43,8 @@ namespace Engine
 		std::map<std::string, SpotLight *> spotLights;
 		std::map<std::string, DirectionalLight *> directionalLights;
 
+		Terrain * terrain;
+
 		std::list<Program *> lightDependentPrograms;
 
 		glm::vec3 clearColor;
@@ -55,6 +58,8 @@ namespace Engine
 		const std::map<std::string, SpotLight *> & getSpotLights() const;
 		const std::map<std::string, DirectionalLight *> getDirectionalLight() const;
 		
+		void setTerrain(Terrain * terrain);
+		Terrain * getTerrain();
 		void setCamera(Camera * cam);
 		Camera * getCamera();
 		void addObject(Object * obj);

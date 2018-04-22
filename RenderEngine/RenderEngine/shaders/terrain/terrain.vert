@@ -1,18 +1,16 @@
-#version 450 core
+#version 410 core
 
+// INPUT
 layout (location=0) in vec3 inPos;
-layout (location=1) in vec3 inNormal;
-layout (location=2) in vec2 inUV;
+layout (location=1) in vec2 inUV;
 
-//layout (location=0) out vec3 outNormal;
-//layout (location=1) out vec2 outUV;
+// OUTPUT
+layout (location=0) out vec2 outUV;
 
-out vec3 vNormal;
-out vec2 vUV;
+uniform ivec2 gridPos;
 
 void main()
 {
 	gl_Position = vec4(inPos, 1.0);
-	vNormal = inNormal;
-	vUV = inUV;
+	outUV = abs(inUV + vec2(float(gridPos.x), float(gridPos.y)));
 }

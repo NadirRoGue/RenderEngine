@@ -58,7 +58,10 @@ void Engine::ForwardRenderer::doRender()
 	if (scene == 0)
 		return;
 
-	Engine::Camera * camera = activeCam;
+	if (scene->getTerrain() != NULL)
+	{
+		scene->getTerrain()->render(activeCam);
+	}
 
 	const std::map<std::string, Engine::ProgramRenderables *> renders = scene->getObjects();
 
@@ -78,26 +81,26 @@ void Engine::ForwardRenderer::doRender()
 			std::map<std::string, Engine::PointLight *>::const_iterator it = pointLights.cbegin();
 			while (it != pointLights.end())
 			{
-				renderableIt->second->program->onRenderLight(it->second->getModelMatrix(), camera->getViewMatrix());
+				renderableIt->second->program->onRenderLight(it->second->getModelMatrix(), activeCam->getViewMatrix());
 				it++;
 			}
 
 			std::map<std::string, Engine::SpotLight *>::const_iterator slIt = spotLights.cbegin();
 			while (slIt != spotLights.end())
 			{
-				renderableIt->second->program->onRenderSpotLight(slIt->second->getModelMatrix(), slIt->second->getDirModelMatrix(), camera->getViewMatrix());
+				renderableIt->second->program->onRenderSpotLight(slIt->second->getModelMatrix(), slIt->second->getDirModelMatrix(), activeCam->getViewMatrix());
 				slIt++;
 			}
 
 			std::map<std::string, Engine::DirectionalLight *>::const_iterator dlIt = directionalLights.cbegin();
 			while (dlIt != directionalLights.end())
 			{
-				renderableIt->second->program->onRenderDirectionalLight(dlIt->second->getModelMatrix(), camera->getViewMatrix());
+				renderableIt->second->program->onRenderDirectionalLight(dlIt->second->getModelMatrix(), activeCam->getViewMatrix());
 				dlIt++;
 			}
 		}
 
-		renderProgram(camera, renderableIt->second);
+		renderProgram(activeCam, renderableIt->second);
 	}
 }
 
@@ -117,15 +120,13 @@ void Engine::ForwardRenderer::renderProgram(Engine::Camera * camera, Engine::Pro
 		std::list<Engine::Object *> meshes = it->second;
 		std::list<Engine::Object *>::iterator listIt;
 
-		// foreach texture change (set a texture and render all object with that texture)
-
 		for (listIt = meshes.begin(); listIt != meshes.end(); listIt++)
 		{
-			program->onRenderObject(*listIt, viewMatrix, projMatrix);
+			Object * objToRender = *listIt;
+			program->onRenderObject(objToRender, viewMatrix, projMatrix);
 
-			glPatchParameteri(GL_PATCH_VERTICES, 4);
-			//glDrawElements(GL_TRIANGLES, (*listIt)->getMesh()->getNumFaces() * 4, GL_UNSIGNED_INT, (void*)0);
-			//glDrawElements(GL_PATCHES, (*listIt)->getMesh()->getNumFaces() * (*listIt)->getMesh()->getNumVerticesPerFace(), GL_UNSIGNED_INT, (void*)0);
+			unsigned int vertexPerFace = objToRender->getMesh()->getNumVerticesPerFace();
+			glDrawElements(objToRender->getRenderMode(), objToRender->getMesh()->getNumFaces() * vertexPerFace, GL_UNSIGNED_INT, (void*)0);
 		}
 	}
 }
@@ -140,6 +141,7 @@ void Engine::ForwardRenderer::onResize(unsigned int w, unsigned int h)
 Engine::DeferredRenderer::DeferredRenderer()
 	:Engine::Renderer()
 {
+	preProcess = nullptr;
 	forwardPass = new Engine::ForwardRenderer();
 	initialized = false;
 }
@@ -155,6 +157,11 @@ Engine::DeferredRenderer::~DeferredRenderer()
 void Engine::DeferredRenderer::setForwardPassBuffers(Engine::DeferredRenderObject * buffers)
 {
 	forwardPassBuffer = buffers;
+}
+
+void Engine::DeferredRenderer::setPreProcess(Engine::PostProcessChainNode * node)
+{
+	preProcess = node;
 }
 
 void Engine::DeferredRenderer::addPostProcess(Engine::PostProcessChainNode * object)
@@ -209,12 +216,27 @@ void Engine::DeferredRenderer::doRender()
 		return;
 
 	Engine::Camera * cam = activeCam;
+	/*
+	if (preProcess != nullptr)
+	{
+		glDisable(GL_CULL_FACE);
+		glDisable(GL_DEPTH_TEST);
 
+		glBindFramebuffer(GL_FRAMEBUFFER, preProcess->renderBuffer->getFrameBufferId());
+		glUseProgram(preProcess->postProcessProgram->getProgramId());
+		glBindVertexArray(preProcess->obj->getMeshInstance()->getMesh()->vao);
+		preProcess->postProcessProgram->onRenderObject(preProcess->obj, cam->getViewMatrix(), cam->getProjectionMatrix());
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
+	}
+	*/
 	glBindFramebuffer(GL_FRAMEBUFFER, forwardPassBuffer->getFrameBufferId());
 	
 	forwardPass->renderFromCamera(cam);
 	forwardPass->doRender();
-
+	
 	std::list<Engine::PostProcessChainNode *>::iterator it = postProcessChain.begin();
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
@@ -233,7 +255,7 @@ void Engine::DeferredRenderer::doRender()
 			node->callBack->execute(node->obj, node->postProcessProgram, node->renderBuffer, cam);
 		}
 
-		glBindVertexArray(node->obj->getMeshInstance()->vao);
+		glBindVertexArray(node->obj->getMeshInstance()->getMesh()->vao);
 
 		prog->onRenderObject(node->obj, cam->getViewMatrix(), cam->getProjectionMatrix());
 
@@ -250,19 +272,21 @@ void Engine::DeferredRenderer::doRender()
 	}
 
 	glUseProgram(finalLink->postProcessProgram->getProgramId());
-	glBindVertexArray(finalLink->obj->getMeshInstance()->vao);
+	glBindVertexArray(finalLink->obj->getMeshInstance()->getMesh()->vao);
 
 	finalLink->postProcessProgram->onRenderObject(finalLink->obj, cam->getViewMatrix(), cam->getProjectionMatrix());
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glEnable(GL_CULL_FACE);
+	
+	//glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 }
 
 void Engine::DeferredRenderer::onResize(unsigned int w, unsigned int h)
 {
+	if (preProcess != nullptr)
+		preProcess->renderBuffer->resizeFBO(w, h);
 	forwardPassBuffer->resizeFBO(w, h);
 
 	std::list<Engine::PostProcessChainNode *>::iterator it = postProcessChain.begin();
@@ -337,7 +361,7 @@ void Engine::SideBySideRenderer::initialize()
 	lNode->postProcessProgram = new Engine::PostProcessProgram(*dynamic_cast<Engine::PostProcessProgram*>(sourcePostProcess));
 	lNode->renderBuffer = 0;
 	lNode->callBack = new Engine::MotionBlurImpl();
-	lNode->obj = new Engine::Object(mi);
+	lNode->obj = new Engine::PostProcessObject(mi);
 
 	leftRenderer->setFinalPostProcess(lNode);
 	leftRenderer->initialize();
@@ -347,7 +371,7 @@ void Engine::SideBySideRenderer::initialize()
 	rNode->postProcessProgram = new Engine::PostProcessProgram(*dynamic_cast<Engine::PostProcessProgram*>(sourcePostProcess));
 	rNode->renderBuffer = 0;
 	rNode->callBack = new Engine::MotionBlurImpl();
-	rNode->obj = new Engine::Object(miR);
+	rNode->obj = new Engine::PostProcessObject(miR);
 	
 	rightRenderer->setFinalPostProcess(rNode);
 	rightRenderer->initialize();

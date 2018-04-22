@@ -52,10 +52,20 @@ const glm::vec3 & Engine::Scene::getClearColor() const
 	return clearColor;
 }
 
+void Engine::Scene::setTerrain(Terrain * terrain)
+{
+	this->terrain = terrain;
+}
+
+Engine::Terrain * Engine::Scene::getTerrain()
+{
+	return this->terrain;
+}
+
 void Engine::Scene::addObject(Engine::Object *obj)
 {
 	std::string material = obj->getMeshInstance()->getMaterial();
-	unsigned int vaoIndex = obj->getMeshInstance()->vao;
+	unsigned int vaoIndex = obj->getMeshInstance()->getMesh()->vao;
 
 	std::map<std::string, Engine::ProgramRenderables *>::iterator renderIt = renders.find(material);
 

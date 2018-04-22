@@ -11,6 +11,8 @@
 #include <vector>
 #include <iostream>
 
+#include <gl\glew.h>
+
 Engine::Mesh::Mesh()
 {
 	faces = 0;
@@ -23,6 +25,8 @@ Engine::Mesh::Mesh(aiMesh * mesh)
 	vertices = colors = normals = tangents = uvs = 0;
 
 	loadFromMesh(mesh);
+
+	syncGPU();
 }
 
 Engine::Mesh::Mesh(const Engine::Mesh &other)
@@ -71,6 +75,16 @@ Engine::Mesh::Mesh(const Engine::Mesh &other)
 		uvs = new float[numVertices * 2];
 		memcpy(uvs, other.uvs, numVertices * 2 * sizeof(float));
 	}
+
+	verticesPerFace = other.verticesPerFace;
+
+	vao = other.vao;
+	vboColors = other.vboColors;
+	vboFaces = other.vboFaces;
+	vboNormals = other.vboNormals;
+	vboTangents = other.vboTangents;
+	vboUVs = other.vboUVs;
+	vboVertices = other.vboVertices;
 }
 
 Engine::Mesh::Mesh(const unsigned int numF, const unsigned int numV, const unsigned int *f, const float *v, const float *c, const float *n, const float *uv, const float *t)
@@ -83,6 +97,7 @@ Engine::Mesh::Mesh(const unsigned int numF, const unsigned int numV, const unsig
 	{
 		if (f != 0)
 		{
+			verticesPerFace = 3;
 			faces = new unsigned int[numFaces * 3];
 			memcpy(faces, f, numFaces * 3 * sizeof(unsigned int));
 		}
@@ -121,6 +136,8 @@ Engine::Mesh::Mesh(const unsigned int numF, const unsigned int numV, const unsig
 			memcpy(tangents, t, totalV * sizeof(float));
 		}
 	}
+
+	syncGPU();
 }
 
 void Engine::Mesh::loadFromMesh(aiMesh * mesh)
@@ -162,7 +179,7 @@ void Engine::Mesh::extractTopology(aiMesh * mesh)
 	}
 	
 	verticesPerFace = mesh->mFaces[0].mNumIndices;
-
+	
 	faces = new unsigned int[numFaces * verticesPerFace];
 
 	for (unsigned int i = 0; i < numFaces; i++)
@@ -360,4 +377,53 @@ float * Engine::Mesh::getUVs()
 float * Engine::Mesh::getTangetns()
 {
 	return tangents;
+}
+
+void Engine::Mesh::syncGPU()
+{
+	// Generamos el VAO
+	glGenVertexArrays(1, &vao);
+	// Activamos el VAO para poder modificarlo
+	// Tras activarlo, cada llamada a la configuración de un vao se hará
+	// sobre el VAO activo
+	glBindVertexArray(vao);
+
+	unsigned int numFaces = getNumFaces();
+	unsigned int numVertex = getNumVertices();
+
+	glGenBuffers(1, &vboVertices);
+	glBindBuffer(GL_ARRAY_BUFFER, vboVertices);
+	glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, getVertices(), GL_STATIC_DRAW);
+
+	if (getColor() != 0)
+	{
+		glGenBuffers(1, &vboColors);
+		glBindBuffer(GL_ARRAY_BUFFER, vboColors);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, getColor(), GL_STATIC_DRAW);
+	}
+
+	if (getNormals() != 0)
+	{
+		glGenBuffers(1, &vboNormals);
+		glBindBuffer(GL_ARRAY_BUFFER, vboNormals);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, getNormals(), GL_STATIC_DRAW);
+	}
+
+	if (getUVs() != 0)
+	{
+		glGenBuffers(1, &vboUVs);
+		glBindBuffer(GL_ARRAY_BUFFER, vboUVs);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 2, getUVs(), GL_STATIC_DRAW);
+	}
+
+	if (getTangetns() != 0)
+	{
+		glGenBuffers(1, &vboTangents);
+		glBindBuffer(GL_ARRAY_BUFFER, vboTangents);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, getTangetns(), GL_STATIC_DRAW);
+	}
+
+	glGenBuffers(1, &vboFaces);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboFaces);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numFaces * sizeof(unsigned int) * 3, getFaces(), GL_STATIC_DRAW);
 }
