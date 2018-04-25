@@ -44,13 +44,15 @@ namespace Engine
 		unsigned int getNumVertices();
 		unsigned int getNumVerticesPerFace();
 
-		unsigned int * getFaces();
-		float * getVertices();
-		float * getNormals();
-		float * getColor();
-		float * getUVs();
-		float * getTangetns();
+		const unsigned int * getFaces() const;
+		const float * getVertices() const;
+		const float * getNormals() const;
+		const float * getColor() const;
+		const float * getUVs() const;
+		const float * getTangetns() const;
 
+		void releaseGPU();
+		void releaseCPU();
 	private:
 		void extractTopology(aiMesh * mesh);
 		void extractGeometry(aiMesh * mesh);

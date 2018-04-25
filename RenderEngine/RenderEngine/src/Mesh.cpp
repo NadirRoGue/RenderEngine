@@ -150,23 +150,8 @@ void Engine::Mesh::loadFromMesh(aiMesh * mesh)
 
 Engine::Mesh::~Mesh()
 {
-	if(faces != nullptr)
-		delete[] faces;
-
-	if(vertices != 0)
-		delete[] vertices;
-
-	if(colors != 0)
-		delete[] colors;
-
-	if(normals != 0)
-		delete[] normals;
-
-	if(uvs != 0)
-		delete[] uvs;
-
-	if(tangents != 0)
-		delete[] tangents;
+	releaseCPU();
+	releaseGPU();
 }
 
 void Engine::Mesh::extractTopology(aiMesh * mesh)
@@ -349,43 +334,39 @@ unsigned int Engine::Mesh::getNumVertices()
 	return numVertices;
 }
 
-unsigned int * Engine::Mesh::getFaces()
+const unsigned int * Engine::Mesh::getFaces() const
 {
 	return faces;
 }
 
-float * Engine::Mesh::getVertices()
+const float * Engine::Mesh::getVertices() const
 {
 	return vertices;
 }
 
-float * Engine::Mesh::getColor()
+const float * Engine::Mesh::getColor() const
 {
 	return colors;
 }
 
-float * Engine::Mesh::getNormals()
+const float * Engine::Mesh::getNormals() const
 {
 	return normals;
 }
 
-float * Engine::Mesh::getUVs()
+const float * Engine::Mesh::getUVs() const
 {
 	return uvs;
 }
 
-float * Engine::Mesh::getTangetns()
+const float * Engine::Mesh::getTangetns() const
 {
 	return tangents;
 }
 
 void Engine::Mesh::syncGPU()
 {
-	// Generamos el VAO
 	glGenVertexArrays(1, &vao);
-	// Activamos el VAO para poder modificarlo
-	// Tras activarlo, cada llamada a la configuración de un vao se hará
-	// sobre el VAO activo
 	glBindVertexArray(vao);
 
 	unsigned int numFaces = getNumFaces();
@@ -395,35 +376,115 @@ void Engine::Mesh::syncGPU()
 	glBindBuffer(GL_ARRAY_BUFFER, vboVertices);
 	glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, getVertices(), GL_STATIC_DRAW);
 
-	if (getColor() != 0)
+	if (colors != 0)
 	{
 		glGenBuffers(1, &vboColors);
 		glBindBuffer(GL_ARRAY_BUFFER, vboColors);
-		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, getColor(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, colors, GL_STATIC_DRAW);
 	}
 
-	if (getNormals() != 0)
+	if (normals != 0)
 	{
 		glGenBuffers(1, &vboNormals);
 		glBindBuffer(GL_ARRAY_BUFFER, vboNormals);
-		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, getNormals(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, normals, GL_STATIC_DRAW);
 	}
 
-	if (getUVs() != 0)
+	if (uvs != 0)
 	{
 		glGenBuffers(1, &vboUVs);
 		glBindBuffer(GL_ARRAY_BUFFER, vboUVs);
-		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 2, getUVs(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 2, uvs, GL_STATIC_DRAW);
 	}
 
-	if (getTangetns() != 0)
+	if (tangents != 0)
 	{
 		glGenBuffers(1, &vboTangents);
 		glBindBuffer(GL_ARRAY_BUFFER, vboTangents);
-		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, getTangetns(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, tangents, GL_STATIC_DRAW);
 	}
 
-	glGenBuffers(1, &vboFaces);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboFaces);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numFaces * sizeof(unsigned int) * 3, getFaces(), GL_STATIC_DRAW);
+	if (faces != 0)
+	{
+		glGenBuffers(1, &vboFaces);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboFaces);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, numFaces * sizeof(unsigned int) * 3, faces, GL_STATIC_DRAW);
+	}
+}
+
+void Engine::Mesh::releaseCPU()
+{
+	if (faces != 0)
+	{
+		delete[] faces;
+	}
+	faces = 0;
+
+	if (vertices != 0)
+	{
+		delete[] vertices;
+	}
+	vertices = 0;
+
+	if (normals != 0)
+	{
+		delete[] normals;
+	}
+	normals = 0;
+
+	if (uvs != 0)
+	{
+		delete[] uvs;
+	}
+	uvs = 0;
+
+	if (tangents != 0)
+	{
+		delete[] tangents;
+	}
+	tangents = 0;
+
+	if (colors != 0)
+	{
+		delete[] colors;
+	}
+	colors = 0;
+}
+
+void Engine::Mesh::releaseGPU()
+{
+	if (vboVertices != -1)
+	{
+		glDeleteBuffers(1, &vboVertices);
+	}
+
+	if (vboNormals != -1)
+	{
+		glDeleteBuffers(1, &vboNormals);
+	}
+
+	if (vboColors != -1)
+	{
+		glDeleteBuffers(1, &vboColors);
+	}
+
+	if (vboUVs != -1)
+	{
+		glDeleteBuffers(1, &vboUVs);
+	}
+
+	if (vboTangents != -1)
+	{
+		glDeleteBuffers(1, &vboTangents);
+	}
+
+	if (vboFaces != -1)
+	{
+		glDeleteBuffers(1, &vboFaces);
+	}
+
+	if (vao != -1)
+	{
+		glDeleteVertexArrays(1, &vao);
+	}
 }

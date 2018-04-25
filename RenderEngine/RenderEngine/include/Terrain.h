@@ -2,7 +2,6 @@
 
 #include <glm\glm.hpp>
 
-#include "Defines.h"
 #include "programs/ProceduralTerrainProgram.h"
 #include "Object.h"
 #include "Camera.h"

@@ -140,6 +140,7 @@ Engine::DeferredRenderObject * Engine::TestImplementation::createDepthOnlyBuffer
 
 Engine::PostProcessChainNode * Engine::TestImplementation::createGaussianBlur(bool addConvolutionControl)
 {
+	/*
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 	Engine::Program * gaussSource = Engine::ProgramTable::getInstance().getProgramByName("gaussian_blur_post_processing_program");
 	node->postProcessProgram = new Engine::GaussianBlurProgram(*dynamic_cast<Engine::GaussianBlurProgram*>(gaussSource));
@@ -178,7 +179,8 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createGaussianBlur(bo
 		std::cout << "Could not instantiate panel" << std::endl;
 	}
 
-	return node;
+	return node;*/
+	return NULL;
 }
 
 Engine::PostProcessChainNode * Engine::TestImplementation::createScreenAntiAliasing()
@@ -208,6 +210,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createScreenAntiAlias
 
 Engine::PostProcessChainNode * Engine::TestImplementation::create5x5GaussianBlur(float * convolutionMask, bool addConvolutionControl)
 {
+	/*
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 	Engine::Program * gaussianBlur = Engine::ProgramTable::getInstance().getProgramByName("gaussian_blur_post_processing_program");
 	node->postProcessProgram = new Engine::GaussianBlurProgram(*dynamic_cast<Engine::GaussianBlurProgram *>(gaussianBlur));
@@ -240,11 +243,13 @@ Engine::PostProcessChainNode * Engine::TestImplementation::create5x5GaussianBlur
 		std::cout << "Could not instantiate panel" << std::endl;
 	}
 
-	return node;
+	return node;*/
+	return NULL;
 }
 
 Engine::PostProcessChainNode * Engine::TestImplementation::createDepthOfField(bool addDofControl, bool addConvolutionControl)
 {
+	/*
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 
 	Engine::Program * dofSource = Engine::ProgramTable::getInstance().getProgramByName("depth_of_field_post_processing_program");
@@ -295,6 +300,8 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createDepthOfField(bo
 	}
 
 	return node;
+	*/
+	return NULL;
 }
 
 Engine::PostProcessChainNode * Engine::TestImplementation::createFinalLink(bool addMB, bool addMBControl)
