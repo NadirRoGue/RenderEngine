@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-#include "ProgramTable.h"
+#include "datatables/ProgramTable.h"
 
 Engine::Scene::Scene()
 {
@@ -17,6 +17,8 @@ Engine::Scene::Scene()
 	keyboardHandlers = new Engine::KeyboardHandlersTable();
 	mouseHandlers = new Engine::MouseEventManager();
 	animations = new Engine::AnimationTable();
+	terrain = NULL;
+	skybox = NULL;
 }
 
 Engine::Scene::~Scene()
@@ -34,6 +36,16 @@ Engine::Scene::~Scene()
 	if (animations != NULL)
 	{
 		delete animations;
+	}
+
+	if (terrain != NULL)
+	{
+		delete terrain;
+	}
+
+	if (skybox != NULL)
+	{
+		delete skybox;
 	}
 }
 
@@ -60,6 +72,16 @@ void Engine::Scene::setTerrain(Terrain * terrain)
 Engine::Terrain * Engine::Scene::getTerrain()
 {
 	return this->terrain;
+}
+
+void Engine::Scene::setSkybox(Engine::SkyBox * sb)
+{
+	skybox = sb;
+}
+
+Engine::SkyBox * Engine::Scene::getSkyBox()
+{
+	return skybox;
 }
 
 void Engine::Scene::addObject(Engine::Object *obj)

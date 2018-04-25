@@ -26,16 +26,16 @@ void main()
 	outPos = (modelView * a).xyz;
 	EmitVertex();
 
-	outUV = inUV[1];
-	outHeight = height[1];
-	gl_Position = modelViewProj * b;
-	outPos = (modelView * b).xyz;
-	EmitVertex();
-
 	outUV = inUV[2];
 	outHeight = height[2];
 	gl_Position = modelViewProj * c;
 	outPos = (modelView * c).xyz;
+	EmitVertex();
+
+	outUV = inUV[1];
+	outHeight = height[1];
+	gl_Position = modelViewProj * b;
+	outPos = (modelView * b).xyz;
 	EmitVertex();
 
 	EndPrimitive();

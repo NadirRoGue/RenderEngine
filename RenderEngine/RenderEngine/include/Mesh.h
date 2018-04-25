@@ -34,7 +34,6 @@ namespace Engine
 	public:
 		Mesh();
 		Mesh(aiMesh * mesh);
-		// BOX.h legacy constructor
 		Mesh(const unsigned int numF, const unsigned int numV, const unsigned int *f, const float *v, const float *c, const float *n, const float *uv, const float *t);
 		Mesh(const Mesh &other);
 		~Mesh();

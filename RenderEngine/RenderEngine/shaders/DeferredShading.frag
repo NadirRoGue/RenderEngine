@@ -53,14 +53,17 @@ vec3 shade();
 
 void main()
 {
-	Ka = Kd = texture(postProcessing_0, texCoord).xyz;
+	vec4 originalColor = texture(postProcessing_0, texCoord);
+	Ka = Kd = originalColor.xyz;
 	N = texture(postProcessing_1, texCoord).xyz;
 	Ks = texture(postProcessing_2, texCoord).xyz;
 	Ke = texture(postProcessing_3, texCoord).xyz;
 	pos = texture(postProcessing_4, texCoord).xyz;
 
-	outColor = vec4(shade(), 1.0);
-	outDepth = vec4(texture(postProcessing_5, texCoord).x, 0, 0, 1);
+	outColor = vec4(shade(), originalColor.w);
+	float depth = texture(postProcessing_5, texCoord).x;
+	outDepth = vec4(depth, 0, 0, 1);
+	gl_FragDepth = depth;
 }
 
 vec3 shade()
@@ -130,7 +133,7 @@ vec3 shade()
 	c += Ke;
 
 	float d = length(pos);
-	float alfa = 1/exp(0.005*d*d);
+	float alfa = 1/exp(0.0025*d*d);
 
 	//alfa*I+(1-alfa)*cf;
 

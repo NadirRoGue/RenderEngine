@@ -31,15 +31,66 @@
     <Filter Include="Archivos de origen\materials">
       <UniqueIdentifier>{4b9c98d2-d364-486c-b040-ac1b1f06b214}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de encabezado\datatables">
+      <UniqueIdentifier>{baf0d1be-6acf-43cb-8f8f-bb9af4e9c3df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\textures">
+      <UniqueIdentifier>{f25c9730-1292-4a8f-838f-ea943a8c879c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\lights">
+      <UniqueIdentifier>{8103116d-90e6-420c-964f-fa260a302db7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\postprocessprograms">
+      <UniqueIdentifier>{9bf5af9a-c0ff-4cdd-aab5-7f59115f4400}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\renderers">
+      <UniqueIdentifier>{10ea7ebe-3d8c-41d3-8287-e8aab6c66300}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\defaultobjects">
+      <UniqueIdentifier>{29d7d3c5-a273-40ec-80bb-c187cc889eb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\inputhandlers">
+      <UniqueIdentifier>{aa78b844-4bea-488a-a349-cd38a98e3eff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\inputhandlers\keyboardhandlers">
+      <UniqueIdentifier>{62e9863e-599c-42d2-b1df-47328e2e356d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\inputhandlers\mousehandlers">
+      <UniqueIdentifier>{5ac48ad9-1269-48ba-a7bf-810f0b06adb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\postprocessprograms">
+      <UniqueIdentifier>{085bcbad-ddcb-4720-aa00-48cd5d31baa0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\textures">
+      <UniqueIdentifier>{b087e105-7858-4bcf-958c-72fc01fec2c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\lights">
+      <UniqueIdentifier>{d657a1fb-1a96-4a2c-b201-b3488572e6d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\renderers">
+      <UniqueIdentifier>{83127cc2-066f-4357-a519-37fb019cf45c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\inputhandlers">
+      <UniqueIdentifier>{3896b294-7e9d-4837-b98e-261a6d5acae4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\datatables">
+      <UniqueIdentifier>{97c0d134-f5b6-4760-ac5c-5c198a004c7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\inputhandlers\keyboardhandlers">
+      <UniqueIdentifier>{2a3ed3e3-1483-456e-8914-aed27b89a522}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\inputhandlers\mousehandlers">
+      <UniqueIdentifier>{880c1a22-923a-464b-b4ac-84334ef2e4c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\instances">
+      <UniqueIdentifier>{280851a5-beac-41a4-9bf3-5cef938caeb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\instances">
+      <UniqueIdentifier>{947fb1ff-644d-4edc-a088-12720789bdc4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Animation.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="include\auxiliar.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="include\BOX.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="include\Camera.h">
@@ -60,31 +111,16 @@
     <ClInclude Include="include\Mesh.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshInstance.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MeshInstanceTable.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MeshLoader.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="include\MouseHandler.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="include\Object.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="include\PLANE.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="include\PostProcessProgram.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="include\Program.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ProgramTable.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer.h">
@@ -98,9 +134,6 @@
     </ClInclude>
     <ClInclude Include="include\CustomMaths.h">
       <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="testimplementation\InputImpl.h">
-      <Filter>Archivos de encabezado\testimplementation</Filter>
     </ClInclude>
     <ClInclude Include="testimplementation\AnimImpl.h">
       <Filter>Archivos de encabezado\testimplementation</Filter>
@@ -128,6 +161,72 @@
     </ClInclude>
     <ClInclude Include="include\Materials\StandardMaterial.h">
       <Filter>Archivos de encabezado\materials</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SkyBox.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\datatables\MeshInstanceTable.h">
+      <Filter>Archivos de encabezado\datatables</Filter>
+    </ClInclude>
+    <ClInclude Include="include\datatables\MeshTable.h">
+      <Filter>Archivos de encabezado\datatables</Filter>
+    </ClInclude>
+    <ClInclude Include="include\datatables\ProgramTable.h">
+      <Filter>Archivos de encabezado\datatables</Filter>
+    </ClInclude>
+    <ClInclude Include="include\datatables\TextureTable.h">
+      <Filter>Archivos de encabezado\datatables</Filter>
+    </ClInclude>
+    <ClInclude Include="include\textures\Texture2D.h">
+      <Filter>Archivos de encabezado\textures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\textures\TextureCubemap.h">
+      <Filter>Archivos de encabezado\textures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\lights\DirectionalLight.h">
+      <Filter>Archivos de encabezado\lights</Filter>
+    </ClInclude>
+    <ClInclude Include="include\lights\PointLight.h">
+      <Filter>Archivos de encabezado\lights</Filter>
+    </ClInclude>
+    <ClInclude Include="include\lights\SpotLight.h">
+      <Filter>Archivos de encabezado\lights</Filter>
+    </ClInclude>
+    <ClInclude Include="include\postprocessprograms\SSAAProgram.h">
+      <Filter>Archivos de encabezado\postprocessprograms</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderers\DeferredRenderer.h">
+      <Filter>Archivos de encabezado\renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderers\ForwardRenderer.h">
+      <Filter>Archivos de encabezado\renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderers\SideBySideRenderer.h">
+      <Filter>Archivos de encabezado\renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\defaultobjects\Cube.h">
+      <Filter>Archivos de encabezado\defaultobjects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\defaultobjects\Plane.h">
+      <Filter>Archivos de encabezado\defaultobjects</Filter>
+    </ClInclude>
+    <ClInclude Include="include\inputhandlers\keyboardhandlers\CameraMovementHandler.h">
+      <Filter>Archivos de encabezado\inputhandlers\keyboardhandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\inputhandlers\mousehandlers\CameraRotationHandler.h">
+      <Filter>Archivos de encabezado\inputhandlers\mousehandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\postprocessprograms\DeferredShadingProgram.h">
+      <Filter>Archivos de encabezado\postprocessprograms</Filter>
+    </ClInclude>
+    <ClInclude Include="include\instances\MeshInstance.h">
+      <Filter>Archivos de encabezado\instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\instances\TextureInstance.h">
+      <Filter>Archivos de encabezado\instances</Filter>
+    </ClInclude>
+    <ClInclude Include="include\programs\SkyProgram.h">
+      <Filter>Archivos de encabezado\programs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -158,15 +257,6 @@
     <ClCompile Include="src\Mesh.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="src\MeshInstance.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MeshInstanceTable.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MeshLoader.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
     <ClCompile Include="src\MouseHandler.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
@@ -177,9 +267,6 @@
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="src\Program.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ProgramTable.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer.cpp">
@@ -193,9 +280,6 @@
     </ClCompile>
     <ClCompile Include="src\CustomMaths.cpp">
       <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="testimplementation\InputImpl.cpp">
-      <Filter>Archivos de origen\testimplementation</Filter>
     </ClCompile>
     <ClCompile Include="testimplementation\AnimImpl.cpp">
       <Filter>Archivos de origen\testimplementation</Filter>
@@ -220,6 +304,66 @@
     </ClCompile>
     <ClCompile Include="src\Materials\StandardMaterial.cpp">
       <Filter>Archivos de origen\materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SkyBox.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lights\DirectionalLight.cpp">
+      <Filter>Archivos de origen\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lights\PointLight.cpp">
+      <Filter>Archivos de origen\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lights\SpotLight.cpp">
+      <Filter>Archivos de origen\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\inputhandlers\keyboardhandlers\CameraMovementHandler.cpp">
+      <Filter>Archivos de origen\inputhandlers\keyboardhandlers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\inputhandlers\mousehandlers\CameraRotationHandler.cpp">
+      <Filter>Archivos de origen\inputhandlers\mousehandlers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\datatables\MeshInstanceTable.cpp">
+      <Filter>Archivos de origen\datatables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\datatables\MeshTable.cpp">
+      <Filter>Archivos de origen\datatables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\datatables\ProgramTable.cpp">
+      <Filter>Archivos de origen\datatables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\datatables\TextureTable.cpp">
+      <Filter>Archivos de origen\datatables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderers\DeferredRenderer.cpp">
+      <Filter>Archivos de origen\renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderers\ForwardRenderer.cpp">
+      <Filter>Archivos de origen\renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderers\SideBySideRenderer.cpp">
+      <Filter>Archivos de origen\renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\textures\Texture2D.cpp">
+      <Filter>Archivos de origen\textures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\textures\TextureCubemap.cpp">
+      <Filter>Archivos de origen\textures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\postprocessprograms\DeferredShadingProgram.cpp">
+      <Filter>Archivos de origen\postprocessprograms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\postprocessprograms\SSAAProgram.cpp">
+      <Filter>Archivos de origen\postprocessprograms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\programs\SkyProgram.cpp">
+      <Filter>Archivos de origen\programs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\instances\MeshInstance.cpp">
+      <Filter>Archivos de origen\instances</Filter>
+    </ClCompile>
+    <ClCompile Include="src\instances\TextureInstance.cpp">
+      <Filter>Archivos de origen\instances</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

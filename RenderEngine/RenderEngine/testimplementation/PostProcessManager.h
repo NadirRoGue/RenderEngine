@@ -7,6 +7,7 @@
 
 #include "DeferredRenderObject.h"
 #include "Renderer.h"
+#include "renderers/DeferredRenderer.h"
 
 namespace Engine
 {
@@ -31,7 +32,6 @@ namespace Engine
 
 		PostProcessChainNode * createDepthOfField(bool addDofControl, bool addConvolutionControl);
 
-		PostProcessChainNode * createDepthRenderNode();
 		PostProcessChainNode * createNormalRenderNode();
 		PostProcessChainNode * createColorRenderNode();
 		PostProcessChainNode * createSpecularRenderNode();

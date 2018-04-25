@@ -9,7 +9,8 @@
 #include <map>
 #include <gl\glew.h>
 
-#include "MeshInstance.h"
+#include "instances/MeshInstance.h"
+#include "instances/TextureInstance.h"
 #include "Texture.h"
 
 namespace Engine

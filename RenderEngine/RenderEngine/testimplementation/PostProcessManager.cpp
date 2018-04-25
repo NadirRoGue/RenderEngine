@@ -5,13 +5,16 @@
 
 #include "PostProcessManager.h"
 
-#include "ProgramTable.h"
-#include "MeshInstanceTable.h"
+#include "datatables/ProgramTable.h"
+#include "datatables/MeshInstanceTable.h"
 #include "Object.h"
 #include "PostProcessProgram.h"
 #include "DeferredNodeCallbacks.h"
 #include "KeyboardHandler.h"
-#include "InputImpl.h"
+#include "postprocessprograms/SSAAProgram.h"
+#include "postprocessprograms/DeferredShadingProgram.h"
+
+#include "Scene.h"
 
 #include <iostream>
 
@@ -39,11 +42,9 @@ Engine::DeferredRenderer * Engine::TestImplementation::createDeferredDepthRender
 	Engine::DeferredRenderer * renderer = new Engine::DeferredRenderer();
 
 	Engine::DeferredRenderObject * forward = createDepthOnlyBuffer();
-	Engine::PostProcessChainNode * end = createDepthRenderNode();
-
+	
 	renderer->setForwardPassBuffers(forward);
-	renderer->setFinalPostProcess(end);
-
+	
 	return renderer;
 }
 
@@ -143,15 +144,6 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createGaussianBlur(bo
 	Engine::Program * gaussSource = Engine::ProgramTable::getInstance().getProgramByName("gaussian_blur_post_processing_program");
 	node->postProcessProgram = new Engine::GaussianBlurProgram(*dynamic_cast<Engine::GaussianBlurProgram*>(gaussSource));
 
-	if (addConvolutionControl)
-	{
-		Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
-		if (table != NULL)
-		{
-			table->registerHandler(new Engine::TestImplementation::ConvolutionMaskManagement(dynamic_cast<Engine::GaussianBlurProgram *>(node->postProcessProgram)));
-		}
-	}
-
 	float maskFactor = 1.0f / 14.0f;
 
 	float mask[9] = {
@@ -193,7 +185,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createScreenAntiAlias
 {
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 	Engine::Program * gaussSource = Engine::ProgramTable::getInstance().getProgramByName("screen_space_anti_aliasing");
-	node->postProcessProgram = new Engine::EdgeBasedProgram(*dynamic_cast<Engine::EdgeBasedProgram*>(gaussSource));
+	node->postProcessProgram = new Engine::SSAAProgram(*dynamic_cast<Engine::SSAAProgram*>(gaussSource));
 
 	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
 	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, GL_LINEAR);
@@ -219,16 +211,6 @@ Engine::PostProcessChainNode * Engine::TestImplementation::create5x5GaussianBlur
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 	Engine::Program * gaussianBlur = Engine::ProgramTable::getInstance().getProgramByName("gaussian_blur_post_processing_program");
 	node->postProcessProgram = new Engine::GaussianBlurProgram(*dynamic_cast<Engine::GaussianBlurProgram *>(gaussianBlur));
-
-
-	if (addConvolutionControl)
-	{
-		Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
-		if (table != NULL)
-		{
-			table->registerHandler(new Engine::TestImplementation::ConvolutionMaskManagement(dynamic_cast<Engine::GaussianBlurProgram *>(node->postProcessProgram)));
-		}
-	}
 
 	glm::vec2 texIdx[25] = {
 		glm::vec2(-2.0,2.0f), glm::vec2(-1.0,2.0f), glm::vec2(0.0,2.0f), glm::vec2(1.0,2.0f), glm::vec2(2.0,2.0),
@@ -267,24 +249,6 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createDepthOfField(bo
 
 	Engine::Program * dofSource = Engine::ProgramTable::getInstance().getProgramByName("depth_of_field_post_processing_program");
 	node->postProcessProgram = new Engine::DepthOfFieldProgram(*dynamic_cast<Engine::DepthOfFieldProgram*>(dofSource));
-
-	if (addDofControl)
-	{
-		Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
-		if (table != NULL)
-		{
-			table->registerHandler(new Engine::TestImplementation::DepthOfFieldManagement(dynamic_cast<Engine::DepthOfFieldProgram *>(node->postProcessProgram)));
-		}
-	}
-
-	if (addConvolutionControl)
-	{
-		Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
-		if (table != NULL)
-		{
-			table->registerHandler(new Engine::TestImplementation::ConvolutionMaskManagement(dynamic_cast<Engine::GaussianBlurProgram *>(node->postProcessProgram)));
-		}
-	}
 
 	float maskFactor = 1.0f / 50.0f;
 
@@ -355,36 +319,6 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createFinalLink(bool 
 	{
 		Engine::MotionBlurImpl * mbi = new Engine::MotionBlurImpl();
 		node->callBack = mbi;
-
-		if (addMBControl)
-		{
-			Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
-			if (table != NULL)
-			{
-				table->registerHandler(new Engine::TestImplementation::MotionBlurManagement(mbi));
-			}
-		}
-	}
-
-	return node;
-}
-
-Engine::PostProcessChainNode * Engine::TestImplementation::createDepthRenderNode()
-{
-	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
-	Engine::Program * sourcePostProcess = Engine::ProgramTable::getInstance().getProgramByName("depth_render_post_processing_program");
-	node->postProcessProgram = new Engine::DepthRenderProgram(*dynamic_cast<Engine::DepthRenderProgram*>(sourcePostProcess));
-	node->renderBuffer = 0;
-	node->callBack = 0;
-
-	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "depth_render_post_processing_program");
-	if (mi != 0)
-	{
-		node->obj = new Engine::PostProcessObject(mi);
-	}
-	else
-	{
-		std::cout << "Could not instantiate panel" << std::endl;
 	}
 
 	return node;
@@ -459,7 +393,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createDeferredShading
 	Engine::Program * sourcePostProcess = ProgramTable::getInstance().getProgramByName("deferred_shading");
 	node->postProcessProgram = new Engine::DeferredShadingProgram(*dynamic_cast<Engine::DeferredShadingProgram*>(sourcePostProcess));
 
-	Engine::DeferredRenderObject * buffer = new Engine::DeferredRenderObject(2, false);
+	Engine::DeferredRenderObject * buffer = new Engine::DeferredRenderObject(2, true);
 	buffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, GL_LINEAR);
 	buffer->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, GL_LINEAR);
 	buffer->addDepthBuffer24(500, 500);
@@ -484,7 +418,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createToonShadingNode
 {
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 	Engine::Program * sourcePostProcess = Engine::ProgramTable::getInstance().getProgramByName("toon_shading_program");
-	node->postProcessProgram = new Engine::EdgeBasedProgram(*dynamic_cast<Engine::EdgeBasedProgram*>(sourcePostProcess));
+	node->postProcessProgram = new Engine::SSAAProgram(*dynamic_cast<Engine::SSAAProgram*>(sourcePostProcess));
 
 	Engine::DeferredRenderObject * buffer = new Engine::DeferredRenderObject(2, false);
 	buffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, GL_LINEAR);

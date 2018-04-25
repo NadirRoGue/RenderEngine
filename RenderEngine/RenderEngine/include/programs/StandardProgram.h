@@ -1,47 +1,77 @@
 #pragma once
-/*
+#pragma once
+
 #include "Program.h"
 
 namespace Engine
 {
-	namespace GPUProgram
+	class StandarProgram : public Program
 	{
-		const unsigned long TEXTURE_ABLEDO_FLAG = 0x01;
-		const unsigned long TEXTURE_NORMAL_FLAG = 0x02;
-		const unsigned long TEXTURE_SPECULAR_FLAG = 0x04;
-		const unsigned long TEXTURE_EMISSIVE_FLAG = 0x08;
+	private:
+		// Uniform variables
+		unsigned int uNormalMat;
+		unsigned int uModelViewMat;
+		unsigned int uModelViewProjMat;
 
-		class StandarProgram : public Program
-		{
-		private:
-			// Uniform variables
-			unsigned int uNormalMat;
-			unsigned int uModelViewMat;
-			unsigned int uModelViewProjMat;
+		unsigned int uPointLightPos;
+		unsigned int uIa;
+		unsigned int uId;
+		unsigned int uIs;
+		unsigned int uPLattenuation;
 
-			// Attributes
-			unsigned int inPos;
-			unsigned int inNormal;
-			unsigned int inTexCoord;
-			unsigned int inTangent;
+		unsigned int uSpotLightPos;
+		unsigned int uSpotLightDir;
+		unsigned int uSLIa;
+		unsigned int uSLId;
+		unsigned int uSLIs;
+		unsigned int uSLapperture;
+		unsigned int uSLm;
+		unsigned int uSLattenuation;
 
-			// uniforms
-			unsigned int uAlbedoTexture;
-			unsigned int uNormalTexture;
-			unsigned int uSpecularTexture;
-			unsigned int uEmissiveTexture;
+		unsigned int uDirectionalLightDir;
+		unsigned int uDLIa;
+		unsigned int uDLId;
+		unsigned int uDLIs;
 
-		public:
-			StandarProgram(std::string name);
-			StandarProgram(const StandarProgram & other);
+		unsigned int uComputeShading;
+		unsigned int uBackground;
 
-			void configureProgram();
-			virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
-			virtual void configureMeshBuffers(MeshInstance * mesh);
+		// Attributes
+		unsigned int inPos;
+		unsigned int inColor;
+		unsigned int inNormal;
+		unsigned int inTexCoord;
+		unsigned int inTangent;
 
+	public:
+		StandarProgram(std::string name);
+		StandarProgram(const StandarProgram & other);
+		void configureProgram();
+		void onRenderLight(const glm::mat4 & model, const glm::mat4 & view);
+		void onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view);
+		void onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view);
+		virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
+		virtual void configureMeshBuffers(MeshInstance * mesh);
 
-			void releaseProgramBuffers(MeshInstance *mi);
-		};
-	}
+		void configureClearColor(const glm::vec3 & cc);
+		void configurePointLightBuffer(const PointLight *pl);
+		void configureSpotLightBuffer(const SpotLight *pl);
+		void configureDirectionalLightBuffer(const DirectionalLight *dl);
+	};
+
+	// =============================================================================
+
+	class TextureProgram : public StandarProgram
+	{
+	private:
+		unsigned int uAlbedoTex;
+		unsigned int uEmissiveTex;
+		unsigned int uSpecTex;
+		unsigned int uNormalTex;
+	public:
+		TextureProgram(std::string name);
+		TextureProgram(const TextureProgram & other);
+		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 & proj);
+		void configureMeshBuffers(MeshInstance * mesh);
+	};
 }
-*/

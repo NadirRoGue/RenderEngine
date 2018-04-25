@@ -1,16 +1,11 @@
 #include "Terrain.h"
 
 #include "Mesh.h"
-#include "MeshLoader.h"
-#include "MeshInstanceTable.h"
-#include "ProgramTable.h"
+#include "datatables/MeshTable.h"
+#include "datatables/MeshInstanceTable.h"
+#include "datatables/ProgramTable.h"
 
 #include <iostream>
-
-inline int sign(int x) 
-{
-	return (x > 0) - (x < 0);
-}
 
 Engine::Terrain::Terrain()
 {
@@ -35,15 +30,13 @@ void Engine::Terrain::render(Engine::Camera * camera)
 {
 	glm::vec3 cameraPosition = camera->getPosition();
 
-	int x = -int(floor(cameraPosition.x)) / tileWidth;
-	int y = -int(floor(cameraPosition.z)) / tileWidth;
+	int x = -int((floor(cameraPosition.x)) / tileWidth);
+	int y = -int((floor(cameraPosition.z)) / tileWidth);
 
 	int xStart = x - renderRadius;
 	int xEnd = x + renderRadius;
 	int yStart = y - renderRadius;
 	int yEnd = y + renderRadius;
-
-	//std::cout << "Cam pos " << x << ", " << y << std::endl;
 
 	glUseProgram(shadingShader->getProgramId());
 	glBindVertexArray(tileObject->getMesh()->vao);
@@ -52,11 +45,6 @@ void Engine::Terrain::render(Engine::Camera * camera)
 	{
 		for (int j = yStart; j < yEnd; j++)
 		{
-			/*
-			if (i < 0 || j < 0)
-				continue;
-				*/
-
 			float poxX = i * tileWidth;
 			float posZ = j * tileWidth;
 			tileObject->setTranslation(glm::vec3(poxX, 0.0f, posZ));
@@ -100,7 +88,7 @@ void Engine::Terrain::createTileMesh()
 	uv[6] = 1.0f; uv[7] = 1.0f;
 
 	Engine::Mesh plane(2, 4, faces, vertices, 0, normals, uv, 0);
-	Engine::MeshLoader::getInstance().addMeshToCache("terrain_tile", plane);
+	Engine::MeshTable::getInstance().addMeshToCache("terrain_tile", plane);
 	Engine::MeshInstanceTable::getInstance().instantiateMesh("terrain_tile", "ProceduralTerrainProgram");
 
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("terrain_tile", "ProceduralTerrainProgram");

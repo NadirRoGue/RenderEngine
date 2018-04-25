@@ -10,6 +10,8 @@
 #include <glm/gtc/quaternion.hpp>
 #include <iostream>
 
+#include "instances/TextureInstance.h"
+
 std::string Engine::Object::ALBEDO_TEX = "albedo";
 std::string Engine::Object::NORMAL_TEX = "normal";
 std::string Engine::Object::EMISSIVE_TEX = "emissive";

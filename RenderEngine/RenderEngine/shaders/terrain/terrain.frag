@@ -13,7 +13,7 @@ layout (location=2) in float height;
 uniform mat4 modelView;
 uniform mat4 normal;
 
-uniform sampler2D noise;
+//uniform sampler2D noise;
 
 uniform vec3 dirt = vec3(0.2, 0.1, 0.0);
 uniform vec3 snow = vec3(0.9, 0.9, 0.9);

@@ -8,8 +8,8 @@
 #include <list>
 #include <gl/glew.h>
 
-#include "Texture.h"
 #include "Object.h"
+#include "instances/TextureInstance.h"
 
 namespace Engine
 {

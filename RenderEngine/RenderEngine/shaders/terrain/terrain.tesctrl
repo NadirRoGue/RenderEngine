@@ -22,11 +22,11 @@ void main()
 		vec3 b = (modelView * gl_in[1].gl_Position).xyz;
 		vec3 c = (modelView * gl_in[2].gl_Position).xyz;
 
-		float la = length(a) * 0.25;
+		float la = length(a) * 0.15;
 		//la *= la;
-		float lb = length(b) * 0.25;
+		float lb = length(b) * 0.15;
 		//lb *= lb;
-		float lc = length(c) * 0.25;
+		float lc = length(c) * 0.15;
 		//lc *= lc;
 
 		float closer = la < lb && la < lc ? la : lb < lc ? lb : lc;

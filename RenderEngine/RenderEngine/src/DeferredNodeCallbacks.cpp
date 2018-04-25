@@ -7,6 +7,7 @@
 
 #include "Scene.h"
 #include "PostProcessProgram.h"
+#include "postprocessprograms/DeferredShadingProgram.h"
 #include <iostream>
 
 Engine::DeferredCallback::DeferredCallback()

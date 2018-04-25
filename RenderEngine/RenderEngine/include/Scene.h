@@ -14,6 +14,7 @@
 #include "MouseHandler.h"
 #include "Animation.h"
 #include "Terrain.h"
+#include "SkyBox.h"
 
 #include <map>
 #include <list>
@@ -44,6 +45,7 @@ namespace Engine
 		std::map<std::string, DirectionalLight *> directionalLights;
 
 		Terrain * terrain;
+		SkyBox * skybox;
 
 		std::list<Program *> lightDependentPrograms;
 
@@ -60,6 +62,8 @@ namespace Engine
 		
 		void setTerrain(Terrain * terrain);
 		Terrain * getTerrain();
+		void setSkybox(SkyBox * skybox);
+		SkyBox * getSkyBox();
 		void setCamera(Camera * cam);
 		Camera * getCamera();
 		void addObject(Object * obj);

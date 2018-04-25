@@ -1,6 +1,3 @@
-#include "BOX.h"
-#include "auxiliar.h"
-
 #include <windows.h>
 
 #include <gl/glew.h>
@@ -13,12 +10,16 @@
 
 #include <vector>
 
-#include "PLANE.h"
 #include "Scene.h"
-#include "ProgramTable.h"
+#include "datatables/ProgramTable.h"
 #include "PostProcessProgram.h"
-#include "MeshLoader.h"
-#include "MeshInstanceTable.h"
+#include "datatables/MeshTable.h"
+#include "datatables/MeshInstanceTable.h"
+#include "datatables/TextureTable.h"
+#include "postprocessprograms/DeferredShadingProgram.h"
+#include "postprocessprograms/SSAAProgram.h"
+#include "defaultobjects/Cube.h"
+#include "defaultobjects/Plane.h"
 #include "Texture.h"
 #include "Light.h"
 #include "KeyboardHandler.h"
@@ -28,7 +29,8 @@
 #include "DeferredRenderObject.h"
 #include "Terrain.h"
 
-#include "InputImpl.h"
+#include "inputhandlers/keyboardhandlers/CameraMovementHandler.h"
+#include "inputhandlers/mousehandlers/CameraRotationHandler.h"
 #include "AnimImpl.h"
 
 
@@ -89,7 +91,7 @@ int main(int argc, char** argv)
 void initContext(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitContextVersion(3, 3);
+	glutInitContextVersion(4, 1);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -127,7 +129,7 @@ void initOGL()
 
 void destroy()
 {
-	Engine::MeshLoader::getInstance().destroy();
+	Engine::MeshTable::getInstance().destroy();
 	Engine::MeshInstanceTable::getInstance().destroy();
 	Engine::ProgramTable::getInstance().destroyAllPrograms();
 	Engine::TextureTable::getInstance().destroy();
@@ -135,7 +137,7 @@ void destroy()
 
 void initScene()
 {
-	Engine::Camera * camera = new Engine::Camera(0.1f, 50.0f, 45.0f, 45.0f);
+	Engine::Camera * camera = new Engine::Camera(0.1f, 1000.0f, 45.0f, 45.0f);
 	camera->translateView(glm::vec3(0.0f, -5.0f, 0.0f));
 	camera->rotateView(glm::vec3(glm::radians(30.0f), glm::radians(60.0f), 0.0f));
 
@@ -164,30 +166,40 @@ void initShaderTable()
 	Engine::ProgramTable::getInstance().createProgram(new Engine::DeferredShadingProgram("deferred_shading"),
 		"shaders/postProcessing.v0.vert", "shaders/DeferredShading.frag");
 
-	Engine::ProgramTable::getInstance().createProgram(new Engine::EdgeBasedProgram("screen_space_anti_aliasing"),
+	Engine::ProgramTable::getInstance().createProgram(new Engine::SSAAProgram("screen_space_anti_aliasing"),
 		"shaders/postProcessing.v0.vert", "shaders/postProcessing.SSAA.frag");
 		
 	Engine::ProgramTable::getInstance().createProgram(new Engine::ProceduralTerrainProgram("ProceduralTerrainProgram"), "", "");
 
 	Engine::ProgramTable::getInstance().createProgram(new Engine::PerlinGeneratorProgram("PerlinGeneratorProgram"),
 		"shaders/postProcessing.v0.vert", "shaders/terrain/perlin.frag");
+
+	Engine::ProgramTable::getInstance().createProgram(new Engine::SkyProgram("SkyProgram"),
+		"shaders/sky/sky.vert", "shaders/sky/sky.frag");
 }
 
 void initMeshesAssets()
 {
-	
-	Engine::Mesh cubeMesh = Engine::Mesh((unsigned int)cubeNTriangleIndex, (unsigned int)cubeNVertex,
-		cubeTriangleIndex, cubeVertexPos, cubeVertexColor, cubeVertexNormal, cubeVertexTexCoord, cubeVertexTangent);
-	Engine::MeshLoader::getInstance().addMeshToCache("cube", cubeMesh);
-	
-	Engine::Mesh plane = Engine::Mesh(0, (unsigned int)planeNVertex, 0, planeVertexPos, 0, 0, planeUVs, 0);
-	Engine::MeshLoader::getInstance().addMeshToCache("plane", plane);
-	
-	Engine::Mesh leftPlane = Engine::Mesh(0, (unsigned int)planeNVertex, 0, leftSmallPlaneVertex, 0, 0, planeUVs, 0);
-	Engine::MeshLoader::getInstance().addMeshToCache("left_plane", leftPlane);
+	Engine::CubemapLoadData data;
+	data.rightFace = "img/skyboxes/Daylight_Box_Right.png";
+	data.leftFace = "img/skyboxes/Daylight_Box_Left.png";
+	data.topFace = "img/skyboxes/Daylight_Box_Top.png";
+	data.bottomFace = "img/skyboxes/Daylight_Box_Bottom.png";
+	data.frontFace = "img/skyboxes/Daylight_Box_Front.png";
+	data.backFace = "img/skyboxes/Daylight_Box_Back.png";
+	//data.rightFace = "img/skyboxes/right.jpg";
+	//data.leftFace = "img/skyboxes/left.jpg";
+	//data.topFace = "img/skyboxes/top.jpg";
+	//data.bottomFace = "img/skyboxes/bottom.jpg";
+	//data.frontFace = "img/skyboxes/front.jpg";
+	//data.backFace = "img/skyboxes/back.jpg";
 
-	Engine::Mesh rightPlane = Engine::Mesh(0, (unsigned int)planeNVertex, 0, rightSmallPlaneVertex, 0, 0, planeUVs, 0);
-	Engine::MeshLoader::getInstance().addMeshToCache("right_plane", rightPlane);
+	Engine::TextureTable::getInstance().cacheCubemapTexture(data, "DaylightCubemap");
+
+	Engine::MeshTable::getInstance().addMeshToCache("cube", Engine::CreateCube());
+	Engine::MeshTable::getInstance().addMeshToCache("plane", Engine::CreatePlane());
+	Engine::MeshTable::getInstance().addMeshToCache("left_plane", Engine::CreateLeftPlane());
+	Engine::MeshTable::getInstance().addMeshToCache("right_plane", Engine::CreateRightPlane());
 
 	//Engine::MeshInstanceTable::getInstance().instantiateMesh("cube", "full_color_material");
 	//Engine::MeshInstanceTable::getInstance().instantiateMesh("cube", "full_texture_material");
@@ -225,7 +237,8 @@ void initSceneObj()
 	Engine::RenderManager::getInstance().getCurrentDeferredRenderer()->setPreProcess(perlinGenerator);
 	*/
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
-	scene->setTerrain(new Engine::Terrain(5.0f, 7));
+	scene->setTerrain(new Engine::Terrain(5.0f, 20));
+	scene->setSkybox(new Engine::SkyBox(Engine::TextureTable::getInstance().instantiateTexture("DaylightCubemap")));
 	/*
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("models/plane.obj", "ProceduralTerrainProgram");
 	if (mi != NULL)
@@ -236,22 +249,17 @@ void initSceneObj()
 		scene->addObject(obj);
 	}*/
 	
-	scene->setClearColor(glm::vec3(1, 1, 1));
+	scene->setClearColor(glm::vec3(0.85, 0.97, 1));
 }
 
 void initHandlers()
 {
-	Engine::PointLight * pl = Engine::SceneManager::getInstance().getActiveScene()->getLightByName("point_light_1");
-	Engine::TestImplementation::LightMovement * lm = new Engine::TestImplementation::LightMovement(pl);
-	Engine::TestImplementation::LightIntensityMod * lim = new Engine::TestImplementation::LightIntensityMod(pl);
-	Engine::TestImplementation::CameraMovement * cm = new Engine::TestImplementation::CameraMovement(Engine::SceneManager::getInstance().getActiveScene()->getCamera());
+	Engine::CameraMovement * cm = new Engine::CameraMovement(Engine::SceneManager::getInstance().getActiveScene()->getCamera());
 
 	Engine::KeyboardHandlersTable * handlers = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
-	handlers->registerHandler(lm);
-	handlers->registerHandler(lim);
 	handlers->registerHandler(cm);
 
-	Engine::TestImplementation::CameraMotion * camMotion = new Engine::TestImplementation::CameraMotion("camera_motion", Engine::SceneManager::getInstance().getActiveScene()->getCamera());
+	Engine::CameraRotationHandler * camMotion = new Engine::CameraRotationHandler("camera_motion", Engine::SceneManager::getInstance().getActiveScene()->getCamera());
 	
 	Engine::MouseEventManager * mouseHandler = Engine::SceneManager::getInstance().getActiveScene()->getMouseHandler();
 	mouseHandler->registerMouseMotionHandler(camMotion);
@@ -261,10 +269,7 @@ void initRenderEngine()
 {
 	Engine::DeferredRenderer * dr = Engine::TestImplementation::createDeferredRendererWithDoF();
 
-	Engine::RenderManager::getInstance().setForwardRenderer(new Engine::ForwardRenderer());
-	Engine::RenderManager::getInstance().setDeferredRenderer(dr);
-
-	Engine::RenderManager::getInstance().deferredRender();
+	Engine::RenderManager::getInstance().setRenderer(dr);
 	
 	Engine::RenderManager::getInstance().doResize(1024, 1024);
 }

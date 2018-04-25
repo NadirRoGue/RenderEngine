@@ -3,6 +3,7 @@
  * @email nadir.ro.gue@gmail.com
  */
 #include "DeferredRenderObject.h"
+#include "textures/Texture2D.h"
 
 #include <iostream>
 
@@ -52,7 +53,7 @@ Engine::TextureInstance * Engine::DeferredRenderObject::addColorBuffer(unsigned 
 	GLenum colorAttachment = COLOR_ATTACHMENTS[usedColorBuffers];
 	usedColorBuffers++;
 
-	Engine::Texture * texture = new Engine::Texture("", 0, w, h);
+	Engine::Texture2D * texture = new Engine::Texture2D(0, w, h);
 	texture->setGenerateMipMaps(false);
 	texture->setMemoryLayoutFormat(gpuTextureFormat);
 	texture->setImageFormatType(inputTextureFormat);
@@ -79,7 +80,7 @@ Engine::TextureInstance * Engine::DeferredRenderObject::addDepthBuffer24(unsigne
 		delete depthBuffer.texture;
 	}
 
-	Engine::Texture * texture = new Engine::Texture("", 0, w, h);
+	Engine::Texture2D * texture = new Engine::Texture2D(0, w, h);
 	texture->setGenerateMipMaps(false);
 	texture->setMemoryLayoutFormat(GL_DEPTH_COMPONENT24);
 	texture->setImageFormatType(GL_DEPTH_COMPONENT);
@@ -103,7 +104,7 @@ Engine::TextureInstance * Engine::DeferredRenderObject::addDepthBuffer32(unsigne
 		delete depthBuffer.texture;
 	}
 
-	Engine::Texture * texture = new Engine::Texture("", 0, w, h);
+	Engine::Texture2D * texture = new Engine::Texture2D(0, w, h);
 	texture->setGenerateMipMaps(false);
 	texture->setMemoryLayoutFormat(GL_DEPTH_COMPONENT32);
 	texture->setImageFormatType(GL_DEPTH_COMPONENT);
@@ -135,10 +136,10 @@ void Engine::DeferredRenderObject::resizeFBO(unsigned int w, unsigned int h)
 {
 	for (unsigned int i = 0; i < colorBuffersSize; i++)
 	{
-		colorBuffers[i].texture->reseize(w, h);
+		colorBuffers[i].texture->resize(w, h);
 	}
 
-	depthBuffer.texture->reseize(w, h);
+	depthBuffer.texture->resize(w, h);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
