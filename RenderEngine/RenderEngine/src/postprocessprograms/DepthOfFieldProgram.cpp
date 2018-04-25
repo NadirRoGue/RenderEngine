@@ -3,6 +3,7 @@
 Engine::DepthOfFieldProgram::DepthOfFieldProgram(std::string name)
 	:Engine::GaussianBlurProgram(name)
 {
+	fShaderFile = "shaders/postProcessing.DepthOfFieldZBuffer.frag";
 }
 
 Engine::DepthOfFieldProgram::DepthOfFieldProgram(const Engine::DepthOfFieldProgram & other)

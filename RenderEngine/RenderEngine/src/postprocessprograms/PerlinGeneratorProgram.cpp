@@ -3,6 +3,7 @@
 Engine::PerlinGeneratorProgram::PerlinGeneratorProgram(std::string name)
 	:PostProcessProgram(name)
 {
+	fShaderFile = "shaders/terrain/perlin.frag";
 	scale = 5.0f;
 	frequency = 1.0f;
 	amplitude = 0.5f;

@@ -9,10 +9,11 @@
 #include <string>
 
 #include "Program.h"
+#include "StorageTable.h"
 
 namespace Engine
 {
-	class ProgramTable
+	class ProgramTable : public StorageTable
 	{
 	private:
 		static ProgramTable * INSTANCE;
@@ -27,10 +28,12 @@ namespace Engine
 
 		~ProgramTable();
 
-		bool createProgram(Program * program, const char *vertexShader, const char *fragmentShader);
+		bool createProgram(Program * program);
+
+
 		Program * getProgramByName(std::string name);
 		int getProgramIdByName(std::string & name);
 
-		void destroyAllPrograms();
+		void clean();
 	};
 }

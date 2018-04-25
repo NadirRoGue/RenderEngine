@@ -22,12 +22,6 @@ Engine::MeshTable::MeshTable()
 
 Engine::MeshTable::~MeshTable()
 {
-	for (std::map<std::string, Engine::Mesh*>::iterator it = meshCache.begin(); it != meshCache.end(); it++)
-	{
-		it->second->~Mesh();
-	}
-
-	meshCache.clear();
 }
 
 Engine::Mesh * Engine::MeshTable::getMesh(std::string filename)
@@ -72,11 +66,12 @@ void Engine::MeshTable::addMeshToCache(std::string name, Engine::Mesh  &mesh)
 	}
 }
 
-void Engine::MeshTable::destroy()
+void Engine::MeshTable::clean()
 {
 	std::map<std::string, Engine::Mesh* >::iterator it = meshCache.begin();
 	while (it != meshCache.end())
 	{
+		it->second->releaseGPU();
 		delete it->second;
 		it++;
 	}

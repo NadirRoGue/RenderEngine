@@ -76,7 +76,6 @@ Engine::TextureTable::TextureTable()
 
 Engine::TextureTable::~TextureTable()
 {
-	destroy();
 }
 
 void Engine::TextureTable::checkForAnisotropicFilterSupport()
@@ -185,7 +184,7 @@ const float Engine::TextureTable::getMaxAnisotropicFilterLevel() const
 	return maxAnisotropicFilterLevel;
 }
 
-void Engine::TextureTable::destroy()
+void Engine::TextureTable::clean()
 {
 	std::map<std::string, Engine::AbstractTexture *>::iterator it = textureTable.begin();
 	while (it != textureTable.end())

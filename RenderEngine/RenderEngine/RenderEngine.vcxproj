@@ -173,6 +173,7 @@
     <ClInclude Include="include\renderers\SideBySideRenderer.h" />
     <ClInclude Include="include\Scene.h" />
     <ClInclude Include="include\SkyBox.h" />
+    <ClInclude Include="include\StorageTable.h" />
     <ClInclude Include="include\Terrain.h" />
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\textures\Texture2D.h" />
@@ -223,6 +224,7 @@
     <ClCompile Include="src\renderers\SideBySideRenderer.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\SkyBox.cpp" />
+    <ClCompile Include="src\StorageTable.cpp" />
     <ClCompile Include="src\Terrain.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\textures\Texture2D.cpp" />

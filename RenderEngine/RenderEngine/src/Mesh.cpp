@@ -151,7 +151,6 @@ void Engine::Mesh::loadFromMesh(aiMesh * mesh)
 Engine::Mesh::~Mesh()
 {
 	releaseCPU();
-	releaseGPU();
 }
 
 void Engine::Mesh::extractTopology(aiMesh * mesh)

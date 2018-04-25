@@ -38,7 +38,7 @@ char *loadStringFromFile(const char *fileName, unsigned int &fileLen)
 
 // ================================================================================
 
-Engine::Program::Program(std::string name)
+Engine::Program::Program(std::string name, unsigned long long params)
 {
 	this->name = std::string(name);
 }
@@ -48,12 +48,21 @@ Engine::Program::Program(const Engine::Program & other)
 	glProgram = other.glProgram;
 	vShader = other.vShader;
 	fShader = other.fShader;
+
+	vShaderFile = other.vShaderFile;
+	fShaderFile = other.fShaderFile;
 }
 
-void Engine::Program::initialize(std::string vertexShader, std::string fragmentShader)
+void Engine::Program::initialize()
 {
-	vShader = loadShader(vertexShader, GL_VERTEX_SHADER);
-	fShader = loadShader(fragmentShader, GL_FRAGMENT_SHADER);
+	if (vShaderFile.empty() || fShaderFile.empty())
+	{
+		std::cout << name << ": Failed to initialize - no shader files specified" << std::endl;
+		return;
+	}
+
+	vShader = loadShader(vShaderFile, GL_VERTEX_SHADER);
+	fShader = loadShader(fShaderFile, GL_FRAGMENT_SHADER);
 
 	glProgram = glCreateProgram();
 

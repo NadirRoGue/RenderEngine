@@ -1,14 +1,25 @@
 #include "programs/ProceduralTerrainProgram.h"
 
 #include <iostream>
+// ==================================================================================
 
-Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(std::string name) :Program(name)
+Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(std::string name, unsigned long long params) 
+	:Program(name, params)
 {
+	vShaderFile =		"shaders/terrain/terrain.vert";
+	tcsShaderFile =		"shaders/terrain/terrain.tesctrl";
+	tevalShaderFile =	"shaders/terrain/terrain.teseval";
+	gShaderFile =		"shaders/terrain/terrain.geom";
+	fShaderFile =		"shaders/terrain/terrain.frag";
 }
 
 Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerrainProgram & other)
 	: Program(other)
 {
+	tcsShaderFile = other.tcsShaderFile;
+	tevalShaderFile = other.tevalShaderFile;
+	gShaderFile = other.gShaderFile;
+
 	uModelView = other.uModelView;
 	uModelViewProj = other.uModelViewProj;
 	uNormal = other.uNormal;
@@ -19,13 +30,13 @@ Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerra
 	uGridPos = other.uGridPos;
 }
 
-void Engine::ProceduralTerrainProgram::initialize(std::string vertexShader, std::string fragmentShader)
+void Engine::ProceduralTerrainProgram::initialize()
 {
-	vShader = loadShader("shaders/terrain/terrain.vert", GL_VERTEX_SHADER);
-	tcsShader = loadShader("shaders/terrain/terrain.tesctrl", GL_TESS_CONTROL_SHADER);
-	tevalShader = loadShader("shaders/terrain/terrain.teseval", GL_TESS_EVALUATION_SHADER);
-	gShader = loadShader("shaders/terrain/terrain.geom", GL_GEOMETRY_SHADER);
-	fShader = loadShader("shaders/terrain/terrain.frag", GL_FRAGMENT_SHADER);
+	vShader = loadShader(vShaderFile, GL_VERTEX_SHADER);
+	tcsShader = loadShader(tcsShaderFile, GL_TESS_CONTROL_SHADER);
+	tevalShader = loadShader(tevalShaderFile, GL_TESS_EVALUATION_SHADER);
+	gShader = loadShader(gShaderFile, GL_GEOMETRY_SHADER);
+	fShader = loadShader(fShaderFile, GL_FRAGMENT_SHADER);
 
 	glProgram = glCreateProgram();
 

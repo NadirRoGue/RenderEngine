@@ -10,7 +10,6 @@
 #include <GL/glew.h>
 #include <memory>
 
-#include "Defines.h"
 #include "instances/MeshInstance.h"
 #include "lights/PointLight.h"
 #include "lights/SpotLight.h"
@@ -26,17 +25,20 @@ namespace Engine
 		unsigned int vShader;
 		unsigned int fShader;
 
+		std::string vShaderFile;
+		std::string fShaderFile;
+
 	private:
 		std::string name;
 
 	public:
-		Program(std::string name);
+		Program(std::string name, unsigned long long params = 0);
 		Program(const Program & other);
 		~Program();
 
 		std::string getName() const;
 		unsigned int getProgramId() const;
-		virtual void initialize(std::string vShaderFile, std::string fShaderFile);
+		virtual void initialize();
 
 		virtual void configureProgram() = 0;
 		virtual void configureMeshBuffers(MeshInstance * mesh) = 0;
@@ -56,46 +58,5 @@ namespace Engine
 		virtual unsigned int loadShader(std::string fileName, GLenum type);
 	};
 
-	/*
-	template<class T, typename std::enable_if<std::is_base_of<Program, T>::value>::type* = nullptr>
-	class ProgramFactory
-	{
-	private:
-		std::map<ulong, std::unique_ptr<T>> cache;
-
-	public:
-		ProgramFactory()
-		{
-		}
-
-		~ProgramFactory()
-		{
-		}
-
-		T * create(ulong params)
-		{
-			std::map<ulong, T*>::iterator it = cache.find(params);
-			if (it != cache.end())
-			{
-				return it->second.get();
-			}
-			else
-			{
-				return (cache[params] = make_unique<T>(params)).get();
-			}
-		}
-
-		void destroy()
-		{
-			std::map<ulong, T *>::iterator it = cache.begin();
-			while (it != cache.end())
-			{
-				it->second->destroy();
-				it++;
-			}
-
-			cache.clear();
-		}
-	};
-	*/
+	// ===================================================================================================
 }

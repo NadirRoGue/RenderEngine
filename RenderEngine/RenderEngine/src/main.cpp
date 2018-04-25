@@ -10,6 +10,7 @@
 
 #include <vector>
 
+#include "StorageTable.h"
 #include "Scene.h"
 #include "datatables/ProgramTable.h"
 #include "PostProcessProgram.h"
@@ -129,14 +130,17 @@ void initOGL()
 
 void destroy()
 {
-	Engine::MeshTable::getInstance().destroy();
-	Engine::MeshInstanceTable::getInstance().destroy();
-	Engine::ProgramTable::getInstance().destroyAllPrograms();
-	Engine::TextureTable::getInstance().destroy();
+	Engine::TableManager::getInstance().cleanUp();
 }
 
 void initScene()
 {
+	Engine::TableManager::getInstance().registerTable(&Engine::MeshInstanceTable::getInstance());
+	Engine::TableManager::getInstance().registerTable(&Engine::MeshTable::getInstance());
+	Engine::TableManager::getInstance().registerTable(&Engine::TextureTable::getInstance());
+	Engine::TableManager::getInstance().registerTable(&Engine::ProgramTable::getInstance());
+
+
 	Engine::Camera * camera = new Engine::Camera(0.1f, 1000.0f, 45.0f, 45.0f);
 	camera->translateView(glm::vec3(0.0f, -5.0f, 0.0f));
 	camera->rotateView(glm::vec3(glm::radians(30.0f), glm::radians(60.0f), 0.0f));
@@ -160,22 +164,15 @@ void initShaderTable()
 	
 	Engine::TextureTable::getInstance().checkForAnisotropicFilterSupport();
 
-	Engine::ProgramTable::getInstance().createProgram(new Engine::PostProcessProgram("post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.v0.frag");
+	Engine::ProgramTable::getInstance().createProgram(new Engine::PostProcessProgram("post_processing_program"));
 
-	Engine::ProgramTable::getInstance().createProgram(new Engine::DeferredShadingProgram("deferred_shading"),
-		"shaders/postProcessing.v0.vert", "shaders/DeferredShading.frag");
+	Engine::ProgramTable::getInstance().createProgram(new Engine::DeferredShadingProgram("deferred_shading"));
 
-	Engine::ProgramTable::getInstance().createProgram(new Engine::SSAAProgram("screen_space_anti_aliasing"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.SSAA.frag");
+	Engine::ProgramTable::getInstance().createProgram(new Engine::SSAAProgram("screen_space_anti_aliasing"));
 		
-	Engine::ProgramTable::getInstance().createProgram(new Engine::ProceduralTerrainProgram("ProceduralTerrainProgram"), "", "");
+	Engine::ProgramTable::getInstance().createProgram(new Engine::ProceduralTerrainProgram("ProceduralTerrainProgram", 0));
 
-	Engine::ProgramTable::getInstance().createProgram(new Engine::PerlinGeneratorProgram("PerlinGeneratorProgram"),
-		"shaders/postProcessing.v0.vert", "shaders/terrain/perlin.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::SkyProgram("SkyProgram"),
-		"shaders/sky/sky.vert", "shaders/sky/sky.frag");
+	Engine::ProgramTable::getInstance().createProgram(new Engine::SkyProgram("SkyProgram"));
 }
 
 void initMeshesAssets()

@@ -16,12 +16,10 @@ Engine::MeshInstanceTable * Engine::MeshInstanceTable::INSTANCE = new Engine::Me
 
 Engine::MeshInstanceTable::MeshInstanceTable()
 {
-
 }
 
 Engine::MeshInstanceTable::~MeshInstanceTable()
 {
-
 }
 
 Engine::MeshInstanceTable & Engine::MeshInstanceTable::getInstance()
@@ -98,7 +96,7 @@ Engine::MeshInstance * Engine::MeshInstanceTable::getMeshInstance(std::string me
 	}
 }
 
-void Engine::MeshInstanceTable::destroy()
+void Engine::MeshInstanceTable::clean()
 {
 	instanceTable.clear();
 }

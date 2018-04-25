@@ -10,9 +10,11 @@
 #include <map>
 #include <assimp\scene.h>
 
+#include "StorageTable.h"
+
 namespace Engine
 {
-	class MeshTable
+	class MeshTable : public StorageTable
 	{
 	private:
 		static MeshTable * INSTANCE;
@@ -31,6 +33,6 @@ namespace Engine
 
 		void addMeshToCache(std::string name, Mesh & mesh);
 
-		void destroy();
+		void clean();
 	};
 }

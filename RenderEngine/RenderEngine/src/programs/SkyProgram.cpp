@@ -3,6 +3,8 @@
 Engine::SkyProgram::SkyProgram(std::string name)
 	:Program(name)
 {
+	vShaderFile = "shaders/sky/sky.vert";
+	fShaderFile = "shaders/sky/sky.frag";
 }
 
 Engine::SkyProgram::SkyProgram(const Engine::SkyProgram & other)

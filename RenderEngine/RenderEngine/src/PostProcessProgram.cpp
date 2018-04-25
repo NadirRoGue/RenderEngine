@@ -13,6 +13,8 @@
 Engine::PostProcessProgram::PostProcessProgram(std::string name)
 	:Engine::Program(name)
 {
+	vShaderFile = "shaders/postProcessing.v0.vert";
+	fShaderFile = "shaders/postProcessing.v0.frag";
 }
 
 Engine::PostProcessProgram::PostProcessProgram(const Engine::PostProcessProgram & other)

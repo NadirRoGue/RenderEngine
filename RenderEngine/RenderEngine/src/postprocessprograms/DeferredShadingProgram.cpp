@@ -3,7 +3,7 @@
 Engine::DeferredShadingProgram::DeferredShadingProgram(std::string name)
 	:Engine::PostProcessProgram(name)
 {
-
+	fShaderFile = "shaders/DeferredShading.frag";
 }
 
 Engine::DeferredShadingProgram::DeferredShadingProgram(const Engine::DeferredShadingProgram & other)

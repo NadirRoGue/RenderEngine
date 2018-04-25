@@ -2,9 +2,13 @@
 
 #include "instances/TextureInstance.h"
 
-Engine::StandarProgram::StandarProgram(std::string name)
-	:Engine::Program(name)
+// ===================================================================================
+
+Engine::StandarProgram::StandarProgram(std::string name, unsigned long long params)
+	:Engine::Program(name, params)
 {
+	vShaderFile = "shaders/shader.full_color.vert";
+	fShaderFile = "shaders/shader.full_color.frag";
 }
 
 Engine::StandarProgram::StandarProgram(const Engine::StandarProgram & other)
@@ -195,17 +199,6 @@ void Engine::StandarProgram::configureDirectionalLightBuffer(const Engine::Direc
 	glUniform3fv(uDLIs, 1, dl->getSpecularIntensity());
 }
 
-/*
-void Engine::StandarProgram::releaseProgramBuffers(Engine::MeshInstance * mi)
-{
-if (inPos != -1) glDeleteBuffers(1, &mi->vboVertices);
-if (inColor != -1) glDeleteBuffers(1, &mi->vboColors);
-if (inNormal != -1) glDeleteBuffers(1, &mi->vboNormals);
-if (inTexCoord != -1) glDeleteBuffers(1, &mi->vboUVs);
-glDeleteBuffers(1, &mi->vboFaces);
-glDeleteVertexArrays(1, &mi->vao);
-}
-*/
 void Engine::StandarProgram::configureClearColor(const glm::vec3 & cc)
 {
 	glUseProgram(glProgram);
@@ -215,15 +208,20 @@ void Engine::StandarProgram::configureClearColor(const glm::vec3 & cc)
 
 // ============================================================================
 
-Engine::TextureProgram::TextureProgram(std::string name)
-	:Engine::StandarProgram(name)
+Engine::TextureProgram::TextureProgram(std::string name, unsigned long long params)
+	:Engine::StandarProgram(name, params)
 {
+	vShaderFile = "shaders/shader.full_texture.vert";
+	fShaderFile = "shaders/shader.full_texture.frag";
 }
 
 Engine::TextureProgram::TextureProgram(const Engine::TextureProgram & other)
 	: Engine::StandarProgram(other)
 {
-
+	uAlbedoTex = other.uAlbedoTex;
+	uEmissiveTex = other.uEmissiveTex;
+	uNormalTex = other.uEmissiveTex;
+	uSpecTex = other.uSpecTex;
 }
 
 void Engine::TextureProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)

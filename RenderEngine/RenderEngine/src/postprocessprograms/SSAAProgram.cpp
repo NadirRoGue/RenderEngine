@@ -5,7 +5,7 @@
 Engine::SSAAProgram::SSAAProgram(std::string name)
 	:Engine::PostProcessProgram(name)
 {
-
+	fShaderFile = "shaders/postProcessing.SSAA.frag";
 }
 
 Engine::SSAAProgram::SSAAProgram(const Engine::SSAAProgram & other)

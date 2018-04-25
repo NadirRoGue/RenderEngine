@@ -5,6 +5,7 @@
 Engine::GaussianBlurProgram::GaussianBlurProgram(std::string name)
 	:Engine::PostProcessProgram(name)
 {
+	fShaderFile = "shaders/postProcessing.GaussianBlur.frag";
 	affectedTexels = kernel = 0;
 }
 

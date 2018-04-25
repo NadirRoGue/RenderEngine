@@ -42,9 +42,8 @@ namespace Engine
 		unsigned int inNormal;
 		unsigned int inTexCoord;
 		unsigned int inTangent;
-
 	public:
-		StandarProgram(std::string name);
+		StandarProgram(std::string name, unsigned long long params);
 		StandarProgram(const StandarProgram & other);
 		void configureProgram();
 		void onRenderLight(const glm::mat4 & model, const glm::mat4 & view);
@@ -69,7 +68,7 @@ namespace Engine
 		unsigned int uSpecTex;
 		unsigned int uNormalTex;
 	public:
-		TextureProgram(std::string name);
+		TextureProgram(std::string name, unsigned long long params);
 		TextureProgram(const TextureProgram & other);
 		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 & proj);
 		void configureMeshBuffers(MeshInstance * mesh);

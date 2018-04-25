@@ -9,11 +9,12 @@
 #include <list>
 #include <string>
 
+#include "StorageTable.h"
 #include "instances/MeshInstance.h"
 
 namespace Engine
 {
-	class MeshInstanceTable
+	class MeshInstanceTable : public StorageTable
 	{
 	private:
 		static MeshInstanceTable * INSTANCE;
@@ -32,6 +33,6 @@ namespace Engine
 		bool instantiateMesh(std::string name, std::string programName);
 		MeshInstance * getMeshInstance(std::string meshName, std::string program);
 
-		void destroy();
+		void clean();
 	};
 }

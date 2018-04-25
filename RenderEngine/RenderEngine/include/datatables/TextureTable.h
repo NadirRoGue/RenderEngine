@@ -6,6 +6,8 @@
 #include "Texture.h"
 #include "instances/TextureInstance.h"
 
+#include "StorageTable.h"
+
 namespace Engine
 {
 	typedef struct CubemapLoadData
@@ -18,7 +20,7 @@ namespace Engine
 		std::string backFace;
 	} CubemapLoadData;
 
-	class TextureTable
+	class TextureTable : public StorageTable
 	{
 	private:
 		static TextureTable * INSTANCE;
@@ -41,6 +43,6 @@ namespace Engine
 		TextureInstance * instantiateTexture(std::string name);
 		const bool isAnisotropicFilteringSupported() const;
 		const float getMaxAnisotropicFilterLevel() const;
-		void destroy();
+		void clean();
 	};
 }

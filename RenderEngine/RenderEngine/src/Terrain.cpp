@@ -92,6 +92,7 @@ void Engine::Terrain::createTileMesh()
 	Engine::MeshInstanceTable::getInstance().instantiateMesh("terrain_tile", "ProceduralTerrainProgram");
 
 	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("terrain_tile", "ProceduralTerrainProgram");
+
 	tileObject = new Engine::Object(mi);
 	if(tileWidth != 1.0f)
 		tileObject->setScale(glm::vec3(tileWidth, tileWidth, tileWidth));

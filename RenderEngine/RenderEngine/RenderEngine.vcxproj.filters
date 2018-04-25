@@ -234,6 +234,9 @@
     <ClInclude Include="include\postprocessprograms\PerlinGeneratorProgram.h">
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>
+    <ClInclude Include="include\StorageTable.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -379,6 +382,9 @@
     </ClCompile>
     <ClCompile Include="src\postprocessprograms\PerlinGeneratorProgram.cpp">
       <Filter>Archivos de origen\postprocessprograms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StorageTable.cpp">
+      <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
