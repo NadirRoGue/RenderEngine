@@ -1,7 +1,9 @@
 #include "postprocessprograms/DeferredShadingProgram.h"
 
-Engine::DeferredShadingProgram::DeferredShadingProgram(std::string name)
-	:Engine::PostProcessProgram(name)
+std::string Engine::DeferredShadingProgram::PROGRAM_NAME = "DeferredShadingProgram";
+
+Engine::DeferredShadingProgram::DeferredShadingProgram(std::string name, unsigned long long params)
+	:Engine::PostProcessProgram(name, params)
 {
 	fShaderFile = "shaders/DeferredShading.frag";
 }
@@ -139,4 +141,13 @@ void Engine::DeferredShadingProgram::configureClearColor(const glm::vec3 & cc)
 	glUseProgram(glProgram);
 	float backgroundColor[3] = { cc.x, cc.y, cc.z };
 	glUniform3fv(uBackground, 1, &backgroundColor[0]);
+}
+
+// =====================================================
+
+Engine::Program * Engine::DeferredShadingProgramFactory::createProgram(unsigned long long parameters)
+{
+	Engine::DeferredShadingProgram * program = new Engine::DeferredShadingProgram(Engine::DeferredShadingProgram::PROGRAM_NAME, parameters);
+	program->initialize();
+	return program;
 }

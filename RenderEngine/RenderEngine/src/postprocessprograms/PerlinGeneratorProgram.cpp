@@ -1,7 +1,9 @@
 #include "postprocessprograms/PerlinGeneratorProgram.h"
 
-Engine::PerlinGeneratorProgram::PerlinGeneratorProgram(std::string name)
-	:PostProcessProgram(name)
+std::string Engine::PerlinGeneratorProgram::PROGRAM_NAME = "PerlinGeneratorProgram";
+
+Engine::PerlinGeneratorProgram::PerlinGeneratorProgram(std::string name, unsigned long long params)
+	:PostProcessProgram(name, params)
 {
 	fShaderFile = "shaders/terrain/perlin.frag";
 	scale = 5.0f;
@@ -45,4 +47,13 @@ void Engine::PerlinGeneratorProgram::onRenderObject(const Object * obj, const gl
 	glUniform1f(perlinFrequency, frequency);
 	glUniform1f(perlinOctaves, octaves);
 	glUniform1f(perlinScale, scale);
+}
+
+// ================================================================================
+
+Engine::Program * Engine::PerlinGeneratorProgramFactory::createProgram(unsigned long long parameters)
+{
+	Engine::PerlinGeneratorProgram * program = new Engine::PerlinGeneratorProgram(Engine::PerlinGeneratorProgram::PROGRAM_NAME, parameters);
+	program->initialize();
+	return program;
 }

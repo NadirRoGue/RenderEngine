@@ -1,7 +1,7 @@
 #include "renderers/SideBySideRenderer.h"
 
 #include "renderers/DeferredRenderer.h"
-#include "datatables/MeshInstanceTable.h"
+#include "datatables/MeshTable.h"
 #include "datatables/ProgramTable.h"
 
 #include "Scene.h"
@@ -63,20 +63,22 @@ void Engine::SideBySideRenderer::initialize()
 	initialized = true;
 
 	Engine::Program * sourcePostProcess = Engine::ProgramTable::getInstance().getProgramByName("post_processing_program");
-	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("left_plane", "post_processing_program");
+	Engine::Mesh * miL = Engine::MeshTable::getInstance().getMesh("leftplane");
 
 	Engine::PostProcessChainNode * lNode = new Engine::PostProcessChainNode;
 	lNode->postProcessProgram = new Engine::PostProcessProgram(*dynamic_cast<Engine::PostProcessProgram*>(sourcePostProcess));
+	lNode->postProcessProgram->configureMeshBuffers(miL);
 	lNode->renderBuffer = 0;
 	lNode->callBack = new Engine::MotionBlurImpl();
-	lNode->obj = new Engine::PostProcessObject(mi);
+	lNode->obj = new Engine::PostProcessObject(miL);
 
 	leftRenderer->setFinalPostProcess(lNode);
 	leftRenderer->initialize();
 
-	Engine::MeshInstance * miR = Engine::MeshInstanceTable::getInstance().getMeshInstance("right_plane", "post_processing_program");
+	Engine::Mesh * miR = Engine::MeshTable::getInstance().getMesh("rightplane");
 	Engine::PostProcessChainNode * rNode = new Engine::PostProcessChainNode;
 	rNode->postProcessProgram = new Engine::PostProcessProgram(*dynamic_cast<Engine::PostProcessProgram*>(sourcePostProcess));
+	rNode->postProcessProgram->configureMeshBuffers(miR);
 	rNode->renderBuffer = 0;
 	rNode->callBack = new Engine::MotionBlurImpl();
 	rNode->obj = new Engine::PostProcessObject(miR);

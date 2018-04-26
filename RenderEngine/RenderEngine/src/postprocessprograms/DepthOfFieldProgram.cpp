@@ -1,7 +1,9 @@
 #include "postprocessprograms/DepthOfFieldProgram.h"
 
-Engine::DepthOfFieldProgram::DepthOfFieldProgram(std::string name)
-	:Engine::GaussianBlurProgram(name)
+std::string Engine::DepthOfFieldProgram::PROGRAM_NAME = "DepthOfFieldProgram";
+
+Engine::DepthOfFieldProgram::DepthOfFieldProgram(std::string name, unsigned long long params)
+	:Engine::GaussianBlurProgram(name, params)
 {
 	fShaderFile = "shaders/postProcessing.DepthOfFieldZBuffer.frag";
 }
@@ -56,4 +58,13 @@ float Engine::DepthOfFieldProgram::getFocalDistance()
 float Engine::DepthOfFieldProgram::getMaxDistanceFactor()
 {
 	return maxDistanceFactor;
+}
+
+// ==================================================================
+
+Engine::Program * Engine::DepthOfFieldProgramFactory::createProgram(unsigned long long parameters)
+{
+	Engine::DepthOfFieldProgram * program = new Engine::DepthOfFieldProgram(Engine::DepthOfFieldProgram::PROGRAM_NAME, parameters);
+	program->initialize();
+	return program;
 }

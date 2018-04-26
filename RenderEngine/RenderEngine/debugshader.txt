@@ -1,3 +1,5 @@
+#version 400 core
+#define WIRE_MODE
 //#version 410 core
 
 layout(triangles) in;

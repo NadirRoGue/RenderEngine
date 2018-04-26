@@ -318,17 +318,17 @@ void Engine::Mesh::computeTangents()
 	}
 }
 
-unsigned int Engine::Mesh::getNumFaces()
+const unsigned int Engine::Mesh::getNumFaces() const
 {
 	return numFaces;
 }
 
-unsigned int Engine::Mesh::getNumVerticesPerFace()
+const unsigned int Engine::Mesh::getNumVerticesPerFace() const
 {
 	return verticesPerFace;
 }
 
-unsigned int Engine::Mesh::getNumVertices()
+const unsigned int Engine::Mesh::getNumVertices() const
 {
 	return numVertices;
 }
@@ -367,7 +367,7 @@ void Engine::Mesh::syncGPU()
 {
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
-
+	
 	unsigned int numFaces = getNumFaces();
 	unsigned int numVertex = getNumVertices();
 

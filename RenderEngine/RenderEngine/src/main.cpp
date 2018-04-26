@@ -15,7 +15,6 @@
 #include "datatables/ProgramTable.h"
 #include "PostProcessProgram.h"
 #include "datatables/MeshTable.h"
-#include "datatables/MeshInstanceTable.h"
 #include "datatables/TextureTable.h"
 #include "postprocessprograms/DeferredShadingProgram.h"
 #include "postprocessprograms/SSAAProgram.h"
@@ -135,7 +134,7 @@ void destroy()
 
 void initScene()
 {
-	Engine::TableManager::getInstance().registerTable(&Engine::MeshInstanceTable::getInstance());
+	//Engine::TableManager::getInstance().registerTable(&Engine::MeshInstanceTable::getInstance());
 	Engine::TableManager::getInstance().registerTable(&Engine::MeshTable::getInstance());
 	Engine::TableManager::getInstance().registerTable(&Engine::TextureTable::getInstance());
 	Engine::TableManager::getInstance().registerTable(&Engine::ProgramTable::getInstance());
@@ -164,15 +163,10 @@ void initShaderTable()
 	
 	Engine::TextureTable::getInstance().checkForAnisotropicFilterSupport();
 
-	Engine::ProgramTable::getInstance().createProgram(new Engine::PostProcessProgram("post_processing_program"));
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::DeferredShadingProgram("deferred_shading"));
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::SSAAProgram("screen_space_anti_aliasing"));
-		
-	Engine::ProgramTable::getInstance().createProgram(new Engine::ProceduralTerrainProgram("ProceduralTerrainProgram", 0));
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::SkyProgram("SkyProgram"));
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::PostProcessProgram::PROGRAM_NAME, new Engine::PostProcessProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::DeferredShadingProgram::PROGRAM_NAME, new Engine::DeferredShadingProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::ProceduralTerrainProgram::PROGRAM_NAME, new Engine::ProceduralTerrainProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SkyProgram::PROGRAM_NAME, new Engine::SkyProgramFactory());
 }
 
 void initMeshesAssets()
@@ -184,67 +178,23 @@ void initMeshesAssets()
 	data.bottomFace = "img/skyboxes/Daylight_Box_Bottom.png";
 	data.frontFace = "img/skyboxes/Daylight_Box_Front.png";
 	data.backFace = "img/skyboxes/Daylight_Box_Back.png";
-	//data.rightFace = "img/skyboxes/right.jpg";
-	//data.leftFace = "img/skyboxes/left.jpg";
-	//data.topFace = "img/skyboxes/top.jpg";
-	//data.bottomFace = "img/skyboxes/bottom.jpg";
-	//data.frontFace = "img/skyboxes/front.jpg";
-	//data.backFace = "img/skyboxes/back.jpg";
 
 	Engine::TextureTable::getInstance().cacheCubemapTexture(data, "DaylightCubemap");
 
 	Engine::MeshTable::getInstance().addMeshToCache("cube", Engine::CreateCube());
 	Engine::MeshTable::getInstance().addMeshToCache("plane", Engine::CreatePlane());
-	Engine::MeshTable::getInstance().addMeshToCache("left_plane", Engine::CreateLeftPlane());
-	Engine::MeshTable::getInstance().addMeshToCache("right_plane", Engine::CreateRightPlane());
 
-	//Engine::MeshInstanceTable::getInstance().instantiateMesh("cube", "full_color_material");
-	//Engine::MeshInstanceTable::getInstance().instantiateMesh("cube", "full_texture_material");
-
-	//Engine::MeshInstanceTable::getInstance().instantiateMesh("models/Rock_10.obj", "full_texture_material");
-
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "deferred_shading");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "screen_space_anti_aliasing");
-		
-	//Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "PerlinGeneratorProgram");
-	//Engine::MeshInstanceTable::getInstance().instantiateMesh("models/quad.obj", "ProceduralTerrainProgram");
-	//Engine::MeshInstanceTable::getInstance().instantiateMesh("models/plane.obj", "ProceduralTerrainProgram");
+	//Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", Engine::PostProcessProgram::PROGRAM_NAME);
+	//Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", Engine::DeferredShadingProgram::PROGRAM_NAME);
+	//Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "screen_space_anti_aliasing");
 }
 
 void initSceneObj()
 {
-	/*
-	Engine::PostProcessChainNode * perlinGenerator = new Engine::PostProcessChainNode;
-	Engine::MeshInstance * pp = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "PerlinGeneratorProgram");
-	Engine::DeferredRenderObject * buffer = new Engine::DeferredRenderObject(1, true);
-	buffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 1024, 1024, GL_NEAREST);
-	buffer->addDepthBuffer24(1024, 1024);
-
-	buffer->initialize();
-	buffer->resizeFBO(1024, 1024);
-
-	Engine::Program * perlinProgram = Engine::ProgramTable::getInstance().getProgramByName("PerlinGeneratorProgram");
-	Engine::PerlinGeneratorProgram * finalProgram = new Engine::PerlinGeneratorProgram(*dynamic_cast<Engine::PerlinGeneratorProgram*>(perlinProgram));
-
-	perlinGenerator->obj = new Engine::PostProcessObject(pp);
-	perlinGenerator->renderBuffer = buffer;
-	perlinGenerator->postProcessProgram = finalProgram;
-
-	Engine::RenderManager::getInstance().getCurrentDeferredRenderer()->setPreProcess(perlinGenerator);
-	*/
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
+
 	scene->setTerrain(new Engine::Terrain(5.0f, 20));
 	scene->setSkybox(new Engine::SkyBox(Engine::TextureTable::getInstance().instantiateTexture("DaylightCubemap")));
-	/*
-	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("models/plane.obj", "ProceduralTerrainProgram");
-	if (mi != NULL)
-	{
-		Engine::Object * obj = new Engine::Object(mi);
-		obj->setRenderMode(GL_PATCHES);
-		//buffer->populateDeferredObject(obj);
-		scene->addObject(obj);
-	}*/
 	
 	scene->setClearColor(glm::vec3(0.85, 0.97, 1));
 }

@@ -2,8 +2,10 @@
 
 #include "Renderer.h"
 
-Engine::SSAAProgram::SSAAProgram(std::string name)
-	:Engine::PostProcessProgram(name)
+std::string Engine::SSAAProgram::PROGRAM_NAME = "SSAAProgram";
+
+Engine::SSAAProgram::SSAAProgram(std::string name, unsigned long long params)
+	:Engine::PostProcessProgram(name, params)
 {
 	fShaderFile = "shaders/postProcessing.SSAA.frag";
 }
@@ -35,4 +37,13 @@ void Engine::SSAAProgram::onRenderObject(const Engine::Object * obj, const glm::
 	texelSize[1] = 1.0f / ScreenManager::SCREEN_HEIGHT;
 
 	glUniform2fv(uTexelSize, 1, &texelSize[0]);
+}
+
+// ===============================================================================
+
+Engine::Program * Engine::SSAAProgramFactory::createProgram(unsigned long long parameters)
+{
+	Engine::SSAAProgram * program = new Engine::SSAAProgram(Engine::SSAAProgram::PROGRAM_NAME, parameters);
+	program->initialize();
+	return program;
 }

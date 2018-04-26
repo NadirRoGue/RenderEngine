@@ -2,7 +2,6 @@
 
 #include "Mesh.h"
 #include "datatables/MeshTable.h"
-#include "datatables/MeshInstanceTable.h"
 #include "datatables/ProgramTable.h"
 
 #include <iostream>
@@ -59,7 +58,8 @@ void Engine::Terrain::render(Engine::Camera * camera)
 
 void Engine::Terrain::initialize()
 {
-	shadingShader = dynamic_cast<Engine::ProceduralTerrainProgram*>(Engine::ProgramTable::getInstance().getProgramByName("ProceduralTerrainProgram"));
+	shadingShader = dynamic_cast<Engine::ProceduralTerrainProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::ProceduralTerrainProgram::PROGRAM_NAME,
+		Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE));
 	createTileMesh();
 }
 
@@ -89,11 +89,11 @@ void Engine::Terrain::createTileMesh()
 
 	Engine::Mesh plane(2, 4, faces, vertices, 0, normals, uv, 0);
 	Engine::MeshTable::getInstance().addMeshToCache("terrain_tile", plane);
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("terrain_tile", "ProceduralTerrainProgram");
+	Engine::Mesh * planeMesh = Engine::MeshTable::getInstance().getMesh("terrain_tile");
+	
+	shadingShader->configureMeshBuffers(planeMesh);
 
-	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("terrain_tile", "ProceduralTerrainProgram");
-
-	tileObject = new Engine::Object(mi);
+	tileObject = new Engine::Object(planeMesh);
 	if(tileWidth != 1.0f)
 		tileObject->setScale(glm::vec3(tileWidth, tileWidth, tileWidth));
 }

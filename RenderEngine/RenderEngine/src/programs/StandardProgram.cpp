@@ -4,8 +4,10 @@
 
 // ===================================================================================
 
+std::string Engine::StandarProgram::PROGRAM_NAME = "StandarProgram";
+
 Engine::StandarProgram::StandarProgram(std::string name, unsigned long long params)
-	:Engine::Program(name, params)
+	:Program(name, params)
 {
 	vShaderFile = "shaders/shader.full_color.vert";
 	fShaderFile = "shaders/shader.full_color.frag";
@@ -133,10 +135,8 @@ void Engine::StandarProgram::onRenderObject(const Engine::Object * obj, const gl
 	glUniformMatrix4fv(uNormalMat, 1, GL_FALSE, &(normal[0][0]));
 }
 
-void Engine::StandarProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
+void Engine::StandarProgram::configureMeshBuffers(Engine::Mesh * data)
 {
-	Engine::Mesh * data = mesh->getMesh();
-
 	glBindVertexArray(data->vao);
 
 	if (inPos != -1)
@@ -208,6 +208,17 @@ void Engine::StandarProgram::configureClearColor(const glm::vec3 & cc)
 
 // ============================================================================
 
+Engine::Program * Engine::StandarProgramFactory::createProgram(unsigned long long parameters)
+{
+	Engine::StandarProgram * program = new Engine::StandarProgram(Engine::StandarProgram::PROGRAM_NAME, parameters);
+	program->initialize();
+	return program;
+}
+
+// ============================================================================
+
+std::string Engine::TextureProgram::PROGRAM_NAME = "TextureProgram";
+
 Engine::TextureProgram::TextureProgram(std::string name, unsigned long long params)
 	:Engine::StandarProgram(name, params)
 {
@@ -254,12 +265,21 @@ void Engine::TextureProgram::onRenderObject(const Engine::Object * obj, const gl
 	glUniform1i(uNormalTex, 3);
 }
 
-void Engine::TextureProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
+void Engine::TextureProgram::configureProgram()
 {
-	Engine::StandarProgram::configureMeshBuffers(mesh);
+	Engine::StandarProgram::configureProgram();
 
 	uAlbedoTex = glGetUniformLocation(glProgram, "colorTex");
 	uEmissiveTex = glGetUniformLocation(glProgram, "emiTex");
 	uSpecTex = glGetUniformLocation(glProgram, "specTex");
 	uNormalTex = glGetUniformLocation(glProgram, "normalTex");
+}
+
+// ===========================================================================
+
+Engine::Program * Engine::TextureProgramFactory::createProgram(unsigned long long parameters)
+{
+	Engine::TextureProgram * program = new Engine::TextureProgram(Engine::TextureProgram::PROGRAM_NAME, parameters);
+	program->initialize();
+	return program;
 }

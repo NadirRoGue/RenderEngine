@@ -20,55 +20,41 @@ Engine::ProgramTable::ProgramTable()
 
 Engine::ProgramTable::~ProgramTable()
 {
+	clean();
 }
 
-bool Engine::ProgramTable::createProgram(Engine::Program * program)
+void Engine::ProgramTable::registerProgramFactory(std::string name, Engine::ProgramFactory * pf)
 {
-	// Duplicate program name
-	if (table.find(program->getName()) != table.end())
+	if (pf != NULL)
 	{
-		std::cout << "ProgramTable: Duplicate program name " << program->getName() << std::endl;
-		return false;
+		table[name] = pf;
 	}
-
-	std::cout << "ProgramTable: Registered program " << program->getName() << std::endl;
-	program->initialize();
-	table[program->getName()] = program;
-
-	return true;
 }
 
-Engine::Program * Engine::ProgramTable::getProgramByName(std::string name)
+Engine::Program * Engine::ProgramTable::getProgramByName(std::string name, unsigned long long parameters)
 {
-	std::map<std::string, Engine::Program *>::iterator it = table.find(name);
+	std::map<std::string, Engine::ProgramFactory *>::iterator it = table.find(name);
 
 	if (it == table.end())
 	{
-		std::cout << "ProgramTable: Tried to access unexistent program " << name << std::endl;
+		std::cout << "ProgramTable: Tried to access unexistent program " << name << ", " << parameters << std::endl;
 		return NULL;
 	}
-
-	return it->second;
-}
-
-int Engine::ProgramTable::getProgramIdByName(std::string & name)
-{
-	std::map<std::string, Program *>::iterator it = table.find(name);
-
-	if (it == table.end())
+	else
 	{
-		return -1;
+		Engine::ProgramFactory * factory = it->second;
+		return factory->instantiateProgram(parameters);
 	}
-
-	return it->second->getProgramId();
 }
 
 void Engine::ProgramTable::clean()
 {
-	std::map<std::string, Engine::Program *>::iterator it = table.begin();
+	std::map<std::string, Engine::ProgramFactory *>::iterator it = table.begin();
 	while (it != table.end())
 	{
-		it->second->destroy();
+		it->second->clean();
+		delete it->second;
 		it++;
 	}
+	table.clear();
 }

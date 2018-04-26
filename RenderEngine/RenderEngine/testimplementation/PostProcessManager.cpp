@@ -6,7 +6,7 @@
 #include "PostProcessManager.h"
 
 #include "datatables/ProgramTable.h"
-#include "datatables/MeshInstanceTable.h"
+#include "datatables/MeshTable.h"
 #include "Object.h"
 #include "PostProcessProgram.h"
 #include "DeferredNodeCallbacks.h"
@@ -186,7 +186,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createGaussianBlur(bo
 Engine::PostProcessChainNode * Engine::TestImplementation::createScreenAntiAliasing()
 {
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
-	Engine::Program * gaussSource = Engine::ProgramTable::getInstance().getProgramByName("screen_space_anti_aliasing");
+	Engine::Program * gaussSource = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSAAProgram::PROGRAM_NAME);
 	node->postProcessProgram = new Engine::SSAAProgram(*dynamic_cast<Engine::SSAAProgram*>(gaussSource));
 
 	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
@@ -195,9 +195,10 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createScreenAntiAlias
 	node->renderBuffer->addDepthBuffer24(500, 500);
 	node->callBack = 0;
 
-	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "screen_space_anti_aliasing");
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
 	if (mi != 0)
 	{
+		node->postProcessProgram->configureMeshBuffers(mi);
 		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
@@ -307,13 +308,14 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createDepthOfField(bo
 Engine::PostProcessChainNode * Engine::TestImplementation::createFinalLink(bool addMB, bool addMBControl)
 {
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
-	Engine::Program * sourcePostProcess = Engine::ProgramTable::getInstance().getProgramByName("post_processing_program");
+	Engine::Program * sourcePostProcess = Engine::ProgramTable::getInstance().getProgramByName(Engine::PostProcessProgram::PROGRAM_NAME);
 	node->postProcessProgram = new Engine::PostProcessProgram(*dynamic_cast<Engine::PostProcessProgram*>(sourcePostProcess));
 	node->renderBuffer = 0;
 
-	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "post_processing_program");
-	if (mi != 0)
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
+	if (mi != NULL)
 	{
+		node->postProcessProgram->configureMeshBuffers(mi);
 		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
@@ -339,9 +341,10 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createNormalRenderNod
 	node->renderBuffer = 0;
 	node->callBack = 0;
 
-	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "normal_render_post_processing_program");
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
 	if (mi != 0)
 	{
+		node->postProcessProgram->configureMeshBuffers(mi);
 		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
@@ -360,9 +363,10 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createColorRenderNode
 	node->renderBuffer = 0;
 	node->callBack = 0;
 
-	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "color_render_post_processing_program");
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
 	if (mi != 0)
 	{
+		node->postProcessProgram->configureMeshBuffers(mi);
 		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
@@ -381,9 +385,10 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createSpecularRenderN
 	node->renderBuffer = 0;
 	node->callBack = 0;
 
-	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "specular_render_post_processing_program");
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
 	if (mi != 0)
 	{
+		node->postProcessProgram->configureMeshBuffers(mi);
 		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
@@ -397,7 +402,7 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createSpecularRenderN
 Engine::PostProcessChainNode * Engine::TestImplementation::createDeferredShadingNode()
 {
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
-	Engine::Program * sourcePostProcess = ProgramTable::getInstance().getProgramByName("deferred_shading");
+	Engine::Program * sourcePostProcess = ProgramTable::getInstance().getProgramByName(Engine::DeferredShadingProgram::PROGRAM_NAME);
 	node->postProcessProgram = new Engine::DeferredShadingProgram(*dynamic_cast<Engine::DeferredShadingProgram*>(sourcePostProcess));
 
 	Engine::DeferredRenderObject * buffer = new Engine::DeferredRenderObject(2, true);
@@ -408,9 +413,10 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createDeferredShading
 	node->renderBuffer = buffer;
 	node->callBack = new Engine::DeferredShadingLightPopulation();
 
-	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "deferred_shading");
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
 	if (mi != 0)
 	{
+		node->postProcessProgram->configureMeshBuffers(mi);
 		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else
@@ -435,9 +441,10 @@ Engine::PostProcessChainNode * Engine::TestImplementation::createToonShadingNode
 	node->renderBuffer = buffer;
 	node->callBack = 0;
 
-	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("plane", "toon_shading_program");
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
 	if (mi != 0)
 	{
+		node->postProcessProgram->configureMeshBuffers(mi);
 		node->obj = new Engine::PostProcessObject(mi);
 	}
 	else

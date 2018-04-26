@@ -1,7 +1,7 @@
 #include "SkyBox.h"
 
 #include "datatables/ProgramTable.h"
-#include "datatables/MeshInstanceTable.h"
+#include "datatables/MeshTable.h"
 
 Engine::SkyBox::SkyBox(Engine::TextureInstance * skyboxTextureCubeMap)
 	:skyCubeMap(skyboxTextureCubeMap)
@@ -28,7 +28,7 @@ Engine::SkyBox::~SkyBox()
 
 void Engine::SkyBox::render(Engine::Camera * camera)
 {
-	Engine::Mesh * data = cubeMesh->getMesh();
+	const Engine::Mesh * data = cubeMesh->getMesh();
 
 	glUseProgram(shader->getProgramId());
 	glBindVertexArray(data->vao);
@@ -45,9 +45,11 @@ void Engine::SkyBox::render(Engine::Camera * camera)
 
 void Engine::SkyBox::initialize()
 {
-	shader = dynamic_cast<SkyProgram*>(Engine::ProgramTable::getInstance().getProgramByName("SkyProgram"));
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("cube", shader->getName());
+	shader = dynamic_cast<SkyProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::SkyProgram::PROGRAM_NAME));
+	Engine::Mesh * mesh = Engine::MeshTable::getInstance().getMesh("cube");
 
-	cubeMesh = new Engine::Object(Engine::MeshInstanceTable::getInstance().getMeshInstance("cube", "SkyProgram"));
+	shader->configureMeshBuffers(mesh);
+
+	cubeMesh = new Engine::Object(mesh);
 	cubeMesh->setScale(glm::vec3(10, 10, 10));
 }

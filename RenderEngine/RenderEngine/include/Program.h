@@ -10,7 +10,6 @@
 #include <GL/glew.h>
 #include <memory>
 
-#include "instances/MeshInstance.h"
 #include "lights/PointLight.h"
 #include "lights/SpotLight.h"
 #include "lights/DirectionalLight.h"
@@ -28,6 +27,8 @@ namespace Engine
 		std::string vShaderFile;
 		std::string fShaderFile;
 
+		unsigned long long parameters;
+
 	private:
 		std::string name;
 
@@ -41,7 +42,7 @@ namespace Engine
 		virtual void initialize();
 
 		virtual void configureProgram() = 0;
-		virtual void configureMeshBuffers(MeshInstance * mesh) = 0;
+		virtual void configureMeshBuffers(Mesh * mesh) = 0;
 
 		virtual void configurePointLightBuffer(const PointLight *pl);
 		virtual void configureSpotLightBuffer(const SpotLight *pl);
@@ -55,8 +56,20 @@ namespace Engine
 
 		virtual void destroy();
 	protected:
-		virtual unsigned int loadShader(std::string fileName, GLenum type);
+		unsigned int loadShader(std::string fileName, GLenum type, std::string configString = "");
 	};
 
 	// ===================================================================================================
+
+	class ProgramFactory
+	{
+	private:
+		std::map<unsigned long long, Program*> cache;
+	protected:
+		virtual Program * createProgram(unsigned long long parameters) = 0;
+	public:
+		Program * instantiateProgram(unsigned long long parameters);
+
+		void clean();
+	};
 }

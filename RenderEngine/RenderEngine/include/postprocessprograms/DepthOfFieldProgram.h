@@ -6,6 +6,8 @@ namespace Engine
 {
 	class DepthOfFieldProgram : public GaussianBlurProgram
 	{
+	public:
+		static std::string PROGRAM_NAME;
 	private:
 		unsigned int uFocalDistance;
 		unsigned int uMaxDistanceFactor;
@@ -15,7 +17,7 @@ namespace Engine
 		float maxDistanceFactor;
 
 	public:
-		DepthOfFieldProgram(std::string name);
+		DepthOfFieldProgram(std::string name, unsigned long long params);
 		DepthOfFieldProgram(const DepthOfFieldProgram & other);
 		~DepthOfFieldProgram();
 
@@ -27,5 +29,11 @@ namespace Engine
 
 		void setFocalDistance(float fd);
 		void setMaxDistanceFactor(float mdf);
+	};
+
+	class DepthOfFieldProgramFactory : public ProgramFactory
+	{
+	protected:
+		Program * createProgram(unsigned long long parameters);
 	};
 }

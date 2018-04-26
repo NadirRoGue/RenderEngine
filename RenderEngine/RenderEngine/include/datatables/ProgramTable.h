@@ -18,8 +18,8 @@ namespace Engine
 	private:
 		static ProgramTable * INSTANCE;
 
-		std::map<std::string, Program *> table;
-
+		//std::map<std::string, Program *> table;
+		std::map<std::string, ProgramFactory *> table;
 	private:
 		ProgramTable();
 
@@ -27,12 +27,9 @@ namespace Engine
 		static ProgramTable & getInstance();
 
 		~ProgramTable();
+		void registerProgramFactory(std::string name, ProgramFactory * pf);
 
-		bool createProgram(Program * program);
-
-
-		Program * getProgramByName(std::string name);
-		int getProgramIdByName(std::string & name);
+		Program * getProgramByName(std::string name, unsigned long long parameters = 0);
 
 		void clean();
 	};

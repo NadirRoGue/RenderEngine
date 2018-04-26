@@ -6,6 +6,8 @@ namespace Engine
 {
 	class DeferredShadingProgram : public PostProcessProgram
 	{
+	public:
+		static std::string PROGRAM_NAME;
 	private:
 		unsigned int uPointLightPos;
 		unsigned int uIa;
@@ -30,7 +32,7 @@ namespace Engine
 		unsigned int uBackground;
 
 	public:
-		DeferredShadingProgram(std::string name);
+		DeferredShadingProgram(std::string name, unsigned long long params);
 		DeferredShadingProgram(const DeferredShadingProgram & other);
 
 		void onRenderLight(const glm::mat4 & model, const glm::mat4 & view);
@@ -44,5 +46,11 @@ namespace Engine
 		void configureSpotLightBuffer(const SpotLight *pl);
 		void configureDirectionalLightBuffer(const DirectionalLight *dl);
 
+	};
+
+	class DeferredShadingProgramFactory : public ProgramFactory
+	{
+	protected:
+		Program * createProgram(unsigned long long parameters);
 	};
 }

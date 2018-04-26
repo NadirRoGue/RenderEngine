@@ -9,7 +9,7 @@
 #include <map>
 #include <gl\glew.h>
 
-#include "instances/MeshInstance.h"
+#include "Mesh.h"
 #include "instances/TextureInstance.h"
 #include "Texture.h"
 
@@ -23,7 +23,7 @@ namespace Engine
 		static std::string SPECULAR_TEX;
 		static std::string EMISSIVE_TEX;
 	private:
-		MeshInstance * meshInstance;
+		Mesh * mesh;
 
 		glm::mat4 modelMatrix;
 
@@ -39,12 +39,11 @@ namespace Engine
 		TextureInstance * normal;
 		TextureInstance * specular;
 	public:
-		Object(MeshInstance * mi);
+		Object(Mesh * mi);
 		~Object();
 
 		const glm::mat4 & getModelMatrix() const;
-		MeshInstance * getMeshInstance();
-		Mesh * getMesh() const;
+		const Mesh * getMesh() const;
 
 		void rotate(float angle, glm::vec3 r);
 		void translate(glm::vec3 t);
@@ -75,7 +74,7 @@ namespace Engine
 	private:
 		std::map<std::string, TextureInstance *> inputBuffers;
 	public:
-		PostProcessObject(MeshInstance * mi);
+		PostProcessObject(Mesh * mi);
 
 		void addTexture(std::string name, TextureInstance * instance);
 		TextureInstance * getTexture(std::string name);

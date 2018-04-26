@@ -10,11 +10,18 @@
 
 #include <iostream>
 
-Engine::PostProcessProgram::PostProcessProgram(std::string name)
-	:Engine::Program(name)
+std::string Engine::PostProcessProgram::PROGRAM_NAME = "PostProcessProgram";
+
+Engine::PostProcessProgram::PostProcessProgram(std::string name, unsigned long long params)
+	:Engine::Program(name, params)
 {
 	vShaderFile = "shaders/postProcessing.v0.vert";
 	fShaderFile = "shaders/postProcessing.v0.frag";
+}
+
+Engine::PostProcessProgram::PostProcessProgram(unsigned long long params)
+	:Engine::PostProcessProgram::PostProcessProgram(Engine::PostProcessProgram::PROGRAM_NAME, params)
+{
 }
 
 Engine::PostProcessProgram::PostProcessProgram(const Engine::PostProcessProgram & other)
@@ -24,6 +31,7 @@ Engine::PostProcessProgram::PostProcessProgram(const Engine::PostProcessProgram 
 	planeVerticesVBO = other.planeVerticesVBO;
 
 	inPos = other.inPos;
+	inTexCoord = other.inTexCoord;
 
 	memcpy(uRenderedTextures, other.uRenderedTextures, 9 * sizeof(unsigned int));
 }
@@ -44,24 +52,16 @@ void Engine::PostProcessProgram::configureProgram()
 	inTexCoord = glGetAttribLocation(glProgram, "inTexCoord");
 }
 
-void Engine::PostProcessProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
+void Engine::PostProcessProgram::configureMeshBuffers(Engine::Mesh * data)
 {
-	Engine::Mesh * data = mesh->getMesh();
-	//glGenVertexArrays(1, &data->vao);
 	glBindVertexArray(data->vao);
-
-	//glGenBuffers(1, &mesh->vboVertices);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, data->vboVertices);
-	//glBufferData(GL_ARRAY_BUFFER, mesh->getMesh()->getNumVertices() * sizeof(float) * 3, mesh->getMesh()->getVertices(), GL_STATIC_DRAW);
 	glVertexAttribPointer(inPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	//glGenBuffers(1, &mesh->vboUVs);
-	glBindBuffer(GL_ARRAY_BUFFER, data->vboUVs);
-	//glBufferData(GL_ARRAY_BUFFER, mesh->getMesh()->getNumVertices() * sizeof(float) * 2,  mesh->getMesh()->getUVs(), GL_STATIC_DRAW);
-
-	glVertexAttribPointer(inTexCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
 	glEnableVertexAttribArray(inPos);
+
+	glBindBuffer(GL_ARRAY_BUFFER, data->vboUVs);
+	glVertexAttribPointer(inTexCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(inTexCoord);
 }
 
@@ -112,4 +112,13 @@ void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, cons
 		start++;
 		it++;
 	}
+}
+
+// ==============================================================================
+
+Engine::Program * Engine::PostProcessProgramFactory::createProgram(unsigned long long parameters)
+{
+	Engine::PostProcessProgram * program = new Engine::PostProcessProgram(Engine::PostProcessProgram::PROGRAM_NAME, parameters);
+	program->initialize();
+	return program;
 }

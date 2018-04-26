@@ -133,7 +133,6 @@
   <ItemGroup>
     <ClInclude Include="include\Animation.h" />
     <ClInclude Include="include\Camera.h" />
-    <ClInclude Include="include\datatables\MeshInstanceTable.h" />
     <ClInclude Include="include\datatables\MeshTable.h" />
     <ClInclude Include="include\datatables\ProgramTable.h" />
     <ClInclude Include="include\datatables\TextureTable.h" />
@@ -143,7 +142,6 @@
     <ClInclude Include="include\DeferredRenderObject.h" />
     <ClInclude Include="include\inputhandlers\keyboardhandlers\CameraMovementHandler.h" />
     <ClInclude Include="include\inputhandlers\mousehandlers\CameraRotationHandler.h" />
-    <ClInclude Include="include\instances\MeshInstance.h" />
     <ClInclude Include="include\instances\TextureInstance.h" />
     <ClInclude Include="include\KeyboardHandler.h" />
     <ClInclude Include="include\Light.h" />
@@ -183,9 +181,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp" />
-    <ClCompile Include="src\auxiliar.cpp" />
     <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="src\datatables\MeshInstanceTable.cpp" />
     <ClCompile Include="src\datatables\MeshTable.cpp" />
     <ClCompile Include="src\datatables\ProgramTable.cpp" />
     <ClCompile Include="src\datatables\TextureTable.cpp" />
@@ -193,7 +189,6 @@
     <ClCompile Include="src\DeferredRenderObject.cpp" />
     <ClCompile Include="src\inputhandlers\keyboardhandlers\CameraMovementHandler.cpp" />
     <ClCompile Include="src\inputhandlers\mousehandlers\CameraRotationHandler.cpp" />
-    <ClCompile Include="src\instances\MeshInstance.cpp" />
     <ClCompile Include="src\instances\TextureInstance.cpp" />
     <ClCompile Include="src\KeyboardHandler.cpp" />
     <ClCompile Include="src\Light.cpp" />

@@ -2,8 +2,10 @@
 
 #include "Renderer.h"
 
-Engine::GaussianBlurProgram::GaussianBlurProgram(std::string name)
-	:Engine::PostProcessProgram(name)
+std::string Engine::GaussianBlurProgram::PROGRAM_NAME = "GaussianBlurProgram";
+
+Engine::GaussianBlurProgram::GaussianBlurProgram(std::string name, unsigned long long params)
+	:Engine::PostProcessProgram(name, params)
 {
 	fShaderFile = "shaders/postProcessing.GaussianBlur.frag";
 	affectedTexels = kernel = 0;
@@ -85,4 +87,13 @@ void Engine::GaussianBlurProgram::onRenderObject(const Engine::Object * obj, con
 	texelSize[1] = 1.0f / ScreenManager::SCREEN_HEIGHT;
 
 	glUniform2fv(uTexelSize, 1, &texelSize[0]);
+}
+
+// ===============================================================================
+
+Engine::Program * Engine::GaussianBlurProgramFactory::createProgram(unsigned long long parameters)
+{
+	Engine::GaussianBlurProgram * program = new Engine::GaussianBlurProgram(Engine::GaussianBlurProgram::PROGRAM_NAME, parameters);
+	program->initialize();
+	return program;
 }

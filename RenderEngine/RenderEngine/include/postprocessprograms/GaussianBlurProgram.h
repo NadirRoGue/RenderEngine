@@ -6,6 +6,8 @@ namespace Engine
 {
 	class GaussianBlurProgram : public PostProcessProgram
 	{
+	public:
+		static std::string PROGRAM_NAME;
 	private:
 		unsigned int uAffetedTexels;
 		unsigned int uMaskSize;
@@ -17,7 +19,7 @@ namespace Engine
 		float * affectedTexels;
 
 	public:
-		GaussianBlurProgram(std::string name);
+		GaussianBlurProgram(std::string name, unsigned long long params);
 		GaussianBlurProgram(const GaussianBlurProgram & other);
 		~GaussianBlurProgram();
 
@@ -27,5 +29,11 @@ namespace Engine
 		void setMaskSize(unsigned int ms);
 		void setKernel(float * k);
 		void setAffectedTexels(glm::vec2 * at);
+	};
+
+	class GaussianBlurProgramFactory : public ProgramFactory
+	{
+	protected:
+		Program * createProgram(unsigned long long parameters);
 	};
 }

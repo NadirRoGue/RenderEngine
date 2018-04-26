@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Texture.h"
-#include "instances/MeshInstance.h"
 #include "programs/SkyProgram.h"
 #include "Camera.h"
 #include "Object.h"

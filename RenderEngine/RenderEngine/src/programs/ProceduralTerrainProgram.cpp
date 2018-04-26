@@ -1,6 +1,10 @@
 #include "programs/ProceduralTerrainProgram.h"
 
 #include <iostream>
+
+std::string Engine::ProceduralTerrainProgram::PROGRAM_NAME = "ProceduralTerrainProgram";
+unsigned long long Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE = 0x01;
+
 // ==================================================================================
 
 Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(std::string name, unsigned long long params) 
@@ -32,10 +36,17 @@ Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerra
 
 void Engine::ProceduralTerrainProgram::initialize()
 {
+	std::string configStr = "";
+
+	if (parameters & Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE)
+	{
+		configStr += "#define WIRE_MODE";
+	}
+
 	vShader = loadShader(vShaderFile, GL_VERTEX_SHADER);
 	tcsShader = loadShader(tcsShaderFile, GL_TESS_CONTROL_SHADER);
 	tevalShader = loadShader(tevalShaderFile, GL_TESS_EVALUATION_SHADER);
-	gShader = loadShader(gShaderFile, GL_GEOMETRY_SHADER);
+	gShader = loadShader(gShaderFile, GL_GEOMETRY_SHADER, configStr);
 	fShader = loadShader(fShaderFile, GL_FRAGMENT_SHADER);
 
 	glProgram = glCreateProgram();
@@ -75,13 +86,9 @@ void Engine::ProceduralTerrainProgram::configureProgram()
 	uInUV = glGetAttribLocation(glProgram, "inUV");
 }
 
-void Engine::ProceduralTerrainProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
+void Engine::ProceduralTerrainProgram::configureMeshBuffers(Engine::Mesh * data)
 {
-	Engine::Mesh * data = mesh->getMesh();
 	glBindVertexArray(data->vao);
-
-	unsigned int numFaces = mesh->getMesh()->getNumFaces();
-	unsigned int numVertex = mesh->getMesh()->getNumVertices();
 
 	if (uInPos != -1)
 	{
@@ -135,4 +142,13 @@ void Engine::ProceduralTerrainProgram::destroy()
 	glDeleteShader(fShader);
 
 	glDeleteProgram(glProgram);
+}
+
+// ==============================================================================
+
+Engine::Program * Engine::ProceduralTerrainProgramFactory::createProgram(unsigned long long parameters)
+{
+	Engine::ProceduralTerrainProgram * program = new Engine::ProceduralTerrainProgram(Engine::ProceduralTerrainProgram::PROGRAM_NAME, parameters);
+	program->initialize();
+	return program;
 }

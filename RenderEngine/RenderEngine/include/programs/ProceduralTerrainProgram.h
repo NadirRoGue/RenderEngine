@@ -6,6 +6,10 @@ namespace Engine
 {
 	class ProceduralTerrainProgram : public Program
 	{
+	public:
+		static std::string PROGRAM_NAME;
+
+		static unsigned long long WIRE_DRAW_MODE;
 	private:
 		std::string tcsShaderFile;
 		std::string tevalShaderFile;
@@ -26,8 +30,14 @@ namespace Engine
 		void initialize();
 		void configureProgram();
 		void setUniformGridPosition(unsigned int i, unsigned int j);
-		void configureMeshBuffers(MeshInstance * mesh);
+		void configureMeshBuffers(Mesh * mesh);
 		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
 		void destroy();
+	};
+
+	class ProceduralTerrainProgramFactory : public ProgramFactory
+	{
+	protected:
+		Program * createProgram(unsigned long long parameters);
 	};
 }

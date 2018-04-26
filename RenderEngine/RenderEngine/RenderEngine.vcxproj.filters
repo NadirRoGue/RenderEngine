@@ -162,9 +162,6 @@
     <ClInclude Include="include\SkyBox.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="include\datatables\MeshInstanceTable.h">
-      <Filter>Archivos de encabezado\datatables</Filter>
-    </ClInclude>
     <ClInclude Include="include\datatables\MeshTable.h">
       <Filter>Archivos de encabezado\datatables</Filter>
     </ClInclude>
@@ -216,9 +213,6 @@
     <ClInclude Include="include\postprocessprograms\DeferredShadingProgram.h">
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>
-    <ClInclude Include="include\instances\MeshInstance.h">
-      <Filter>Archivos de encabezado\instances</Filter>
-    </ClInclude>
     <ClInclude Include="include\instances\TextureInstance.h">
       <Filter>Archivos de encabezado\instances</Filter>
     </ClInclude>
@@ -240,9 +234,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="src\auxiliar.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="src\Camera.cpp">
@@ -332,9 +323,6 @@
     <ClCompile Include="src\inputhandlers\mousehandlers\CameraRotationHandler.cpp">
       <Filter>Archivos de origen\inputhandlers\mousehandlers</Filter>
     </ClCompile>
-    <ClCompile Include="src\datatables\MeshInstanceTable.cpp">
-      <Filter>Archivos de origen\datatables</Filter>
-    </ClCompile>
     <ClCompile Include="src\datatables\MeshTable.cpp">
       <Filter>Archivos de origen\datatables</Filter>
     </ClCompile>
@@ -367,9 +355,6 @@
     </ClCompile>
     <ClCompile Include="src\programs\SkyProgram.cpp">
       <Filter>Archivos de origen\programs</Filter>
-    </ClCompile>
-    <ClCompile Include="src\instances\MeshInstance.cpp">
-      <Filter>Archivos de origen\instances</Filter>
     </ClCompile>
     <ClCompile Include="src\instances\TextureInstance.cpp">
       <Filter>Archivos de origen\instances</Filter>

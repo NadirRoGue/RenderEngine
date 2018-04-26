@@ -15,7 +15,7 @@ namespace Engine
 		unsigned int gridPosJ;
 
 	public:
-		TerrainTile(MeshInstance * instance) : Object(instance)
+		TerrainTile(Mesh * instance) : Object(instance)
 		{
 		}
 

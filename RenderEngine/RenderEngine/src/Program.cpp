@@ -39,12 +39,15 @@ char *loadStringFromFile(const char *fileName, unsigned int &fileLen)
 // ================================================================================
 
 Engine::Program::Program(std::string name, unsigned long long params)
+	:name(name),parameters(params)
 {
-	this->name = std::string(name);
 }
 
 Engine::Program::Program(const Engine::Program & other)
 {
+	name = other.name;
+	parameters = other.parameters;
+
 	glProgram = other.glProgram;
 	vShader = other.vShader;
 	fShader = other.fShader;
@@ -96,16 +99,42 @@ unsigned int Engine::Program::getProgramId() const
 	return glProgram;
 }
 
-unsigned int Engine::Program::loadShader(std::string fileName, GLenum type)
+unsigned int Engine::Program::loadShader(std::string fileName, GLenum type, std::string configString)
 {
 	unsigned int fileLen;
 	char *source = loadStringFromFile(fileName.c_str(), fileLen);
+	
+	std::string result(source);
 
+	if (type == GL_GEOMETRY_SHADER)
+	{
+		std::cout << "Result len before " << result.size() << std::endl;
+	}
+
+	if (!configString.empty())
+	{
+		result = "#version 400 core\n" + configString + "\n" + result;
+		std::cout << "Result len afterwards " << result.size() << std::endl;
+	}
+
+	if (type == GL_GEOMETRY_SHADER)
+	{
+		std::ofstream o("debugshader.txt");
+		o << result;
+		o.flush();
+		o.close();
+	}
+	
+	char * finalSourceCStr = new char[result.size()];
+	memcpy(finalSourceCStr, result.c_str(), result.size() * sizeof(char));
+	fileLen = result.size();
+	
 	GLuint shader;
 	shader = glCreateShader(type);
-	glShaderSource(shader, 1, (const GLchar **)&source, (const GLint *)&fileLen);
+	glShaderSource(shader, 1, (const GLchar **)&finalSourceCStr, (const GLint *)&fileLen);
 	glCompileShader(shader);
 	delete[] source;
+	//delete[] finalSourceCStr;
 
 	GLint compiled;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
@@ -150,4 +179,33 @@ void Engine::Program::destroy()
 	glDeleteShader(fShader);
 
 	glDeleteProgram(glProgram);
+}
+
+// ===========================================================
+
+Engine::Program * Engine::ProgramFactory::instantiateProgram(unsigned long long parameters)
+{
+	std::map<unsigned long long, Program*>::iterator it = cache.find(parameters);
+	if (it != cache.end())
+	{
+		return it->second;
+	}
+	else
+	{
+		Engine::Program * program = createProgram(parameters);
+		cache[parameters] = program;
+		return program;
+	}
+}
+
+void Engine::ProgramFactory::clean()
+{
+	std::map<unsigned long long, Program*>::iterator it = cache.begin();
+	while (it != cache.end())
+	{
+		it->second->destroy();
+		delete it->second;
+	}
+
+	cache.clear();
 }

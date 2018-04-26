@@ -17,8 +17,8 @@ std::string Engine::Object::NORMAL_TEX = "normal";
 std::string Engine::Object::EMISSIVE_TEX = "emissive";
 std::string Engine::Object::SPECULAR_TEX = "specular";
 
-Engine::Object::Object(Engine::MeshInstance * mi)
-	:meshInstance(mi)
+Engine::Object::Object(Engine::Mesh * m)
+	:mesh(m)
 {
 	modelMatrix = glm::mat4(1.0f);
 	translation = glm::vec3(0,0,0);
@@ -41,14 +41,9 @@ const glm::mat4 & Engine::Object::getModelMatrix() const
 	return modelMatrix;
 }
 
-Engine::MeshInstance * Engine::Object::getMeshInstance()
+const Engine::Mesh * Engine::Object::getMesh() const
 {
-	return meshInstance;
-}
-
-Engine::Mesh * Engine::Object::getMesh() const
-{
-	return meshInstance->getMesh();
+	return mesh;
 }
 
 void Engine::Object::rotate(float angle, glm::vec3 r)
@@ -173,10 +168,9 @@ const Engine::TextureInstance * Engine::Object::getSpecularMapTexture() const
 
 // ======================================================================================================
 
-Engine::PostProcessObject::PostProcessObject(MeshInstance * mi)
-	:Object(mi)
+Engine::PostProcessObject::PostProcessObject(Engine::Mesh * mi)
+	:Engine::Object(mi)
 {
-
 }
 
 void Engine::PostProcessObject::addTexture(std::string name, Engine::TextureInstance * instance)

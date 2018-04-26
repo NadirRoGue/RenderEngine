@@ -40,9 +40,9 @@ namespace Engine
 
 		void loadFromMesh(aiMesh * mesh);
 
-		unsigned int getNumFaces();
-		unsigned int getNumVertices();
-		unsigned int getNumVerticesPerFace();
+		const unsigned int getNumFaces() const;
+		const unsigned int getNumVertices() const;
+		const unsigned int getNumVerticesPerFace() const;
 
 		const unsigned int * getFaces() const;
 		const float * getVertices() const;

@@ -86,8 +86,8 @@ Engine::SkyBox * Engine::Scene::getSkyBox()
 
 void Engine::Scene::addObject(Engine::Object *obj)
 {
-	std::string material = obj->getMeshInstance()->getMaterial();
-	unsigned int vaoIndex = obj->getMeshInstance()->getMesh()->vao;
+	std::string material = "";// obj->getMeshInstance()->getMaterial();
+	unsigned int vaoIndex = obj->getMesh()->vao;
 
 	std::map<std::string, Engine::ProgramRenderables *>::iterator renderIt = renders.find(material);
 

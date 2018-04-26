@@ -7,6 +7,8 @@ namespace Engine
 {
 	class StandarProgram : public Program
 	{
+	public:
+		static std::string PROGRAM_NAME;
 	private:
 		// Uniform variables
 		unsigned int uNormalMat;
@@ -45,12 +47,12 @@ namespace Engine
 	public:
 		StandarProgram(std::string name, unsigned long long params);
 		StandarProgram(const StandarProgram & other);
-		void configureProgram();
+		virtual void configureProgram();
 		void onRenderLight(const glm::mat4 & model, const glm::mat4 & view);
 		void onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view);
 		void onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view);
 		virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
-		virtual void configureMeshBuffers(MeshInstance * mesh);
+		void configureMeshBuffers(Mesh * mesh);
 
 		void configureClearColor(const glm::vec3 & cc);
 		void configurePointLightBuffer(const PointLight *pl);
@@ -58,10 +60,18 @@ namespace Engine
 		void configureDirectionalLightBuffer(const DirectionalLight *dl);
 	};
 
+	class StandarProgramFactory : public ProgramFactory
+	{
+	protected:
+		Program * createProgram(unsigned long long parameters);
+	};
+
 	// =============================================================================
 
 	class TextureProgram : public StandarProgram
 	{
+	public:
+		static std::string PROGRAM_NAME;
 	private:
 		unsigned int uAlbedoTex;
 		unsigned int uEmissiveTex;
@@ -71,6 +81,12 @@ namespace Engine
 		TextureProgram(std::string name, unsigned long long params);
 		TextureProgram(const TextureProgram & other);
 		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 & proj);
-		void configureMeshBuffers(MeshInstance * mesh);
+		void configureProgram();
+	};
+
+	class TextureProgramFactory : public ProgramFactory
+	{
+	protected:
+		Program * createProgram(unsigned long long parameters);
 	};
 }

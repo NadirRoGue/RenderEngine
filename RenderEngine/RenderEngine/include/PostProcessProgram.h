@@ -15,6 +15,8 @@ namespace Engine
 {
 	class PostProcessProgram : public Program
 	{
+	public:
+		static std::string PROGRAM_NAME;
 	private:
 		unsigned int planeVAO;
 		unsigned int planeVerticesVBO;
@@ -27,12 +29,13 @@ namespace Engine
 		unsigned int uRenderedTextures[9];
 
 	public:
-		PostProcessProgram(std::string name);
+		PostProcessProgram(std::string name, unsigned long long params);
+		PostProcessProgram(unsigned long long params);
 		PostProcessProgram(const PostProcessProgram & other);
 		~PostProcessProgram();
 
 		virtual void configureProgram();
-		void configureMeshBuffers(MeshInstance * mesh);
+		void configureMeshBuffers(Mesh * mesh);
 		virtual void configureClearColor(const glm::vec3 & cc);
 
 		virtual void configurePointLightBuffer(const PointLight *pl);
@@ -43,5 +46,13 @@ namespace Engine
 		virtual void onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view);
 		virtual void onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view);
 		virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
+	};
+
+	// =======================================================
+
+	class PostProcessProgramFactory : public ProgramFactory
+	{
+	protected:
+		Program * createProgram(unsigned long long parameters);
 	};
 }

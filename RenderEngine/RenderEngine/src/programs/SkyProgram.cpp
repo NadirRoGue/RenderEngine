@@ -1,7 +1,9 @@
 #include "programs/SkyProgram.h"
 
-Engine::SkyProgram::SkyProgram(std::string name)
-	:Program(name)
+std::string Engine::SkyProgram::PROGRAM_NAME = "SkyProgram";
+
+Engine::SkyProgram::SkyProgram(std::string name, unsigned long long params)
+	:Program(name, params)
 {
 	vShaderFile = "shaders/sky/sky.vert";
 	fShaderFile = "shaders/sky/sky.frag";
@@ -24,9 +26,8 @@ void Engine::SkyProgram::configureProgram()
 	inPos = glGetAttribLocation(glProgram, "inPos");
 }
 
-void Engine::SkyProgram::configureMeshBuffers(Engine::MeshInstance * mesh)
+void Engine::SkyProgram::configureMeshBuffers(Engine::Mesh * m)
 {
-	Engine::Mesh * m = mesh->getMesh();
 	glBindVertexArray(m->vao);
 
 	if (inPos != -1)
@@ -49,4 +50,13 @@ void Engine::SkyProgram::setCubemapUniform(Engine::TextureInstance * t)
 	glBindTexture(GL_TEXTURE_CUBE_MAP, t->getTexture()->getTextureId());
 	glUniform1i(uCubeMap, 0);
 
+}
+
+// =====================================================================
+
+Engine::Program * Engine::SkyProgramFactory::createProgram(unsigned long long parameters)
+{
+	Engine::SkyProgram * program = new Engine::SkyProgram(Engine::SkyProgram::PROGRAM_NAME, parameters);
+	program->initialize();
+	return program;
 }

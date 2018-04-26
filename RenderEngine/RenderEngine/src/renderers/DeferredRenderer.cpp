@@ -1,5 +1,7 @@
 #include "renderers/DeferredRenderer.h"
 
+#include <iostream>
+
 #include "Scene.h"
 
 Engine::DeferredRenderer::DeferredRenderer()
@@ -120,14 +122,15 @@ void Engine::DeferredRenderer::doRender()
 		{
 			node->callBack->execute(node->obj, node->postProcessProgram, node->renderBuffer, cam);
 		}
-
-		glBindVertexArray(node->obj->getMeshInstance()->getMesh()->vao);
+		
+		glBindVertexArray(node->obj->getMesh()->vao);
 
 		prog->onRenderObject(node->obj, cam->getViewMatrix(), cam->getProjectionMatrix());
 
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		it++;
 	}
+	
 	// Enable default framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -140,7 +143,7 @@ void Engine::DeferredRenderer::doRender()
 	}
 
 	glUseProgram(finalLink->postProcessProgram->getProgramId());
-	glBindVertexArray(finalLink->obj->getMeshInstance()->getMesh()->vao);
+	glBindVertexArray(finalLink->obj->getMesh()->vao);
 
 	finalLink->postProcessProgram->onRenderObject(finalLink->obj, cam->getViewMatrix(), cam->getProjectionMatrix());
 
@@ -148,6 +151,7 @@ void Engine::DeferredRenderer::doRender()
 
 	glDepthFunc(GL_LEQUAL);
 	scene->getSkyBox()->render(cam);
+	glDepthFunc(GL_LESS);
 }
 
 void Engine::DeferredRenderer::onResize(unsigned int w, unsigned int h)
