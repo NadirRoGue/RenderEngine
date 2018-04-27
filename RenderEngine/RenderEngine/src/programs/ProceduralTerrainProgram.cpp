@@ -47,7 +47,7 @@ void Engine::ProceduralTerrainProgram::initialize()
 	tcsShader = loadShader(tcsShaderFile, GL_TESS_CONTROL_SHADER);
 	tevalShader = loadShader(tevalShaderFile, GL_TESS_EVALUATION_SHADER);
 	gShader = loadShader(gShaderFile, GL_GEOMETRY_SHADER, configStr);
-	fShader = loadShader(fShaderFile, GL_FRAGMENT_SHADER);
+	fShader = loadShader(fShaderFile, GL_FRAGMENT_SHADER, configStr);
 
 	glProgram = glCreateProgram();
 

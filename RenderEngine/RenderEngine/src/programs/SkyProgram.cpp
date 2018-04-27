@@ -14,7 +14,7 @@ Engine::SkyProgram::SkyProgram(const Engine::SkyProgram & other)
 {
 	uProjMatrix = other.uProjMatrix;
 	uCubeMap = other.uCubeMap;
-
+	uLightDir = other.uLightDir;
 	inPos = other.inPos;
 }
 
@@ -22,7 +22,7 @@ void Engine::SkyProgram::configureProgram()
 {
 	uProjMatrix = glGetUniformLocation(glProgram, "proj");
 	uCubeMap = glGetUniformLocation(glProgram, "skybox");
-
+	uLightDir = glGetUniformLocation(glProgram, "lightDir");
 	inPos = glGetAttribLocation(glProgram, "inPos");
 }
 
@@ -50,6 +50,11 @@ void Engine::SkyProgram::setCubemapUniform(Engine::TextureInstance * t)
 	glBindTexture(GL_TEXTURE_CUBE_MAP, t->getTexture()->getTextureId());
 	glUniform1i(uCubeMap, 0);
 
+}
+
+void Engine::SkyProgram::setLightDirUniform(glm::vec3 & lightDir)
+{
+	glUniform3fv(uLightDir, 1, &lightDir[0]);
 }
 
 // =====================================================================

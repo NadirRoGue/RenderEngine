@@ -25,7 +25,7 @@ uniform ivec2 gridPos;
 // ================================================================================
 
 uniform float amplitude = 0.5;
-uniform float frecuency = 1.0;
+uniform float frecuency = 0.5;
 uniform float scale = 1.0;
 uniform float octaves = 8;
 
@@ -72,8 +72,9 @@ float noiseHeight(in vec2 pos)
 		localFrecuency *= 2.0;
 	}
 
+	//noiseValue = noiseValue * 0.5 + 0.5;
+	noiseValue = noiseValue > 0.1? noiseValue * noiseValue * noiseValue : noiseValue > 0.8? noiseValue * 2 : noiseValue;
 	return noiseValue;
-	//noiseValue = noiseValue;// * 0.5 + 0.5;
 }
 
 // ================================================================================
@@ -97,11 +98,15 @@ void main()
 	rawNormal.x = xSign != 0 ? rawNormal.x * xSign : rawNormal.x;
 	rawNormal.z = ySign != 0 ? rawNormal.z * ySign : rawNormal.z;
 	
+#ifdef WIRE_MODE
+	vec3 heightColor = vec3(0);
+#else
 	// Compute slope respect vertical axis
 	vec3 up = vec3(0, 1, 0);
 	float cos = abs(dot(rawNormal, up));
 	// Compute color gradient based on height / slope
 	vec3 heightColor = height < 0.5? mix(grass, dirt, 2*height) : height > 0.75 || (height > 0.5 && cos > 0.01)? snow : dirt;
+#endif
 
 	vec3 n = (normal * vec4(rawNormal, 0.0)).xyz;
 	outColor = vec4(heightColor, 1.0);

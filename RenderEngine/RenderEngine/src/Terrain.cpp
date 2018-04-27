@@ -27,6 +27,7 @@ Engine::Terrain::Terrain(const Terrain & other)
 
 void Engine::Terrain::render(Engine::Camera * camera)
 {
+	/*
 	glm::vec3 cameraPosition = camera->getPosition();
 
 	int x = -int((floor(cameraPosition.x)) / tileWidth);
@@ -37,7 +38,7 @@ void Engine::Terrain::render(Engine::Camera * camera)
 	int yStart = y - renderRadius;
 	int yEnd = y + renderRadius;
 
-	glUseProgram(shadingShader->getProgramId());
+	glUseProgram(terrainActiveShader->getProgramId());
 	glBindVertexArray(tileObject->getMesh()->vao);
 
 	for (int i = xStart; i < xEnd; i++)
@@ -48,8 +49,42 @@ void Engine::Terrain::render(Engine::Camera * camera)
 			float posZ = j * tileWidth;
 			tileObject->setTranslation(glm::vec3(poxX, 0.0f, posZ));
 
-			shadingShader->setUniformGridPosition(i, j);
-			shadingShader->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
+			activeShader->setUniformGridPosition(i, j);
+			activeShader->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
+
+			glDrawElements(GL_PATCHES, 6, GL_UNSIGNED_INT, (void*)0);
+		}
+	}
+	*/
+	drawLayer(camera, terrainActiveShader);
+	drawLayer(camera, waterActiveShader, 0.1f);
+}
+
+void Engine::Terrain::drawLayer(Engine::Camera * camera, Engine::ProceduralTerrainProgram * program, float yOffset)
+{
+	glm::vec3 cameraPosition = camera->getPosition();
+
+	int x = -int((floor(cameraPosition.x)) / tileWidth);
+	int y = -int((floor(cameraPosition.z)) / tileWidth);
+
+	int xStart = x - renderRadius;
+	int xEnd = x + renderRadius;
+	int yStart = y - renderRadius;
+	int yEnd = y + renderRadius;
+
+	glUseProgram(program->getProgramId());
+	glBindVertexArray(tileObject->getMesh()->vao);
+
+	for (int i = xStart; i < xEnd; i++)
+	{
+		for (int j = yStart; j < yEnd; j++)
+		{
+			float poxX = i * tileWidth;
+			float posZ = j * tileWidth;
+			tileObject->setTranslation(glm::vec3(poxX, yOffset * tileWidth, posZ));
+
+			program->setUniformGridPosition(i, j);
+			program->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
 
 			glDrawElements(GL_PATCHES, 6, GL_UNSIGNED_INT, (void*)0);
 		}
@@ -58,8 +93,18 @@ void Engine::Terrain::render(Engine::Camera * camera)
 
 void Engine::Terrain::initialize()
 {
-	shadingShader = dynamic_cast<Engine::ProceduralTerrainProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::ProceduralTerrainProgram::PROGRAM_NAME,
+	terrainShadingShader = dynamic_cast<Engine::ProceduralTerrainProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::ProceduralTerrainProgram::PROGRAM_NAME));
+	terrainWireShader = dynamic_cast<Engine::ProceduralTerrainProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::ProceduralTerrainProgram::PROGRAM_NAME,
 		Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE));
+
+	terrainActiveShader = terrainShadingShader;
+
+	waterShadingShader = dynamic_cast<Engine::ProceduralWaterProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::ProceduralWaterProgram::PROGRAM_NAME));
+	waterWireShader = dynamic_cast<Engine::ProceduralWaterProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::ProceduralWaterProgram::PROGRAM_NAME, 
+		Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE));
+
+	waterActiveShader = waterShadingShader;
+
 	createTileMesh();
 }
 
@@ -91,9 +136,25 @@ void Engine::Terrain::createTileMesh()
 	Engine::MeshTable::getInstance().addMeshToCache("terrain_tile", plane);
 	Engine::Mesh * planeMesh = Engine::MeshTable::getInstance().getMesh("terrain_tile");
 	
-	shadingShader->configureMeshBuffers(planeMesh);
+	terrainShadingShader->configureMeshBuffers(planeMesh);
+	waterShadingShader->configureMeshBuffers(planeMesh);
 
 	tileObject = new Engine::Object(planeMesh);
 	if(tileWidth != 1.0f)
 		tileObject->setScale(glm::vec3(tileWidth, tileWidth, tileWidth));
+}
+
+void Engine::Terrain::notifyRenderModeUpdate(Engine::RenderMode mode)
+{
+	switch (mode)
+	{
+	case Engine::RenderMode::RENDER_MODE_WIRE:
+		terrainActiveShader = terrainWireShader;
+		waterActiveShader = waterWireShader;
+		break;
+	default:
+		terrainActiveShader = terrainShadingShader;
+		waterActiveShader = waterShadingShader;
+		break;
+	}
 }

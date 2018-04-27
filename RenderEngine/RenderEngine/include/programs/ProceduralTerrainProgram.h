@@ -10,7 +10,7 @@ namespace Engine
 		static std::string PROGRAM_NAME;
 
 		static unsigned long long WIRE_DRAW_MODE;
-	private:
+	protected:
 		std::string tcsShaderFile;
 		std::string tevalShaderFile;
 		std::string gShaderFile;

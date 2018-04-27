@@ -231,6 +231,12 @@
     <ClInclude Include="include\StorageTable.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="include\IRenderable.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\programs\ProceduralWaterProgram.h">
+      <Filter>Archivos de encabezado\programs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -370,6 +376,9 @@
     </ClCompile>
     <ClCompile Include="src\StorageTable.cpp">
       <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\programs\ProceduralWaterProgram.cpp">
+      <Filter>Archivos de origen\programs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

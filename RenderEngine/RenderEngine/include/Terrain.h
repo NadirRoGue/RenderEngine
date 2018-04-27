@@ -3,6 +3,7 @@
 #include <glm\glm.hpp>
 
 #include "programs/ProceduralTerrainProgram.h"
+#include "programs/ProceduralWaterProgram.h"
 #include "Object.h"
 #include "Camera.h"
 
@@ -40,14 +41,21 @@ namespace Engine
 		}
 	};
 
-	class Terrain
+	class Terrain : public IRenderable
 	{
 	private:
 		float tileWidth;
 		unsigned int renderRadius;
 		
-		ProceduralTerrainProgram * shadingShader;
-		ProceduralTerrainProgram * wireShader;
+		ProceduralTerrainProgram * terrainShadingShader;
+		ProceduralTerrainProgram * terrainWireShader;
+
+		ProceduralTerrainProgram * terrainActiveShader;
+
+		ProceduralWaterProgram * waterShadingShader;
+		ProceduralWaterProgram * waterWireShader;
+
+		ProceduralWaterProgram * waterActiveShader;
 
 		Object * tileObject;
 	public:
@@ -57,8 +65,10 @@ namespace Engine
 
 		void render(Camera * camera);
 
+		void notifyRenderModeUpdate(RenderMode mode);
 	private:
 		void initialize();
 		void createTileMesh();
+		void drawLayer(Engine::Camera * cam, Engine::ProceduralTerrainProgram * program, float yOffset = 0.0f);
 	};
 }

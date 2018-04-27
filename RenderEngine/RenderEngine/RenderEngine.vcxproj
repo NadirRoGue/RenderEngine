@@ -143,6 +143,7 @@
     <ClInclude Include="include\inputhandlers\keyboardhandlers\CameraMovementHandler.h" />
     <ClInclude Include="include\inputhandlers\mousehandlers\CameraRotationHandler.h" />
     <ClInclude Include="include\instances\TextureInstance.h" />
+    <ClInclude Include="include\IRenderable.h" />
     <ClInclude Include="include\KeyboardHandler.h" />
     <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\CustomMaths.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="include\postprocessprograms\SSAAProgram.h" />
     <ClInclude Include="include\Program.h" />
     <ClInclude Include="include\programs\ProceduralTerrainProgram.h" />
+    <ClInclude Include="include\programs\ProceduralWaterProgram.h" />
     <ClInclude Include="include\programs\SkyProgram.h" />
     <ClInclude Include="include\programs\StandardProgram.h" />
     <ClInclude Include="include\Renderer.h" />
@@ -211,6 +213,7 @@
     <ClCompile Include="src\postprocessprograms\SSAAProgram.cpp" />
     <ClCompile Include="src\Program.cpp" />
     <ClCompile Include="src\programs\ProceduralTerrainProgram.cpp" />
+    <ClCompile Include="src\programs\ProceduralWaterProgram.cpp" />
     <ClCompile Include="src\programs\SkyProgram.cpp" />
     <ClCompile Include="src\programs\StandardProgram.cpp" />
     <ClCompile Include="src\Renderer.cpp" />

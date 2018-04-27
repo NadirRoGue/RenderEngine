@@ -1,0 +1,78 @@
+#version 410 core
+
+layout(triangles, equal_spacing, ccw) in;
+
+// INPUT
+layout (location=0) in vec2 inUV[];
+
+// OUTPUT
+layout (location=0) out vec2 outUV;
+
+//uniform sampler2D noise;
+
+uniform mat4 modelView;
+uniform mat4 modelViewProj;
+
+// ============================================================================
+
+uniform float scale = 80.0;
+
+float Random2D(in vec2 st)
+{
+	return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+float cellularNoise(vec2 uv)
+{	
+	//obtenemos su coordenada en el grid y su coordenada real
+    vec2 currentPos = uv * scale; 
+    vec2 gridCoord  = floor( currentPos );
+    
+	float dist0 = 1000.0;
+    vec2 offset = vec2( -1.0, -1.0 );
+    
+    //recorremos los vecinos buscando la distancia mas cortas
+    for( offset.y = -1.0f; offset.y <= 1.0f; offset.y += 1.0f )
+    {
+        for( offset.x = -1.0f; offset.x <= 1.0f; offset.x += 1.0f )
+        {
+            vec2 cellCenter = gridCoord + offset;
+            cellCenter      = cellCenter + Random2D( cellCenter );
+            
+            float dist = length( cellCenter - currentPos );
+            
+            if( dist < dist0 )
+            {
+                dist0 = dist;
+            }
+        }
+    }
+    
+    //dist0 = 1.0 - dist0;
+    dist0 = dist0 * 0.5 + 0.5;
+    return dist0;
+}
+
+//=======================================================================
+
+void main()
+{
+	float u = gl_TessCoord.x;
+	float v = gl_TessCoord.y;
+	float w = gl_TessCoord.z;
+
+	outUV = inUV[0] * w + inUV[1] * u + inUV[2] * v;
+	
+	vec3 a = gl_in[0].gl_Position.xyz;
+	vec3 b = gl_in[1].gl_Position.xyz;
+	vec3 c = gl_in[2].gl_Position.xyz;
+
+	vec3 p0 = a * w;
+	vec3 p1 = b * u;
+	vec3 p2 = c * v;
+
+	vec3 final = p0 + p1 + p2;
+	
+	final.y = cellularNoise(outUV) * 0.01;
+	gl_Position = vec4(final, 1);
+}

@@ -2,6 +2,7 @@
 
 #include "datatables/ProgramTable.h"
 #include "datatables/MeshTable.h"
+#include "Scene.h"
 
 Engine::SkyBox::SkyBox(Engine::TextureInstance * skyboxTextureCubeMap)
 	:skyCubeMap(skyboxTextureCubeMap)
@@ -11,6 +12,8 @@ Engine::SkyBox::SkyBox(Engine::TextureInstance * skyboxTextureCubeMap)
 	skyCubeMap->setAnisotropicFilterEnabled(false);
 	skyCubeMap->configureTexture();
 	initialize();
+
+	renderMode = GL_TRIANGLES;
 }
 
 Engine::SkyBox::~SkyBox()
@@ -39,8 +42,18 @@ void Engine::SkyBox::render(Engine::Camera * camera)
 	shader->onRenderObject(cubeMesh, camera->getViewMatrix(), camera->getProjectionMatrix());
 	shader->setCubemapUniform(skyCubeMap);
 
+	Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
 
-	glDrawElements(GL_TRIANGLES, data->getNumFaces() * data->getNumVerticesPerFace(), GL_UNSIGNED_INT, (void*)0);
+	const glm::mat4 & modelCopy = dl->getModelMatrix();
+	//modelCopy[3][3] = 0.0f;
+	//glm::mat4 resultPos = camera->getViewMatrix() * modelCopy;
+
+	glm::vec3 direction(modelCopy[3][0], modelCopy[3][1], modelCopy[3][2]);
+	direction = -glm::normalize(direction);
+
+	shader->setLightDirUniform(direction);
+
+	glDrawElements(renderMode, data->getNumFaces() * data->getNumVerticesPerFace(), GL_UNSIGNED_INT, (void*)0);
 }
 
 void Engine::SkyBox::initialize()
@@ -51,5 +64,18 @@ void Engine::SkyBox::initialize()
 	shader->configureMeshBuffers(mesh);
 
 	cubeMesh = new Engine::Object(mesh);
-	cubeMesh->setScale(glm::vec3(10, 10, 10));
+	//cubeMesh->setScale(glm::vec3(1, 1, 1));
+}
+
+void Engine::SkyBox::notifyRenderModeUpdate(Engine::RenderMode mode)
+{
+	switch (mode)
+	{
+	case Engine::RenderMode::RENDER_MODE_WIRE:
+		renderMode = GL_LINES;
+		break;
+	default:
+		renderMode = GL_TRIANGLES;
+		break;
+	}
 }

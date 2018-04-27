@@ -40,9 +40,10 @@ namespace Engine
 		Camera * camera;
 
 		std::map<std::string, ProgramRenderables *> renders;
+
+		DirectionalLight * directionalLight;
 		std::map<std::string, PointLight *> pointLights;
 		std::map<std::string, SpotLight *> spotLights;
-		std::map<std::string, DirectionalLight *> directionalLights;
 
 		Terrain * terrain;
 		SkyBox * skybox;
@@ -71,11 +72,11 @@ namespace Engine
 
 		void addPointLight(PointLight * pl);
 		void addSpotLight(SpotLight * sl);
-		void addDirectionalLight(DirectionalLight * dl);
+		void setDirectionalLight(DirectionalLight * dl);
 
 		PointLight * getLightByName(std::string name);
 		SpotLight * getSpotLightByName(std::string name);
-		DirectionalLight * getDirectionalLightByName(std::string name);
+		DirectionalLight * getDirectionalLight();
 
 		void triggerLightUpdate(PointLight *pl);
 

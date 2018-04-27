@@ -193,3 +193,16 @@ const std::map<std::string, Engine::TextureInstance *> & Engine::PostProcessObje
 {
 	return inputBuffers;
 }
+
+void Engine::Object::notifyRenderModeUpdate(Engine::RenderMode mode)
+{
+	switch (mode)
+	{
+	case Engine::RenderMode::RENDER_MODE_WIRE:
+		setRenderMode(GL_LINES);
+		break;
+	default:
+		setRenderMode(GL_TRIANGLES);
+		break;
+	}
+}

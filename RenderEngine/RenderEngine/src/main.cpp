@@ -29,6 +29,8 @@
 #include "DeferredRenderObject.h"
 #include "Terrain.h"
 
+#include "programs/ProceduralWaterProgram.h"
+
 #include "inputhandlers/keyboardhandlers/CameraMovementHandler.h"
 #include "inputhandlers/mousehandlers/CameraRotationHandler.h"
 #include "AnimImpl.h"
@@ -146,13 +148,13 @@ void initScene()
 
 	// Parameters: name, direction
 	Engine::DirectionalLight * dl = new Engine::DirectionalLight("directional_light", glm::vec3(1,1,0));
-	dl->setAmbientIntensity(0.1f, 0.1f, 0.1f);
+	dl->setAmbientIntensity(0.2f, 0.2f, 0.2f);
 	dl->setDiffuseIntensity(1.0f, 1.0f, 1.0f);
 	dl->setSpecularIntensity(0.0f, 0.0f, 0.0f);
 
 	Engine::Scene * scene = new Engine::Scene();
 	scene->setCamera(camera);
-	scene->addDirectionalLight(dl);
+	scene->setDirectionalLight(dl);
 
 	Engine::SceneManager::getInstance().registerScene("scene_0", scene);
 	Engine::SceneManager::getInstance().activateScene("scene_0");
@@ -166,6 +168,7 @@ void initShaderTable()
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::PostProcessProgram::PROGRAM_NAME, new Engine::PostProcessProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::DeferredShadingProgram::PROGRAM_NAME, new Engine::DeferredShadingProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::ProceduralTerrainProgram::PROGRAM_NAME, new Engine::ProceduralTerrainProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::ProceduralWaterProgram::PROGRAM_NAME, new Engine::ProceduralWaterProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SkyProgram::PROGRAM_NAME, new Engine::SkyProgramFactory());
 }
 

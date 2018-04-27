@@ -9,13 +9,14 @@
 #include <map>
 #include <gl\glew.h>
 
+#include "IRenderable.h"
 #include "Mesh.h"
 #include "instances/TextureInstance.h"
 #include "Texture.h"
 
 namespace Engine
 {
-	class Object
+	class Object : public IRenderable
 	{
 	public:
 		static std::string ALBEDO_TEX;
@@ -64,6 +65,8 @@ namespace Engine
 		const TextureInstance * getNormalMapTexture() const;
 		const TextureInstance * getSpecularMapTexture() const;
 		const TextureInstance * getEmissiveTexture() const;
+
+		void notifyRenderModeUpdate(RenderMode mode);
 		
 	private:
 		void updateModelMatrix();

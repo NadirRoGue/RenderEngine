@@ -29,7 +29,7 @@ void Engine::ForwardRenderer::doRender()
 
 	const std::map<std::string, Engine::PointLight *> pointLights = scene->getPointLights();
 	const std::map<std::string, Engine::SpotLight *> spotLights = scene->getSpotLights();
-	const std::map<std::string, Engine::DirectionalLight *> directionalLights = scene->getDirectionalLight();
+	Engine::DirectionalLight * dl = scene->getDirectionalLight();
 
 	std::map<std::string, Engine::ProgramRenderables *>::const_iterator renderableIt;
 	for (renderableIt = renders.cbegin(); renderableIt != renders.cend(); renderableIt++)

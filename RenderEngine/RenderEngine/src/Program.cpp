@@ -8,6 +8,8 @@
 #include <iostream>
 #include <fstream>
 
+const size_t VERSION_HEADER_LENGHT = 17;
+
 char *loadStringFromFile(const char *fileName, unsigned int &fileLen)
 {
 	//Se carga el fichero
@@ -106,23 +108,11 @@ unsigned int Engine::Program::loadShader(std::string fileName, GLenum type, std:
 	
 	std::string result(source);
 
-	if (type == GL_GEOMETRY_SHADER)
-	{
-		std::cout << "Result len before " << result.size() << std::endl;
-	}
-
 	if (!configString.empty())
 	{
-		result = "#version 400 core\n" + configString + "\n" + result;
-		std::cout << "Result len afterwards " << result.size() << std::endl;
-	}
-
-	if (type == GL_GEOMETRY_SHADER)
-	{
-		std::ofstream o("debugshader.txt");
-		o << result;
-		o.flush();
-		o.close();
+		std::string header = result.substr(0, VERSION_HEADER_LENGHT);
+		std::string body = result.substr(VERSION_HEADER_LENGHT, result.size() - VERSION_HEADER_LENGHT);
+		result = header + "\n" + configString + "\n" + body;
 	}
 	
 	char * finalSourceCStr = new char[result.size()];

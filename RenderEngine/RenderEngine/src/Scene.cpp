@@ -17,6 +17,7 @@ Engine::Scene::Scene()
 	keyboardHandlers = new Engine::KeyboardHandlersTable();
 	mouseHandlers = new Engine::MouseEventManager();
 	animations = new Engine::AnimationTable();
+	directionalLight = NULL;
 	terrain = NULL;
 	skybox = NULL;
 }
@@ -133,12 +134,7 @@ void Engine::Scene::configureNewProgramLights(Engine::Program * p)
 		sIt++;
 	}
 
-	std::map<std::string, Engine::DirectionalLight *>::iterator dIt = directionalLights.begin();
-	while (dIt != directionalLights.end())
-	{
-		p->configureDirectionalLightBuffer(dIt->second);
-		dIt++;
-	}
+	p->configureDirectionalLightBuffer(directionalLight);
 }
 
 void Engine::Scene::addPointLight(Engine::PointLight * pl)
@@ -160,16 +156,14 @@ void Engine::Scene::addSpotLight(Engine::SpotLight * sl)
 	}
 }
 
-void Engine::Scene::addDirectionalLight(Engine::DirectionalLight * dl)
+void Engine::Scene::setDirectionalLight(Engine::DirectionalLight * dl)
 {
-	directionalLights[dl->getName()] = dl;
-
-	std::map<std::string, Engine::ProgramRenderables *>::iterator it = renders.begin();
-	while (it != renders.end())
+	if (directionalLight != NULL)
 	{
-		it->second->program->configureDirectionalLightBuffer(dl);
-		it++;
+		delete directionalLight;
 	}
+
+	directionalLight = dl;
 }
 
 void Engine::Scene::triggerLightUpdate(PointLight *pl)
@@ -211,15 +205,9 @@ Engine::SpotLight * Engine::Scene::getSpotLightByName(std::string name)
 	return NULL;
 }
 
-Engine::DirectionalLight * Engine::Scene::getDirectionalLightByName(std::string name)
+Engine::DirectionalLight * Engine::Scene::getDirectionalLight()
 {
-	std::map<std::string, Engine::DirectionalLight *>::iterator it = directionalLights.find(name);
-	if (it != directionalLights.end())
-	{
-		return it->second;
-	}
-
-	return NULL;
+	return directionalLight;
 }
 
 void Engine::Scene::setCamera(Engine::Camera * cam)
@@ -245,11 +233,6 @@ const std::map<std::string, Engine::PointLight *> & Engine::Scene::getPointLight
 const std::map<std::string, Engine::SpotLight *> & Engine::Scene::getSpotLights() const
 {
 	return spotLights;
-}
-
-const std::map<std::string, Engine::DirectionalLight *> Engine::Scene::getDirectionalLight() const
-{
-	return directionalLights;
 }
 
 void Engine::Scene::onViewportResize(int width, int height)

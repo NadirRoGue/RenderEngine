@@ -98,7 +98,7 @@ void Engine::DeferredShadingLightPopulation::initialize(Engine::Object *obj, Eng
 
 	const std::map<std::string, Engine::PointLight *> pointLights = scene->getPointLights();
 	const std::map<std::string, Engine::SpotLight *> spotLights = scene->getSpotLights();
-	const std::map<std::string, Engine::DirectionalLight *> directionalLights = scene->getDirectionalLight();
+	Engine::DirectionalLight * dl = scene->getDirectionalLight();
 
 	std::map<std::string, Engine::PointLight *>::const_iterator it = pointLights.cbegin();
 	while (it != pointLights.end())
@@ -114,12 +114,7 @@ void Engine::DeferredShadingLightPopulation::initialize(Engine::Object *obj, Eng
 		slIt++;
 	}
 
-	std::map<std::string, Engine::DirectionalLight *>::const_iterator dlIt = directionalLights.cbegin();
-	while (dlIt != directionalLights.end())
-	{
-		dSP->configureDirectionalLightBuffer(dlIt->second);
-		dlIt++;
-	}
+	dSP->configureDirectionalLightBuffer(dl);
 
 	dSP->configureClearColor(scene->getClearColor());
 }
@@ -137,7 +132,7 @@ void Engine::DeferredShadingLightPopulation::execute(Engine::Object * obj, Engin
 
 	const std::map<std::string, Engine::PointLight *> pointLights = scene->getPointLights();
 	const std::map<std::string, Engine::SpotLight *> spotLights = scene->getSpotLights();
-	const std::map<std::string, Engine::DirectionalLight *> directionalLights = scene->getDirectionalLight();
+	Engine::DirectionalLight * dl = scene->getDirectionalLight();
 
 	std::map<std::string, Engine::PointLight *>::const_iterator it = pointLights.cbegin();
 	while (it != pointLights.end())
@@ -153,12 +148,8 @@ void Engine::DeferredShadingLightPopulation::execute(Engine::Object * obj, Engin
 		slIt++;
 	}
 
-	std::map<std::string, Engine::DirectionalLight *>::const_iterator dlIt = directionalLights.cbegin();
-	while (dlIt != directionalLights.end())
-	{
-		dSP->onRenderDirectionalLight(dlIt->second->getModelMatrix(), camera->getViewMatrix());
-		dlIt++;
-	}
+	dSP->onRenderDirectionalLight(dl->getModelMatrix(), camera->getViewMatrix());
+	
 
 	dSP->configureClearColor(scene->getClearColor());
 }
