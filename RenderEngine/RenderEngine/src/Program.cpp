@@ -10,7 +10,7 @@
 
 const size_t VERSION_HEADER_LENGHT = 17;
 
-char *loadStringFromFile(const char *fileName, unsigned int &fileLen)
+char *loadStringFromFile(const char *fileName, unsigned long long &fileLen)
 {
 	//Se carga el fichero
 	std::ifstream file;
@@ -19,7 +19,7 @@ char *loadStringFromFile(const char *fileName, unsigned int &fileLen)
 
 	//Se calcula la longitud del fichero
 	file.seekg(0, std::ios::end);
-	fileLen = unsigned int(file.tellg());
+	fileLen = file.tellg();
 	file.seekg(std::ios::beg);
 
 	//Se lee el fichero
@@ -103,7 +103,7 @@ unsigned int Engine::Program::getProgramId() const
 
 unsigned int Engine::Program::loadShader(std::string fileName, GLenum type, std::string configString)
 {
-	unsigned int fileLen;
+	size_t fileLen;
 	char *source = loadStringFromFile(fileName.c_str(), fileLen);
 	
 	std::string result(source);

@@ -34,6 +34,9 @@
 #include "inputhandlers/keyboardhandlers/CameraMovementHandler.h"
 #include "inputhandlers/mousehandlers/CameraRotationHandler.h"
 #include "AnimImpl.h"
+#include <chrono>
+
+#define DEBUG_FPS
 
 
 //////////////////////////////////////////////////////////////
@@ -136,21 +139,20 @@ void destroy()
 
 void initScene()
 {
-	//Engine::TableManager::getInstance().registerTable(&Engine::MeshInstanceTable::getInstance());
 	Engine::TableManager::getInstance().registerTable(&Engine::MeshTable::getInstance());
 	Engine::TableManager::getInstance().registerTable(&Engine::TextureTable::getInstance());
 	Engine::TableManager::getInstance().registerTable(&Engine::ProgramTable::getInstance());
 
 
 	Engine::Camera * camera = new Engine::Camera(0.1f, 1000.0f, 45.0f, 45.0f);
-	camera->translateView(glm::vec3(0.0f, -5.0f, 0.0f));
+	camera->translateView(glm::vec3(5.0f, -5.0f, 5.0f));
 	camera->rotateView(glm::vec3(glm::radians(30.0f), glm::radians(60.0f), 0.0f));
 
 	// Parameters: name, direction
 	Engine::DirectionalLight * dl = new Engine::DirectionalLight("directional_light", glm::vec3(1,1,0));
 	dl->setAmbientIntensity(0.2f, 0.2f, 0.2f);
 	dl->setDiffuseIntensity(1.0f, 1.0f, 1.0f);
-	dl->setSpecularIntensity(0.0f, 0.0f, 0.0f);
+	dl->setSpecularIntensity(1.0f, 1.0f, 1.0f);
 
 	Engine::Scene * scene = new Engine::Scene();
 	scene->setCamera(camera);
@@ -181,15 +183,10 @@ void initMeshesAssets()
 	data.bottomFace = "img/skyboxes/Daylight_Box_Bottom.png";
 	data.frontFace = "img/skyboxes/Daylight_Box_Front.png";
 	data.backFace = "img/skyboxes/Daylight_Box_Back.png";
-
 	Engine::TextureTable::getInstance().cacheCubemapTexture(data, "DaylightCubemap");
 
 	Engine::MeshTable::getInstance().addMeshToCache("cube", Engine::CreateCube());
 	Engine::MeshTable::getInstance().addMeshToCache("plane", Engine::CreatePlane());
-
-	//Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", Engine::PostProcessProgram::PROGRAM_NAME);
-	//Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", Engine::DeferredShadingProgram::PROGRAM_NAME);
-	//Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "screen_space_anti_aliasing");
 }
 
 void initSceneObj()
@@ -226,8 +223,22 @@ void initRenderEngine()
 
 void renderFunc()
 {
+#ifdef DEBUG_FPS
+	std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
+#endif
 	Engine::RenderManager::getInstance().doRender();
+
+#ifdef DEBUG_FPS
+	std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
+
+	auto duration = end - now;
+	auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() / 1000.0;
+	auto fps = 1.0 / millis;
+	printf("\rFPS: %05.0f", fps);
+#endif
 	glutSwapBuffers();
+
+
 }
 
 void resizeFunc(int width, int height)

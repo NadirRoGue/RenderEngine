@@ -18,6 +18,7 @@ uniform mat4 normal;
 uniform vec3 dirt = vec3(0.2, 0.1, 0.0);
 uniform vec3 snow = vec3(0.9, 0.9, 0.9);
 uniform vec3 grass = vec3(0.3, 0.6, 0.3);
+uniform vec3 sand = vec3(1,1,0.8);
 
 uniform ivec2 gridPos;
 
@@ -72,17 +73,15 @@ float noiseHeight(in vec2 pos)
 		localFrecuency *= 2.0;
 	}
 
-	//noiseValue = noiseValue * 0.5 + 0.5;
-	noiseValue = noiseValue > 0.1? noiseValue * noiseValue * noiseValue : noiseValue > 0.8? noiseValue * 2 : noiseValue;
-	return noiseValue;
+	return noiseValue * noiseValue * noiseValue * 0.01;
 }
 
 // ================================================================================
 
 void main()
 {
-	float u = inUV.x;//inUV.x;
-	float v = inUV.y;//inUV.y;
+	float u = inUV.x;
+	float v = inUV.y;
 
 	float step = 0.01;
 	float tH = noiseHeight(vec2(u, v + step)); //texture(noise, vec2(u, v + step)).r;//noiseHeight(vec2(u, v + step));
@@ -98,14 +97,17 @@ void main()
 	rawNormal.x = xSign != 0 ? rawNormal.x * xSign : rawNormal.x;
 	rawNormal.z = ySign != 0 ? rawNormal.z * ySign : rawNormal.z;
 	
-#ifdef WIRE_MODE
+
 	vec3 heightColor = vec3(0);
-#else
+#ifndef WIRE_MODE
+
 	// Compute slope respect vertical axis
 	vec3 up = vec3(0, 1, 0);
 	float cos = abs(dot(rawNormal, up));
+
 	// Compute color gradient based on height / slope
-	vec3 heightColor = height < 0.5? mix(grass, dirt, 2*height) : height > 0.75 || (height > 0.5 && cos > 0.01)? snow : dirt;
+	heightColor = height < 0.06? sand : (height < 0.3? (cos > 0.75? grass : dirt) : (height < 0.6? (dirt) : (cos > 0.3? snow : dirt)));
+
 #endif
 
 	vec3 n = (normal * vec4(rawNormal, 0.0)).xyz;

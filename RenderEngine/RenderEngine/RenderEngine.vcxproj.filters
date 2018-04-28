@@ -88,6 +88,12 @@
     <Filter Include="Archivos de encabezado\instances">
       <UniqueIdentifier>{947fb1ff-644d-4edc-a088-12720789bdc4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de encabezado\windowmanagers">
+      <UniqueIdentifier>{7f6f69ba-1705-42ea-9982-164192b3adcb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\windowmanagers">
+      <UniqueIdentifier>{e7dfc417-dc83-4f63-bc89-60d74dd4d202}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Animation.h">
@@ -237,6 +243,18 @@
     <ClInclude Include="include\programs\ProceduralWaterProgram.h">
       <Filter>Archivos de encabezado\programs</Filter>
     </ClInclude>
+    <ClInclude Include="include\WindowToolkit.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\windowmanagers\GLFWWindow.h">
+      <Filter>Archivos de encabezado\windowmanagers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\windowmanagers\GLUTWindow.h">
+      <Filter>Archivos de encabezado\windowmanagers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\windowmanagers\WindowManager.h">
+      <Filter>Archivos de encabezado\windowmanagers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -379,6 +397,15 @@
     </ClCompile>
     <ClCompile Include="src\programs\ProceduralWaterProgram.cpp">
       <Filter>Archivos de origen\programs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\windowmanagers\GLFWWindow.cpp">
+      <Filter>Archivos de origen\windowmanagers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\windowmanagers\GLUTWindow.cpp">
+      <Filter>Archivos de origen\windowmanagers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\windowmanagers\WindowManager.cpp">
+      <Filter>Archivos de origen\windowmanagers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

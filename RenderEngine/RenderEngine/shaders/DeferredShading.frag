@@ -22,7 +22,7 @@ vec3 Kd;
 vec3 Ks;
 vec3 Ke;
 vec3 N;
-float alpha = 30.0;
+float alpha = 100.0;
 
 // Point light
 uniform vec3 Ia;
@@ -127,8 +127,8 @@ vec3 shade()
 
 	vec3 DL_R = normalize(reflect(-D_L, N));
 	vec3 DL_V = normalize(-pos);
-	float DL_Factor = max(dot(R,DL_V), 0.01);
-	c += DLIs * Ks * DL_Factor;
+	float DL_Factor = max(dot(DL_R,DL_V), 0.01);
+	c += DLIs * Ks * pow(DL_Factor, alpha);
 
 	c += Ke;
 

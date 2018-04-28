@@ -1,5 +1,8 @@
 #include "programs/ProceduralWaterProgram.h"
 
+#include <chrono>
+#include <iostream>
+
 std::string Engine::ProceduralWaterProgram::PROGRAM_NAME = "ProceduralWaterProgram";
 
 Engine::ProceduralWaterProgram::ProceduralWaterProgram(std::string name, unsigned long long params)
@@ -16,6 +19,18 @@ Engine::ProceduralWaterProgram::ProceduralWaterProgram(std::string name, unsigne
 Engine::ProceduralWaterProgram::ProceduralWaterProgram(const Engine::ProceduralWaterProgram & other)
 	:Engine::ProceduralTerrainProgram(other)
 {
+}
+
+void Engine::ProceduralWaterProgram::configureProgram()
+{
+	Engine::ProceduralTerrainProgram::configureProgram();
+
+	uTime = glGetUniformLocation(glProgram, "time");
+}
+
+void Engine::ProceduralWaterProgram::setTimeUniform(float sinTime)
+{
+	glUniform1f(uTime, sinTime);
 }
 
 // ========================================================================================

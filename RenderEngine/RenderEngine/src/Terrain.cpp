@@ -1,10 +1,20 @@
+#define _USE_MATH_DEFINES
+
 #include "Terrain.h"
 
 #include "Mesh.h"
 #include "datatables/MeshTable.h"
 #include "datatables/ProgramTable.h"
 
+#include <cmath>
+
 #include <iostream>
+#include <chrono>
+
+inline double clamp(double value)
+{
+	return value < 0.0 ? 0.0 : value > 1.0 ? 1.0 : value;
+}
 
 Engine::Terrain::Terrain()
 {
@@ -27,7 +37,12 @@ Engine::Terrain::Terrain(const Terrain & other)
 
 void Engine::Terrain::render(Engine::Camera * camera)
 {
-	/*
+	drawTerrainLayer(camera);
+	drawWaterLayer(camera);
+}
+
+void Engine::Terrain::drawTerrainLayer(Engine::Camera * camera)
+{
 	glm::vec3 cameraPosition = camera->getPosition();
 
 	int x = -int((floor(cameraPosition.x)) / tileWidth);
@@ -49,18 +64,15 @@ void Engine::Terrain::render(Engine::Camera * camera)
 			float posZ = j * tileWidth;
 			tileObject->setTranslation(glm::vec3(poxX, 0.0f, posZ));
 
-			activeShader->setUniformGridPosition(i, j);
-			activeShader->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
+			terrainActiveShader->setUniformGridPosition(i, j);
+			terrainActiveShader->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
 
 			glDrawElements(GL_PATCHES, 6, GL_UNSIGNED_INT, (void*)0);
 		}
 	}
-	*/
-	drawLayer(camera, terrainActiveShader);
-	drawLayer(camera, waterActiveShader, 0.1f);
 }
 
-void Engine::Terrain::drawLayer(Engine::Camera * camera, Engine::ProceduralTerrainProgram * program, float yOffset)
+void Engine::Terrain::drawWaterLayer(Engine::Camera * camera)
 {
 	glm::vec3 cameraPosition = camera->getPosition();
 
@@ -72,7 +84,7 @@ void Engine::Terrain::drawLayer(Engine::Camera * camera, Engine::ProceduralTerra
 	int yStart = y - renderRadius;
 	int yEnd = y + renderRadius;
 
-	glUseProgram(program->getProgramId());
+	glUseProgram(waterActiveShader->getProgramId());
 	glBindVertexArray(tileObject->getMesh()->vao);
 
 	for (int i = xStart; i < xEnd; i++)
@@ -81,10 +93,12 @@ void Engine::Terrain::drawLayer(Engine::Camera * camera, Engine::ProceduralTerra
 		{
 			float poxX = i * tileWidth;
 			float posZ = j * tileWidth;
-			tileObject->setTranslation(glm::vec3(poxX, yOffset * tileWidth, posZ));
+			tileObject->setTranslation(glm::vec3(poxX, 0.3, posZ));
 
-			program->setUniformGridPosition(i, j);
-			program->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
+			waterActiveShader->setUniformGridPosition(i, j);
+			waterActiveShader->setTimeUniform(waterMovementSignal);
+			waterMovementSignal += 0.00001f;
+			waterActiveShader->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
 
 			glDrawElements(GL_PATCHES, 6, GL_UNSIGNED_INT, (void*)0);
 		}
@@ -93,6 +107,8 @@ void Engine::Terrain::drawLayer(Engine::Camera * camera, Engine::ProceduralTerra
 
 void Engine::Terrain::initialize()
 {
+	waterMovementSignal = 0;
+
 	terrainShadingShader = dynamic_cast<Engine::ProceduralTerrainProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::ProceduralTerrainProgram::PROGRAM_NAME));
 	terrainWireShader = dynamic_cast<Engine::ProceduralTerrainProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::ProceduralTerrainProgram::PROGRAM_NAME,
 		Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE));

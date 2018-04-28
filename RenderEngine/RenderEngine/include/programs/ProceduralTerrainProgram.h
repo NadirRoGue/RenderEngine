@@ -28,7 +28,7 @@ namespace Engine
 		ProceduralTerrainProgram(std::string name, unsigned long long params);
 		ProceduralTerrainProgram(const ProceduralTerrainProgram & other);
 		void initialize();
-		void configureProgram();
+		virtual void configureProgram();
 		void setUniformGridPosition(unsigned int i, unsigned int j);
 		void configureMeshBuffers(Mesh * mesh);
 		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);

@@ -45,7 +45,7 @@ unsigned int Engine::DeferredRenderObject::getFrameBufferId()
 	return fbo;
 }
 
-Engine::TextureInstance * Engine::DeferredRenderObject::addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, float filterMethod)
+Engine::TextureInstance * Engine::DeferredRenderObject::addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, int filterMethod)
 {
 	if (index < 0 || index > colorBuffersSize || usedColorBuffers >= 8)
 		exit(-1);

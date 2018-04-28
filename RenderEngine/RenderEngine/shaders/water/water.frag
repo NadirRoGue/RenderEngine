@@ -14,9 +14,11 @@ uniform mat4 normal;
 
 uniform ivec2 gridPos;
 
+uniform float time;
+
 // ================================================================================
 
-uniform float scale = 80.0;
+uniform float scale = 200.0;
 
 float Random2D(in vec2 st)
 {
@@ -51,7 +53,56 @@ float cellularNoise(vec2 uv)
     
     //dist0 = 1.0 - dist0;
     dist0 = dist0 * 0.5 + 0.5;
+	//dist0 = clamp(dist0, 0.3, 1.0);
     return dist0;
+}
+
+// ================================================================================
+
+uniform float amplitude = 0.5;
+uniform float frecuency = 1.0;
+uniform int octaves = 4;
+
+float NoiseInterpolation(in vec2 i_coord, in float i_size)
+{
+	vec2 grid = i_coord *i_size;
+
+	vec2 randomInput = floor(grid);
+	vec2 weights = fract(grid);
+
+
+	float p0 = Random2D(randomInput);
+	float p1 = Random2D(randomInput + vec2(1.0, 0.0));
+	float p2 = Random2D(randomInput + vec2(0.0, 1.0));
+	float p3 = Random2D(randomInput + vec2(1.0, 1.0));
+
+	weights = smoothstep(vec2(0.0, 0.0), vec2(1.0, 1.0), weights);
+
+	return p0 +
+		(p1 - p0) * (weights.x) +
+		(p2 - p0) * (weights.y) * (1.0 - weights.x) +
+		(p3 - p1) * (weights.y * weights.x);
+}
+
+float noiseHeight(in vec2 pos)
+{
+
+	float noiseValue = 0.0;
+
+	float localAplitude = amplitude;
+	float localFrecuency = frecuency;
+
+	for (int index = 0; index < octaves; index++)
+	{
+
+		noiseValue += NoiseInterpolation(pos + time * 0.00511, scale * localFrecuency) * localAplitude;
+		noiseValue += NoiseInterpolation(pos.yx - time * 0.003, scale * localFrecuency) * localAplitude;
+
+		localAplitude /= 2.0;
+		localFrecuency *= 2.0;
+	}
+
+	return noiseValue * 0.000001;
 }
 
 // ================================================================================
@@ -63,10 +114,10 @@ void main()
 
 	// COMPUTE NORMAL
 	float step = 0.001;
-	float tH = cellularNoise(vec2(u, v + step)); //texture(noise, vec2(u, v + step)).r;//noiseHeight(vec2(u, v + step));
-	float bH = cellularNoise(vec2(u, v - step)); //texture(noise, vec2(u, v - step)).r;//noiseHeight(vec2(u, v - step));
-	float rH = cellularNoise(vec2(u + step, v)); //texture(noise, vec2(u + step, v)).r;//noiseHeight(vec2(u + step, v));
-	float lH = cellularNoise(vec2(u - step, v)); //texture(noise, vec2(u - step, v)).r;//noiseHeight(vec2(u - step, v));
+	float tH = noiseHeight(vec2(u, v + step)); //texture(noise, vec2(u, v + step)).r;//noiseHeight(vec2(u, v + step));
+	float bH = noiseHeight(vec2(u, v - step)); //texture(noise, vec2(u, v - step)).r;//noiseHeight(vec2(u, v - step));
+	float rH = noiseHeight(vec2(u + step, v)); //texture(noise, vec2(u + step, v)).r;//noiseHeight(vec2(u + step, v));
+	float lH = noiseHeight(vec2(u - step, v)); //texture(noise, vec2(u - step, v)).r;//noiseHeight(vec2(u - step, v));
 	vec3 rawNormal = normalize(vec3(lH - rH, step * step, bH - tH));
 
 	// Correct normal if we have pass from +X to -X, from +Z to -Z, viceversa, or both
@@ -80,7 +131,7 @@ void main()
 #ifdef WIRE_MODE
 	vec3 color = vec3(0);
 #else
-	vec3 color = vec3(0, 0.298, 0.6);
+	vec3 color = vec3(0, 0.1, 0.2);
 #endif
 
 	// OUTPUT TO G-BUFFERS

@@ -30,6 +30,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -69,7 +70,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -79,7 +80,7 @@
       <AdditionalIncludeDirectories>lib/include;include;testimplementation</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>lib/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>lib/x86/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>FreeImage.lib;opengl32.lib;freeglut.lib;glew32.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -92,8 +93,8 @@
       <AdditionalIncludeDirectories>include;lib/include;testimplementation;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>assimp.lib;freeglut.lib;FreeImage.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>lib/lib;lib/bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>FreeImage.lib;opengl32.lib;freeglut.lib;glew32.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib/x64/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -109,7 +110,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>lib/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>lib/x86/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>FreeImage.lib;opengl32.lib;freeglut.lib;glew32.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -126,8 +127,8 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>assimp.lib;freeglut.lib;FreeImage.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>lib/lib;lib/bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>FreeImage.lib;opengl32.lib;freeglut.lib;glew32.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib/x64/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -178,6 +179,10 @@
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\textures\Texture2D.h" />
     <ClInclude Include="include\textures\TextureCubemap.h" />
+    <ClInclude Include="include\windowmanagers\GLFWWindow.h" />
+    <ClInclude Include="include\windowmanagers\GLUTWindow.h" />
+    <ClInclude Include="include\windowmanagers\WindowManager.h" />
+    <ClInclude Include="include\WindowToolkit.h" />
     <ClInclude Include="testimplementation\AnimImpl.h" />
     <ClInclude Include="testimplementation\PostProcessManager.h" />
   </ItemGroup>
@@ -227,6 +232,9 @@
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\textures\Texture2D.cpp" />
     <ClCompile Include="src\textures\TextureCubemap.cpp" />
+    <ClCompile Include="src\windowmanagers\GLFWWindow.cpp" />
+    <ClCompile Include="src\windowmanagers\GLUTWindow.cpp" />
+    <ClCompile Include="src\windowmanagers\WindowManager.cpp" />
     <ClCompile Include="testimplementation\AnimImpl.cpp" />
     <ClCompile Include="testimplementation\PostProcessManager.cpp" />
   </ItemGroup>

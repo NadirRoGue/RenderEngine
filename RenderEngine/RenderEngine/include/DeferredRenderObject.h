@@ -40,7 +40,7 @@ namespace Engine
 
 		unsigned int getFrameBufferId();
 
-		TextureInstance * addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, float filterMethod = GL_NEAREST);
+		TextureInstance * addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, int filterMethod = GL_NEAREST);
 		TextureInstance * addDepthBuffer24(unsigned int w, unsigned int h);
 		TextureInstance * addDepthBuffer32(unsigned int w, unsigned int h);
 

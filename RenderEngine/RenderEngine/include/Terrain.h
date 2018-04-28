@@ -58,6 +58,8 @@ namespace Engine
 		ProceduralWaterProgram * waterActiveShader;
 
 		Object * tileObject;
+
+		float waterMovementSignal;
 	public:
 		Terrain();
 		Terrain(float tileWidth, unsigned int renderRadius);
@@ -69,6 +71,7 @@ namespace Engine
 	private:
 		void initialize();
 		void createTileMesh();
-		void drawLayer(Engine::Camera * cam, Engine::ProceduralTerrainProgram * program, float yOffset = 0.0f);
+		void drawTerrainLayer(Engine::Camera * cam);
+		void drawWaterLayer(Engine::Camera * cam);
 	};
 }

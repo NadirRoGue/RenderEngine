@@ -64,9 +64,7 @@ float noiseHeight(in vec2 pos)
 		localFrecuency *= 2.0;
 	}
 
-	//noiseValue = noiseValue * 0.5 + 0.5;
-	noiseValue = noiseValue > 0.1? noiseValue * noiseValue *noiseValue: noiseValue > 0.8? noiseValue * 2 : noiseValue;
-	return noiseValue;
+	return noiseValue * noiseValue * noiseValue;
 }
 
 //=======================================================================

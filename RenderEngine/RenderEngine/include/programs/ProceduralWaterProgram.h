@@ -8,9 +8,13 @@ namespace Engine
 	{
 	public:
 		static std::string PROGRAM_NAME;
+	private:
+		unsigned int uTime;
 	public:
 		ProceduralWaterProgram(std::string name, unsigned long long parameters);
 		ProceduralWaterProgram(const ProceduralWaterProgram & other);
+		void configureProgram();
+		void setTimeUniform(float sinTime);
 	};
 
 	// =========================================================
