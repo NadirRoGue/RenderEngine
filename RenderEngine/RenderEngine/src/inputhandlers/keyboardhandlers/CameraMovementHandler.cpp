@@ -6,7 +6,7 @@ Engine::CameraMovement::CameraMovement(Engine::Camera * cam)
 	usedKeys = { 'w', 'a', 's', 'd' };
 }
 
-void Engine::CameraMovement::onKeyPressed(unsigned char key, int x, int y)
+void Engine::CameraMovement::onKeyPressed(unsigned char key, int x, int y, int mode)
 {
 	if (camera == nullptr)
 		return;

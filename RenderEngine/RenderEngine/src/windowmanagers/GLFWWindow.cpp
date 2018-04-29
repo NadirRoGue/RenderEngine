@@ -2,10 +2,13 @@
 
 #include <iostream>
 
+#include "imgui/imgui.h"
+
 #include "Renderer.h"
 #include "Scene.h"
 
 #include "userinterfaces/WorldControllerUI.h"
+#include "WorldConfig.h"
 
 double lastMouseXPos = 0.0, lastMouseYPos = 0.0;
 
@@ -16,8 +19,17 @@ void Engine::Window::defaultGLFWKeyboardCallback(GLFWwindow * window, int key, i
 	{
 		int x = int(floor(lastMouseXPos));
 		int y = int(floor(lastMouseYPos));
-		table->handleKeyPress(key, x, y);
+		table->handleKeyPress(key, x, y, action);
 	}
+
+	ImGuiIO& io = ImGui::GetIO();
+	if (action == GLFW_PRESS)
+	{
+		io.KeysDown[key] = true;
+		io.AddInputCharacter(unsigned short(key));
+	}
+	if (action == GLFW_RELEASE)
+		io.KeysDown[key] = false;
 }
 
 void Engine::Window::defaultGLFWMouseInputCallback(GLFWwindow * window, int button, int action, int mods)
@@ -118,6 +130,8 @@ void Engine::Window::GLFWWindow::mainLoop()
 
 		// Update user interface
 		updateUI();
+
+		Engine::RenderableNotifier::getInstance().checkUpdatedConfig();
 
 		// Process inputs
 		glfwPollEvents();

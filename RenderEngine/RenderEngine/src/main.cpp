@@ -33,7 +33,9 @@
 #include "postprocessprograms/SSAAProgram.h"
 
 #include "inputhandlers/keyboardhandlers/CameraMovementHandler.h"
+#include "inputhandlers/keyboardhandlers/ToggleUIHandler.h"
 #include "inputhandlers/mousehandlers/CameraRotationHandler.h"
+
 
 
 void initOpenGL();
@@ -147,8 +149,10 @@ void initHandlers()
 {
 	// W A S D movement
 	Engine::CameraMovement * cm = new Engine::CameraMovement(Engine::SceneManager::getInstance().getActiveScene()->getCamera());
+	Engine::ToggleUIHandler * uiHandler = new Engine::ToggleUIHandler();
 	Engine::KeyboardHandlersTable * handlers = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
 	handlers->registerHandler(cm);
+	handlers->registerHandler(uiHandler);
 
 	// Mouse pitch & yaw
 	Engine::CameraRotationHandler * camMotion = new Engine::CameraRotationHandler("camera_motion", Engine::SceneManager::getInstance().getActiveScene()->getCamera());

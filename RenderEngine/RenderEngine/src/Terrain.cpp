@@ -6,6 +6,8 @@
 #include "datatables/MeshTable.h"
 #include "datatables/ProgramTable.h"
 
+#include "WorldConfig.h"
+
 #include <cmath>
 
 #include <iostream>
@@ -28,6 +30,8 @@ Engine::Terrain::Terrain(float tileWidth, unsigned int renderRadius)
 	this->tileWidth = tileWidth;
 	this->renderRadius = renderRadius;
 	initialize();
+
+	Engine::RenderableNotifier::getInstance().registerRenderable(this);
 }
 
 Engine::Terrain::Terrain(const Terrain & other)
@@ -93,7 +97,7 @@ void Engine::Terrain::drawWaterLayer(Engine::Camera * camera)
 		{
 			float poxX = i * tileWidth;
 			float posZ = j * tileWidth;
-			tileObject->setTranslation(glm::vec3(poxX, 0.3, posZ));
+			tileObject->setTranslation(glm::vec3(poxX, Engine::Settings::waterHeight * 4.5f, posZ));
 
 			waterActiveShader->setUniformGridPosition(i, j);
 			waterActiveShader->setTimeUniform(waterMovementSignal);

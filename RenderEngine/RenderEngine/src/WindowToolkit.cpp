@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "WorldConfig.h"
+
 // ===================================================================
 
 Engine::Window::WindowToolkit::WindowToolkit(std::string title, unsigned int x, unsigned int y, unsigned int width, unsigned int height)
@@ -59,14 +61,18 @@ void Engine::Window::WindowToolkit::setContextProfile(unsigned int contxtProfile
 
 void Engine::Window::WindowToolkit::addUserInterface(Engine::Window::UserInterface * ui)
 {
+	ui->initialize();
 	userInterfaces.push_back(ui);
 }
 
 void Engine::Window::WindowToolkit::updateUI()
 {
-	for (auto ui : userInterfaces)
+	if (Engine::Settings::showUI)
 	{
-		ui->render(deltaTime);
+		for (auto ui : userInterfaces)
+		{
+			ui->render(deltaTime);
+		}
 	}
 }
 

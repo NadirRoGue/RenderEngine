@@ -2,8 +2,6 @@
 
 #include "UserInterface.h"
 
-#include "GLFW/glfw3.h"
-
 namespace Engine
 {
 	namespace Window

@@ -3,10 +3,14 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "WorldConfig.h"
+
 Engine::DirectionalLight::DirectionalLight(std::string name, glm::vec3 dir)
 	:Engine::Light(name)
 {
 	translate(dir);
+
+	Engine::RenderableNotifier::getInstance().registerLight(this);
 }
 
 Engine::DirectionalLight::~DirectionalLight()

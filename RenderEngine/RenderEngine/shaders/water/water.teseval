@@ -14,6 +14,7 @@ uniform mat4 modelView;
 uniform mat4 modelViewProj;
 
 uniform float time;
+uniform float waterspeed;
 
 // ============================================================================
 
@@ -94,15 +95,15 @@ float noiseHeight(in vec2 pos)
 	for (int index = 0; index < octaves; index++)
 	{
 
-		noiseValue += NoiseInterpolation(pos + time * 0.00511, scale * localFrecuency) * localAplitude;
-		noiseValue += NoiseInterpolation(pos.yx - time * 0.003, scale * localFrecuency) * localAplitude;
+		noiseValue += NoiseInterpolation(pos + time * waterspeed, scale * localFrecuency) * localAplitude;
+		noiseValue += NoiseInterpolation(pos.yx - time * waterspeed, scale * localFrecuency) * localAplitude;
 
 		localAplitude /= 2.0;
 		localFrecuency *= 2.0;
 	}
 
 	
-	return noiseValue * 0.001;
+	return noiseValue * 0.01;
 }
 
 //=======================================================================

@@ -291,6 +291,12 @@
     <ClInclude Include="include\userinterfaces\WorldControllerUI.h">
       <Filter>Archivos de encabezado\userinterfaces</Filter>
     </ClInclude>
+    <ClInclude Include="include\WorldConfig.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\inputhandlers\keyboardhandlers\ToggleUIHandler.h">
+      <Filter>Archivos de encabezado\inputhandlers\keyboardhandlers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -460,6 +466,12 @@
     </ClCompile>
     <ClCompile Include="src\userinterfaces\WorldControllerUI.cpp">
       <Filter>Archivos de origen\userinterfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\inputhandlers\keyboardhandlers\ToggleUIHandler.cpp">
+      <Filter>Archivos de origen\inputhandlers\keyboardhandlers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WorldConfig.cpp">
+      <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

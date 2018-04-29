@@ -14,13 +14,12 @@ layout (location=1) out float height;
 uniform mat4 modelView;
 uniform mat4 modelViewProj;
 
+uniform float amplitude;
+uniform float frecuency;
+uniform float scale;
+uniform int octaves;
+
 // ============================================================================
-
-uniform float amplitude = 0.5;
-uniform float frecuency = 0.5;
-uniform float scale = 1.0;
-uniform float octaves = 8;
-
 float Random2D(in vec2 st)
 {
 	return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);

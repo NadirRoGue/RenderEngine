@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "WorldConfig.h"
+
 std::string Engine::ProceduralTerrainProgram::PROGRAM_NAME = "ProceduralTerrainProgram";
 unsigned long long Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE = 0x01;
 
@@ -27,6 +29,11 @@ Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerra
 	uModelView = other.uModelView;
 	uModelViewProj = other.uModelViewProj;
 	uNormal = other.uNormal;
+
+	uAmplitude = other.uAmplitude;
+	uFrecuency = other.uFrecuency;
+	uScale = other.uScale;
+	uOctaves = other.uOctaves;
 
 	uInPos = other.uInPos;
 	uInUV = other.uInUV;
@@ -82,6 +89,11 @@ void Engine::ProceduralTerrainProgram::configureProgram()
 	uNormal = glGetUniformLocation(glProgram, "normal");
 	uGridPos = glGetUniformLocation(glProgram, "gridPos");
 
+	uAmplitude = glGetUniformLocation(glProgram, "amplitude");
+	uFrecuency = glGetUniformLocation(glProgram, "frecuency");
+	uScale = glGetUniformLocation(glProgram, "scale");
+	uOctaves = glGetUniformLocation(glProgram, "octaves");
+
 	uInPos = glGetAttribLocation(glProgram, "inPos");
 	uInUV = glGetAttribLocation(glProgram, "inUV");
 }
@@ -114,6 +126,11 @@ void Engine::ProceduralTerrainProgram::onRenderObject(const Engine::Object * obj
 	glUniformMatrix4fv(uModelView, 1, GL_FALSE, &(modelView[0][0]));
 	glUniformMatrix4fv(uModelViewProj, 1, GL_FALSE, &(modelViewProj[0][0]));
 	glUniformMatrix4fv(uNormal, 1, GL_FALSE, &(normal[0][0]));
+
+	glUniform1f(uAmplitude, Engine::Settings::terrainAmplitude);
+	glUniform1f(uFrecuency, Engine::Settings::terrainFrecuency);
+	glUniform1f(uScale, Engine::Settings::terrainScale);
+	glUniform1i(uOctaves, Engine::Settings::terrainOctaves);
 
 	unsigned int vertexPerFace = obj->getMesh()->getNumVerticesPerFace();
 	glPatchParameteri(GL_PATCH_VERTICES, vertexPerFace);

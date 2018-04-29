@@ -22,14 +22,12 @@ uniform vec3 sand = vec3(1,1,0.8);
 
 uniform ivec2 gridPos;
 
+uniform float amplitude;
+uniform float frecuency;
+uniform float scale;
+uniform int octaves;
 
 // ================================================================================
-
-uniform float amplitude = 0.5;
-uniform float frecuency = 0.5;
-uniform float scale = 1.0;
-uniform float octaves = 8;
-
 float Random2D(in vec2 st)
 {
 	return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);

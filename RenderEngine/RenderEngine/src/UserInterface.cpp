@@ -9,7 +9,7 @@
 Engine::Window::UserInterface::UserInterface(GLFWwindow * surf)
 	:surface(surf)
 {
-	initialize();
+	setFont("lib/include/imgui/extra_fonts/Roboto-Medium.ttf");
 }
 
 Engine::Window::UserInterface::~UserInterface()
@@ -102,6 +102,8 @@ void Engine::Window::UserInterface::createFontsTexture()
 	unsigned char* pixels;
 	int width, height;
 
+	ImFont * fontPtr = io.Fonts->AddFontFromFileTTF(font.c_str(), 14.0f);
+
 	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more 
 	// likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level 
 	// concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
@@ -121,6 +123,26 @@ void Engine::Window::UserInterface::createFontsTexture()
 
 	// Restore state
 	glBindTexture(GL_TEXTURE_2D, last_texture);
+
+	io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;                         // Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
+	io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
+	io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
+	io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
+	io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
+	io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
+	io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
+	io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
+	io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
+	io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
+	io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
+	io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
+	io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
+	io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
+	io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
+	io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
+	io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
+	io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
+	io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 }
 
 void Engine::Window::UserInterface::initialize()
@@ -231,6 +253,20 @@ void Engine::Window::UserInterface::updateGraphics()
 	if (last_enable_scissor_test) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
 	glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
 	glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
+
+	/*
+	io.AddInputCharacter(unsigned char('0'));
+	io.AddInputCharacter(unsigned char('1'));
+	io.AddInputCharacter(unsigned char('2'));
+	io.AddInputCharacter(unsigned char('3'));
+	io.AddInputCharacter(unsigned char('4'));
+	io.AddInputCharacter(unsigned char('5'));
+	io.AddInputCharacter(unsigned char('6'));
+	io.AddInputCharacter(unsigned char('7'));
+	io.AddInputCharacter(unsigned char('8'));
+	io.AddInputCharacter(unsigned char('9'));
+	io.AddInputCharacter(unsigned char('.'));
+	*/
 }
 
 void Engine::Window::UserInterface::render(double deltaTime)
@@ -337,4 +373,19 @@ void Engine::Window::UserInterface::updateMouseButtonPressed(int button, bool pr
 	{
 		g_MousePressed[button] = pressed;
 	}
+}
+
+void Engine::Window::UserInterface::setFont(std::string fontName)
+{
+	font = fontName;
+}
+
+void Engine::Window::UserInterface::setUIStyle(UIStyle style)
+{
+	uistyle = style;
+}
+
+std::string Engine::Window::UserInterface::getFont()
+{
+	return font;
 }

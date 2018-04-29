@@ -1,16 +1,13 @@
 #pragma once
 
 #include "KeyboardHandler.h"
-#include "Camera.h"
 
 namespace Engine
 {
-	class CameraMovement : public KeyboardHandler
+	class ToggleUIHandler : public KeyboardHandler
 	{
-	private:
-		Camera * camera;
 	public:
-		CameraMovement(Camera * cam);
+		ToggleUIHandler();
 		void onKeyPressed(unsigned char key, int x, int y, int mode);
 	};
 }

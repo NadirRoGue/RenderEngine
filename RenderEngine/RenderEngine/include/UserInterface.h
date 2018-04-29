@@ -3,10 +3,19 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <string>
+
 namespace Engine
 {
 	namespace Window
 	{
+		enum UIStyle
+		{
+			CLASSIC,
+			DARK,
+			LIGHT
+		};
+
 		class UserInterface
 		{
 		private:
@@ -29,6 +38,10 @@ namespace Engine
 			bool g_MousePressed[3];
 
 			GLFWwindow * surface;
+
+		protected:
+			std::string font;
+			UIStyle uistyle;
 		public:
 			UserInterface(GLFWwindow * surf);
 			~UserInterface();
@@ -38,6 +51,11 @@ namespace Engine
 			void release();
 
 			void updateMouseButtonPressed(int button, bool pressed);
+
+			void setFont(std::string name);
+			void setUIStyle(UIStyle style);
+
+			std::string getFont();
 		private:
 			void initializeGraphics();
 			void createFontsTexture();

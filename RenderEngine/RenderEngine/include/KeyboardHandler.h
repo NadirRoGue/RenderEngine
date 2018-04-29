@@ -13,12 +13,16 @@ namespace Engine
 
 	class KeyboardHandler
 	{
+	public:
+		static const int MODE_RELEASE;
+		static const int MODE_PRESS;
+		static const int MODE_REPEAT;
 	protected:
 		std::list<unsigned char> usedKeys;
 	public:
 		KeyboardHandler();
 		const std::list<unsigned char> & getUsedKeys() const;
-		virtual void onKeyPressed(unsigned char key, int x, int y);
+		virtual void onKeyPressed(unsigned char key, int x, int y, int mode);
 	};
 
 	// =========================================================================
@@ -35,7 +39,7 @@ namespace Engine
 		~KeyboardHandlersTable();
 
 		void registerHandler(KeyboardHandler *handler);
-		void handleKeyPress(unsigned char key, int x, int y);
+		void handleKeyPress(unsigned char key, int x, int y, int mode);
 
 		void destroy();
 	};

@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include "instances/TextureInstance.h"
+#include "WorldConfig.h"
 
 std::string Engine::Object::ALBEDO_TEX = "albedo";
 std::string Engine::Object::NORMAL_TEX = "normal";
@@ -29,6 +30,8 @@ Engine::Object::Object(Engine::Mesh * m)
 	albedo = normal = specular = emissive = 0;
 
 	renderMode = GL_TRIANGLES;
+
+	Engine::RenderableNotifier::getInstance().registerRenderable(this);
 }
 
 Engine::Object::~Object()

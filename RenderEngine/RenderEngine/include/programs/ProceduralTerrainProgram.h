@@ -24,6 +24,11 @@ namespace Engine
 		unsigned int uModelViewProj;
 		unsigned int uNormal;
 		unsigned int uGridPos;
+
+		unsigned int uAmplitude;
+		unsigned int uFrecuency;
+		unsigned int uScale;
+		unsigned int uOctaves;
 	public:
 		ProceduralTerrainProgram(std::string name, unsigned long long params);
 		ProceduralTerrainProgram(const ProceduralTerrainProgram & other);

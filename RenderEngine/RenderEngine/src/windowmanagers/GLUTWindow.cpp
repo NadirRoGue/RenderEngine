@@ -21,7 +21,7 @@ void Engine::Window::defaultKeyboardInputCallback(unsigned char key, int x, int 
 	Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
 	if (table != NULL)
 	{
-		table->handleKeyPress(key, x, y);
+		table->handleKeyPress(key, x, y, Engine::KeyboardHandler::MODE_PRESS);
 	}
 
 	Engine::Window::WindowManager::getInstance().getWindowToolkit()->onKeyboardInput(key);

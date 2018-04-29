@@ -142,6 +142,7 @@
     <ClInclude Include="include\DeferredNodeCallbacks.h" />
     <ClInclude Include="include\DeferredRenderObject.h" />
     <ClInclude Include="include\inputhandlers\keyboardhandlers\CameraMovementHandler.h" />
+    <ClInclude Include="include\inputhandlers\keyboardhandlers\ToggleUIHandler.h" />
     <ClInclude Include="include\inputhandlers\mousehandlers\CameraRotationHandler.h" />
     <ClInclude Include="include\instances\TextureInstance.h" />
     <ClInclude Include="include\IRenderable.h" />
@@ -185,6 +186,7 @@
     <ClInclude Include="include\windowmanagers\GLUTWindow.h" />
     <ClInclude Include="include\windowmanagers\WindowManager.h" />
     <ClInclude Include="include\WindowToolkit.h" />
+    <ClInclude Include="include\WorldConfig.h" />
     <ClInclude Include="lib\include\imgui\imconfig.h" />
     <ClInclude Include="lib\include\imgui\imgui.h" />
     <ClInclude Include="lib\include\imgui\imgui_internal.h" />
@@ -206,6 +208,7 @@
     <ClCompile Include="src\DeferredNodeCallbacks.cpp" />
     <ClCompile Include="src\DeferredRenderObject.cpp" />
     <ClCompile Include="src\inputhandlers\keyboardhandlers\CameraMovementHandler.cpp" />
+    <ClCompile Include="src\inputhandlers\keyboardhandlers\ToggleUIHandler.cpp" />
     <ClCompile Include="src\inputhandlers\mousehandlers\CameraRotationHandler.cpp" />
     <ClCompile Include="src\instances\TextureInstance.cpp" />
     <ClCompile Include="src\KeyboardHandler.cpp" />
@@ -249,6 +252,7 @@
     <ClCompile Include="src\windowmanagers\GLUTWindow.cpp" />
     <ClCompile Include="src\windowmanagers\WindowManager.cpp" />
     <ClCompile Include="src\WindowToolkit.cpp" />
+    <ClCompile Include="src\WorldConfig.cpp" />
     <ClCompile Include="testimplementation\AnimImpl.cpp" />
     <ClCompile Include="testimplementation\PostProcessManager.cpp" />
   </ItemGroup>

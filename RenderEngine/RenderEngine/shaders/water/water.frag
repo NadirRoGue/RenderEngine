@@ -15,6 +15,8 @@ uniform mat4 normal;
 uniform ivec2 gridPos;
 
 uniform float time;
+uniform vec3 watercolor;
+uniform float waterspeed;
 
 // ================================================================================
 
@@ -95,8 +97,8 @@ float noiseHeight(in vec2 pos)
 	for (int index = 0; index < octaves; index++)
 	{
 
-		noiseValue += NoiseInterpolation(pos + time * 0.00511, scale * localFrecuency) * localAplitude;
-		noiseValue += NoiseInterpolation(pos.yx - time * 0.003, scale * localFrecuency) * localAplitude;
+		noiseValue += NoiseInterpolation(pos + time * waterspeed, scale * localFrecuency) * localAplitude;
+		noiseValue += NoiseInterpolation(pos.yx - time * waterspeed, scale * localFrecuency) * localAplitude;
 
 		localAplitude /= 2.0;
 		localFrecuency *= 2.0;
@@ -131,7 +133,7 @@ void main()
 #ifdef WIRE_MODE
 	vec3 color = vec3(0);
 #else
-	vec3 color = vec3(0, 0.1, 0.2);
+	vec3 color = watercolor;
 #endif
 
 	// OUTPUT TO G-BUFFERS

@@ -42,17 +42,6 @@ void Engine::SkyBox::render(Engine::Camera * camera)
 	shader->onRenderObject(cubeMesh, camera->getViewMatrix(), camera->getProjectionMatrix());
 	shader->setCubemapUniform(skyCubeMap);
 
-	Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
-
-	const glm::mat4 & modelCopy = dl->getModelMatrix();
-	//modelCopy[3][3] = 0.0f;
-	//glm::mat4 resultPos = camera->getViewMatrix() * modelCopy;
-
-	glm::vec3 direction(modelCopy[3][0], modelCopy[3][1], modelCopy[3][2]);
-	direction = -glm::normalize(direction);
-
-	shader->setLightDirUniform(direction);
-
 	glDrawElements(renderMode, data->getNumFaces() * data->getNumVerticesPerFace(), GL_UNSIGNED_INT, (void*)0);
 }
 
