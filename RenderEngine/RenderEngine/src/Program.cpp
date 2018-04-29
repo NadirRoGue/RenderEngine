@@ -195,6 +195,7 @@ void Engine::ProgramFactory::clean()
 	{
 		it->second->destroy();
 		delete it->second;
+		it++;
 	}
 
 	cache.clear();

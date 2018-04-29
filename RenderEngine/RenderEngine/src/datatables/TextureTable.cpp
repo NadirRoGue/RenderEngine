@@ -193,4 +193,7 @@ void Engine::TextureTable::clean()
 		glDeleteTextures(1, &id);
 		it++;
 	}
+
+	textureTable.clear();
+	std::cout << "Texture table cleared" << std::endl;
 }

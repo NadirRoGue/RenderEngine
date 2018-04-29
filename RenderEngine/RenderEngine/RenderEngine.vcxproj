@@ -81,7 +81,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>lib/x86/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;opengl32.lib;freeglut.lib;glew32.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;opengl32.lib;freeglut.lib;glew32.lib;assimp.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -93,7 +93,7 @@
       <AdditionalIncludeDirectories>include;lib/include;testimplementation;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>FreeImage.lib;opengl32.lib;freeglut.lib;glew32.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;opengl32.lib;freeglut.lib;glew32.lib;assimp.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>lib/x64/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -111,7 +111,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>lib/x86/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;opengl32.lib;freeglut.lib;glew32.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;opengl32.lib;freeglut.lib;glew32.lib;assimp.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -127,7 +127,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>FreeImage.lib;opengl32.lib;freeglut.lib;glew32.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;opengl32.lib;freeglut.lib;glew32.lib;assimp.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>lib/x64/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -179,14 +179,25 @@
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\textures\Texture2D.h" />
     <ClInclude Include="include\textures\TextureCubemap.h" />
+    <ClInclude Include="include\UserInterface.h" />
+    <ClInclude Include="include\userinterfaces\WorldControllerUI.h" />
     <ClInclude Include="include\windowmanagers\GLFWWindow.h" />
     <ClInclude Include="include\windowmanagers\GLUTWindow.h" />
     <ClInclude Include="include\windowmanagers\WindowManager.h" />
     <ClInclude Include="include\WindowToolkit.h" />
+    <ClInclude Include="lib\include\imgui\imconfig.h" />
+    <ClInclude Include="lib\include\imgui\imgui.h" />
+    <ClInclude Include="lib\include\imgui\imgui_internal.h" />
+    <ClInclude Include="lib\include\imgui\stb_rect_pack.h" />
+    <ClInclude Include="lib\include\imgui\stb_textedit.h" />
+    <ClInclude Include="lib\include\imgui\stb_truetype.h" />
     <ClInclude Include="testimplementation\AnimImpl.h" />
     <ClInclude Include="testimplementation\PostProcessManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="lib\include\imgui\imgui.cpp" />
+    <ClCompile Include="lib\include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="lib\include\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\Animation.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\datatables\MeshTable.cpp" />
@@ -232,9 +243,12 @@
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\textures\Texture2D.cpp" />
     <ClCompile Include="src\textures\TextureCubemap.cpp" />
+    <ClCompile Include="src\UserInterface.cpp" />
+    <ClCompile Include="src\userinterfaces\WorldControllerUI.cpp" />
     <ClCompile Include="src\windowmanagers\GLFWWindow.cpp" />
     <ClCompile Include="src\windowmanagers\GLUTWindow.cpp" />
     <ClCompile Include="src\windowmanagers\WindowManager.cpp" />
+    <ClCompile Include="src\WindowToolkit.cpp" />
     <ClCompile Include="testimplementation\AnimImpl.cpp" />
     <ClCompile Include="testimplementation\PostProcessManager.cpp" />
   </ItemGroup>

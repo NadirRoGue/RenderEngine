@@ -75,4 +75,6 @@ void Engine::MeshTable::clean()
 		delete it->second;
 		it++;
 	}
+
+	std::cout << "Mesh table cleared" << std::endl;
 }

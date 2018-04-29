@@ -21,9 +21,7 @@ namespace Engine
 			~WindowManager();
 			
 			void setToolkit(std::unique_ptr<WindowToolkit> toolkit);
-			const WindowToolkit * getWindowToolkit() const;
-
-			void initialize();
+			WindowToolkit * getWindowToolkit();
 		};
 	}
 }

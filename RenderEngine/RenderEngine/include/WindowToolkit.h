@@ -1,6 +1,11 @@
 #pragma once
 
 #include <string>
+#include <GL/glew.h>
+
+#include <list>
+
+#include "UserInterface.h"
 
 namespace Engine
 {
@@ -8,16 +13,42 @@ namespace Engine
 	{
 		class WindowToolkit
 		{
-		public:
-			virtual void initializeOGL() = 0;
-			virtual void initializeContext(std::string title, unsigned int width, unsigned int height) = 0;
+		protected:
+			std::list<UserInterface *> userInterfaces;
 
-			virtual void registerResizeCallback(void * funcPtr) = 0;
-			virtual void registerKeyboardInputCallback(void * funcPtr) = 0;
-			virtual void registerMouseInputCallback(void * funcPtr) = 0;
-			virtual void registerMouseMovementCallback(void * funcPtr) = 0;
-			virtual void registerRenderLoopCallback(void * funcPtr) = 0;
-			virtual void registerIdleCallback(void * funcPtr) = 0;
+			unsigned int contextProfile;
+			unsigned int oglMajorV, oglMinorV;
+			unsigned int windowPosX, windowPosY;
+			unsigned int windowWidth, windowHeight;
+			std::string windowTitle;
+
+			double lastFrameTime;
+			double deltaTime;
+
+		public:
+			WindowToolkit(std::string title, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+			~WindowToolkit();
+			void setOGLVersion(unsigned int major, unsigned int minor);
+			void initializeOGL();
+			void setContextProfile(unsigned int contxtProfile);
+
+			void addUserInterface(UserInterface * ui);
+			void updateUI();
+
+			double getDeltaTime();
+
+			virtual void initializeContext() = 0;
+			virtual void mainLoop() = 0;
+
+			// Optional
+			virtual void onMouseClick(int button, int state) {}
+			virtual void onMouseMove(int x, int y) {}
+			virtual void onKeyboardInput(unsigned char key) { }
+			virtual void onResize(int width, int height) { }
+			virtual void onRenderStart() { }
+			virtual void onRenderEnd() { }
+		protected:
+			void initGlew();
 		};
 	}
 }

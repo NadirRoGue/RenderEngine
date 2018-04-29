@@ -94,6 +94,18 @@
     <Filter Include="Archivos de origen\windowmanagers">
       <UniqueIdentifier>{e7dfc417-dc83-4f63-bc89-60d74dd4d202}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de encabezado\imgui">
+      <UniqueIdentifier>{e81328c1-ae86-460c-ade5-6c5af1834228}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\imgui">
+      <UniqueIdentifier>{c9deb772-1fc4-4b45-bdca-57d9e8677761}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\userinterfaces">
+      <UniqueIdentifier>{6422deb5-d726-43e5-9b7f-32f8476991f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\userinterfaces">
+      <UniqueIdentifier>{7a3abfaf-b2b5-4baa-aa73-b74814eeb999}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Animation.h">
@@ -255,6 +267,30 @@
     <ClInclude Include="include\windowmanagers\WindowManager.h">
       <Filter>Archivos de encabezado\windowmanagers</Filter>
     </ClInclude>
+    <ClInclude Include="include\UserInterface.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\include\imgui\imconfig.h">
+      <Filter>Archivos de encabezado\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\include\imgui\imgui.h">
+      <Filter>Archivos de encabezado\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\include\imgui\imgui_internal.h">
+      <Filter>Archivos de encabezado\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\include\imgui\stb_rect_pack.h">
+      <Filter>Archivos de encabezado\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\include\imgui\stb_textedit.h">
+      <Filter>Archivos de encabezado\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\include\imgui\stb_truetype.h">
+      <Filter>Archivos de encabezado\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\userinterfaces\WorldControllerUI.h">
+      <Filter>Archivos de encabezado\userinterfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -406,6 +442,24 @@
     </ClCompile>
     <ClCompile Include="src\windowmanagers\WindowManager.cpp">
       <Filter>Archivos de origen\windowmanagers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WindowToolkit.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UserInterface.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\include\imgui\imgui_demo.cpp">
+      <Filter>Archivos de origen\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\include\imgui\imgui_draw.cpp">
+      <Filter>Archivos de origen\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\include\imgui\imgui.cpp">
+      <Filter>Archivos de origen\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\userinterfaces\WorldControllerUI.cpp">
+      <Filter>Archivos de origen\userinterfaces</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

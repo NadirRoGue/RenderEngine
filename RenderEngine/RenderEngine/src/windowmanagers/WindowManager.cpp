@@ -1,5 +1,7 @@
 #include "windowmanagers/WindowManager.h"
 
+#include <memory>
+
 Engine::Window::WindowManager * Engine::Window::WindowManager::INSTANCE = new Engine::Window::WindowManager();
 
 Engine::Window::WindowManager & Engine::Window::WindowManager::getInstance()
@@ -20,12 +22,20 @@ Engine::Window::WindowManager::~WindowManager()
 	}
 }
 
-const Engine::Window::WindowToolkit * Engine::Window::WindowManager::getWindowToolkit() const
+Engine::Window::WindowToolkit * Engine::Window::WindowManager::getWindowToolkit()
 {
 	return currentToolkit.get();
 }
 
-void Engine::Window::WindowManager::initialize()
+void Engine::Window::WindowManager::setToolkit(std::unique_ptr<Engine::Window::WindowToolkit> win)
 {
+	Engine::Window::WindowToolkit * cleanUp = currentToolkit.release();
+	if (cleanUp != nullptr)
+	{
+		delete cleanUp;
+	}
 
+	currentToolkit = std::move(win);
+	currentToolkit->initializeContext();
+	currentToolkit->initializeOGL();
 }

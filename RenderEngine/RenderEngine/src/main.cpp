@@ -1,63 +1,44 @@
 #include <windows.h>
 
-#include <gl/glew.h>
+
+#include "windowmanagers/GLUTWindow.h"
+#include "windowmanagers/GLFWWindow.h"
+#include "windowmanagers/WindowManager.h"
+
+#include "userinterfaces/WorldControllerUI.h"
+
 #define SOLVE_FGLUT_WARNING
 #include <gl/freeglut.h> 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
-#include <vector>
 
-#include "StorageTable.h"
 #include "Scene.h"
-#include "datatables/ProgramTable.h"
-#include "PostProcessProgram.h"
-#include "datatables/MeshTable.h"
-#include "datatables/TextureTable.h"
-#include "postprocessprograms/DeferredShadingProgram.h"
-#include "postprocessprograms/SSAAProgram.h"
-#include "defaultobjects/Cube.h"
-#include "defaultobjects/Plane.h"
-#include "Texture.h"
-#include "Light.h"
-#include "KeyboardHandler.h"
-#include "MouseHandler.h"
 #include "Renderer.h"
 #include "PostProcessManager.h"
-#include "DeferredRenderObject.h"
 #include "Terrain.h"
 
+#include "StorageTable.h"
+#include "datatables/ProgramTable.h"
+#include "datatables/MeshTable.h"
+#include "datatables/TextureTable.h"
+
+#include "defaultobjects/Cube.h"
+#include "defaultobjects/Plane.h"
+
+#include "programs/ProceduralTerrainProgram.h"
 #include "programs/ProceduralWaterProgram.h"
+#include "postprocessprograms/DeferredShadingProgram.h"
+#include "postprocessprograms/SSAAProgram.h"
 
 #include "inputhandlers/keyboardhandlers/CameraMovementHandler.h"
 #include "inputhandlers/mousehandlers/CameraRotationHandler.h"
-#include "AnimImpl.h"
-#include <chrono>
-
-#define DEBUG_FPS
 
 
-//////////////////////////////////////////////////////////////
-// Funciones auxiliares
-//////////////////////////////////////////////////////////////
-
-//Declaración de CB
-void renderFunc();
-void resizeFunc(int width, int height);
-void idleFunc();
-void keyboardFunc(unsigned char key, int x, int y);
-void mouseFunc(int button, int state, int x, int y);
-void motionFunc(int x, int y);
-
-//Funciones de inicialización y destrucción
-void initContext(int argc, char** argv);
-void initOGL();
-
+void initOpenGL();
 void initScene();
-void initShaderTable();
-void initMeshesAssets();
+void initTables();
 void initSceneObj();
 void initHandlers();
 void initRenderEngine();
@@ -71,19 +52,16 @@ void destroy();
 
 int main(int argc, char** argv)
 {
-	std::locale::global(std::locale("spanish"));// acentos ;)
+	std::locale::global(std::locale("spanish")); // acentos ;)
 
-	initContext(argc, argv);
-	initOGL();
-
+	initOpenGL();
 	initScene();
-	initShaderTable();
-	initMeshesAssets();
+	initTables();
 	initRenderEngine();
 	initSceneObj();
 	initHandlers();
 	
-	glutMainLoop();
+	Engine::Window::WindowManager::getInstance().getWindowToolkit()->mainLoop();
 
 	destroy();
 
@@ -93,48 +71,16 @@ int main(int argc, char** argv)
 // ======================================================================
 // ======================================================================
 
-void initContext(int argc, char** argv)
+void initOpenGL()
 {
-	glutInit(&argc, argv);
-	glutInitContextVersion(4, 1);
-	glutInitContextProfile(GLUT_CORE_PROFILE);
-	
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-	glutInitWindowSize(1024, 1024);
-	glutInitWindowPosition(0, 0);
-	glutCreateWindow("Prácticas GLSL");
+	//std::unique_ptr<Engine::Window::GLUTWindow> win = std::make_unique<Engine::Window::GLUTWindow>("Procedural World", 0, 0, 1024, 1024);
+	std::unique_ptr<Engine::Window::GLFWWindow> win = std::make_unique<Engine::Window::GLFWWindow>("Procedural World", 0, 30, 1024, 1024);
+	win->setOGLVersion(4, 1);
+	//win->setContextProfile(GLUT_CORE_PROFILE);
+	win->setContextProfile(GLFW_OPENGL_CORE_PROFILE);
+	//win->setDisplayFlags(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 
-	glewExperimental = GL_TRUE;
-	GLenum err = glewInit();
-	if (GLEW_OK != err)
-	{
-		std::cout << "Error: " << glewGetErrorString(err) << std::endl;
-		exit(-1);
-	}
-	
-	const GLubyte *oglVersion = glGetString(GL_VERSION);
-	std::cout << "This system supports OpenGL Version: " << oglVersion << std::endl;
-
-	glutReshapeFunc(resizeFunc);
-	glutDisplayFunc(renderFunc);
-	glutIdleFunc(idleFunc);
-	glutKeyboardFunc(keyboardFunc);
-	glutMouseFunc(mouseFunc);
-	glutMotionFunc(motionFunc);
-}
-
-void initOGL()
-{
-	glEnable(GL_DEPTH_TEST);
-	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-	glFrontFace(GL_CCW);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glEnable(GL_CULL_FACE);
-}
-
-void destroy()
-{
-	Engine::TableManager::getInstance().cleanUp();
+	Engine::Window::WindowManager::getInstance().setToolkit(std::move(win));
 }
 
 void initScene()
@@ -145,7 +91,7 @@ void initScene()
 
 
 	Engine::Camera * camera = new Engine::Camera(0.1f, 1000.0f, 45.0f, 45.0f);
-	camera->translateView(glm::vec3(5.0f, -5.0f, 5.0f));
+	camera->translateView(glm::vec3(30.0f, -5.0f, -50.0f));
 	camera->rotateView(glm::vec3(glm::radians(30.0f), glm::radians(60.0f), 0.0f));
 
 	// Parameters: name, direction
@@ -162,20 +108,10 @@ void initScene()
 	Engine::SceneManager::getInstance().activateScene("scene_0");
 }
 
-void initShaderTable()
+void initTables()
 {
-	
+	// Texture table
 	Engine::TextureTable::getInstance().checkForAnisotropicFilterSupport();
-
-	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::PostProcessProgram::PROGRAM_NAME, new Engine::PostProcessProgramFactory());
-	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::DeferredShadingProgram::PROGRAM_NAME, new Engine::DeferredShadingProgramFactory());
-	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::ProceduralTerrainProgram::PROGRAM_NAME, new Engine::ProceduralTerrainProgramFactory());
-	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::ProceduralWaterProgram::PROGRAM_NAME, new Engine::ProceduralWaterProgramFactory());
-	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SkyProgram::PROGRAM_NAME, new Engine::SkyProgramFactory());
-}
-
-void initMeshesAssets()
-{
 	Engine::CubemapLoadData data;
 	data.rightFace = "img/skyboxes/Daylight_Box_Right.png";
 	data.leftFace = "img/skyboxes/Daylight_Box_Left.png";
@@ -185,6 +121,14 @@ void initMeshesAssets()
 	data.backFace = "img/skyboxes/Daylight_Box_Back.png";
 	Engine::TextureTable::getInstance().cacheCubemapTexture(data, "DaylightCubemap");
 
+	// Shader table
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::PostProcessProgram::PROGRAM_NAME, new Engine::PostProcessProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::DeferredShadingProgram::PROGRAM_NAME, new Engine::DeferredShadingProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::ProceduralTerrainProgram::PROGRAM_NAME, new Engine::ProceduralTerrainProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::ProceduralWaterProgram::PROGRAM_NAME, new Engine::ProceduralWaterProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SkyProgram::PROGRAM_NAME, new Engine::SkyProgramFactory());
+
+	// Mesh table
 	Engine::MeshTable::getInstance().addMeshToCache("cube", Engine::CreateCube());
 	Engine::MeshTable::getInstance().addMeshToCache("plane", Engine::CreatePlane());
 }
@@ -201,13 +145,13 @@ void initSceneObj()
 
 void initHandlers()
 {
+	// W A S D movement
 	Engine::CameraMovement * cm = new Engine::CameraMovement(Engine::SceneManager::getInstance().getActiveScene()->getCamera());
-
 	Engine::KeyboardHandlersTable * handlers = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
 	handlers->registerHandler(cm);
 
+	// Mouse pitch & yaw
 	Engine::CameraRotationHandler * camMotion = new Engine::CameraRotationHandler("camera_motion", Engine::SceneManager::getInstance().getActiveScene()->getCamera());
-	
 	Engine::MouseEventManager * mouseHandler = Engine::SceneManager::getInstance().getActiveScene()->getMouseHandler();
 	mouseHandler->registerMouseMotionHandler(camMotion);
 }
@@ -215,73 +159,11 @@ void initHandlers()
 void initRenderEngine()
 {
 	Engine::DeferredRenderer * dr = Engine::TestImplementation::createDeferredRendererWithDoF();
-
 	Engine::RenderManager::getInstance().setRenderer(dr);
-	
 	Engine::RenderManager::getInstance().doResize(1024, 1024);
 }
 
-void renderFunc()
+void destroy()
 {
-#ifdef DEBUG_FPS
-	std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
-#endif
-	Engine::RenderManager::getInstance().doRender();
-
-#ifdef DEBUG_FPS
-	std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
-
-	auto duration = end - now;
-	auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() / 1000.0;
-	auto fps = 1.0 / millis;
-	printf("\rFPS: %05.0f", fps);
-#endif
-	glutSwapBuffers();
-
-
-}
-
-void resizeFunc(int width, int height)
-{
-	Engine::SceneManager::getInstance().getActiveScene()->onViewportResize(width, height);
-	Engine::RenderManager::getInstance().doResize(width, height);
-	glViewport(0, 0, width, height);
-}
-
-void idleFunc()
-{
-	Engine::SceneManager::getInstance().getActiveScene()->getAnimationHandler()->tick();
-	glutPostRedisplay();
-}
-
-void keyboardFunc(unsigned char key, int x, int y)
-{
-	Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
-	if (table != NULL)
-	{
-		table->handleKeyPress(key, x, y);
-	}
-}
-
-void mouseFunc(int button, int state, int x, int y)
-{
-	// Left button = 0
-	// Pressed = 0
-	// Released = 0
-	Engine::MouseEventManager * manager = Engine::SceneManager::getInstance().getActiveScene()->getMouseHandler();
-	if (manager != NULL)
-	{
-		manager->handleMouseClick(button, state, x, y);
-	}
-}
-
-void motionFunc(int x, int y)
-{
-	// xMin, yMin = 0,0 (top-left corner)
-	// xMax, yMax = width,height (bottom-right corner)
-	Engine::MouseEventManager * manager = Engine::SceneManager::getInstance().getActiveScene()->getMouseHandler();
-	if (manager != NULL)
-	{
-		manager->handleMouseMotion(x, y);
-	}
+	Engine::TableManager::getInstance().cleanUp();
 }

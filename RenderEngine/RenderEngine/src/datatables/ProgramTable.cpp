@@ -52,9 +52,13 @@ void Engine::ProgramTable::clean()
 	std::map<std::string, Engine::ProgramFactory *>::iterator it = table.begin();
 	while (it != table.end())
 	{
-		it->second->clean();
-		delete it->second;
+		if (it->second != NULL)
+		{
+			it->second->clean();
+			delete it->second;
+		}
 		it++;
 	}
 	table.clear();
+	std::cout << "Program table cleared" << std::endl;
 }
