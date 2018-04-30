@@ -7,7 +7,7 @@ std::string Engine::GaussianBlurProgram::PROGRAM_NAME = "GaussianBlurProgram";
 Engine::GaussianBlurProgram::GaussianBlurProgram(std::string name, unsigned long long params)
 	:Engine::PostProcessProgram(name, params)
 {
-	fShaderFile = "shaders/postProcessing.GaussianBlur.frag";
+	fShaderFile = "shaders/postprocess/postProcessing.GaussianBlur.frag";
 	affectedTexels = kernel = 0;
 }
 

@@ -55,7 +55,7 @@ void Engine::SkyProgram::onRenderObject(const Engine::Object * obj, const glm::m
 	direction = -glm::normalize(direction);
 	glUniform3fv(uLightDir, 1, &direction[0]);
 
-	glUniform3fv(uLightColor, 1, dl->getDiffuseIntensity());
+	glUniform3fv(uLightColor, 1, dl->getData().color);
 }
 
 void Engine::SkyProgram::setCubemapUniform(Engine::TextureInstance * t)

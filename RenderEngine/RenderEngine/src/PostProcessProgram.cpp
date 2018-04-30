@@ -15,8 +15,8 @@ std::string Engine::PostProcessProgram::PROGRAM_NAME = "PostProcessProgram";
 Engine::PostProcessProgram::PostProcessProgram(std::string name, unsigned long long params)
 	:Engine::Program(name, params)
 {
-	vShaderFile = "shaders/postProcessing.v0.vert";
-	fShaderFile = "shaders/postProcessing.v0.frag";
+	vShaderFile = "shaders/postprocess/postProcessing.v0.vert";
+	fShaderFile = "shaders/postprocess/postProcessing.v0.frag";
 }
 
 Engine::PostProcessProgram::PostProcessProgram(unsigned long long params)
@@ -63,35 +63,6 @@ void Engine::PostProcessProgram::configureMeshBuffers(Engine::Mesh * data)
 	glBindBuffer(GL_ARRAY_BUFFER, data->vboUVs);
 	glVertexAttribPointer(inTexCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(inTexCoord);
-}
-
-void Engine::PostProcessProgram::configureClearColor(const glm::vec3 & cc)
-{
-	// Does nothing
-}
-
-void Engine::PostProcessProgram::onRenderLight(const glm::mat4 & model, const glm::mat4 & view)
-{
-}
-
-void Engine::PostProcessProgram::onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view)
-{
-}
-
-void Engine::PostProcessProgram::onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view)
-{
-}
-
-void Engine::PostProcessProgram::configurePointLightBuffer(const Engine::PointLight *pl)
-{
-}
-
-void Engine::PostProcessProgram::configureSpotLightBuffer(const Engine::SpotLight *sl)
-{
-}
-
-void Engine::PostProcessProgram::configureDirectionalLightBuffer(const Engine::DirectionalLight *dl)
-{
 }
 
 void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)

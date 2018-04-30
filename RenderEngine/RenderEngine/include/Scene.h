@@ -48,8 +48,6 @@ namespace Engine
 		Terrain * terrain;
 		SkyBox * skybox;
 
-		std::list<Program *> lightDependentPrograms;
-
 		glm::vec3 clearColor;
 
 	public:
@@ -57,9 +55,15 @@ namespace Engine
 		~Scene();
 
 		const std::map<std::string, ProgramRenderables *> & getObjects() const;
+
+		void addPointLight(PointLight * pl);
+		void addSpotLight(SpotLight * sl);
+		void setDirectionalLight(DirectionalLight * dl);
 		const std::map<std::string, PointLight *> & getPointLights() const;
 		const std::map<std::string, SpotLight *> & getSpotLights() const;
-		const std::map<std::string, DirectionalLight *> getDirectionalLight() const;
+		PointLight * getLightByName(std::string name);
+		SpotLight * getSpotLightByName(std::string name);
+		DirectionalLight * getDirectionalLight();
 		
 		void setTerrain(Terrain * terrain);
 		Terrain * getTerrain();
@@ -68,17 +72,8 @@ namespace Engine
 		void setCamera(Camera * cam);
 		Camera * getCamera();
 		void addObject(Object * obj);
-		void addLightDependentProgram(Program * prog);
 
-		void addPointLight(PointLight * pl);
-		void addSpotLight(SpotLight * sl);
-		void setDirectionalLight(DirectionalLight * dl);
-
-		PointLight * getLightByName(std::string name);
-		SpotLight * getSpotLightByName(std::string name);
-		DirectionalLight * getDirectionalLight();
-
-		void triggerLightUpdate(PointLight *pl);
+		
 
 		void setClearColor(glm::vec3 cc);
 		const glm::vec3 & getClearColor() const;
@@ -88,8 +83,6 @@ namespace Engine
 		KeyboardHandlersTable * getKeyboardHandler() const;
 		MouseEventManager * getMouseHandler() const;
 		AnimationTable * getAnimationHandler() const;
-	private:
-		void configureNewProgramLights(Program * p);
 	};
 
 	// =====================================================================

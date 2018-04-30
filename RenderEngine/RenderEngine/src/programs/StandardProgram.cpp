@@ -75,6 +75,7 @@ void Engine::StandarProgram::configureProgram()
 	inTangent = glGetAttribLocation(glProgram, "inTangent");
 }
 
+/*
 void Engine::StandarProgram::onRenderLight(const glm::mat4 & model, const glm::mat4 & view)
 {
 	glm::mat4 result = view * model;
@@ -121,7 +122,7 @@ void Engine::StandarProgram::onRenderDirectionalLight(const glm::mat4 & model, c
 
 	glUniform3fv(uDirectionalLightDir, 1, &position[0]);
 }
-
+*/
 void Engine::StandarProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
 {
 	glm::mat4 modelView = view * obj->getModelMatrix();
@@ -170,7 +171,7 @@ void Engine::StandarProgram::configureMeshBuffers(Engine::Mesh * data)
 		glEnableVertexAttribArray(inTangent);
 	}
 }
-
+/*
 void Engine::StandarProgram::configurePointLightBuffer(const Engine::PointLight *pl)
 {
 	glUseProgram(glProgram);
@@ -205,7 +206,7 @@ void Engine::StandarProgram::configureClearColor(const glm::vec3 & cc)
 	float backgroundColor[3] = { cc.x, cc.y, cc.z };
 	glUniform3fv(uBackground, 1, &backgroundColor[0]);
 }
-
+*/
 // ============================================================================
 
 Engine::Program * Engine::StandarProgramFactory::createProgram(unsigned long long parameters)

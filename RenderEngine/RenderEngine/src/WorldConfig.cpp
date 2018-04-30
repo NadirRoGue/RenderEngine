@@ -67,7 +67,7 @@ void Engine::RenderableNotifier::checkUpdatedConfig()
 		for (auto light : lights)
 		{
 			light->translate(previousLightDir);
-			light->setDiffuseIntensity(r, g, b);
+			light->setColor(r, g, b);
 		}
 	}
 }

@@ -4,27 +4,38 @@
 
 namespace Engine
 {
+	typedef struct SpotLightData
+	{
+		float position[4];
+		float direction[4]; // 0 - 2: direction, 3: aperture
+		float color[4];
+		float attenuation[4];
+		float kFactors[4];  // 0 - 2: Ka, Kd, Ks
+	} SpotLightData;
+
 	class SpotLight : public Light
 	{
 	private:
-		glm::vec3 direction;
-		float appertureAngle;
-		float m;
-		float attenuationFactor[3];
+		SpotLightData shaderData;
 
 		glm::mat4 dirMatrix;
 	public:
-		SpotLight(std::string name, glm::vec3 pos, glm::vec3 dir, float apperture, float m);
-		SpotLight(std::string name, glm::vec3 pos, glm::vec3 dir, float apperture, float m, glm::vec3 attenuation);
+		SpotLight(std::string name);
 		~SpotLight();
 
-		const glm::vec3 getPosition() const;
-		const glm::vec3 getDirection() const;
-		const float * getAttenuationFactor() const;
-		const float getAppertureAngle() const;
-		const float getM() const;
-
 		const glm::mat4 & getDirModelMatrix() const;
+
+		void setAttenuation(const glm::vec3 & att);
+		void setPosition(const glm::vec3 & pos);
+		void setDirection(const glm::vec3 & dir);
+		void setApperture(float app);
+		void setM(float m);
+		void setColor(float r, float g, float b);
+		void setKa(float a);
+		void setKd(float d);
+		void setKs(float s);
+
+		SpotLightData & getData();
 
 		void translate(const glm::vec3 & translation);
 		void directTo(const glm::vec3 & dir);

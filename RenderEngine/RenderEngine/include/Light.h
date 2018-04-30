@@ -15,14 +15,10 @@ namespace Engine
 	private:
 		bool enabled;
 		std::string name;
-
+		unsigned int bufferIndex;
 	protected:
-
 		glm::mat4 modelMatrix;
-
-		float ambientIntensity[3];
-		float diffuseIntensity[3];
-		float specularIntensity[3];
+		bool update;
 	public:
 		Light(std::string name);
 		~Light();
@@ -32,18 +28,19 @@ namespace Engine
 		void setEnabled(bool val);
 		const bool isEnabled() const;
 
-		void setAmbientIntensity(float r, float g, float b);
-		void setDiffuseIntensity(float r, float g, float b);
-		void setSpecularIntensity(float r, float g, float b);
-
-		const float * getAmbientIntensity() const;
-		const float * getDiffuseIntensity() const;
-		const float * getSpecularIntensity() const;
-
-		void modifyIntensity(float deltaR, float deltaG, float deltaB);
+		virtual void setColor(float r, float g, float b) = 0;
+		virtual void setKa(float a) = 0;
+		virtual void setKd(float d) = 0;
+		virtual void setKs(float s) = 0;
 
 		virtual void translate(const glm::vec3 & translation) = 0;
 
 		const glm::mat4 & getModelMatrix() const;
+
+		bool requiresUpdate();
+		void clearUpdateFlag();
+
+		void setBufferIndex(unsigned int bi);
+		unsigned int getBufferIndex();
 	};
 }

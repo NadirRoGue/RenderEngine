@@ -27,42 +27,13 @@ void Engine::ForwardRenderer::doRender()
 
 	const std::map<std::string, Engine::ProgramRenderables *> renders = scene->getObjects();
 
-	const std::map<std::string, Engine::PointLight *> pointLights = scene->getPointLights();
-	const std::map<std::string, Engine::SpotLight *> spotLights = scene->getSpotLights();
-	Engine::DirectionalLight * dl = scene->getDirectionalLight();
-
 	std::map<std::string, Engine::ProgramRenderables *>::const_iterator renderableIt;
 	for (renderableIt = renders.cbegin(); renderableIt != renders.cend(); renderableIt++)
 	{
 		// Stablish program to use
-		// changing program is expensive -> https://www.opengl.org/discussion_boards/showthread.php/185615-cheep-expensive-calls
+		// changing program is expensive -> 
+		// https://www.opengl.org/discussion_boards/showthread.php/185615-cheep-expensive-calls
 		glUseProgram(renderableIt->second->program->getProgramId());
-
-		/*
-		if (Engine::RenderManager::getInstance().isForwardRendering())
-		{
-			std::map<std::string, Engine::PointLight *>::const_iterator it = pointLights.cbegin();
-			while (it != pointLights.end())
-			{
-				renderableIt->second->program->onRenderLight(it->second->getModelMatrix(), activeCam->getViewMatrix());
-				it++;
-			}
-
-			std::map<std::string, Engine::SpotLight *>::const_iterator slIt = spotLights.cbegin();
-			while (slIt != spotLights.end())
-			{
-				renderableIt->second->program->onRenderSpotLight(slIt->second->getModelMatrix(), slIt->second->getDirModelMatrix(), activeCam->getViewMatrix());
-				slIt++;
-			}
-
-			std::map<std::string, Engine::DirectionalLight *>::const_iterator dlIt = directionalLights.cbegin();
-			while (dlIt != directionalLights.end())
-			{
-				renderableIt->second->program->onRenderDirectionalLight(dlIt->second->getModelMatrix(), activeCam->getViewMatrix());
-				dlIt++;
-			}
-		}
-		*/
 
 		renderProgram(activeCam, renderableIt->second);
 	}

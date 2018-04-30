@@ -156,9 +156,6 @@
     <ClInclude Include="testimplementation\AnimImpl.h">
       <Filter>Archivos de encabezado\testimplementation</Filter>
     </ClInclude>
-    <ClInclude Include="testimplementation\PostProcessManager.h">
-      <Filter>Archivos de encabezado\testimplementation</Filter>
-    </ClInclude>
     <ClInclude Include="include\Material.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
@@ -297,6 +294,9 @@
     <ClInclude Include="include\inputhandlers\keyboardhandlers\ToggleUIHandler.h">
       <Filter>Archivos de encabezado\inputhandlers\keyboardhandlers</Filter>
     </ClInclude>
+    <ClInclude Include="include\LightBufferManager.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -348,9 +348,6 @@
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="testimplementation\AnimImpl.cpp">
-      <Filter>Archivos de origen\testimplementation</Filter>
-    </ClCompile>
-    <ClCompile Include="testimplementation\PostProcessManager.cpp">
       <Filter>Archivos de origen\testimplementation</Filter>
     </ClCompile>
     <ClCompile Include="src\Material.cpp">
@@ -471,6 +468,9 @@
       <Filter>Archivos de origen\inputhandlers\keyboardhandlers</Filter>
     </ClCompile>
     <ClCompile Include="src\WorldConfig.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LightBufferManager.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>

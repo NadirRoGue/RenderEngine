@@ -48,16 +48,16 @@ namespace Engine
 		StandarProgram(std::string name, unsigned long long params);
 		StandarProgram(const StandarProgram & other);
 		virtual void configureProgram();
-		void onRenderLight(const glm::mat4 & model, const glm::mat4 & view);
-		void onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view);
-		void onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view);
+		//void onRenderLight(const glm::mat4 & model, const glm::mat4 & view);
+		//void onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view);
+		//void onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view);
 		virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
 		void configureMeshBuffers(Mesh * mesh);
 
-		void configureClearColor(const glm::vec3 & cc);
-		void configurePointLightBuffer(const PointLight *pl);
-		void configureSpotLightBuffer(const SpotLight *pl);
-		void configureDirectionalLightBuffer(const DirectionalLight *dl);
+		//void configureClearColor(const glm::vec3 & cc);
+		//void configurePointLightBuffer(const PointLight *pl);
+		//void configureSpotLightBuffer(const SpotLight *pl);
+		//void configureDirectionalLightBuffer(const DirectionalLight *dl);
 	};
 
 	class StandarProgramFactory : public ProgramFactory

@@ -53,11 +53,6 @@ Engine::Scene::~Scene()
 void Engine::Scene::setClearColor(glm::vec3 cc)
 {
 	clearColor = cc;
-	std::map<std::string, Engine::ProgramRenderables *>::const_iterator renderableIt;
-	for (renderableIt = renders.cbegin(); renderableIt != renders.cend(); renderableIt++)
-	{
-		renderableIt->second->program->configureClearColor(clearColor);
-	}
 }
 
 const glm::vec3 & Engine::Scene::getClearColor() const
@@ -101,8 +96,6 @@ void Engine::Scene::addObject(Engine::Object *obj)
 			return;
 		}
 
-		configureNewProgramLights(prog);
-
 		Engine::ProgramRenderables * renderable = new Engine::ProgramRenderables(prog);
 		renderable->objects[vaoIndex].push_back(obj);
 		renders[material] = renderable;
@@ -113,47 +106,14 @@ void Engine::Scene::addObject(Engine::Object *obj)
 	}
 }
 
-void Engine::Scene::addLightDependentProgram(Engine::Program * prog)
-{
-	lightDependentPrograms.push_back(prog);
-}
-
-void Engine::Scene::configureNewProgramLights(Engine::Program * p)
-{
-	std::map<std::string, Engine::PointLight *>::iterator it = pointLights.begin();
-	while (it != pointLights.end())
-	{
-		p->configurePointLightBuffer(it->second);
-		it++;
-	}
-
-	std::map<std::string, Engine::SpotLight *>::iterator sIt = spotLights.begin();
-	while (sIt != spotLights.end())
-	{
-		p->configureSpotLightBuffer(sIt->second);
-		sIt++;
-	}
-
-	p->configureDirectionalLightBuffer(directionalLight);
-}
-
 void Engine::Scene::addPointLight(Engine::PointLight * pl)
 {
 	pointLights[pl->getName()] = pl;
-
-	triggerLightUpdate(pl);
 }
 
 void Engine::Scene::addSpotLight(Engine::SpotLight * sl)
 {
 	spotLights[sl->getName()] = sl;
-
-	std::map<std::string, Engine::ProgramRenderables *>::iterator it = renders.begin();
-	while (it != renders.end())
-	{
-		it->second->program->configureSpotLightBuffer(sl);
-		it++;
-	}
 }
 
 void Engine::Scene::setDirectionalLight(Engine::DirectionalLight * dl)
@@ -164,23 +124,6 @@ void Engine::Scene::setDirectionalLight(Engine::DirectionalLight * dl)
 	}
 
 	directionalLight = dl;
-}
-
-void Engine::Scene::triggerLightUpdate(PointLight *pl)
-{
-	std::map<std::string, Engine::ProgramRenderables *>::iterator it = renders.begin();
-	while (it != renders.end())
-	{
-		it->second->program->configurePointLightBuffer(pl);
-		it++;
-	}
-
-	std::list<Engine::Program *>::iterator it2 = lightDependentPrograms.begin();
-	while (it2 != lightDependentPrograms.end())
-	{
-		(*it2)->configurePointLightBuffer(pl);
-		it2++;
-	}
 }
 
 Engine::PointLight * Engine::Scene::getLightByName(std::string name)

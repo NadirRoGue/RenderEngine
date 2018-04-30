@@ -36,15 +36,7 @@ namespace Engine
 
 		virtual void configureProgram();
 		void configureMeshBuffers(Mesh * mesh);
-		virtual void configureClearColor(const glm::vec3 & cc);
 
-		virtual void configurePointLightBuffer(const PointLight *pl);
-		virtual void configureSpotLightBuffer(const SpotLight *pl);
-		virtual void configureDirectionalLightBuffer(const DirectionalLight *dl);
-
-		virtual void onRenderLight(const glm::mat4 & model, const glm::mat4 & view);
-		virtual void onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view);
-		virtual void onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view);
 		virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
 	};
 

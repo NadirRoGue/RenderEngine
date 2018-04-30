@@ -1,39 +1,75 @@
 #include "postprocessprograms/DeferredShadingProgram.h"
 
+#include "Scene.h"
+
 std::string Engine::DeferredShadingProgram::PROGRAM_NAME = "DeferredShadingProgram";
 
 Engine::DeferredShadingProgram::DeferredShadingProgram(std::string name, unsigned long long params)
 	:Engine::PostProcessProgram(name, params)
 {
-	fShaderFile = "shaders/DeferredShading.frag";
+	fShaderFile = "shaders/postprocess/DeferredShading.frag";
 }
 
 Engine::DeferredShadingProgram::DeferredShadingProgram(const Engine::DeferredShadingProgram & other)
 	: Engine::PostProcessProgram(other)
 {
-	uPointLightPos = other.uPointLightPos;
-	uIa = other.uIa;
-	uId = other.uId;
-	uIs = other.uIs;
-	uPLattenuation = other.uPLattenuation;
-
-	uSpotLightPos = other.uSpotLightPos;
-	uSpotLightDir = other.uSpotLightDir;
-	uSLIa = other.uSLIa;
-	uSLId = other.uSLId;
-	uSLIs = other.uSLIs;
-	uSLapperture = other.uSLapperture;
-	uSLm = other.uSLm;
-	uSLattenuation = other.uSLattenuation;
-
 	uDirectionalLightDir = other.uDirectionalLightDir;
 	uDLIa = other.uDLIa;
 	uDLId = other.uDLId;
 	uDLIs = other.uDLIs;
 
+	uDLBuffer = other.uDLBuffer;
+	uPLBuffer = other.uPLBuffer;
+	uSLBuffer = other.uSLBuffer;
+
 	uBackground = other.uBackground;
 }
 
+void Engine::DeferredShadingProgram::initializeLightBuffers()
+{
+
+	lightBufferInitialized = true;
+}
+
+void Engine::DeferredShadingProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+{
+	// FIXME - UGLY INITIALIZATION
+	if (!lightBufferInitialized)
+		initializeLightBuffers();
+
+	Engine::PostProcessProgram::onRenderObject(obj, view, proj);
+
+	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
+	if (scene != 0)
+	{
+		Engine::DirectionalLight * dl = scene->getDirectionalLight();
+
+		static float IA[3] = { 0.15f, 0.15f, 0.15f };
+		static float ID[3] = { 1.f, 1.f, 1.f };
+
+		glUniform3fv(uDLIa, 1, IA);
+		glUniform3fv(uDLId, 1, ID);
+		glUniform3fv(uDLIs, 1, ID);
+
+		glm::mat4 modelCopy = dl->getModelMatrix();
+		modelCopy[3][3] = 0.0f;
+		glm::mat4 resultPos = view * modelCopy;
+
+		glm::vec3 direction(resultPos[3][0], resultPos[3][1], resultPos[3][2]);
+		direction = glm::normalize(direction);
+
+		float position[3];
+		position[0] = direction.x;
+		position[1] = direction.y;
+		position[2] = direction.z;
+
+		glUniform3fv(uDirectionalLightDir, 1, &position[0]);
+
+		glUniform3fv(uBackground, 1, &scene->getClearColor()[0]);
+	}
+}
+
+/*
 void Engine::DeferredShadingProgram::onRenderLight(const glm::mat4 & model, const glm::mat4 & view)
 {
 	glm::mat4 result = view * model;
@@ -80,27 +116,16 @@ void Engine::DeferredShadingProgram::onRenderDirectionalLight(const glm::mat4 & 
 
 	glUniform3fv(uDirectionalLightDir, 1, &position[0]);
 }
-
+*/
 void Engine::DeferredShadingProgram::configureProgram()
 {
 	Engine::PostProcessProgram::configureProgram();
 
 	uBackground = glGetUniformLocation(glProgram, "backgroundColor");
 
-	uIa = glGetUniformLocation(glProgram, "Ia");
-	uId = glGetUniformLocation(glProgram, "Id");
-	uIs = glGetUniformLocation(glProgram, "Is");
-	uPointLightPos = glGetUniformLocation(glProgram, "lpos");
-	uPLattenuation = glGetUniformLocation(glProgram, "PLattenuation");
-
-	uSLIa = glGetUniformLocation(glProgram, "SLIa");
-	uSLId = glGetUniformLocation(glProgram, "SLId");
-	uSLIs = glGetUniformLocation(glProgram, "SLIs");
-	uSpotLightPos = glGetUniformLocation(glProgram, "SLpos");
-	uSpotLightDir = glGetUniformLocation(glProgram, "SLdir");
-	uSLapperture = glGetUniformLocation(glProgram, "SLapperture");
-	uSLm = glGetUniformLocation(glProgram, "SLm");
-	uSLattenuation = glGetUniformLocation(glProgram, "SLattenuation");
+	uDLBuffer = glGetUniformBlockIndex(glProgram, "DLBuffer");
+	uPLBuffer = glGetUniformBlockIndex(glProgram, "PLBuffer");
+	uSLBuffer = glGetUniformBlockIndex(glProgram, "SLBuffer");
 
 	uDLIa = glGetUniformLocation(glProgram, "DLIa");
 	uDLId = glGetUniformLocation(glProgram, "DLId");
@@ -108,6 +133,7 @@ void Engine::DeferredShadingProgram::configureProgram()
 	uDirectionalLightDir = glGetUniformLocation(glProgram, "DLdir");
 }
 
+/*
 void Engine::DeferredShadingProgram::configurePointLightBuffer(const Engine::PointLight *pl)
 {
 	glUseProgram(glProgram);
@@ -142,7 +168,7 @@ void Engine::DeferredShadingProgram::configureClearColor(const glm::vec3 & cc)
 	float backgroundColor[3] = { cc.x, cc.y, cc.z };
 	glUniform3fv(uBackground, 1, &backgroundColor[0]);
 }
-
+*/
 // =====================================================
 
 Engine::Program * Engine::DeferredShadingProgramFactory::createProgram(unsigned long long parameters)

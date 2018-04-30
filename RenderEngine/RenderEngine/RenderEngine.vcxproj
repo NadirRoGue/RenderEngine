@@ -31,6 +31,7 @@
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CLRSupport>false</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -38,6 +39,7 @@
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <CLRSupport>false</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -149,6 +151,7 @@
     <ClInclude Include="include\KeyboardHandler.h" />
     <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\CustomMaths.h" />
+    <ClInclude Include="include\LightBufferManager.h" />
     <ClInclude Include="include\lights\DirectionalLight.h" />
     <ClInclude Include="include\lights\PointLight.h" />
     <ClInclude Include="include\lights\SpotLight.h" />
@@ -194,7 +197,6 @@
     <ClInclude Include="lib\include\imgui\stb_textedit.h" />
     <ClInclude Include="lib\include\imgui\stb_truetype.h" />
     <ClInclude Include="testimplementation\AnimImpl.h" />
-    <ClInclude Include="testimplementation\PostProcessManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\include\imgui\imgui.cpp" />
@@ -213,6 +215,7 @@
     <ClCompile Include="src\instances\TextureInstance.cpp" />
     <ClCompile Include="src\KeyboardHandler.cpp" />
     <ClCompile Include="src\Light.cpp" />
+    <ClCompile Include="src\LightBufferManager.cpp" />
     <ClCompile Include="src\lights\DirectionalLight.cpp" />
     <ClCompile Include="src\lights\PointLight.cpp" />
     <ClCompile Include="src\lights\SpotLight.cpp" />
@@ -254,7 +257,6 @@
     <ClCompile Include="src\WindowToolkit.cpp" />
     <ClCompile Include="src\WorldConfig.cpp" />
     <ClCompile Include="testimplementation\AnimImpl.cpp" />
-    <ClCompile Include="testimplementation\PostProcessManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

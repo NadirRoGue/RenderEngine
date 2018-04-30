@@ -143,18 +143,6 @@ unsigned int Engine::Program::loadShader(std::string fileName, GLenum type, std:
 	return shader;
 }
 
-void Engine::Program::configureDirectionalLightBuffer(const Engine::DirectionalLight *dl)
-{
-}
-
-void Engine::Program::configurePointLightBuffer(const Engine::PointLight *pl)
-{
-}
-
-void Engine::Program::configureSpotLightBuffer(const Engine::SpotLight *sl)
-{
-}
-
 std::string Engine::Program::getName() const
 {
 	return name;

@@ -82,22 +82,6 @@ void Engine::DeferredRenderer::doRender()
 		return;
 
 	Engine::Camera * cam = activeCam;
-	/*
-	if (preProcess != nullptr)
-	{
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, preProcess->renderBuffer->getFrameBufferId());
-	glUseProgram(preProcess->postProcessProgram->getProgramId());
-	glBindVertexArray(preProcess->obj->getMeshInstance()->getMesh()->vao);
-	preProcess->postProcessProgram->onRenderObject(preProcess->obj, cam->getViewMatrix(), cam->getProjectionMatrix());
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-	}
-	*/
 
 	glBindFramebuffer(GL_FRAMEBUFFER, forwardPassBuffer->getFrameBufferId());
 	glEnable(GL_DEPTH_TEST);
@@ -134,6 +118,7 @@ void Engine::DeferredRenderer::doRender()
 	// Enable default framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	// Enable depth test to draw skybox + gbuffers
 	glEnable(GL_DEPTH_TEST);
 
@@ -149,9 +134,12 @@ void Engine::DeferredRenderer::doRender()
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-	glDepthFunc(GL_LEQUAL);
-	scene->getSkyBox()->render(cam);
-	glDepthFunc(GL_LESS);
+	if (scene->getSkyBox() != NULL)
+	{
+		glDepthFunc(GL_LEQUAL);
+		scene->getSkyBox()->render(cam);
+		glDepthFunc(GL_LESS);
+	}
 }
 
 void Engine::DeferredRenderer::onResize(unsigned int w, unsigned int h)

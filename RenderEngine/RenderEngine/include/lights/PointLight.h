@@ -4,17 +4,30 @@
 
 namespace Engine
 {
+	typedef struct PointLightData
+	{
+		float position[4];
+		float color[4];
+		float attenuation[4];
+		float kFactors[4];
+	} PointLightData;
+
 	class PointLight : public Light
 	{
 	private:
-		float attenuationFactor[3];
+		PointLightData shaderData;
 	public:
-		PointLight(std::string name, glm::vec3 pos);
-		PointLight(std::string name, glm::vec3 pos, glm::vec3 attenuation);
+		PointLight(std::string name);
 		~PointLight();
 
-		const glm::vec3 getPositioin() const;
-		const float * getAttenuationFactor() const;
+		void setPosition(const glm::vec3 & pos);
+		void setAttenuation(const glm::vec3 & att);
+		void setColor(float r, float g, float b);
+		void setKa(float a);
+		void setKd(float d);
+		void setKs(float s);
 		void translate(const glm::vec3 & translation);
+
+		PointLightData & getData();
 	};
 }

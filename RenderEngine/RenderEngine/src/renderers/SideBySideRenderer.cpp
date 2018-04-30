@@ -69,7 +69,7 @@ void Engine::SideBySideRenderer::initialize()
 	lNode->postProcessProgram = new Engine::PostProcessProgram(*dynamic_cast<Engine::PostProcessProgram*>(sourcePostProcess));
 	lNode->postProcessProgram->configureMeshBuffers(miL);
 	lNode->renderBuffer = 0;
-	lNode->callBack = new Engine::MotionBlurImpl();
+	lNode->callBack = 0;
 	lNode->obj = new Engine::PostProcessObject(miL);
 
 	leftRenderer->setFinalPostProcess(lNode);
@@ -80,7 +80,7 @@ void Engine::SideBySideRenderer::initialize()
 	rNode->postProcessProgram = new Engine::PostProcessProgram(*dynamic_cast<Engine::PostProcessProgram*>(sourcePostProcess));
 	rNode->postProcessProgram->configureMeshBuffers(miR);
 	rNode->renderBuffer = 0;
-	rNode->callBack = new Engine::MotionBlurImpl();
+	rNode->callBack = 0;
 	rNode->obj = new Engine::PostProcessObject(miR);
 
 	rightRenderer->setFinalPostProcess(rNode);
