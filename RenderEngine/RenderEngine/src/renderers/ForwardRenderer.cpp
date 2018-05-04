@@ -70,3 +70,8 @@ void Engine::ForwardRenderer::onResize(unsigned int w, unsigned int h)
 {
 
 }
+
+Engine::DeferredRenderObject * Engine::ForwardRenderer::getGBuffer()
+{
+	return NULL;
+}

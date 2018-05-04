@@ -5,7 +5,16 @@
 #include "DeferredRenderObject.h"
 #include "textures/Texture2D.h"
 
+#include "datatables/DeferredObjectsTable.h"
+
 #include <iostream>
+
+const std::string Engine::DeferredRenderObject::G_BUFFER_COLOR = "g_buffer_color";
+const std::string Engine::DeferredRenderObject::G_BUFFER_DEPTH = "g_buffer_depth";
+const std::string Engine::DeferredRenderObject::G_BUFFER_NORMAL = "g_buffer_normal";
+const std::string Engine::DeferredRenderObject::G_BUFFER_POS = "g_buffer_pos";
+const std::string Engine::DeferredRenderObject::G_BUFFER_SPECULAR = "g_buffer_depth";
+const std::string Engine::DeferredRenderObject::G_BUFFER_EMISSIVE = "g_buffer_emissive";
 
 GLenum Engine::DeferredRenderObject::COLOR_ATTACHMENTS[8] =
 {
@@ -30,13 +39,37 @@ Engine::DeferredRenderObject::DeferredRenderObject(unsigned int numBuffers, bool
 	usedColorBuffers = 0;
 
 	depthBuffer.texture = 0;
+
+	Engine::DeferredObjectsTable::getInstance().registerDeferredObject(this);
 }
 
 Engine::DeferredRenderObject::~DeferredRenderObject()
 {
 	if (colorBuffers != 0)
 	{
+		for (unsigned int i = 0; i < colorBuffersSize; i++)
+		{
+			BufferInfo bi = colorBuffers[i];
+			if (bi.texture != NULL)
+			{
+				if (bi.texture->getTexture() != NULL)
+				{
+					delete bi.texture->getTexture();
+				}
+				delete bi.texture;
+			}
+		}
+
 		delete[] colorBuffers;
+	}
+
+	if (depthBuffer.texture != NULL)
+	{
+		if (depthBuffer.texture->getTexture() != NULL)
+		{
+			delete depthBuffer.texture->getTexture();
+		}
+		delete depthBuffer.texture;
 	}
 }
 
@@ -45,7 +78,7 @@ unsigned int Engine::DeferredRenderObject::getFrameBufferId()
 	return fbo;
 }
 
-Engine::TextureInstance * Engine::DeferredRenderObject::addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, int filterMethod)
+Engine::TextureInstance * Engine::DeferredRenderObject::addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, std::string name, int filterMethod)
 {
 	if (index < 0 || index > colorBuffersSize || usedColorBuffers >= 8)
 		exit(-1);
@@ -53,7 +86,7 @@ Engine::TextureInstance * Engine::DeferredRenderObject::addColorBuffer(unsigned 
 	GLenum colorAttachment = COLOR_ATTACHMENTS[usedColorBuffers];
 	usedColorBuffers++;
 
-	Engine::Texture2D * texture = new Engine::Texture2D(0, w, h);
+	Engine::Texture2D * texture = new Engine::Texture2D(name, 0, w, h);
 	texture->setGenerateMipMaps(false);
 	texture->setMemoryLayoutFormat(gpuTextureFormat);
 	texture->setImageFormatType(inputTextureFormat);
@@ -69,6 +102,8 @@ Engine::TextureInstance * Engine::DeferredRenderObject::addColorBuffer(unsigned 
 	colorBuffers[index].bufferType = colorAttachment;
 	colorBuffers[index].texture = ti;
 
+	gBufferMap[name] = ti;
+
 	return ti;
 }
 
@@ -80,19 +115,23 @@ Engine::TextureInstance * Engine::DeferredRenderObject::addDepthBuffer24(unsigne
 		delete depthBuffer.texture;
 	}
 
-	Engine::Texture2D * texture = new Engine::Texture2D(0, w, h);
+	Engine::Texture2D * texture = new Engine::Texture2D(Engine::DeferredRenderObject::G_BUFFER_DEPTH, 0, w, h);
 	texture->setGenerateMipMaps(false);
 	texture->setMemoryLayoutFormat(GL_DEPTH_COMPONENT24);
 	texture->setImageFormatType(GL_DEPTH_COMPONENT);
-	texture->setPixelFormatType(GL_UNSIGNED_BYTE);
+	texture->setPixelFormatType(GL_FLOAT);
 	
 	Engine::TextureInstance * textureInstance = new Engine::TextureInstance(texture);
 	textureInstance->setAnisotropicFilterEnabled(false);
 	textureInstance->setMagnificationFilterType(GL_NEAREST);
 	textureInstance->setMinificationFilterType(GL_NEAREST);
+	textureInstance->setSComponentWrapType(GL_CLAMP_TO_EDGE);
+	textureInstance->setTComponentWrapType(GL_CLAMP_TO_EDGE);
 	
 	depthBuffer.bufferType = GL_DEPTH_ATTACHMENT;
 	depthBuffer.texture = textureInstance;
+
+	gBufferMap[Engine::DeferredRenderObject::G_BUFFER_DEPTH] = textureInstance;
 
 	return textureInstance;
 }
@@ -104,21 +143,35 @@ Engine::TextureInstance * Engine::DeferredRenderObject::addDepthBuffer32(unsigne
 		delete depthBuffer.texture;
 	}
 
-	Engine::Texture2D * texture = new Engine::Texture2D(0, w, h);
+	Engine::Texture2D * texture = new Engine::Texture2D(Engine::DeferredRenderObject::G_BUFFER_DEPTH, 0, w, h);
 	texture->setGenerateMipMaps(false);
 	texture->setMemoryLayoutFormat(GL_DEPTH_COMPONENT32);
 	texture->setImageFormatType(GL_DEPTH_COMPONENT);
-	texture->setPixelFormatType(GL_UNSIGNED_BYTE);
+	texture->setPixelFormatType(GL_FLOAT);
 
 	Engine::TextureInstance * textureInstance = new Engine::TextureInstance(texture);
 	textureInstance->setAnisotropicFilterEnabled(false);
 	textureInstance->setMagnificationFilterType(GL_NEAREST);
 	textureInstance->setMinificationFilterType(GL_NEAREST);
+	textureInstance->setSComponentWrapType(GL_CLAMP_TO_EDGE);
+	textureInstance->setTComponentWrapType(GL_CLAMP_TO_EDGE);
 
 	depthBuffer.bufferType = GL_DEPTH_ATTACHMENT;
 	depthBuffer.texture = textureInstance;
+
+	gBufferMap[Engine::DeferredRenderObject::G_BUFFER_DEPTH] = textureInstance;
 	
 	return textureInstance;
+}
+
+Engine::TextureInstance * Engine::DeferredRenderObject::getBufferByName(std::string name)
+{
+	std::map<std::string, Engine::TextureInstance*>::iterator it = gBufferMap.find(name);
+	if (it != gBufferMap.end())
+	{
+		return it->second;
+	}
+	return NULL;
 }
 
 void Engine::DeferredRenderObject::initialize()
@@ -151,8 +204,15 @@ void Engine::DeferredRenderObject::resizeFBO(unsigned int w, unsigned int h)
 	}
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthBuffer.texture->getTexture()->getTextureId(), 0); 
-		
-	glDrawBuffers(colorBuffersSize, buffers);
+	
+	if (colorBuffersSize > 0)
+	{
+		glDrawBuffers(colorBuffersSize, buffers);
+	}
+	else
+	{
+		glDrawBuffer(GL_NONE);
+	}
 
 	if (GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus(GL_FRAMEBUFFER))
 	{

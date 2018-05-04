@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 
 layout (location=0) out vec4 outColor;
 layout (location=1) out vec4 outDepth;
@@ -13,129 +13,173 @@ uniform sampler2D postProcessing_4; // pos
 uniform sampler2D postProcessing_5; // depth
 
 // ===============================================
+// back ground color, used for fog effect
 uniform vec3 backgroundColor;
 
-//Propiedades del objeto
+uniform mat4 projMat;
+uniform mat4 viewMat;
+uniform vec3 cameraPos;
+
+// Different lights data
+
+uniform int numSpotLights;
+uniform int numPointLights;
+
+layout(std140, binding = 0) uniform DLBuffer
+{
+	vec4 DLdirection [];
+	vec4 DLcolor [];
+	vec4 DLkFactors [];
+};
+
+/*
+layout(std140, binding = 1) uniform SLBuffer
+{
+	vec4 SLposition [];
+	vec4 SLdirection [];
+	vec4 SLcolor [];
+	vec4 SLattenuation [];
+	vec4 SLkFactors [];
+};
+
+layout(std140, binding = 2) uniform PLBuffer
+{
+	vec4 PLposition [];
+	vec4 PLcolor [];
+	vec4 PLattenuation [];
+	vec4 PLkFactors [];
+};
+*/
+
+// Objects properties to be used across shading fuctions
 vec3 pos;
+float distToCam;
 vec3 Ka;
 vec3 Kd;
 vec3 Ks;
 vec3 Ke;
 vec3 N;
+float depth;
 float alpha = 100.0;
+float colorFactor;
 
-// Point light
-uniform vec3 Ia;
-uniform vec3 Id;
-uniform vec3 Is;
-uniform vec3 lpos; 
-uniform vec3 PLattenuation;
+// ================================================================================
+// SHADING FUNCTIONALITY
+vec3 processDirectionalLight(in float visibility)
+{
+	colorFactor = clamp(dot(vec3(0,1,0), -DLdirection[0].xyz), 0.25, 1.0);
+	vec3 c = vec3(0,0,0);
 
-// Spot light
-uniform vec3 SLIa;
-uniform vec3 SLId;
-uniform vec3 SLIs;
-uniform vec3 SLpos;
-uniform vec3 SLdir;
-uniform float SLapperture;
-uniform float SLm;
-uniform vec3 SLattenuation;
+	vec3 L = DLdirection[0].xyz;
+	vec3 lightColor = DLcolor[0].rgb;
+	vec3 Kfactors = DLkFactors[0].xyz;
 
-// Directional light
-uniform vec3 DLIa;
-uniform vec3 DLId;
-uniform vec3 DLIs;
-uniform vec3 DLdir; 
+	// Ambient
+	c += lightColor * Kfactors.x * Ka;
 
-// ====================================================
+	// Diffuse
+	c += (lightColor * Kfactors.y * Kd * max(dot(N,L), 0)) * visibility;
 
-vec3 shade();
+	// Specular
+	vec3 R = normalize(reflect(-L, N));
+	vec3 V = normalize(-pos);
+	float sFactor = max(dot(R, V), 0.01);
+	c += lightColor * Kfactors.z * Ks * pow(sFactor, alpha) * visibility;
+
+	return c;
+}
+
+vec3 processAtmosphericFog(in vec3 shadedColor)
+{
+	float d = length(pos);
+	float lerpVal = 1 / exp(0.0025 * d * d);
+	
+	return mix(backgroundColor * colorFactor, shadedColor, lerpVal);
+}
+
+// ================================================================================
+// REFLECTION FUNCTIONALITY
+
+vec3 raymarch(vec3 position, vec3 direction)
+{
+	vec3 PrevRaySample, RaySample;
+	for (int RayStepIdx = 0; RayStepIdx < 16; RayStepIdx++)
+	{
+		PrevRaySample = RaySample;
+		RaySample = (RayStepIdx * 0.02) * direction + position;
+		float ZBufferVal = texture(postProcessing_5, RaySample.xy).x;
+				
+		if (RaySample.z > ZBufferVal )
+		{
+			vec3 MinRaySample = PrevRaySample;
+			vec3 MaxRaySample = RaySample;
+			vec3 MidRaySample;
+			for (int i = 0; i < 6; i++)
+			{
+				MidRaySample = mix(MinRaySample, MaxRaySample, 0.5);
+				float ZBufferVal = texture(postProcessing_5, MidRaySample.xy).x;
+
+				if (MidRaySample.z > ZBufferVal)
+					MaxRaySample = MidRaySample;
+				else
+					MinRaySample = MidRaySample;
+			}
+
+			return texture(postProcessing_0, MidRaySample.xy).rgb;
+		}
+	}
+
+	return vec3(1,1,1);
+}
+
+vec3 computeReflectionColor()
+{
+	vec3 ssPos = vec3(texCoord, depth);
+
+	vec3 camReflect = reflect(-pos, N);
+
+	vec3 pointAlongRefl = camReflect * 10.0 + pos;
+	vec4 projPointAlong = projMat * vec4(pointAlongRefl, 1);
+	projPointAlong /= projPointAlong.w;
+	projPointAlong.xy = projPointAlong.xy * vec2(0.5, 0.5) + vec2(0.5, 0.5);
+
+	vec3 ssreflectdir = normalize(projPointAlong.xyz - ssPos);
+
+	return raymarch(ssPos, ssreflectdir);
+}
+
+// ================================================================================
 
 void main()
 {
-	vec4 originalColor = texture(postProcessing_0, texCoord);
-	Ka = Kd = originalColor.xyz;
-	N = texture(postProcessing_1, texCoord).xyz;
-	Ks = texture(postProcessing_2, texCoord).xyz;
-	Ke = texture(postProcessing_3, texCoord).xyz;
-	pos = texture(postProcessing_4, texCoord).xyz;
+	vec4 gbufferemissive = texture(postProcessing_3, texCoord);
+	vec4 gbuffernormal = texture(postProcessing_1, texCoord);
+	vec4 gbufferspec = texture(postProcessing_2, texCoord);
+	vec4 gbufferpos = texture(postProcessing_4, texCoord);
+	depth = texture(postProcessing_5, texCoord).x;
+	vec4 gbuffercolor = texture(postProcessing_0,  texCoord);
 
-	outColor = vec4(shade(), originalColor.w);
-	float depth = texture(postProcessing_5, texCoord).x;
+	distToCam = gbufferpos.w;
+	N = gbuffernormal.xyz;
+	pos = gbufferpos.xyz;
+
+	// REFRACTION
+	float camFactor = max(distToCam, 1);
+	vec3 realColor = gbufferspec.w > 0? texture(postProcessing_0, texCoord + normalize(gbuffernormal.xz) * 0.01 / camFactor).rgb * gbuffercolor.rgb : gbuffercolor.rgb;
+
+	// REFLECTION
+	realColor = gbufferspec.w > 0? computeReflectionColor() * realColor : realColor;
+
+	
+	Ka = realColor;
+	Kd = Ka;
+	Ks = gbufferspec.xyz;
+	Ke = gbufferemissive.xyz;
+
+	vec3 shaded = processDirectionalLight(gbuffercolor.w);
+	shaded = processAtmosphericFog(shaded);
+
+	outColor = vec4(shaded, 1.0);
 	outDepth = vec4(depth, 0, 0, 1);
 	gl_FragDepth = depth;
-}
-
-vec3 shade()
-{
-	vec3 c = vec3(0.0);
-
-	// ============================================
-	// Point light
-	// ============================================
-	c = Ia * Ka;
-
-	vec3 PL_L = lpos - pos;
-	float PL_dist = length(PL_L);
-
-	float PL_fatt = min(1/(PLattenuation.x + PLattenuation.y * PL_dist + PLattenuation.z * PL_dist * PL_dist), 1);
-
-	vec3 L = normalize (PL_L);
-	vec3 diffuse = Id * Kd * dot (L,N) * PL_fatt;
-	c += clamp(diffuse, 0.0, 1.0);
-	
-	vec3 V = normalize (-pos);
-	vec3 R = normalize (reflect (-L,N));
-	float PL_factor = max (dot (R,V), 0.01);
-	vec3 specular = Is*Ks*pow(PL_factor,alpha);
-	c += clamp(specular, 0.0, 1.0);
-	
-	// ============================================
-	// Spot light
-	// ============================================
-	c+= SLIa * Ka;
-
-	vec3 SL_L = SLpos - pos;
-	float SL_dist = length(SL_L);
-	SL_L = normalize(SL_L);
-
-	// Factor de atenuación
-	float SL_fatt = min(1/(SLattenuation.x + SLattenuation.y * SL_dist + SLattenuation.z * SL_dist * SL_dist),1);
-
-	vec3 normDir = normalize(SLdir);
-
-	float cosApertura = cos(radians(SLapperture));
-	float point = dot(normDir , -SL_L);
-
-	float factor = max(pow(max(point - cosApertura, 0) / (1 - cosApertura), SLm), 0);
-
-	c += clamp(factor * Kd * SLId * dot(SL_L, N) * SL_fatt, 0, 1);
-
-	vec3 SL_R = normalize(reflect(-SL_L, N));
-	float SL_Factor = max(dot(SL_R, V),0.01);
-	c += SLIs * Ks * SL_Factor * factor * SL_fatt;
-
-	// ============================================
-	// Directional light
-	// ============================================
-	c += DLIa * Ka;
-
-	vec3 D_L = DLdir; // normalized in the client (see StandarProgram::onDirectionalLightRender)
-	
-	// LUZ DIFUSA
-	c += (DLId * Kd * max(dot(N,D_L), 0));
-
-	vec3 DL_R = normalize(reflect(-D_L, N));
-	vec3 DL_V = normalize(-pos);
-	float DL_Factor = max(dot(DL_R,DL_V), 0.01);
-	c += DLIs * Ks * pow(DL_Factor, alpha);
-
-	c += Ke;
-
-	float d = length(pos);
-	float alfa = 1/exp(0.0025*d*d);
-
-	//alfa*I+(1-alfa)*cf;
-
-	return mix(backgroundColor, c, alfa);
 }

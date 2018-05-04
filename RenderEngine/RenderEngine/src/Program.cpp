@@ -101,7 +101,7 @@ unsigned int Engine::Program::getProgramId() const
 	return glProgram;
 }
 
-unsigned int Engine::Program::loadShader(std::string fileName, GLenum type, std::string configString)
+unsigned int Engine::Program::loadShader(std::string fileName, GLenum type, std::string configString, bool outputToFile, std::string outputFileName)
 {
 	size_t fileLen;
 	char *source = loadStringFromFile(fileName.c_str(), fileLen);
@@ -124,7 +124,7 @@ unsigned int Engine::Program::loadShader(std::string fileName, GLenum type, std:
 	glShaderSource(shader, 1, (const GLchar **)&finalSourceCStr, (const GLint *)&fileLen);
 	glCompileShader(shader);
 	delete[] source;
-	//delete[] finalSourceCStr;
+	delete[] finalSourceCStr;
 
 	GLint compiled;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);

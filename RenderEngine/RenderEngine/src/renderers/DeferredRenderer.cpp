@@ -3,31 +3,19 @@
 #include <iostream>
 
 #include "Scene.h"
+#include "datatables/DeferredObjectsTable.h"
+#include "datatables/MeshTable.h"
+#include "datatables/ProgramTable.h"
 
 Engine::DeferredRenderer::DeferredRenderer()
 	:Engine::Renderer()
 {
-	preProcess = nullptr;
 	forwardPass = new Engine::ForwardRenderer();
 	initialized = false;
 }
 
 Engine::DeferredRenderer::~DeferredRenderer()
 {
-	if (forwardPass != 0)
-	{
-		delete forwardPass;
-	}
-}
-
-void Engine::DeferredRenderer::setForwardPassBuffers(Engine::DeferredRenderObject * buffers)
-{
-	forwardPassBuffer = buffers;
-}
-
-void Engine::DeferredRenderer::setPreProcess(Engine::PostProcessChainNode * node)
-{
-	preProcess = node;
 }
 
 void Engine::DeferredRenderer::addPostProcess(Engine::PostProcessChainNode * object)
@@ -35,9 +23,9 @@ void Engine::DeferredRenderer::addPostProcess(Engine::PostProcessChainNode * obj
 	postProcessChain.push_back(object);
 }
 
-void Engine::DeferredRenderer::setFinalPostProcess(Engine::PostProcessChainNode * object)
+Engine::DeferredRenderObject * Engine::DeferredRenderer::getGBuffer()
 {
-	finalLink = object;
+	return forwardPassBuffer;
 }
 
 void Engine::DeferredRenderer::initialize()
@@ -49,10 +37,34 @@ void Engine::DeferredRenderer::initialize()
 
 	initialized = true;
 
+	// Create G Buffers
+	forwardPassBuffer = new Engine::DeferredRenderObject(5, true);
+	forwardPassBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_COLOR, GL_LINEAR);
+	forwardPassBuffer->addColorBuffer(1, GL_RGB32F, GL_RGBA, GL_UNSIGNED_BYTE, 500, 500, Engine::DeferredRenderObject::G_BUFFER_NORMAL, GL_LINEAR);
+	forwardPassBuffer->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_SPECULAR, GL_LINEAR);
+	forwardPassBuffer->addColorBuffer(3, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_EMISSIVE, GL_LINEAR);
+	forwardPassBuffer->addColorBuffer(4, GL_RGB32F, GL_RGBA, GL_UNSIGNED_BYTE, 500, 500, Engine::DeferredRenderObject::G_BUFFER_POS, GL_LINEAR);
+	forwardPassBuffer->addDepthBuffer24(500, 500);
 	forwardPassBuffer->initialize();
 
+	// Instantiate deferred shading program
+	deferredShading = dynamic_cast<Engine::DeferredShadingProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::DeferredShadingProgram::PROGRAM_NAME));
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
+	deferredShading->configureMeshBuffers(mi);
+	deferredDrawSurface = new Engine::PostProcessObject(mi);
+	// Link G-Buffers to deferred shading surface input
+	forwardPassBuffer->populateDeferredObject(deferredDrawSurface);
+
+	// Creage deferred shading buffer
+	deferredPassBuffer = new Engine::DeferredRenderObject(2, true);
+	deferredPassBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);	// Color info
+	deferredPassBuffer->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);	// Extra info: depth, brightness, etc.
+	deferredPassBuffer->addDepthBuffer24(500, 500);
+	deferredPassBuffer->initialize();
+
+	// Linke post processes as a chain
 	std::list<Engine::PostProcessChainNode *>::iterator it = postProcessChain.begin();
-	Engine::DeferredRenderObject * previousLink = forwardPassBuffer;
+	Engine::DeferredRenderObject * previousLink = deferredPassBuffer;
 	while (it != postProcessChain.end())
 	{
 		Engine::PostProcessChainNode * node = (*it);
@@ -70,8 +82,13 @@ void Engine::DeferredRenderer::initialize()
 		it++;
 	}
 
+	// Create buffers to screen shader
+	screenOutput = dynamic_cast<Engine::PostProcessProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::PostProcessProgram::PROGRAM_NAME));
+	screenOutput->configureMeshBuffers(mi);
+	chainEnd = new Engine::PostProcessObject(mi);
+
 	// Close the final link (will output to screen)
-	previousLink->populateDeferredObject(finalLink->obj);
+	previousLink->populateDeferredObject(chainEnd);
 }
 
 void Engine::DeferredRenderer::doRender()
@@ -81,16 +98,47 @@ void Engine::DeferredRenderer::doRender()
 	if (scene == 0)
 		return;
 
-	Engine::Camera * cam = activeCam;
-
+	// Do forward pass
 	glBindFramebuffer(GL_FRAMEBUFFER, forwardPassBuffer->getFrameBufferId());
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	forwardPass->renderFromCamera(cam);
+	forwardPass->renderFromCamera(activeCam);
 	forwardPass->doRender();
-
+	
+	// Do deferred shading pass
 	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
+	glBindFramebuffer(GL_FRAMEBUFFER, deferredPassBuffer->getFrameBufferId());
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glUseProgram(deferredShading->getProgramId());
+	glBindVertexArray(deferredDrawSurface->getMesh()->vao);
+	deferredShading->onRenderObject(deferredDrawSurface, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	glEnable(GL_DEPTH_TEST);
+	if (scene->getSkyBox() != NULL)
+	{
+		glDepthFunc(GL_LEQUAL);
+		scene->getSkyBox()->render(activeCam);
+		glDepthFunc(GL_LESS);
+	}
+
+	// Run the post-process chain
+	runPostProcesses();
+
+	// Enable default framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+
+	// Output the final result to screen
+	glUseProgram(screenOutput->getProgramId());
+	glBindVertexArray(chainEnd->getMesh()->vao);
+	screenOutput->onRenderObject(chainEnd, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+void Engine::DeferredRenderer::runPostProcesses()
+{
 	std::list<Engine::PostProcessChainNode *>::iterator it = postProcessChain.begin();
 	while (it != postProcessChain.end())
 	{
@@ -104,48 +152,22 @@ void Engine::DeferredRenderer::doRender()
 
 		if (node->callBack != 0)
 		{
-			node->callBack->execute(node->obj, node->postProcessProgram, node->renderBuffer, cam);
+			node->callBack->execute(node->obj, node->postProcessProgram, node->renderBuffer, activeCam);
 		}
-		
+
 		glBindVertexArray(node->obj->getMesh()->vao);
 
-		prog->onRenderObject(node->obj, cam->getViewMatrix(), cam->getProjectionMatrix());
+		prog->onRenderObject(node->obj, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
 
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		it++;
-	}
-	
-	// Enable default framebuffer
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// Enable depth test to draw skybox + gbuffers
-	glEnable(GL_DEPTH_TEST);
-
-	if (finalLink->callBack != 0)
-	{
-		finalLink->callBack->execute(finalLink->obj, finalLink->postProcessProgram, finalLink->renderBuffer, cam);
-	}
-
-	glUseProgram(finalLink->postProcessProgram->getProgramId());
-	glBindVertexArray(finalLink->obj->getMesh()->vao);
-
-	finalLink->postProcessProgram->onRenderObject(finalLink->obj, cam->getViewMatrix(), cam->getProjectionMatrix());
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	if (scene->getSkyBox() != NULL)
-	{
-		glDepthFunc(GL_LEQUAL);
-		scene->getSkyBox()->render(cam);
-		glDepthFunc(GL_LESS);
 	}
 }
 
 void Engine::DeferredRenderer::onResize(unsigned int w, unsigned int h)
 {
-	if (preProcess != nullptr)
-		preProcess->renderBuffer->resizeFBO(w, h);
+	Engine::DeferredObjectsTable::getInstance().onResize(int(w), int(h));
+	/*
 	forwardPassBuffer->resizeFBO(w, h);
 
 	std::list<Engine::PostProcessChainNode *>::iterator it = postProcessChain.begin();
@@ -154,4 +176,5 @@ void Engine::DeferredRenderer::onResize(unsigned int w, unsigned int h)
 		(*it)->renderBuffer->resizeFBO(w, h);
 		it++;
 	}
+	*/
 }

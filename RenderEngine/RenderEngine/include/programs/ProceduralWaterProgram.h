@@ -9,18 +9,17 @@ namespace Engine
 	public:
 		static std::string PROGRAM_NAME;
 	private:
-		std::string tcsShaderFile;
-		std::string tevalShaderFile;
-		std::string gShaderFile;
-
-		unsigned int tcsShader, tevalShader, gShader;
-
 		unsigned int uInPos;
 		unsigned int uInUV;
 
 		unsigned int uModelView;
 		unsigned int uModelViewProj;
 		unsigned int uNormal;
+
+		unsigned int uLightDepthMatrix;
+		unsigned int uDepthTexture;
+		unsigned int uLightDirection;
+
 		unsigned int uGridPos;
 		unsigned int uTime;
 		unsigned int uWaterColor;
@@ -31,13 +30,17 @@ namespace Engine
 
 		void initialize();
 		void configureProgram();
+		void configureMeshBuffers(Mesh * mesh);
 
 		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
-		void destroy();
 
-		void configureMeshBuffers(Mesh * mesh);
+		void destroy();
+		
 		void setTimeUniform(float sinTime);
 		void setUniformGridPosition(unsigned int i, unsigned int j);
+		void setUniformLightDepthMatrix(const glm::mat4 & ldm);
+		void setUniformDepthTexture(TextureInstance * depthTexture);
+		void setUniformLightDirection(const glm::vec3 & lightDir);
 	};
 
 	// =========================================================

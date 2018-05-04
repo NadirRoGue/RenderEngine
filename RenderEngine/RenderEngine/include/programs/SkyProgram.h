@@ -11,7 +11,6 @@ namespace Engine
 		static std::string PROGRAM_NAME;
 	private:
 		unsigned int uProjMatrix;
-		unsigned int uCubeMap;
 		unsigned int uLightDir;
 		unsigned int uLightColor;
 
@@ -24,7 +23,6 @@ namespace Engine
 		void configureProgram();
 		void configureMeshBuffers(Mesh * mesh);
 		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
-		void setCubemapUniform(TextureInstance * t);
 	};
 
 	class SkyProgramFactory : public ProgramFactory

@@ -18,8 +18,6 @@ namespace Engine
 		SideBySideRenderer();
 		~SideBySideRenderer();
 
-		void setLeftForwardPassBuffer(DeferredRenderObject * buffer);
-		void setRightForwardPassBuffer(DeferredRenderObject * buffer);
 		void addLeftPostProcess(PostProcessChainNode * node);
 		void addRightPostProcess(PostProcessChainNode * node);
 
@@ -27,5 +25,7 @@ namespace Engine
 		void initialize();
 		void doRender();
 		void onResize(unsigned int w, unsigned int h);
+
+		DeferredRenderObject * getGBuffer();
 	};
 }

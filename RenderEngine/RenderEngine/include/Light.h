@@ -28,7 +28,7 @@ namespace Engine
 		void setEnabled(bool val);
 		const bool isEnabled() const;
 
-		virtual void setColor(float r, float g, float b) = 0;
+		virtual void setColor(const glm::vec3 & color) = 0;
 		virtual void setKa(float a) = 0;
 		virtual void setKd(float d) = 0;
 		virtual void setKs(float s) = 0;

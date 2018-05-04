@@ -60,5 +60,4 @@ void Engine::ProgramTable::clean()
 		it++;
 	}
 	table.clear();
-	std::cout << "Program table cleared" << std::endl;
 }

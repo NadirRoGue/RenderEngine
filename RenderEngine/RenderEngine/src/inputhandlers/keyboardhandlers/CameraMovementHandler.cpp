@@ -1,5 +1,7 @@
 #include "inputhandlers/keyboardhandlers/CameraMovementHandler.h"
 
+#include "WorldConfig.h"
+
 Engine::CameraMovement::CameraMovement(Engine::Camera * cam)
 {
 	camera = cam;
@@ -8,7 +10,7 @@ Engine::CameraMovement::CameraMovement(Engine::Camera * cam)
 
 void Engine::CameraMovement::onKeyPressed(unsigned char key, int x, int y, int mode)
 {
-	if (camera == nullptr)
+	if (camera == nullptr || static_cast<Engine::TravelMethod>(Engine::Settings::travelMethod) != Engine::TravelMethod::TRAVEL_MANUAL)
 		return;
 
 	glm::vec3 t;

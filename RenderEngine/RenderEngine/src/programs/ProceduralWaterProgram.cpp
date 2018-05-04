@@ -11,22 +11,18 @@ Engine::ProceduralWaterProgram::ProceduralWaterProgram(std::string name, unsigne
 {
 	vShaderFile = "shaders/water/water.vert";
 	fShaderFile = "shaders/water/water.frag";
-
-	tcsShaderFile = "shaders/water/water.tesctrl";
-	tevalShaderFile = "shaders/water/water.teseval";
-	gShaderFile = "shaders/water/water.geom";
 }
 
 Engine::ProceduralWaterProgram::ProceduralWaterProgram(const Engine::ProceduralWaterProgram & other)
 	:Engine::Program(other)
 {
-	tcsShaderFile = other.tcsShaderFile;
-	tevalShaderFile = other.tevalShaderFile;
-	gShaderFile = other.gShaderFile;
-
 	uModelView = other.uModelView;
 	uModelViewProj = other.uModelViewProj;
 	uNormal = other.uNormal;
+
+	uLightDepthMatrix = other.uLightDepthMatrix;
+	uDepthTexture = other.uDepthTexture;
+	uLightDirection = other.uLightDirection;
 
 	uTime = other.uTime;
 	uWaterColor = other.uWaterColor;
@@ -47,18 +43,17 @@ void Engine::ProceduralWaterProgram::initialize()
 		configStr += "#define WIRE_MODE";
 	}
 
-	vShader = loadShader(vShaderFile, GL_VERTEX_SHADER);
-	tcsShader = loadShader(tcsShaderFile, GL_TESS_CONTROL_SHADER);
-	tevalShader = loadShader(tevalShaderFile, GL_TESS_EVALUATION_SHADER);
-	gShader = loadShader(gShaderFile, GL_GEOMETRY_SHADER, configStr);
+	if (parameters & Engine::ProceduralTerrainProgram::SHADOW_MAP)
+	{
+		configStr += "#define SHADOW_MAP";
+	}
+
+	vShader = loadShader(vShaderFile, GL_VERTEX_SHADER, configStr);
 	fShader = loadShader(fShaderFile, GL_FRAGMENT_SHADER, configStr);
 
 	glProgram = glCreateProgram();
 
 	glAttachShader(glProgram, vShader);
-	glAttachShader(glProgram, tcsShader);
-	glAttachShader(glProgram, tevalShader);
-	glAttachShader(glProgram, gShader);
 	glAttachShader(glProgram, fShader);
 
 	glLinkProgram(glProgram);
@@ -86,6 +81,10 @@ void Engine::ProceduralWaterProgram::configureProgram()
 	uNormal = glGetUniformLocation(glProgram, "normal");
 	uGridPos = glGetUniformLocation(glProgram, "gridPos");
 
+	uLightDepthMatrix = glGetUniformLocation(glProgram, "lightDepthMat");
+	uDepthTexture = glGetUniformLocation(glProgram, "depthTexture");
+	uLightDirection = glGetUniformLocation(glProgram, "lightDir");
+	
 	uWaterColor = glGetUniformLocation(glProgram, "watercolor");
 	uWaterSpeed = glGetUniformLocation(glProgram, "waterspeed");
 	uTime = glGetUniformLocation(glProgram, "time");
@@ -104,6 +103,23 @@ void Engine::ProceduralWaterProgram::setUniformGridPosition(unsigned int i, unsi
 	glUniform2i(uGridPos, i, j);
 }
 
+void Engine::ProceduralWaterProgram::setUniformLightDepthMatrix(const glm::mat4 & ldm)
+{
+	glUniformMatrix4fv(uLightDepthMatrix, 1, GL_FALSE, &(ldm[0][0]));
+}
+
+void Engine::ProceduralWaterProgram::setUniformDepthTexture(Engine::TextureInstance * depthTexture)
+{
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, depthTexture->getTexture()->getTextureId());
+	glUniform1i(uDepthTexture, 0);
+}
+
+void Engine::ProceduralWaterProgram::setUniformLightDirection(const glm::vec3 & lightDir)
+{
+	glUniform3fv(uLightDirection, 1, &lightDir[0]);
+}
+
 void Engine::ProceduralWaterProgram::onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
 {
 	glm::mat4 modelView = view * obj->getModelMatrix();
@@ -116,9 +132,6 @@ void Engine::ProceduralWaterProgram::onRenderObject(const Object * obj, const gl
 
 	glUniform1f(uWaterSpeed, Engine::Settings::waterSpeed);
 	glUniform3fv(uWaterColor, 1, &Engine::Settings::waterColor[0]);
-
-	unsigned int vertexPerFace = obj->getMesh()->getNumVerticesPerFace();
-	glPatchParameteri(GL_PATCH_VERTICES, vertexPerFace);
 }
 
 void Engine::ProceduralWaterProgram::configureMeshBuffers(Engine::Mesh * data)
@@ -142,20 +155,17 @@ void Engine::ProceduralWaterProgram::configureMeshBuffers(Engine::Mesh * data)
 
 void Engine::ProceduralWaterProgram::destroy()
 {
-	glDetachShader(glProgram, vShader);
-	glDeleteShader(vShader);
+	if (vShader != -1)
+	{
+		glDetachShader(glProgram, vShader);
+		glDeleteShader(vShader);
+	}
 
-	glDetachShader(glProgram, tcsShader);
-	glDeleteShader(tcsShader);
-
-	glDetachShader(glProgram, tevalShader);
-	glDeleteShader(tevalShader);
-
-	glDetachShader(glProgram, gShader);
-	glDeleteShader(gShader);
-
-	glDetachShader(glProgram, fShader);
-	glDeleteShader(fShader);
+	if (fShader != -1)
+	{
+		glDetachShader(glProgram, fShader);
+		glDeleteShader(fShader);
+	}
 
 	glDeleteProgram(glProgram);
 }

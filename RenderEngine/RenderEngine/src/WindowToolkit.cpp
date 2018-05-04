@@ -3,11 +3,12 @@
 #include <iostream>
 
 #include "WorldConfig.h"
+#include "Time.h"
 
 // ===================================================================
 
 Engine::Window::WindowToolkit::WindowToolkit(std::string title, unsigned int x, unsigned int y, unsigned int width, unsigned int height)
-	:windowTitle(title),windowPosX(x),windowPosY(y),windowWidth(width),windowHeight(height),deltaTime(1.0 / 60.0),lastFrameTime(0.0)
+	:windowTitle(title),windowPosX(x),windowPosY(y),windowWidth(width),windowHeight(height)
 {
 }
 
@@ -51,7 +52,6 @@ void Engine::Window::WindowToolkit::initializeOGL()
 	glFrontFace(GL_CCW);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
-	//glEnable(GL_MULTISAMPLE);
 }
 
 void Engine::Window::WindowToolkit::setContextProfile(unsigned int contxtProfile)
@@ -71,12 +71,7 @@ void Engine::Window::WindowToolkit::updateUI()
 	{
 		for (auto ui : userInterfaces)
 		{
-			ui->render(deltaTime);
+			ui->render(Engine::Time::deltaTime);
 		}
 	}
-}
-
-double Engine::Window::WindowToolkit::getDeltaTime()
-{
-	return deltaTime;
 }

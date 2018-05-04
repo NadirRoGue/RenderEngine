@@ -48,7 +48,7 @@ namespace Engine
 
 		virtual void destroy();
 	protected:
-		unsigned int loadShader(std::string fileName, GLenum type, std::string configString = "");
+		unsigned int loadShader(std::string fileName, GLenum type, std::string configString = "", bool outputToFile = false, std::string outputFileName = "");
 	};
 
 	// ===================================================================================================

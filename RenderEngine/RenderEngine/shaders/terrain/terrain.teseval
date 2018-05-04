@@ -11,8 +11,9 @@ layout (location=1) out float height;
 
 //uniform sampler2D noise;
 
-uniform mat4 modelView;
-uniform mat4 modelViewProj;
+#ifdef SHADOW_MAP
+uniform mat4 lightDepthMat;
+#endif
 
 uniform float amplitude;
 uniform float frecuency;
@@ -89,5 +90,10 @@ void main()
 	height = noiseHeight(outUV);
 
 	final.y = height * 1.5;
+
+#ifndef SHADOW_MAP
 	gl_Position = vec4(final, 1);
+#else
+	gl_Position = lightDepthMat *  vec4(final, 1);
+#endif
 }

@@ -24,7 +24,7 @@ namespace Engine
 		void translate(const glm::vec3 & translation);
 
 		void setDirection(const glm::vec3 & dir);
-		void setColor(float r, float g, float b);
+		void setColor(const glm::vec3 & color);
 		void setKa(float a);
 		void setKd(float d);
 		void setKs(float s);

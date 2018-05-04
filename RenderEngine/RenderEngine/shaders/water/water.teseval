@@ -8,10 +8,6 @@ layout (location=0) in vec2 inUV[];
 // OUTPUT
 layout (location=0) out vec2 outUV;
 
-//uniform sampler2D noise;
-
-uniform mat4 modelView;
-uniform mat4 modelViewProj;
 
 uniform float time;
 uniform float waterspeed;
@@ -127,5 +123,6 @@ void main()
 	vec3 final = p0 + p1 + p2;
 	
 	final.y = noiseHeight(outUV) * 0.01;
+
 	gl_Position = vec4(final, 1);
 }

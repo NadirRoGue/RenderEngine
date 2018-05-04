@@ -110,7 +110,7 @@ void Engine::TextureTable::cacheTexture(std::string filename, std::string name)
 		return;
 	}
 
-	Engine::Texture2D * texture = new Engine::Texture2D(data, width, height);
+	Engine::Texture2D * texture = new Engine::Texture2D(name, data, width, height);
 	texture->generateTexture();
 	texture->uploadTexture();
 	textureTable[name] = texture;
@@ -142,7 +142,7 @@ void Engine::TextureTable::cacheCubemapTexture(CubemapLoadData & cubemapData, st
 	unsigned char *backData = readTextureFromFile(cubemapData.backFace, width, height, "(Cubemap back face)");
 	if (backData == NULL) return;
 
-	Engine::TextureCubemap * texture = new Engine::TextureCubemap(width, height);
+	Engine::TextureCubemap * texture = new Engine::TextureCubemap(name, width, height);
 	texture->setTileData(0, rightData);
 	texture->setTileData(1, leftData);
 	texture->setTileData(2, bottomData);
@@ -195,5 +195,4 @@ void Engine::TextureTable::clean()
 	}
 
 	textureTable.clear();
-	std::cout << "Texture table cleared" << std::endl;
 }

@@ -1,5 +1,7 @@
 #include "inputhandlers/mousehandlers/CameraRotationHandler.h"
 
+#include "WorldConfig.h"
+
 Engine::CameraRotationHandler::CameraRotationHandler(std::string nam, Engine::Camera * cam)
 	:MouseMotionHandler(nam)
 {
@@ -14,6 +16,12 @@ Engine::CameraRotationHandler::CameraRotationHandler(std::string nam, Engine::Ca
 
 void Engine::CameraRotationHandler::handleMotion(int x, int y)
 {
+	if (Engine::Settings::showUI || static_cast<Engine::TravelMethod>(Engine::Settings::travelMethod) != Engine::TravelMethod::TRAVEL_MANUAL)
+	{
+		finishMotion();
+		return;
+	}
+
 	if (camera != nullptr)
 	{
 		if (previousX == -1 && previousY == -1)

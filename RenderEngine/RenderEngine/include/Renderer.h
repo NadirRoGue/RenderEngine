@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Camera.h"
+#include "DeferredRenderObject.h"
 
 namespace Engine
 {
@@ -35,6 +36,8 @@ namespace Engine
 		virtual void doRender() = 0;
 
 		virtual void onResize(unsigned int w, unsigned int h) = 0;
+
+		virtual DeferredRenderObject * getGBuffer() = 0;
 	};	
 
 	// ==================================================================
@@ -53,7 +56,7 @@ namespace Engine
 		~RenderManager();
 
 		void setRenderer(Renderer * render);
-		const Renderer * getRenderer() const;
+		Renderer * getRenderer();
 		void doRender();
 		void doResize(unsigned int w, unsigned int h);
 	};

@@ -22,7 +22,7 @@ namespace Engine
 
 		void setPosition(const glm::vec3 & pos);
 		void setAttenuation(const glm::vec3 & att);
-		void setColor(float r, float g, float b);
+		void setColor(const glm::vec3 & color);
 		void setKa(float a);
 		void setKd(float d);
 		void setKs(float s);

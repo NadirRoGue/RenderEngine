@@ -73,7 +73,7 @@ namespace Engine
 		Camera * getCamera();
 		void addObject(Object * obj);
 
-		
+		void initialize();
 
 		void setClearColor(glm::vec3 cc);
 		const glm::vec3 & getClearColor() const;

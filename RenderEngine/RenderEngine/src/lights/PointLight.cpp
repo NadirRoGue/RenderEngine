@@ -29,11 +29,9 @@ void Engine::PointLight::setAttenuation(const glm::vec3 & att)
 	update = true;
 }
 
-void Engine::PointLight::setColor(float r, float g, float b)
+void Engine::PointLight::setColor(const  glm::vec3 & color)
 {
-	shaderData.color[0] = r;
-	shaderData.color[1] = g;
-	shaderData.color[2] = b;
+	memcpy(shaderData.color, &color[0], sizeof(float) * 3);
 	update = true;
 }
 

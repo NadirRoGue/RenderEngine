@@ -2,6 +2,7 @@
 
 #include "imgui/imgui.h"
 #include "WorldConfig.h"
+#include "Time.h"
 
 Engine::Window::WorldControllerUI::WorldControllerUI(GLFWwindow * surface)
 	:Engine::Window::UserInterface(surface)
@@ -19,11 +20,19 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 	
 	if (ImGui::Begin("World Controller##app"))
 	{
+		int fps = int(floor(1.0f / Time::deltaTime));
+		std::string fpsStr = "FPS: " + std::to_string(fps);
+		ImGui::Text(fpsStr.c_str());
+
+		ImGui::Spacing(); ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing(); ImGui::Spacing();
+
 		ImGui::Text("Drawing settings");
 		ImGui::PushItemWidth(150.0f);
 		ImGui::Combo("Drawing Method##app", reinterpret_cast< int32_t* >(&Engine::Settings::drawingMethod), "Shaded\0Wireframe\0", 2);
 		ImGui::Spacing();
-		ImGui::Combo("Travel Method##app", reinterpret_cast<int32_t*>(&Engine::Settings::travelMethod), "Bezier\0Straight\0Manual", 3);
+		ImGui::Combo("Travel Method##app", reinterpret_cast<int32_t*>(&Engine::Settings::travelMethod), "Manual\0Bezier\0Straight", 3);
 
 		ImGui::Spacing(); ImGui::Spacing();
 		ImGui::Separator();

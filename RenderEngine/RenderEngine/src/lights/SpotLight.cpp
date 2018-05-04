@@ -58,11 +58,9 @@ void Engine::SpotLight::setM(float m)
 	update = true;
 }
 
-void Engine::SpotLight::setColor(float r, float g, float b)
+void Engine::SpotLight::setColor(const glm::vec3 & color)
 {
-	shaderData.color[0] = r;
-	shaderData.color[1] = g;
-	shaderData.color[2] = b;
+	memcpy(shaderData.color, &color[0], sizeof(float) * 3);
 	update = true;
 }
 

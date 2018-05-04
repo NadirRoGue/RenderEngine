@@ -75,7 +75,7 @@ void Engine::RenderManager::setRenderer(Engine::Renderer * renderer)
 	activeRender->initialize();
 }
 
-const Engine::Renderer * Engine::RenderManager::getRenderer() const
+Engine::Renderer * Engine::RenderManager::getRenderer()
 {
 	return activeRender;
 }

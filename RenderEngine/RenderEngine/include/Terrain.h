@@ -6,6 +6,7 @@
 #include "programs/ProceduralWaterProgram.h"
 #include "Object.h"
 #include "Camera.h"
+#include "DeferredRenderObject.h"
 
 namespace Engine
 {
@@ -14,7 +15,6 @@ namespace Engine
 	private:
 		unsigned int gridPosI;
 		unsigned int gridPosJ;
-
 	public:
 		TerrainTile(Mesh * instance) : Object(instance)
 		{
@@ -47,11 +47,13 @@ namespace Engine
 		float tileWidth;
 		unsigned int renderRadius;
 		
+		ProceduralTerrainProgram * terrainShadowMapShader;
 		ProceduralTerrainProgram * terrainShadingShader;
 		ProceduralTerrainProgram * terrainWireShader;
 
 		ProceduralTerrainProgram * terrainActiveShader;
 
+		ProceduralWaterProgram * waterShadowMapShader;
 		ProceduralWaterProgram * waterShadingShader;
 		ProceduralWaterProgram * waterWireShader;
 
@@ -59,11 +61,16 @@ namespace Engine
 
 		Object * tileObject;
 
-		float waterMovementSignal;
+		glm::mat4 lightProjMatrix;
+		glm::mat4 lightDepthMat;
+		glm::mat4 biasMat;
+
+		DeferredRenderObject * shadowMap;
+		TextureInstance * depthTexture;
 	public:
 		Terrain();
 		Terrain(float tileWidth, unsigned int renderRadius);
-		Terrain(const Terrain & other);
+		~Terrain();
 
 		void render(Camera * camera);
 
@@ -71,7 +78,12 @@ namespace Engine
 	private:
 		void initialize();
 		void createTileMesh();
-		void drawTerrainLayer(Engine::Camera * cam);
-		void drawWaterLayer(Engine::Camera * cam);
+
+		void tiledRendering(Camera * cam, Program * prog, void (Terrain::*func)(Camera * cam, int i, int j));
+
+		void terrainShadowMapRender(Camera * cam, int i, int j);
+		void waterShadowMapRender(Camera * cam, int i, int j);
+		void terrainRender(Camera * cam, int i, int j);
+		void waterRender(Camera * cam, int i, int j);
 	};
 }

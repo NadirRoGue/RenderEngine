@@ -30,16 +30,6 @@ Engine::SideBySideRenderer::~SideBySideRenderer()
 	}
 }
 
-void Engine::SideBySideRenderer::setLeftForwardPassBuffer(Engine::DeferredRenderObject * buffer)
-{
-	leftRenderer->setForwardPassBuffers(buffer);
-}
-
-void Engine::SideBySideRenderer::setRightForwardPassBuffer(Engine::DeferredRenderObject * buffer)
-{
-	rightRenderer->setForwardPassBuffers(buffer);
-}
-
 void Engine::SideBySideRenderer::addLeftPostProcess(Engine::PostProcessChainNode * node)
 {
 	leftRenderer->addPostProcess(node);
@@ -55,6 +45,16 @@ void Engine::SideBySideRenderer::setClearScreen(bool val)
 	clearScreen = val;
 }
 
+Engine::DeferredRenderObject * Engine::SideBySideRenderer::getGBuffer()
+{
+	if (leftRenderer != NULL)
+	{
+		return leftRenderer->getGBuffer();
+	}
+
+	return NULL;
+}
+
 void Engine::SideBySideRenderer::initialize()
 {
 	if (initialized)
@@ -65,25 +65,7 @@ void Engine::SideBySideRenderer::initialize()
 	Engine::Program * sourcePostProcess = Engine::ProgramTable::getInstance().getProgramByName("post_processing_program");
 	Engine::Mesh * miL = Engine::MeshTable::getInstance().getMesh("leftplane");
 
-	Engine::PostProcessChainNode * lNode = new Engine::PostProcessChainNode;
-	lNode->postProcessProgram = new Engine::PostProcessProgram(*dynamic_cast<Engine::PostProcessProgram*>(sourcePostProcess));
-	lNode->postProcessProgram->configureMeshBuffers(miL);
-	lNode->renderBuffer = 0;
-	lNode->callBack = 0;
-	lNode->obj = new Engine::PostProcessObject(miL);
-
-	leftRenderer->setFinalPostProcess(lNode);
 	leftRenderer->initialize();
-
-	Engine::Mesh * miR = Engine::MeshTable::getInstance().getMesh("rightplane");
-	Engine::PostProcessChainNode * rNode = new Engine::PostProcessChainNode;
-	rNode->postProcessProgram = new Engine::PostProcessProgram(*dynamic_cast<Engine::PostProcessProgram*>(sourcePostProcess));
-	rNode->postProcessProgram->configureMeshBuffers(miR);
-	rNode->renderBuffer = 0;
-	rNode->callBack = 0;
-	rNode->obj = new Engine::PostProcessObject(miR);
-
-	rightRenderer->setFinalPostProcess(rNode);
 	rightRenderer->initialize();
 }
 

@@ -11,7 +11,7 @@ namespace Engine
 		unsigned int width;
 		unsigned int height;
 	public:
-		Texture2D(unsigned char *data, unsigned int width, unsigned int height);
+		Texture2D(std::string name, unsigned char *data, unsigned int width, unsigned int height);
 		~Texture2D();
 
 		const unsigned char * getTexturePixels() const;

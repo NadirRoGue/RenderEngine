@@ -16,12 +16,14 @@ namespace Engine
 	{
 	protected:
 		unsigned int textureId;
+		std::string name;
 
 		int internalFormat;	// How do we want to store the texture in the gpu memory?
 		GLenum formatType;	// Whats the format of the image we got form disk (what does each element we read mean)?
 		GLenum pixelType;	// Hows each element of the texture codified? (3 floats, 1 unsigned int, 1 unsigned char,...)
 		bool generateMipMaps;
 	public:
+		AbstractTexture(std::string name);
 		const unsigned int getTextureId() const;
 
 		void setMemoryLayoutFormat(const int format);

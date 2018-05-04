@@ -5,6 +5,11 @@
 
 #include "Texture.h"
 
+Engine::AbstractTexture::AbstractTexture(std::string name)
+	:name(name)
+{
+}
+
 const unsigned int Engine::AbstractTexture::getTextureId() const
 {
 	return textureId;

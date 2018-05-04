@@ -4,13 +4,8 @@
 #include "datatables/MeshTable.h"
 #include "Scene.h"
 
-Engine::SkyBox::SkyBox(Engine::TextureInstance * skyboxTextureCubeMap)
-	:skyCubeMap(skyboxTextureCubeMap)
+Engine::SkyBox::SkyBox()
 {
-	skyCubeMap->setMinificationFilterType(GL_NEAREST);
-	skyCubeMap->setMagnificationFilterType(GL_NEAREST);
-	skyCubeMap->setAnisotropicFilterEnabled(false);
-	skyCubeMap->configureTexture();
 	initialize();
 
 	renderMode = GL_TRIANGLES;
@@ -18,11 +13,6 @@ Engine::SkyBox::SkyBox(Engine::TextureInstance * skyboxTextureCubeMap)
 
 Engine::SkyBox::~SkyBox()
 {
-	if (skyCubeMap != NULL)
-	{
-		delete skyCubeMap;
-	}
-
 	if (cubeMesh != NULL)
 	{
 		delete cubeMesh;
@@ -40,7 +30,6 @@ void Engine::SkyBox::render(Engine::Camera * camera)
 	glm::vec3 cubePos(pos);
 	cubeMesh->setTranslation(cubePos * -1.0f);
 	shader->onRenderObject(cubeMesh, camera->getViewMatrix(), camera->getProjectionMatrix());
-	shader->setCubemapUniform(skyCubeMap);
 
 	glDrawElements(renderMode, data->getNumFaces() * data->getNumVerticesPerFace(), GL_UNSIGNED_INT, (void*)0);
 }

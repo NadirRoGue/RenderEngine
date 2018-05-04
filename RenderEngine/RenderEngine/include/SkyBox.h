@@ -11,12 +11,11 @@ namespace Engine
 	{
 	private:
 		SkyProgram * shader;
-		TextureInstance * skyCubeMap;
 		Object * cubeMesh;
 
 		GLenum renderMode;
 	public:
-		SkyBox(TextureInstance * skyTextureCubeMap);
+		SkyBox();
 		~SkyBox();
 
 		void render(Camera * camera);

@@ -1,5 +1,7 @@
 #pragma once
 
+#define GLM_FORCE_RADIANS
+
 #include "glm/glm.hpp"
 
 #include <list>
@@ -8,6 +10,13 @@
 
 namespace Engine
 {
+	enum TravelMethod
+	{
+		TRAVEL_MANUAL,
+		TRAVEL_BEZIER,
+		TRAVEL_STRAIGHT
+	};
+
 	class Settings
 	{
 	public:

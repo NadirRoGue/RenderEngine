@@ -13,5 +13,7 @@ namespace Engine
 		void doRender();
 		void onResize(unsigned int w, unsigned int h);
 		void renderProgram(Camera * camera, ProgramRenderables * pr);
+
+		DeferredRenderObject * getGBuffer();
 	};
 }

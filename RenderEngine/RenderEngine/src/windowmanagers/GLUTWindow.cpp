@@ -8,6 +8,7 @@
 #include "Renderer.h"
 #include "Scene.h"
 #include "windowmanagers/WindowManager.h"
+#include "Time.h"
 
 void Engine::Window::defaultResizeCallback(int width, int height)
 {
@@ -155,9 +156,7 @@ void Engine::Window::GLUTWindow::onRenderEnd()
 {
 	std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
 	double currentAbsTime = double(std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count());
-	currentAbsTime -= renderStartTime;
+	//currentAbsTime -= renderStartTime;
 
-	deltaTime = currentAbsTime - lastFrameTime;
-
-	lastFrameTime = currentAbsTime;
+	Engine::Time::update(currentAbsTime);
 }

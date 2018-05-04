@@ -4,8 +4,10 @@
 
 #include "WorldConfig.h"
 
-std::string Engine::ProceduralTerrainProgram::PROGRAM_NAME = "ProceduralTerrainProgram";
-unsigned long long Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE = 0x01;
+const std::string Engine::ProceduralTerrainProgram::PROGRAM_NAME = "ProceduralTerrainProgram";
+
+const unsigned long long Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE = 0x01;
+const unsigned long long Engine::ProceduralTerrainProgram::SHADOW_MAP = 0x02;
 
 // ==================================================================================
 
@@ -30,6 +32,10 @@ Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerra
 	uModelViewProj = other.uModelViewProj;
 	uNormal = other.uNormal;
 
+	uLightDepthMatrix = other.uLightDepthMatrix;
+	uDepthTexture = other.uDepthTexture;
+	uLightDirection = other.uLightDirection;
+
 	uAmplitude = other.uAmplitude;
 	uFrecuency = other.uFrecuency;
 	uScale = other.uScale;
@@ -50,10 +56,20 @@ void Engine::ProceduralTerrainProgram::initialize()
 		configStr += "#define WIRE_MODE";
 	}
 
-	vShader = loadShader(vShaderFile, GL_VERTEX_SHADER);
-	tcsShader = loadShader(tcsShaderFile, GL_TESS_CONTROL_SHADER);
-	tevalShader = loadShader(tevalShaderFile, GL_TESS_EVALUATION_SHADER);
-	gShader = loadShader(gShaderFile, GL_GEOMETRY_SHADER, configStr);
+	if (parameters & Engine::ProceduralTerrainProgram::SHADOW_MAP)
+	{
+		configStr += "#define SHADOW_MAP";
+	}
+
+	vShader = loadShader(vShaderFile, GL_VERTEX_SHADER, configStr);
+	tcsShader = loadShader(tcsShaderFile, GL_TESS_CONTROL_SHADER, configStr);
+	tevalShader = loadShader(tevalShaderFile, GL_TESS_EVALUATION_SHADER, configStr);
+
+	if (!(parameters & Engine::ProceduralTerrainProgram::SHADOW_MAP))
+	{
+		gShader = loadShader(gShaderFile, GL_GEOMETRY_SHADER, configStr);
+	}
+
 	fShader = loadShader(fShaderFile, GL_FRAGMENT_SHADER, configStr);
 
 	glProgram = glCreateProgram();
@@ -61,7 +77,12 @@ void Engine::ProceduralTerrainProgram::initialize()
 	glAttachShader(glProgram, vShader);
 	glAttachShader(glProgram, tcsShader);
 	glAttachShader(glProgram, tevalShader);
-	glAttachShader(glProgram, gShader);
+
+	if (!(parameters & Engine::ProceduralTerrainProgram::SHADOW_MAP))
+	{
+		glAttachShader(glProgram, gShader);
+	}
+
 	glAttachShader(glProgram, fShader);
 
 	glLinkProgram(glProgram);
@@ -88,6 +109,10 @@ void Engine::ProceduralTerrainProgram::configureProgram()
 	uModelViewProj = glGetUniformLocation(glProgram, "modelViewProj");
 	uNormal = glGetUniformLocation(glProgram, "normal");
 	uGridPos = glGetUniformLocation(glProgram, "gridPos");
+
+	uLightDepthMatrix = glGetUniformLocation(glProgram, "lightDepthMat");
+	uLightDirection = glGetUniformLocation(glProgram, "lightDir");
+	uDepthTexture = glGetUniformLocation(glProgram, "depthTexture");
 
 	uAmplitude = glGetUniformLocation(glProgram, "amplitude");
 	uFrecuency = glGetUniformLocation(glProgram, "frecuency");
@@ -127,18 +152,35 @@ void Engine::ProceduralTerrainProgram::onRenderObject(const Engine::Object * obj
 	glUniformMatrix4fv(uModelViewProj, 1, GL_FALSE, &(modelViewProj[0][0]));
 	glUniformMatrix4fv(uNormal, 1, GL_FALSE, &(normal[0][0]));
 
+	unsigned int vertexPerFace = obj->getMesh()->getNumVerticesPerFace();
+	glPatchParameteri(GL_PATCH_VERTICES, vertexPerFace);
+
 	glUniform1f(uAmplitude, Engine::Settings::terrainAmplitude);
 	glUniform1f(uFrecuency, Engine::Settings::terrainFrecuency);
 	glUniform1f(uScale, Engine::Settings::terrainScale);
 	glUniform1i(uOctaves, Engine::Settings::terrainOctaves);
-
-	unsigned int vertexPerFace = obj->getMesh()->getNumVerticesPerFace();
-	glPatchParameteri(GL_PATCH_VERTICES, vertexPerFace);
 }
 
 void Engine::ProceduralTerrainProgram::setUniformGridPosition(unsigned int i, unsigned int j)
 {
 	glUniform2i(uGridPos, i, j);
+}
+
+void Engine::ProceduralTerrainProgram::setUniformLightDepthMatrix(const glm::mat4 & ldm)
+{
+	glUniformMatrix4fv(uLightDepthMatrix, 1, GL_FALSE, &(ldm[0][0]));
+}
+
+void Engine::ProceduralTerrainProgram::setUniformDepthTexture(Engine::TextureInstance * depthTexture)
+{
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, depthTexture->getTexture()->getTextureId());
+	glUniform1i(uDepthTexture, 0);
+}
+
+void Engine::ProceduralTerrainProgram::setUniformLightDirection(const glm::vec3 & lightDir)
+{
+	glUniform3fv(uLightDirection, 1, &lightDir[0]);
 }
 
 void Engine::ProceduralTerrainProgram::destroy()

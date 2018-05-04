@@ -5,6 +5,8 @@
 #include "Object.h"
 #include "DeferredNodeCallbacks.h"
 
+#include "postprocessprograms/DeferredShadingProgram.h"
+
 #include "renderers/ForwardRenderer.h"
 
 namespace Engine
@@ -23,13 +25,17 @@ namespace Engine
 	{
 	private:
 		ForwardRenderer * forwardPass;
+
 		DeferredRenderObject * forwardPassBuffer;
+		DeferredRenderObject * deferredPassBuffer;
 
-		PostProcessChainNode * preProcess;
+		DeferredShadingProgram * deferredShading;
+		PostProcessProgram * screenOutput;
+
+		PostProcessObject * deferredDrawSurface;
+		PostProcessObject * chainEnd;
+
 		std::list<PostProcessChainNode *> postProcessChain;
-		PostProcessChainNode * finalLink;
-
-		glm::mat4 dummyMatrix;
 
 		bool initialized;
 
@@ -37,12 +43,13 @@ namespace Engine
 		DeferredRenderer();
 		~DeferredRenderer();
 
-		void setForwardPassBuffers(DeferredRenderObject * buffers);
-		void setPreProcess(PostProcessChainNode * node);
 		void addPostProcess(PostProcessChainNode * object);
-		void setFinalPostProcess(PostProcessChainNode * object);
 		void initialize();
 		void doRender();
 		void onResize(unsigned int w, unsigned int h);
+		
+		DeferredRenderObject * getGBuffer();
+	private:
+		void runPostProcesses();
 	};
 }

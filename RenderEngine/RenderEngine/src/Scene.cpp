@@ -10,6 +10,8 @@
 
 #include "datatables/ProgramTable.h"
 
+#include "LightBufferManager.h"
+
 Engine::Scene::Scene()
 {
 	clearColor = glm::vec3(0, 0, 0);
@@ -108,11 +110,13 @@ void Engine::Scene::addObject(Engine::Object *obj)
 
 void Engine::Scene::addPointLight(Engine::PointLight * pl)
 {
+	pl->setBufferIndex(unsigned int(pointLights.size()));
 	pointLights[pl->getName()] = pl;
 }
 
 void Engine::Scene::addSpotLight(Engine::SpotLight * sl)
 {
+	sl->setBufferIndex(unsigned int(spotLights.size()));
 	spotLights[sl->getName()] = sl;
 }
 
@@ -196,6 +200,11 @@ Engine::MouseEventManager * Engine::Scene::getMouseHandler() const
 Engine::AnimationTable * Engine::Scene::getAnimationHandler() const
 {
 	return animations;
+}
+
+void Engine::Scene::initialize()
+{
+	Engine::GPU::LightBufferManager::getInstance().onSceneStart();
 }
 
 // ===========================================================================================

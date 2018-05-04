@@ -9,6 +9,7 @@
 
 #include "userinterfaces/WorldControllerUI.h"
 #include "WorldConfig.h"
+#include "Time.h"
 
 double lastMouseXPos = 0.0, lastMouseYPos = 0.0;
 
@@ -114,7 +115,7 @@ void Engine::Window::GLFWWindow::initializeContext()
 
 	glfwSetWindowPos(window, windowPosX, windowPosY);
 
-	glfwSwapInterval(1);
+	glfwSwapInterval(0);
 
 	initGlew();
 
@@ -138,11 +139,9 @@ void Engine::Window::GLFWWindow::mainLoop()
 		glfwSwapBuffers(window);
 
 		// Update animations
-		//Engine::SceneManager::getInstance().getActiveScene()->getAnimationHandler()->tick();
+		Engine::SceneManager::getInstance().getActiveScene()->getAnimationHandler()->tick();
 
-		double time = glfwGetTime();
-		deltaTime = time - lastFrameTime;
-		lastFrameTime = time;
+		Engine::Time::update(glfwGetTime());
 	}
 
 	glfwDestroyWindow(window);

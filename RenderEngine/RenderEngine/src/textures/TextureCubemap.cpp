@@ -1,7 +1,7 @@
 #include "textures/TextureCubemap.h"
 
-Engine::TextureCubemap::TextureCubemap(unsigned int tileWidth, unsigned int tileHeight)
-	:tileWidth(tileWidth), tileHeight(tileHeight)
+Engine::TextureCubemap::TextureCubemap(std::string name, unsigned int tileWidth, unsigned int tileHeight)
+	:Engine::AbstractTexture(name),tileWidth(tileWidth), tileHeight(tileHeight)
 {
 	internalFormat = GL_RGBA;
 	formatType = GL_RGBA;

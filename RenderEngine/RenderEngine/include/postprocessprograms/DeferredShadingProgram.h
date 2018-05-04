@@ -2,6 +2,8 @@
 
 #include "PostProcessProgram.h"
 
+#include "Scene.h"
+
 namespace Engine
 {
 	class DeferredShadingProgram : public PostProcessProgram
@@ -21,7 +23,9 @@ namespace Engine
 
 		unsigned int uBackground;
 
-		bool lightBufferInitialized;
+		unsigned int uProjMat;
+		unsigned int uViewMat;
+		unsigned int uCamPos;
 
 	public:
 		DeferredShadingProgram(std::string name, unsigned long long params);
@@ -29,18 +33,8 @@ namespace Engine
 
 		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
 		void configureProgram();
-
-		// DEPRECATED
-		//void onRenderLight(const glm::mat4 & model, const glm::mat4 & view);
-		//void onRenderSpotLight(const glm::mat4 & modelPos, const glm::mat4 & modelDir, const glm::mat4 & view);
-		//void onRenderDirectionalLight(const glm::mat4 & model, const glm::mat4 & view);
-	
-		//void configureClearColor(const glm::vec3 & cc);
-		//void configurePointLightBuffer(const PointLight *pl);
-		//void configureSpotLightBuffer(const SpotLight *pl);
-		//void configureDirectionalLightBuffer(const DirectionalLight *dl);
 	private:
-		void initializeLightBuffers();
+		void processDirectionalLights(DirectionalLight * dl, const glm::mat4 & viewMatrix);
 	};
 
 	class DeferredShadingProgramFactory : public ProgramFactory

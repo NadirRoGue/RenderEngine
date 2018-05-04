@@ -1,7 +1,7 @@
 #include "textures/Texture2D.h"
 
-Engine::Texture2D::Texture2D(unsigned char *data, unsigned int width, unsigned int height)
-	:width(width), height(height)
+Engine::Texture2D::Texture2D(std::string name, unsigned char *data, unsigned int width, unsigned int height)
+	:Engine::AbstractTexture(name),width(width), height(height)
 {
 	// Default settings
 	internalFormat = GL_RGBA8;

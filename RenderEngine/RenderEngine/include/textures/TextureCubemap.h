@@ -11,7 +11,7 @@ namespace Engine
 		unsigned int tileWidth;
 		unsigned int tileHeight;
 	public:
-		TextureCubemap(unsigned int tileWidth, unsigned int tileHeight);
+		TextureCubemap(std::string name, unsigned int tileWidth, unsigned int tileHeight);
 		~TextureCubemap();
 		void setTileData(unsigned int index, unsigned char * data);
 

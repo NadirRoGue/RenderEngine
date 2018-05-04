@@ -6,11 +6,23 @@ layout (location=1) in vec2 inUV;
 
 // OUTPUT
 layout (location=0) out vec2 outUV;
+layout (location=1) out vec3 outPos;
+layout (location=2) out vec4 outShadowMapPos;
 
 uniform ivec2 gridPos;
 
+uniform mat4 modelView;
+uniform mat4 modelViewProj;
+uniform mat4 lightDepthMat;
+
 void main()
 {
-	gl_Position = vec4(inPos, 1.0);
+#ifndef SHADOW_MAP
+	gl_Position = modelViewProj * vec4(inPos, 1.0);
+	outPos = (modelView * vec4(inPos, 1.0)).xyz;
 	outUV = abs(inUV + vec2(float(gridPos.x), float(gridPos.y)));
+	outShadowMapPos = lightDepthMat * vec4(inPos, 1.0);
+#else
+	gl_Position = lightDepthMat * vec4(inPos, 1);
+#endif
 }

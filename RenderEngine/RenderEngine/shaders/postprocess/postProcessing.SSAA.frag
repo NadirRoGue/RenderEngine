@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 
 #define MASK_MAX_SIZE 64u
 
@@ -76,5 +76,7 @@ void main()
 	}
 
 	outColor = vec4(color.rgb, 1);
-	outDepth = vec4(texture(postProcessing_1, texCoord).x, 0, 0, 1);
+	float depth = texture(postProcessing_1, texCoord).x;
+	outDepth = vec4(depth, 0, 0, 1);
+	gl_FragDepth = depth;
 }

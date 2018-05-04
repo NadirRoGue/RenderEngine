@@ -1,5 +1,6 @@
 #version 410 core
 
+#ifndef SHADOW_MAP
 layout (location=0) out vec4 outColor;
 layout (location=1) out vec4 outNormal;
 layout (location=2) out vec4 outSpecular;
@@ -8,9 +9,18 @@ layout (location=4) out vec4 outPos;
 
 layout (location=0) in vec2 inUV;
 layout (location=1) in vec3 inPos;
+layout (location=2) in vec4 inShadowMapPos;
 
-uniform mat4 modelView;
 uniform mat4 normal;
+
+uniform sampler2D depthTexture;
+uniform vec3 lightDir;
+vec2 poissonDisk[4] = vec2[](
+  vec2( -0.94201624, -0.39906216 ),
+  vec2( 0.94558609, -0.76890725 ),
+  vec2( -0.094184101, -0.92938870 ),
+  vec2( 0.34495938, 0.29387760 )
+);
 
 uniform ivec2 gridPos;
 
@@ -106,20 +116,28 @@ float noiseHeight(in vec2 pos)
 
 	return noiseValue * 0.000001;
 }
+#else
+layout (location=0) out vec4 lightdepth;
+#endif
 
 // ================================================================================
 
 void main()
 {
+#ifdef SHADOW_MAP
+	lightdepth = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, 1);
+#else
 	float u = inUV.x;
 	float v = inUV.y;
 
 	// COMPUTE NORMAL
+	// ------------------------------------------------------------------------------
 	float step = 0.001;
-	float tH = noiseHeight(vec2(u, v + step)); //texture(noise, vec2(u, v + step)).r;//noiseHeight(vec2(u, v + step));
-	float bH = noiseHeight(vec2(u, v - step)); //texture(noise, vec2(u, v - step)).r;//noiseHeight(vec2(u, v - step));
-	float rH = noiseHeight(vec2(u + step, v)); //texture(noise, vec2(u + step, v)).r;//noiseHeight(vec2(u + step, v));
-	float lH = noiseHeight(vec2(u - step, v)); //texture(noise, vec2(u - step, v)).r;//noiseHeight(vec2(u - step, v));
+	float tH = noiseHeight(vec2(u, v + step)); 
+	float bH = noiseHeight(vec2(u, v - step));
+	float rH = noiseHeight(vec2(u + step, v)); 
+	float lH = noiseHeight(vec2(u - step, v));
+
 	vec3 rawNormal = normalize(vec3(lH - rH, step * step, bH - tH));
 
 	// Correct normal if we have pass from +X to -X, from +Z to -Z, viceversa, or both
@@ -130,16 +148,32 @@ void main()
 	vec3 n = normalize((normal * vec4(rawNormal, 0.0)).xyz);
 	
 	// COMPUTE COLOR
+	// ------------------------------------------------------------------------------
 #ifdef WIRE_MODE
 	vec3 color = vec3(0);
 #else
 	vec3 color = watercolor;
 #endif
 
+	// APPLY SHADOW MAP
+	// ------------------------------------------------------------------------------
+	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
+	float curDepth = inShadowMapPos.z - bias;
+	float visibility = 1.0;
+	if(inShadowMapPos.x >= 0 && inShadowMapPos.x <= 1 && inShadowMapPos.y >= 0 && inShadowMapPos.y <= 1)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			visibility -= 0.25 * ( texture( depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0 ).x  <  curDepth? 1.0 : 0.0 );
+		}
+	}
+
 	// OUTPUT TO G-BUFFERS
-	outColor = vec4(color, 0.5);
+	// ------------------------------------------------------------------------------
+	outColor = vec4(color, visibility);
 	outNormal = vec4(n, 1.0);
 	outPos = vec4(inPos, 1.0);
 	outSpecular = vec4(1,1,1,1);
 	outEmissive = vec4(0,0,0,1);
+#endif
 }

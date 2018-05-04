@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <GL/glew.h>
+#include <string>
 
 #include <list>
 
@@ -22,9 +22,6 @@ namespace Engine
 			unsigned int windowWidth, windowHeight;
 			std::string windowTitle;
 
-			double lastFrameTime;
-			double deltaTime;
-
 		public:
 			WindowToolkit(std::string title, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
 			~WindowToolkit();
@@ -34,8 +31,6 @@ namespace Engine
 
 			void addUserInterface(UserInterface * ui);
 			void updateUI();
-
-			double getDeltaTime();
 
 			virtual void initializeContext() = 0;
 			virtual void mainLoop() = 0;

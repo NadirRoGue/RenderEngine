@@ -1,12 +1,13 @@
 #pragma
 
 #include "Scene.h"
+#include "StorageTable.h"
 
 namespace Engine
 {
 	namespace GPU
 	{
-		class LightBufferManager
+		class LightBufferManager : public StorageTable
 		{
 		private:
 			static LightBufferManager * INSTANCE;
@@ -31,9 +32,10 @@ namespace Engine
 			void updateDirectionalLight(DirectionalLight * dl, bool onlyViewDependent = false);
 			void updatePointLight(PointLight * pl, bool onlyViewDependent = false);
 			void updateSpotLight(SpotLight * sl, bool onlyViewDependent = false);
+
+			void clean();
 		private:
 			void initializeBuffers(Scene * scene);
-			void clean();
 		};
 	}
 }

@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <map>
 #include <vector>
+#include <iostream>
 
 #include "lights/DirectionalLight.h"
 #include "lights/PointLight.h"

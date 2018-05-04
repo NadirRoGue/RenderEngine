@@ -79,7 +79,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>lib/include;include;testimplementation</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>lib/include;include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>lib/x86/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -92,7 +92,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>include;lib/include;testimplementation;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;lib/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>FreeImage.lib;opengl32.lib;freeglut.lib;glew32.lib;assimp.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -107,7 +107,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>lib/include;include;testimplementation</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>lib/include;include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -124,7 +124,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>include;lib/include;testimplementation;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;lib/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -135,7 +135,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\Animation.h" />
+    <ClInclude Include="include\animations\CameraBezier.h" />
     <ClInclude Include="include\Camera.h" />
+    <ClInclude Include="include\datatables\DeferredObjectsTable.h" />
     <ClInclude Include="include\datatables\MeshTable.h" />
     <ClInclude Include="include\datatables\ProgramTable.h" />
     <ClInclude Include="include\datatables\TextureTable.h" />
@@ -155,13 +157,11 @@
     <ClInclude Include="include\lights\DirectionalLight.h" />
     <ClInclude Include="include\lights\PointLight.h" />
     <ClInclude Include="include\lights\SpotLight.h" />
-    <ClInclude Include="include\Material.h" />
-    <ClInclude Include="include\Materials\ProceduralTerrainMaterial.h" />
-    <ClInclude Include="include\Materials\StandardMaterial.h" />
     <ClInclude Include="include\Mesh.h" />
     <ClInclude Include="include\MouseHandler.h" />
     <ClInclude Include="include\Object.h" />
     <ClInclude Include="include\PostProcessProgram.h" />
+    <ClInclude Include="include\postprocessprograms\BloomProgram.h" />
     <ClInclude Include="include\postprocessprograms\DeferredShadingProgram.h" />
     <ClInclude Include="include\postprocessprograms\DepthOfFieldProgram.h" />
     <ClInclude Include="include\postprocessprograms\GaussianBlurProgram.h" />
@@ -170,6 +170,7 @@
     <ClInclude Include="include\Program.h" />
     <ClInclude Include="include\programs\ProceduralTerrainProgram.h" />
     <ClInclude Include="include\programs\ProceduralWaterProgram.h" />
+    <ClInclude Include="include\programs\ShadowMapProgram.h" />
     <ClInclude Include="include\programs\SkyProgram.h" />
     <ClInclude Include="include\programs\StandardProgram.h" />
     <ClInclude Include="include\Renderer.h" />
@@ -183,6 +184,7 @@
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\textures\Texture2D.h" />
     <ClInclude Include="include\textures\TextureCubemap.h" />
+    <ClInclude Include="include\Time.h" />
     <ClInclude Include="include\UserInterface.h" />
     <ClInclude Include="include\userinterfaces\WorldControllerUI.h" />
     <ClInclude Include="include\windowmanagers\GLFWWindow.h" />
@@ -196,14 +198,15 @@
     <ClInclude Include="lib\include\imgui\stb_rect_pack.h" />
     <ClInclude Include="lib\include\imgui\stb_textedit.h" />
     <ClInclude Include="lib\include\imgui\stb_truetype.h" />
-    <ClInclude Include="testimplementation\AnimImpl.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\include\imgui\imgui.cpp" />
     <ClCompile Include="lib\include\imgui\imgui_demo.cpp" />
     <ClCompile Include="lib\include\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\Animation.cpp" />
+    <ClCompile Include="src\animations\CameraBezier.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\datatables\DeferredObjectsTable.cpp" />
     <ClCompile Include="src\datatables\MeshTable.cpp" />
     <ClCompile Include="src\datatables\ProgramTable.cpp" />
     <ClCompile Include="src\datatables\TextureTable.cpp" />
@@ -221,13 +224,11 @@
     <ClCompile Include="src\lights\SpotLight.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\CustomMaths.cpp" />
-    <ClCompile Include="src\Material.cpp" />
-    <ClCompile Include="src\Materials\ProceduralTerrainMaterial.cpp" />
-    <ClCompile Include="src\Materials\StandardMaterial.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\MouseHandler.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\PostProcessProgram.cpp" />
+    <ClCompile Include="src\postprocessprograms\BloomProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\DeferredShadingProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\DepthOfFieldProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\GaussianBlurProgram.cpp" />
@@ -236,6 +237,7 @@
     <ClCompile Include="src\Program.cpp" />
     <ClCompile Include="src\programs\ProceduralTerrainProgram.cpp" />
     <ClCompile Include="src\programs\ProceduralWaterProgram.cpp" />
+    <ClCompile Include="src\programs\ShadowMapProgram.cpp" />
     <ClCompile Include="src\programs\SkyProgram.cpp" />
     <ClCompile Include="src\programs\StandardProgram.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
@@ -249,6 +251,7 @@
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\textures\Texture2D.cpp" />
     <ClCompile Include="src\textures\TextureCubemap.cpp" />
+    <ClCompile Include="src\Time.cpp" />
     <ClCompile Include="src\UserInterface.cpp" />
     <ClCompile Include="src\userinterfaces\WorldControllerUI.cpp" />
     <ClCompile Include="src\windowmanagers\GLFWWindow.cpp" />
@@ -256,7 +259,32 @@
     <ClCompile Include="src\windowmanagers\WindowManager.cpp" />
     <ClCompile Include="src\WindowToolkit.cpp" />
     <ClCompile Include="src\WorldConfig.cpp" />
-    <ClCompile Include="testimplementation\AnimImpl.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\postprocess\Bloom.frag" />
+    <None Include="shaders\postprocess\DeferredShading.frag" />
+    <None Include="shaders\postprocess\perlin.frag" />
+    <None Include="shaders\postprocess\postProcessing.DepthOfFieldZBuffer.frag" />
+    <None Include="shaders\postprocess\postProcessing.GaussianBlur.frag" />
+    <None Include="shaders\postprocess\postProcessing.SSAA.frag" />
+    <None Include="shaders\postprocess\postProcessing.v0.frag" />
+    <None Include="shaders\postprocess\postProcessing.v0.vert" />
+    <None Include="shaders\shader.full_color.frag" />
+    <None Include="shaders\shader.full_color.vert" />
+    <None Include="shaders\shader.full_texture.frag" />
+    <None Include="shaders\shader.full_texture.vert" />
+    <None Include="shaders\sky\sky.frag" />
+    <None Include="shaders\sky\sky.vert" />
+    <None Include="shaders\terrain\terrain.frag" />
+    <None Include="shaders\terrain\terrain.geom" />
+    <None Include="shaders\terrain\terrain.tesctrl" />
+    <None Include="shaders\terrain\terrain.teseval" />
+    <None Include="shaders\terrain\terrain.vert" />
+    <None Include="shaders\water\water.frag" />
+    <None Include="shaders\water\water.geom" />
+    <None Include="shaders\water\water.tesctrl" />
+    <None Include="shaders\water\water.teseval" />
+    <None Include="shaders\water\water.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -13,23 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Archivos de encabezado\testimplementation">
-      <UniqueIdentifier>{2d0c34cd-cbac-422f-a6cc-739d9d2f8e7d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Archivos de origen\testimplementation">
-      <UniqueIdentifier>{2b047032-e0d7-4d67-9221-4c62e3056afe}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Archivos de encabezado\programs">
       <UniqueIdentifier>{9def421f-ef6e-43a5-9c1e-d3d460e130d8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Archivos de origen\programs">
       <UniqueIdentifier>{8a4e8fa6-8e4a-4b0b-911c-90a6576599df}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Archivos de encabezado\materials">
-      <UniqueIdentifier>{3ecf64e0-fe08-4ccd-b481-5125c079ab85}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Archivos de origen\materials">
-      <UniqueIdentifier>{4b9c98d2-d364-486c-b040-ac1b1f06b214}</UniqueIdentifier>
     </Filter>
     <Filter Include="Archivos de encabezado\datatables">
       <UniqueIdentifier>{baf0d1be-6acf-43cb-8f8f-bb9af4e9c3df}</UniqueIdentifier>
@@ -106,6 +94,27 @@
     <Filter Include="Archivos de encabezado\userinterfaces">
       <UniqueIdentifier>{7a3abfaf-b2b5-4baa-aa73-b74814eeb999}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de encabezado\animations">
+      <UniqueIdentifier>{6325bca1-bd18-4a64-989d-5ba2a09d61e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\animatios">
+      <UniqueIdentifier>{1d39236f-1074-448d-8db5-733f3d67e7c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{7119b34f-0c23-4ed2-b22c-abbe6a1cb5a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\postprocess">
+      <UniqueIdentifier>{57ca5e8b-4000-4988-b830-0bfc0567e185}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\terrain">
+      <UniqueIdentifier>{ee1fc9d8-eb03-4f98-9235-5415966777c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\water">
+      <UniqueIdentifier>{8f3de222-b9a5-4459-b691-1cc7347132fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\sky">
+      <UniqueIdentifier>{2b8ece40-cc22-4953-a204-5f44bc12d2d5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Animation.h">
@@ -153,12 +162,6 @@
     <ClInclude Include="include\CustomMaths.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="testimplementation\AnimImpl.h">
-      <Filter>Archivos de encabezado\testimplementation</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Material.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="include\Terrain.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
@@ -167,12 +170,6 @@
     </ClInclude>
     <ClInclude Include="include\programs\StandardProgram.h">
       <Filter>Archivos de encabezado\programs</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Materials\ProceduralTerrainMaterial.h">
-      <Filter>Archivos de encabezado\materials</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Materials\StandardMaterial.h">
-      <Filter>Archivos de encabezado\materials</Filter>
     </ClInclude>
     <ClInclude Include="include\SkyBox.h">
       <Filter>Archivos de encabezado</Filter>
@@ -297,6 +294,21 @@
     <ClInclude Include="include\LightBufferManager.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="include\programs\ShadowMapProgram.h">
+      <Filter>Archivos de encabezado\programs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\datatables\DeferredObjectsTable.h">
+      <Filter>Archivos de encabezado\datatables</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Time.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\animations\CameraBezier.h">
+      <Filter>Archivos de encabezado\animations</Filter>
+    </ClInclude>
+    <ClInclude Include="include\postprocessprograms\BloomProgram.h">
+      <Filter>Archivos de encabezado\postprocessprograms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -347,12 +359,6 @@
     <ClCompile Include="src\CustomMaths.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="testimplementation\AnimImpl.cpp">
-      <Filter>Archivos de origen\testimplementation</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Material.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
     <ClCompile Include="src\Terrain.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
@@ -361,12 +367,6 @@
     </ClCompile>
     <ClCompile Include="src\programs\StandardProgram.cpp">
       <Filter>Archivos de origen\programs</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Materials\ProceduralTerrainMaterial.cpp">
-      <Filter>Archivos de origen\materials</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Materials\StandardMaterial.cpp">
-      <Filter>Archivos de origen\materials</Filter>
     </ClCompile>
     <ClCompile Include="src\SkyBox.cpp">
       <Filter>Archivos de origen</Filter>
@@ -473,5 +473,94 @@
     <ClCompile Include="src\LightBufferManager.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="src\programs\ShadowMapProgram.cpp">
+      <Filter>Archivos de origen\programs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\datatables\DeferredObjectsTable.cpp">
+      <Filter>Archivos de origen\datatables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Time.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\animations\CameraBezier.cpp">
+      <Filter>Archivos de origen\animatios</Filter>
+    </ClCompile>
+    <ClCompile Include="src\postprocessprograms\BloomProgram.cpp">
+      <Filter>Archivos de origen\postprocessprograms</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\sky\sky.frag">
+      <Filter>shaders\sky</Filter>
+    </None>
+    <None Include="shaders\sky\sky.vert">
+      <Filter>shaders\sky</Filter>
+    </None>
+    <None Include="shaders\water\water.frag">
+      <Filter>shaders\water</Filter>
+    </None>
+    <None Include="shaders\water\water.geom">
+      <Filter>shaders\water</Filter>
+    </None>
+    <None Include="shaders\water\water.tesctrl">
+      <Filter>shaders\water</Filter>
+    </None>
+    <None Include="shaders\water\water.teseval">
+      <Filter>shaders\water</Filter>
+    </None>
+    <None Include="shaders\water\water.vert">
+      <Filter>shaders\water</Filter>
+    </None>
+    <None Include="shaders\terrain\terrain.frag">
+      <Filter>shaders\terrain</Filter>
+    </None>
+    <None Include="shaders\terrain\terrain.geom">
+      <Filter>shaders\terrain</Filter>
+    </None>
+    <None Include="shaders\terrain\terrain.tesctrl">
+      <Filter>shaders\terrain</Filter>
+    </None>
+    <None Include="shaders\terrain\terrain.teseval">
+      <Filter>shaders\terrain</Filter>
+    </None>
+    <None Include="shaders\terrain\terrain.vert">
+      <Filter>shaders\terrain</Filter>
+    </None>
+    <None Include="shaders\postprocess\DeferredShading.frag">
+      <Filter>shaders\postprocess</Filter>
+    </None>
+    <None Include="shaders\postprocess\perlin.frag">
+      <Filter>shaders\postprocess</Filter>
+    </None>
+    <None Include="shaders\postprocess\postProcessing.DepthOfFieldZBuffer.frag">
+      <Filter>shaders\postprocess</Filter>
+    </None>
+    <None Include="shaders\postprocess\postProcessing.GaussianBlur.frag">
+      <Filter>shaders\postprocess</Filter>
+    </None>
+    <None Include="shaders\postprocess\postProcessing.SSAA.frag">
+      <Filter>shaders\postprocess</Filter>
+    </None>
+    <None Include="shaders\postprocess\postProcessing.v0.frag">
+      <Filter>shaders\postprocess</Filter>
+    </None>
+    <None Include="shaders\postprocess\postProcessing.v0.vert">
+      <Filter>shaders\postprocess</Filter>
+    </None>
+    <None Include="shaders\shader.full_color.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\shader.full_color.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\shader.full_texture.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\shader.full_texture.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\postprocess\Bloom.frag">
+      <Filter>shaders\postprocess</Filter>
+    </None>
   </ItemGroup>
 </Project>
