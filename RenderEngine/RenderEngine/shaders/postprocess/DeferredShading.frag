@@ -2,6 +2,7 @@
 
 layout (location=0) out vec4 outColor;
 layout (location=1) out vec4 outDepth;
+layout (location=2) out vec4 outEmission;
 
 in vec2 texCoord;
 
@@ -181,5 +182,6 @@ void main()
 
 	outColor = vec4(shaded, 1.0);
 	outDepth = vec4(depth, 0, 0, 1);
+	outEmission = gbufferemissive;
 	gl_FragDepth = depth;
 }

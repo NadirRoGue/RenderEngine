@@ -15,8 +15,8 @@ namespace Engine
 		SSAAProgram(const SSAAProgram & other);
 		~SSAAProgram();
 
-		void configureProgram();
-		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
+		virtual void configureProgram();
+		virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
 	};
 
 	class SSAAProgramFactory : public ProgramFactory

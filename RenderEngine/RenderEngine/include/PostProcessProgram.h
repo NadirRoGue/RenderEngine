@@ -26,6 +26,7 @@ namespace Engine
 
 		// OpenGL ensures 8 color attachments in any implementation
 		// plus 1 for depth/stencil/depth & stencil
+	protected:
 		unsigned int uRenderedTextures[9];
 
 	public:

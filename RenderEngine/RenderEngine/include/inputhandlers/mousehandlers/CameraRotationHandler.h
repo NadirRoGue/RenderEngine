@@ -8,6 +8,8 @@ namespace Engine
 	class CameraRotationHandler : public MouseMotionHandler
 	{
 	private:
+		static const float ROTATION_SPEED;
+	private:
 		Camera * camera;
 
 		int previousX, previousY;

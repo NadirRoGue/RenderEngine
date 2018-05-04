@@ -96,8 +96,8 @@ Engine::TextureInstance * Engine::DeferredRenderObject::addColorBuffer(unsigned 
 	ti->setMagnificationFilterType(filterMethod);
 	ti->setMinificationFilterType(filterMethod);
 	ti->setAnisotropicFilterEnabled(false);
-	ti->setSComponentWrapType(GL_REPEAT);
-	ti->setTComponentWrapType(GL_REPEAT);
+	ti->setSComponentWrapType(GL_CLAMP_TO_EDGE);
+	ti->setTComponentWrapType(GL_CLAMP_TO_EDGE);
 
 	colorBuffers[index].bufferType = colorAttachment;
 	colorBuffers[index].texture = ti;

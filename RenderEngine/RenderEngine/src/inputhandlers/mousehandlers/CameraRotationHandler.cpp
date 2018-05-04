@@ -1,6 +1,9 @@
 #include "inputhandlers/mousehandlers/CameraRotationHandler.h"
 
 #include "WorldConfig.h"
+#include "Time.h"
+
+const float Engine::CameraRotationHandler::ROTATION_SPEED = 50.0f;
 
 Engine::CameraRotationHandler::CameraRotationHandler(std::string nam, Engine::Camera * cam)
 	:MouseMotionHandler(nam)
@@ -40,7 +43,8 @@ void Engine::CameraRotationHandler::handleMotion(int x, int y)
 			float hAngle = deltaX * horizontalSpeed;
 			float vAngle = deltaY * verticalSpeed;
 
-			camera->rotateView(glm::vec3(vAngle, hAngle, 0.0f));
+			float speed = ROTATION_SPEED * Engine::Time::deltaTime;
+			camera->rotateView(glm::vec3(vAngle * speed, hAngle * speed, 0.0f));
 		}
 	}
 }

@@ -174,6 +174,6 @@ void main()
 	outNormal = vec4(n, 1.0);
 	outPos = vec4(inPos, 1.0);
 	outSpecular = vec4(1,1,1,1);
-	outEmissive = vec4(0,0,0,1);
+	outEmissive = vec4(color,0);
 #endif
 }

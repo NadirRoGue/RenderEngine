@@ -2,6 +2,8 @@
 
 #include "Renderer.h"
 
+#include <iostream>
+
 std::string Engine::SSAAProgram::PROGRAM_NAME = "SSAAProgram";
 
 Engine::SSAAProgram::SSAAProgram(std::string name, unsigned long long params)

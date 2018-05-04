@@ -56,9 +56,10 @@ void Engine::DeferredRenderer::initialize()
 	forwardPassBuffer->populateDeferredObject(deferredDrawSurface);
 
 	// Creage deferred shading buffer
-	deferredPassBuffer = new Engine::DeferredRenderObject(2, true);
+	deferredPassBuffer = new Engine::DeferredRenderObject(3, true);
 	deferredPassBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);	// Color info
-	deferredPassBuffer->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);	// Extra info: depth, brightness, etc.
+	deferredPassBuffer->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);	// Depth info
+	deferredPassBuffer->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);	// Emission info
 	deferredPassBuffer->addDepthBuffer24(500, 500);
 	deferredPassBuffer->initialize();
 
@@ -114,14 +115,12 @@ void Engine::DeferredRenderer::doRender()
 	deferredShading->onRenderObject(deferredDrawSurface, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-	glEnable(GL_DEPTH_TEST);
 	if (scene->getSkyBox() != NULL)
 	{
 		glDepthFunc(GL_LEQUAL);
 		scene->getSkyBox()->render(activeCam);
 		glDepthFunc(GL_LESS);
 	}
-
 	// Run the post-process chain
 	runPostProcesses();
 
@@ -139,6 +138,7 @@ void Engine::DeferredRenderer::doRender()
 
 void Engine::DeferredRenderer::runPostProcesses()
 {
+	glDisable(GL_DEPTH_TEST);
 	std::list<Engine::PostProcessChainNode *>::iterator it = postProcessChain.begin();
 	while (it != postProcessChain.end())
 	{
@@ -162,6 +162,7 @@ void Engine::DeferredRenderer::runPostProcesses()
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		it++;
 	}
+	glEnable(GL_DEPTH_TEST);
 }
 
 void Engine::DeferredRenderer::onResize(unsigned int w, unsigned int h)

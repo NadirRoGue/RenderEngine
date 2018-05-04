@@ -2,6 +2,7 @@
 
 layout (location=0) out vec4 color;
 layout (location=1) out vec4 depth;
+layout (location=2) out vec4 emission;
 
 layout (location=0) in vec3 inCubeUV;
 
@@ -34,19 +35,21 @@ void main()
 	vec3 zenit = vec3(0.4, 0.7, 1);
 	vec3 cubeMapColor = mix(horizon, zenit, alphaSky);
 
-	float isSun = 0.0;
 	vec3 skyColor;
-
+	
+	vec3 emissive;
 	if(realY < 0 && dotValue > 0.999)
 	{
 		skyColor = centerColor;
-		isSun = 1.0;
+		emissive = centerColor;
 	}
 	else
 	{
 		skyColor = cubeMapColor * colorFactor;
+		emissive = vec3(0,0,0);
 	}
 
 	color = vec4(skyColor, 1.0);
-	depth = vec4(gl_FragDepth, isSun, 0, 1);
+	depth = vec4(gl_FragDepth, 0, 0, 1);
+	emission = vec4(emissive, 1);
 }

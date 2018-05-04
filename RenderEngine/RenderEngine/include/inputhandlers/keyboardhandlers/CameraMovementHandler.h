@@ -8,6 +8,8 @@ namespace Engine
 	class CameraMovement : public KeyboardHandler
 	{
 	private:
+		const static float MOVE_SPEED;
+	private:
 		Camera * camera;
 	public:
 		CameraMovement(Camera * cam);

@@ -94,8 +94,8 @@ void initOpenGL()
 void initScene()
 {
 	Engine::Camera * camera = new Engine::Camera(1.0f, 1000.0f, 45.0f, 45.0f);
-	camera->translateView(glm::vec3(0, -6, 0));
-	//camera->translateView(glm::vec3(30.0f, -5.0f, -50.0f));
+	//camera->translateView(glm::vec3(0, -6, 0));
+	camera->translateView(glm::vec3(30.0f, -5.0f, -50.0f));
 	//camera->rotateView(glm::vec3(glm::radians(30.0f), glm::radians(60.0f), 0.0f));
 
 	Engine::Scene * scene = new Engine::Scene();
@@ -166,7 +166,7 @@ void initHandlers()
 	handlers->registerHandler(cm);
 	handlers->registerHandler(uiHandler);
 	
-	Engine::CameraBezier * camBezier = new Engine::CameraBezier(scene->getCamera(), glm::vec3(100,10,100), 30.0f, 5.0f);
+	Engine::CameraBezier * camBezier = new Engine::CameraBezier(scene->getCamera(), glm::vec3(100,10,100), 50.0f, 3.0f);
 	scene->getAnimationHandler()->registerAnimation(camBezier);
 
 	// Mouse pitch & yaw
@@ -177,7 +177,12 @@ void initHandlers()
 
 void initRenderEngine()
 {
-	Engine::RenderManager::getInstance().setRenderer(new Engine::DeferredRenderer());
+	Engine::DeferredRenderer * dr = new Engine::DeferredRenderer();
+	dr->addPostProcess(createBloomNode());
+	dr->addPostProcess(createBloomNode());
+	dr->addPostProcess(createBloomNode());
+
+	Engine::RenderManager::getInstance().setRenderer(dr);
 }
 
 void destroy()
@@ -216,9 +221,10 @@ Engine::PostProcessChainNode * createBloomNode()
 	
 	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::BloomProgram::PROGRAM_NAME);
 
-	node->renderBuffer = new Engine::DeferredRenderObject(2, true);
+	node->renderBuffer = new Engine::DeferredRenderObject(3, true);
 	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addDepthBuffer24(500, 500);
 	node->callBack = 0;
 

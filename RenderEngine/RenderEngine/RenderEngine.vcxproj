@@ -167,6 +167,7 @@
     <ClInclude Include="include\postprocessprograms\GaussianBlurProgram.h" />
     <ClInclude Include="include\postprocessprograms\PerlinGeneratorProgram.h" />
     <ClInclude Include="include\postprocessprograms\SSAAProgram.h" />
+    <ClInclude Include="include\ProceduralVegetation.h" />
     <ClInclude Include="include\Program.h" />
     <ClInclude Include="include\programs\ProceduralTerrainProgram.h" />
     <ClInclude Include="include\programs\ProceduralWaterProgram.h" />
@@ -234,6 +235,7 @@
     <ClCompile Include="src\postprocessprograms\GaussianBlurProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\PerlinGeneratorProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\SSAAProgram.cpp" />
+    <ClCompile Include="src\ProceduralVegetation.cpp" />
     <ClCompile Include="src\Program.cpp" />
     <ClCompile Include="src\programs\ProceduralTerrainProgram.cpp" />
     <ClCompile Include="src\programs\ProceduralWaterProgram.cpp" />
