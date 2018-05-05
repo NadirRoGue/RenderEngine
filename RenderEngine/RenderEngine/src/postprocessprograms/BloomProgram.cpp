@@ -25,7 +25,7 @@ Engine::BloomProgram::BloomProgram(std::string name, unsigned long long paramete
 	buf[1].pass->addDepthBuffer24(500, 500);
 	buf[1].pass->initialize();
 
-	passes = 6;
+	passes = 10;
 }
 
 Engine::BloomProgram::BloomProgram(const Engine::BloomProgram & other)

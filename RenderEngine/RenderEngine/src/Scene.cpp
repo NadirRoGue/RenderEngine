@@ -84,7 +84,7 @@ Engine::SkyBox * Engine::Scene::getSkyBox()
 
 void Engine::Scene::addObject(Engine::Object *obj)
 {
-	std::string material = "";// obj->getMeshInstance()->getMaterial();
+	std::string material = obj->getShaderName();
 	unsigned int vaoIndex = obj->getMesh()->vao;
 
 	std::map<std::string, Engine::ProgramRenderables *>::iterator renderIt = renders.find(material);
@@ -95,8 +95,11 @@ void Engine::Scene::addObject(Engine::Object *obj)
 
 		if(prog == nullptr)
 		{
+			std::cerr << "Scene: Tried to add object with non-existent shader: " << material << std::endl;
 			return;
 		}
+
+		prog->configureMeshBuffers(obj->getManipMesh());
 
 		Engine::ProgramRenderables * renderable = new Engine::ProgramRenderables(prog);
 		renderable->objects[vaoIndex].push_back(obj);

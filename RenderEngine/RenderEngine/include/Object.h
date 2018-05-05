@@ -40,12 +40,15 @@ namespace Engine
 		TextureInstance * emissive;
 		TextureInstance * normal;
 		TextureInstance * specular;
+
+		std::string shaderName;
 	public:
 		Object(Mesh * mi);
 		~Object();
 
 		const glm::mat4 & getModelMatrix() const;
 		const Mesh * getMesh() const;
+		Mesh * getManipMesh();
 
 		void rotate(float angle, glm::vec3 r);
 		void translate(glm::vec3 t);
@@ -53,6 +56,9 @@ namespace Engine
 		void setTranslation(glm::vec3 t);
 		void setScale(glm::vec3 s);
 		void setModelMatrix(const glm::mat4 & matrix);
+
+		void setShader(std::string shaderName);
+		std::string getShaderName();
 
 		void setRenderMode(GLenum renderMode);
 		GLenum getRenderMode();

@@ -115,6 +115,18 @@
     <Filter Include="shaders\sky">
       <UniqueIdentifier>{2b8ece40-cc22-4953-a204-5f44bc12d2d5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de encabezado\vegetation">
+      <UniqueIdentifier>{ed003448-b7e5-4afd-b744-3aab40e9dcb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\vegetation">
+      <UniqueIdentifier>{c9c96168-7dec-4eec-8bf0-2b98a6a88135}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\vegetation">
+      <UniqueIdentifier>{13d8fc30-a085-4d6d-9620-142bb20c2042}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\vegetation\tree">
+      <UniqueIdentifier>{b5bb3fcd-02b2-415e-a20e-db00483148df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Animation.h">
@@ -312,6 +324,15 @@
     <ClInclude Include="include\ProceduralVegetation.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="include\vegetation\FractalTree.h">
+      <Filter>Archivos de encabezado\vegetation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\programs\TreeProgram.h">
+      <Filter>Archivos de encabezado\programs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\datatables\VegetationTable.h">
+      <Filter>Archivos de encabezado\datatables</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -494,6 +515,15 @@
     <ClCompile Include="src\ProceduralVegetation.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="src\vegetation\FractalTree.cpp">
+      <Filter>Archivos de origen\vegetation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\programs\TreeProgram.cpp">
+      <Filter>Archivos de origen\programs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\datatables\VegetationTable.cpp">
+      <Filter>Archivos de origen\datatables</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\sky\sky.frag">
@@ -567,6 +597,15 @@
     </None>
     <None Include="shaders\postprocess\Bloom.frag">
       <Filter>shaders\postprocess</Filter>
+    </None>
+    <None Include="shaders\vegetation\tree\tree.frag">
+      <Filter>shaders\vegetation\tree</Filter>
+    </None>
+    <None Include="shaders\vegetation\tree\tree.vert">
+      <Filter>shaders\vegetation\tree</Filter>
+    </None>
+    <None Include="shaders\vegetation\tree\tree.geom">
+      <Filter>shaders\vegetation\tree</Filter>
     </None>
   </ItemGroup>
 </Project>

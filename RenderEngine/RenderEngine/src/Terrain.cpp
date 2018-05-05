@@ -1,12 +1,17 @@
 #include "Terrain.h"
 
 #include "Mesh.h"
+
 #include "datatables/MeshTable.h"
 #include "datatables/ProgramTable.h"
+#include "datatables/VegetationTable.h"
+
 #include "Scene.h"
 #include "Time.h"
 #include "WorldConfig.h"
 #include "Renderer.h"
+
+#include <random>
 
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
@@ -68,6 +73,12 @@ void Engine::Terrain::render(Engine::Camera * camera)
 	glBlendColor(1.0f, 1.0f, 1.0f, 0.6f);
 	tiledRendering(camera, waterActiveShader, &Terrain::waterRender);
 	glDisable(GL_BLEND);
+
+	// RENDER TREES
+	unsigned int previousRadius = renderRadius;
+	renderRadius = 5;
+	tiledRendering(camera, treeShader, &Terrain::treesRender);
+	renderRadius = previousRadius;
 }
 
 // ====================================================================================================================
@@ -169,6 +180,52 @@ void Engine::Terrain::waterRender(Engine::Camera * camera, int i, int j)
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 }
 
+void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
+{
+	// We have to travel way to much to make this seed system not to work...
+	unsigned int seed = (i << 16) | j;
+	float posX = i * tileWidth;
+	float posZ = j * tileWidth;
+
+	std::uniform_int_distribution<unsigned long long> dTree(0, treeTypes.size() - 1);
+	std::default_random_engine eTree(seed);
+
+	std::uniform_real_distribution<float> dTerrain(0.0f, 1.0f);
+	std::default_random_engine eTerrain(seed);
+
+	// 30 trees per terrain tile
+	unsigned int lastVao = -1;
+	for (unsigned int z = 0; z < 6; z++)
+	{
+		Engine::Object * randomTree = treeTypes[1];// treeTypes[dTree(eTree)];
+		
+		unsigned int currentVao = randomTree->getMesh()->vao;
+		if (currentVao != lastVao)
+		{
+			glBindVertexArray(currentVao);
+			lastVao = currentVao;
+		}
+
+		float xOffset = dTerrain(eTerrain) * tileWidth;
+		float yOffset = dTerrain(eTerrain) * tileWidth;
+
+		float treePosX = posX + xOffset;
+		float treePosZ = posZ + yOffset;
+
+		randomTree->setTranslation(glm::vec3(treePosX, 0.0f, treePosZ));
+
+		float u = i * xOffset;
+		float v = j * yOffset;
+
+		treeShader->setUniformTileUV(u, v);
+		treeShader->onRenderObject(randomTree, camera->getViewMatrix(), camera->getProjectionMatrix());
+
+		const Engine::Mesh * treeMesh = randomTree->getMesh();
+		glDrawElements(randomTree->getRenderMode(), treeMesh->getNumFaces() * 3, GL_UNSIGNED_INT, (void*)0);
+	}
+
+}
+
 // ====================================================================================================================
 
 void Engine::Terrain::initialize()
@@ -219,8 +276,18 @@ void Engine::Terrain::initialize()
 
 	waterActiveShader = waterShadingShader;
 
+	// TREE SHADERS INSTANCING
+	const std::string & treeProgName = Engine::TreeProgram::PROGRAM_NAME;
+	treeShader = dynamic_cast<Engine::TreeProgram*>
+	(
+		Engine::ProgramTable::getInstance().getProgramByName(treeProgName)
+	);
+
 	// MESHES INSTANCING
 	createTileMesh();
+
+	// TREES INSTANCING
+	addTrees();
 
 	// SHADOW MAP TEXTURE
 	shadowMap = new Engine::DeferredRenderObject(0, true);
@@ -272,6 +339,37 @@ void Engine::Terrain::createTileMesh()
 	tileObject = new Engine::Object(planeMesh);
 	if(tileWidth != 1.0f)
 		tileObject->setScale(glm::vec3(tileWidth, tileWidth, tileWidth));
+}
+
+void Engine::Terrain::addTrees()
+{
+	std::uniform_int_distribution<unsigned int> d(0, 50000);
+	std::default_random_engine e(0);
+	for (int i = 0; i < 10; i++)
+	{
+		Engine::TreeGenerationData treeData;
+		treeData.treeName = std::string("CherryTree") + std::to_string(i);
+		treeData.emissiveLeaf = false;
+		treeData.startTrunkColor = glm::vec3(0.2f, 0.1f, 0.0f);
+		treeData.endTrunkColor = treeData.startTrunkColor;
+		treeData.leafColor = glm::vec3(0.2f, 0.4f, 0.0f);
+		treeData.maxBranchesSplit = 7;
+		treeData.maxBranchRotation = glm::vec3(45.0f, 45.0f, 45.0f);
+		treeData.minBranchRotation = glm::vec3(-45.0f, -45.0f, -45.0f);
+		treeData.maxDepth = 7;
+		treeData.rotateMainTrunk = false;
+		treeData.scalingFactor = glm::vec3(0.7, 0.9, 0.7);
+		treeData.seed = d(e);
+		treeData.startBranchingDepth = 2;
+
+		Engine::Mesh * m = Engine::VegetationTable::getInstance().generateFractalTree(treeData, true);
+
+		treeShader->configureMeshBuffers(m);
+
+		Engine::Object * tree = new Engine::Object(m);
+		
+		treeTypes.push_back(tree);
+	}
 }
 
 // ====================================================================================================================

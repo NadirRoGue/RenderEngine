@@ -49,6 +49,11 @@ const Engine::Mesh * Engine::Object::getMesh() const
 	return mesh;
 }
 
+Engine::Mesh * Engine::Object::getManipMesh()
+{
+	return mesh;
+}
+
 void Engine::Object::rotate(float angle, glm::vec3 r)
 {
 	rotation += r;
@@ -167,6 +172,16 @@ const Engine::TextureInstance * Engine::Object::getNormalMapTexture() const
 const Engine::TextureInstance * Engine::Object::getSpecularMapTexture() const
 {
 	return specular;
+}
+
+void Engine::Object::setShader(std::string shaderName)
+{
+	this->shaderName = shaderName;
+}
+
+std::string Engine::Object::getShaderName()
+{
+	return this->shaderName;
 }
 
 // ======================================================================================================

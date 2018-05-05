@@ -1,9 +1,11 @@
 #pragma once
 
 #include <glm\glm.hpp>
+#include <vector>
 
 #include "programs/ProceduralTerrainProgram.h"
 #include "programs/ProceduralWaterProgram.h"
+#include "programs/TreeProgram.h"
 #include "Object.h"
 #include "Camera.h"
 #include "DeferredRenderObject.h"
@@ -59,6 +61,8 @@ namespace Engine
 
 		ProceduralWaterProgram * waterActiveShader;
 
+		TreeProgram * treeShader;
+
 		Object * tileObject;
 
 		glm::mat4 lightProjMatrix;
@@ -67,6 +71,8 @@ namespace Engine
 
 		DeferredRenderObject * shadowMap;
 		TextureInstance * depthTexture;
+
+		std::vector<Object *> treeTypes;
 	public:
 		Terrain();
 		Terrain(float tileWidth, unsigned int renderRadius);
@@ -78,12 +84,15 @@ namespace Engine
 	private:
 		void initialize();
 		void createTileMesh();
+		void addTrees();
 
 		void tiledRendering(Camera * cam, Program * prog, void (Terrain::*func)(Camera * cam, int i, int j));
 
 		void terrainShadowMapRender(Camera * cam, int i, int j);
 		void waterShadowMapRender(Camera * cam, int i, int j);
+		//void treesShadowMapRender(Camera * cam, int i, int j);
 		void terrainRender(Camera * cam, int i, int j);
 		void waterRender(Camera * cam, int i, int j);
+		void treesRender(Camera * cam, int i, int j);
 	};
 }

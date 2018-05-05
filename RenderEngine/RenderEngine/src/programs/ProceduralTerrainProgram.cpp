@@ -145,7 +145,7 @@ void Engine::ProceduralTerrainProgram::configureMeshBuffers(Engine::Mesh * data)
 void Engine::ProceduralTerrainProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
 {
 	glm::mat4 modelView = view * obj->getModelMatrix();
-	glm::mat4 modelViewProj = proj * view * obj->getModelMatrix();
+	glm::mat4 modelViewProj = proj * modelView;
 	glm::mat4 normal = glm::transpose(glm::inverse(modelView));
 
 	glUniformMatrix4fv(uModelView, 1, GL_FALSE, &(modelView[0][0]));

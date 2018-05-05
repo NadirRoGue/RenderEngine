@@ -141,6 +141,7 @@
     <ClInclude Include="include\datatables\MeshTable.h" />
     <ClInclude Include="include\datatables\ProgramTable.h" />
     <ClInclude Include="include\datatables\TextureTable.h" />
+    <ClInclude Include="include\datatables\VegetationTable.h" />
     <ClInclude Include="include\defaultobjects\Cube.h" />
     <ClInclude Include="include\defaultobjects\Plane.h" />
     <ClInclude Include="include\DeferredNodeCallbacks.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="include\programs\ShadowMapProgram.h" />
     <ClInclude Include="include\programs\SkyProgram.h" />
     <ClInclude Include="include\programs\StandardProgram.h" />
+    <ClInclude Include="include\programs\TreeProgram.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\renderers\DeferredRenderer.h" />
     <ClInclude Include="include\renderers\ForwardRenderer.h" />
@@ -188,6 +190,7 @@
     <ClInclude Include="include\Time.h" />
     <ClInclude Include="include\UserInterface.h" />
     <ClInclude Include="include\userinterfaces\WorldControllerUI.h" />
+    <ClInclude Include="include\vegetation\FractalTree.h" />
     <ClInclude Include="include\windowmanagers\GLFWWindow.h" />
     <ClInclude Include="include\windowmanagers\GLUTWindow.h" />
     <ClInclude Include="include\windowmanagers\WindowManager.h" />
@@ -211,6 +214,7 @@
     <ClCompile Include="src\datatables\MeshTable.cpp" />
     <ClCompile Include="src\datatables\ProgramTable.cpp" />
     <ClCompile Include="src\datatables\TextureTable.cpp" />
+    <ClCompile Include="src\datatables\VegetationTable.cpp" />
     <ClCompile Include="src\DeferredNodeCallbacks.cpp" />
     <ClCompile Include="src\DeferredRenderObject.cpp" />
     <ClCompile Include="src\inputhandlers\keyboardhandlers\CameraMovementHandler.cpp" />
@@ -242,6 +246,7 @@
     <ClCompile Include="src\programs\ShadowMapProgram.cpp" />
     <ClCompile Include="src\programs\SkyProgram.cpp" />
     <ClCompile Include="src\programs\StandardProgram.cpp" />
+    <ClCompile Include="src\programs\TreeProgram.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\renderers\DeferredRenderer.cpp" />
     <ClCompile Include="src\renderers\ForwardRenderer.cpp" />
@@ -256,6 +261,7 @@
     <ClCompile Include="src\Time.cpp" />
     <ClCompile Include="src\UserInterface.cpp" />
     <ClCompile Include="src\userinterfaces\WorldControllerUI.cpp" />
+    <ClCompile Include="src\vegetation\FractalTree.cpp" />
     <ClCompile Include="src\windowmanagers\GLFWWindow.cpp" />
     <ClCompile Include="src\windowmanagers\GLUTWindow.cpp" />
     <ClCompile Include="src\windowmanagers\WindowManager.cpp" />
@@ -282,6 +288,9 @@
     <None Include="shaders\terrain\terrain.tesctrl" />
     <None Include="shaders\terrain\terrain.teseval" />
     <None Include="shaders\terrain\terrain.vert" />
+    <None Include="shaders\vegetation\tree\tree.frag" />
+    <None Include="shaders\vegetation\tree\tree.geom" />
+    <None Include="shaders\vegetation\tree\tree.vert" />
     <None Include="shaders\water\water.frag" />
     <None Include="shaders\water\water.geom" />
     <None Include="shaders\water\water.tesctrl" />

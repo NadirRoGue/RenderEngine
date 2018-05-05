@@ -20,6 +20,7 @@ namespace Engine
 		float *vertices;
 		float *normals;
 		float *colors;
+		float *emission;
 		float *uvs;
 		float *tangents;
 	public:
@@ -28,13 +29,14 @@ namespace Engine
 		unsigned int vboVertices;
 		unsigned int vboNormals;
 		unsigned int vboColors;
+		unsigned int vboEmission;
 		unsigned int vboUVs;
 		unsigned int vboTangents;
 
 	public:
 		Mesh();
 		Mesh(aiMesh * mesh);
-		Mesh(const unsigned int numF, const unsigned int numV, const unsigned int *f, const float *v, const float *c, const float *n, const float *uv, const float *t);
+		Mesh(const unsigned int numF, const unsigned int numV, const unsigned int *f, const float *v, const float *c, const float *n, const float *uv, const float *t, const float *e = 0);
 		Mesh(const Mesh &other);
 		~Mesh();
 
@@ -50,16 +52,17 @@ namespace Engine
 		const float * getColor() const;
 		const float * getUVs() const;
 		const float * getTangetns() const;
+		const float * getEmissive() const;
+
+		void computeNormals();
+		void computeTangents();
+
+		void syncGPU();
 
 		void releaseGPU();
 		void releaseCPU();
 	private:
 		void extractTopology(aiMesh * mesh);
 		void extractGeometry(aiMesh * mesh);
-
-		void computeNormals();
-		void computeTangents();
-
-		void syncGPU();
 	};
 }

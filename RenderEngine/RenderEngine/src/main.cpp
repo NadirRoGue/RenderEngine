@@ -30,6 +30,7 @@
 
 #include "programs/ProceduralTerrainProgram.h"
 #include "programs/ProceduralWaterProgram.h"
+#include "programs/TreeProgram.h"
 #include "postprocessprograms/DeferredShadingProgram.h"
 #include "postprocessprograms/SSAAProgram.h"
 #include "postprocessprograms/BloomProgram.h"
@@ -39,6 +40,8 @@
 #include "inputhandlers/mousehandlers/CameraRotationHandler.h"
 
 #include "animations/CameraBezier.h"
+
+#include "datatables/VegetationTable.h"
 
 #include "WorldConfig.h"
 
@@ -94,8 +97,8 @@ void initOpenGL()
 void initScene()
 {
 	Engine::Camera * camera = new Engine::Camera(1.0f, 1000.0f, 45.0f, 45.0f);
-	//camera->translateView(glm::vec3(0, -6, 0));
-	camera->translateView(glm::vec3(30.0f, -5.0f, -50.0f));
+	camera->translateView(glm::vec3(0, -6, 0));
+	//camera->translateView(glm::vec3(30.0f, -5.0f, -50.0f));
 	//camera->rotateView(glm::vec3(glm::radians(30.0f), glm::radians(60.0f), 0.0f));
 
 	Engine::Scene * scene = new Engine::Scene();
@@ -124,10 +127,28 @@ void initTables()
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::ProceduralWaterProgram::PROGRAM_NAME, new Engine::ProceduralWaterProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SkyProgram::PROGRAM_NAME, new Engine::SkyProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::BloomProgram::PROGRAM_NAME, new Engine::BloomProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::TreeProgram::PROGRAM_NAME, new Engine::TreeProgramFactory());
 
 	// Mesh table
 	Engine::MeshTable::getInstance().addMeshToCache("cube", Engine::CreateCube());
 	Engine::MeshTable::getInstance().addMeshToCache("plane", Engine::CreatePlane());
+	/*
+	Engine::TreeGenerationData treeData;
+	treeData.treeName = "CherryTree";
+	treeData.emissiveLeaf = false;
+	treeData.startTrunkColor = glm::vec3(0.2f, 0.1f, 0.0f);
+	treeData.endTrunkColor = treeData.startTrunkColor;
+	treeData.leafColor = glm::vec3(0.2f, 0.4f, 0.0f);
+	treeData.maxBranchesSplit = 7;
+	treeData.maxBranchRotation = glm::vec3(45.0f, 45.0f, 45.0f);
+	treeData.minBranchRotation = glm::vec3(-45.0f, -45.0f, -45.0f);
+	treeData.maxDepth = 7;
+	treeData.rotateMainTrunk = false;
+	treeData.scalingFactor = glm::vec3(0.7, 0.9, 0.7);
+	treeData.seed = 984669;
+	treeData.startBranchingDepth = 2;
+	Engine::VegetationTable::getInstance().generateFractalTree(treeData, true);
+	*/
 }
 
 void initSceneObj()
@@ -147,7 +168,7 @@ void initSceneObj()
 	
 	// Configure clear color (used for far objects fog)
 	scene->setClearColor(glm::vec3(0.8, 0.85, 1));
-
+	
 	scene->initialize();
 
 	// Trigger FBO resize according to screen size
@@ -179,10 +200,9 @@ void initRenderEngine()
 {
 	Engine::DeferredRenderer * dr = new Engine::DeferredRenderer();
 	dr->addPostProcess(createBloomNode());
-	dr->addPostProcess(createBloomNode());
-	dr->addPostProcess(createBloomNode());
 
 	Engine::RenderManager::getInstance().setRenderer(dr);
+	Engine::RenderManager::getInstance().doResize(1024, 1024);
 }
 
 void destroy()

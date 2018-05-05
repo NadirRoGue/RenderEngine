@@ -50,6 +50,6 @@ void main()
 
 	outColor = vec4(finalColor, 1.0);
 	outDepth = inDepth;
-	outEmission = vec4(result, 1.0);
+	outEmission = vec4(result * 1.12, 1.0);
 	gl_FragDepth = inDepth.x;
 }
