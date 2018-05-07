@@ -333,6 +333,9 @@
     <ClInclude Include="include\datatables\VegetationTable.h">
       <Filter>Archivos de encabezado\datatables</Filter>
     </ClInclude>
+    <ClInclude Include="include\defaultobjects\TreeShapes.h">
+      <Filter>Archivos de encabezado\defaultobjects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">

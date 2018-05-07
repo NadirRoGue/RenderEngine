@@ -10,7 +10,8 @@
 Engine::FractalTree::FractalTree(const TreeGenerationData & data) :Engine::ProceduralVegetation(data)
 {
 	// Get base shape to build the trees
-	base = Engine::MeshTable::getInstance().getMesh("cube");
+	base = Engine::MeshTable::getInstance().getMesh("trunk");
+	leaf = Engine::MeshTable::getInstance().getMesh("leaf");
 
 	// Initialize random generator engine
 	randEngine = std::default_random_engine(treeData.seed);
@@ -28,7 +29,7 @@ Engine::FractalTree::FractalTree(const TreeGenerationData & data) :Engine::Proce
 Engine::Mesh * Engine::FractalTree::generate()
 {
 	// Initial data to start growin the tree
-	glm::vec3 scale = glm::vec3(0.02f, 0.1f, 0.02f);
+	glm::vec3 scale = glm::vec3(0.012f, 0.1f, 0.012f);
 	glm::vec3 translation(0, 0, 0);
 	glm::vec3 rotation;
 
@@ -45,7 +46,7 @@ Engine::Mesh * Engine::FractalTree::generate()
 		rotation = glm::vec3(0, 0, 0);
 	}
 	
-	processChunk(glm::mat4(1.0f), scale, translation, rotation, 1);
+	processChunk(glm::mat4(1.0f), scale, translation, rotation, 0, 1);
 
 	// Copy generated data to the Engine::Mesh class format
 	float * newVertices = new float[vertices.size() * 3];
@@ -87,11 +88,11 @@ Engine::Mesh * Engine::FractalTree::generate()
 	return tree;
 }
 
-void Engine::FractalTree::processChunk(glm::mat4 & origin, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotation, unsigned int depth)
+void Engine::FractalTree::processChunk(glm::mat4 & origin, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotation, size_t vOffset, unsigned int depth)
 {
 	if (depth >= treeData.maxDepth)
 	{
-		addLeaf(origin, scale / treeData.scalingFactor);
+		addLeaf(origin, scale / treeData.scalingFactor, vOffset, depth);
 		return;
 	}
 
@@ -105,10 +106,10 @@ void Engine::FractalTree::processChunk(glm::mat4 & origin, glm::vec3 scale, glm:
 	glm::mat4 modelMat = origin * translateMat * rotateMat;
 
 	// Add vertices and faces applying the transformation
-	appendVerticesAndFaces(modelMat, scale, depth, false);
+	appendVerticesAndFaces(base, modelMat, scale, depth, vOffset, depth==1, false);
 
 	// Generate common translation to prevent branches from growing inside parent branches
-	translate.y = 2.0f * scale.y;
+	translate.y = scale.y;
 
 	// Check for branching
 	unsigned int intBranches = 1;
@@ -117,70 +118,114 @@ void Engine::FractalTree::processChunk(glm::mat4 & origin, glm::vec3 scale, glm:
 		float branches = randGen(randEngine) * float(treeData.maxBranchesSplit);
 		intBranches = unsigned int(ceil(branches)); // ceil ensures there will be at least 1 branch
 	}
-	
+
+	size_t currentOffset = vertices.size();
+
+	intBranches = depth + 1;
+
+	float deltaAngle = (2.f * 3.1415f) / intBranches;
+	float sign = randSign();
 	// Apply branching
 	for (unsigned int i = 0; i < intBranches; i++)
 	{
 		// Copy and adjust next branch random data
 		glm::vec3 scaleCopy = scale;
 		scaleCopy *= treeData.scalingFactor;
+		scaleCopy.y *= 1.5f;
 
 		glm::vec3 rotationCopy = rotation;
-		rotationCopy.x += randInInterval(treeData.minBranchRotation.x, treeData.maxBranchRotation.x);
-		rotationCopy.y += randInInterval(treeData.minBranchRotation.y, treeData.maxBranchRotation.y);
-		rotationCopy.z += randInInterval(treeData.minBranchRotation.z, treeData.maxBranchRotation.z);
+		//rotationCopy.x += randInInterval(treeData.minBranchRotation.x, treeData.maxBranchRotation.x) * depth * 2;
+		//rotationCopy.y += randInInterval(treeData.minBranchRotation.y, treeData.maxBranchRotation.y) * depth * 2;
+		//rotationCopy.z += randInInterval(treeData.minBranchRotation.z, treeData.maxBranchRotation.z) * depth * 2;
+		rotationCopy.x = (3.1415f / 4.0f) * (float(depth + 1) / float(treeData.maxDepth)) * sign;
+		rotationCopy.y = deltaAngle * (i + 1);
+		rotationCopy.z = 0.0f;
 
 		// Next branch
-		processChunk(modelMat, scaleCopy, translate, rotationCopy, depth + 1);
+		processChunk(modelMat, scaleCopy, translate, rotationCopy, currentOffset, depth + 1);
 	}
 }
 
-void Engine::FractalTree::addLeaf(glm::mat4 & origin, glm::vec3 lastScaling)
+void Engine::FractalTree::addLeaf(glm::mat4 & origin, glm::vec3 lastScaling, size_t offset, unsigned int depth)
 {
 	float minScale = lastScaling.x < lastScaling.y && lastScaling.x < lastScaling.z ? lastScaling.x : lastScaling.y < lastScaling.z ? lastScaling.y : lastScaling.z;
-	float maxScale = minScale * 2.5f;
-	float moveD = 2.0f;
+	minScale *= depth / 2;
+	float maxScale = minScale * depth;
 
-	glm::vec3 top(0, moveD * lastScaling.y, 0);
-	glm::mat4 topModel = origin * glm::translate(glm::mat4(1.0f), top); // lol!
-	appendVerticesAndFaces(topModel, glm::vec3(minScale, maxScale, minScale), 0, true);
+	float depthScaleFactor = depth / treeData.maxDepth;
 
-	glm::vec3 up(0, moveD * lastScaling.y, moveD * maxScale);
-	glm::mat4 upModel = origin * glm::translate(glm::mat4(1.0f), up);
-	appendVerticesAndFaces(upModel, glm::vec3(minScale, minScale, maxScale), 0, true);
+	minScale *= depthScaleFactor;
+	maxScale *= depthScaleFactor;
 
-	glm::vec3 down(0, moveD * lastScaling.y,-moveD * maxScale);
-	glm::mat4 downModel = origin * glm::translate(glm::mat4(1.0f), down);
-	appendVerticesAndFaces(downModel, glm::vec3(minScale, minScale, maxScale), 0, true);
+	minScale = maxScale = 0.025;
 
-	glm::vec3 left(-moveD * maxScale, moveD * lastScaling.y, 0);
-	glm::mat4 leftModel = origin * glm::translate(glm::mat4(1.0f), left);
-	appendVerticesAndFaces(leftModel, glm::vec3(maxScale, minScale, minScale), 0, true);
+	float moveD = 1.0f / 4;
 
-	glm::vec3 right(moveD * maxScale, moveD * lastScaling.y, 0);
-	glm::mat4 rightModel = origin * glm::translate(glm::mat4(1.0f), right);
-	appendVerticesAndFaces(rightModel, glm::vec3(maxScale, minScale, minScale), 0, true);
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		float displacement = moveD * i * lastScaling.y;
+
+		glm::mat4 rotateUp = glm::rotate(glm::mat4(1.0f), 3.1415f / 2.0f, glm::vec3(0,1,0));
+		glm::vec3 up(maxScale, displacement, 0);
+		glm::mat4 upModel = origin * glm::translate(glm::mat4(1.0f), up) * rotateUp;
+		appendVerticesAndFaces(leaf, upModel, glm::vec3(minScale, minScale, maxScale), 0, offset, true, true);
+
+		glm::mat4 rotateDown = glm::rotate(glm::mat4(1.0f), 3.1415f / 2.0f, glm::vec3(0, 1, 0));
+		glm::vec3 down(-maxScale, displacement, 0);
+		glm::mat4 downModel = origin * glm::translate(glm::mat4(1.0f), down) * rotateDown;
+		appendVerticesAndFaces(leaf, downModel, glm::vec3(minScale, minScale, minScale), 0, offset, true, true);
+
+		glm::mat4 rotateLeft = glm::rotate(glm::mat4(1.0f), randGen(randEngine) * 2.0f - 1.0f, glm::vec3(1, 0, 0));
+		glm::vec3 left(-maxScale, displacement, 0);
+		glm::mat4 leftModel = origin * glm::translate(glm::mat4(1.0f), left) * rotateLeft;
+		appendVerticesAndFaces(leaf, leftModel, glm::vec3(maxScale, minScale, minScale), 0, offset, true, true);
+
+		glm::mat4 rotateRight = glm::rotate(glm::mat4(1.0f), randGen(randEngine) * 2.0f - 1.0f, glm::vec3(1, 0, 0));
+		glm::vec3 right(maxScale, displacement, 0);
+		glm::mat4 rightModel = origin * glm::translate(glm::mat4(1.0f), right) * rotateRight;
+		appendVerticesAndFaces(leaf, rightModel, glm::vec3(maxScale, minScale, minScale), 0, offset, true, true);
+	}
 }
 
-void Engine::FractalTree::appendVerticesAndFaces(glm::mat4 & model, glm::vec3 scale, unsigned int depth, bool isLeaf)
+void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat4 & model, glm::vec3 scale, unsigned int depth, size_t vOffset, bool keepBase, bool isLeaf)
 {
 	// Add faces adding the offset of vertices already added to the main tree
-	const unsigned int * fac = base->getFaces();
-	size_t offset = vertices.size();
-	for (unsigned int i = 0; i < base->getNumFaces(); i++)
+	const unsigned int * fac = source->getFaces();
+	//vOffset = vertices.size();
+	size_t realOffset = vertices.size();
+	for (unsigned int i = 0; i < source->getNumFaces(); i++)
 	{
 		unsigned int index = i * 3;
-		glm::ivec3 f(fac[index] + offset, fac[index + 1] + offset, fac[index + 2] + offset);
+
+		unsigned int a = fac[index];
+		unsigned int b = fac[index + 1];
+		unsigned int c = fac[index + 2];
+
+		if (!keepBase)
+		{
+			a = a < 4 ? a + vOffset - 4 : a + realOffset - 4;
+			b = b < 4 ? b + vOffset - 4 : b + realOffset - 4;
+			c = c < 4 ? c + vOffset - 4 : c + realOffset - 4;
+		}
+		else
+		{
+			a += realOffset;
+			b += realOffset;
+			c += realOffset;
+		}
+
+		glm::ivec3 f(a, b, c);
 		faces.push_back(f);
 	}
 
 	// Add new vertices applying the transformations
-	const float * verts = base->getVertices();
-	for (unsigned int i = 0; i < base->getNumVertices(); i++)
+	const float * verts = source->getVertices();
+	unsigned int start = keepBase ? 0 : source->getNumVertices() / 2;
+	for (unsigned int i = start; i < source->getNumVertices(); i++)
 	{
 		unsigned int index = i * 3;
 		float x = verts[index] * scale.x;
-		float y = (verts[index + 1] + 1.0f) * scale.y; // + 1.0f to fix the y coordinate (the original cube is defined between -1 and 1)
+		float y = verts[index + 1] * scale.y; 
 		float z = verts[index + 2] * scale.z;
 		glm::vec4 v(x, y, z, 1.0);
 

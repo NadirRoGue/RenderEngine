@@ -127,6 +127,10 @@ void main()
 #ifdef SHADOW_MAP
 	lightdepth = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, 1);
 #else
+
+#ifdef WIRE_MODE
+	vec3 rawNormal = vec3(0,1,0);
+#else
 	float u = inUV.x;
 	float v = inUV.y;
 
@@ -145,8 +149,9 @@ void main()
 	int ySign = sign(gridPos.y);
 	rawNormal.x = xSign != 0 ? rawNormal.x * xSign : rawNormal.x;
 	rawNormal.z = ySign != 0 ? rawNormal.z * ySign : rawNormal.z;
-	vec3 n = normalize((normal * vec4(rawNormal, 0.0)).xyz);
-	
+#endif
+
+	vec3 n = normalize((normal * vec4(rawNormal, 0.0)).xyz);	
 	// COMPUTE COLOR
 	// ------------------------------------------------------------------------------
 #ifdef WIRE_MODE
@@ -173,7 +178,13 @@ void main()
 	outColor = vec4(color, visibility);
 	outNormal = vec4(n, 1.0);
 	outPos = vec4(inPos, 1.0);
+#ifdef WIRE_MODE
+	outSpecular = vec4(0,0,0,0);
+	outEmissive = vec4(0,0,0,0);
+#else
 	outSpecular = vec4(1,1,1,1);
-	outEmissive = vec4(color,0);
+	//outEmissive = vec4(color,0);
+	outEmissive = vec4(0,0,0,0);
+#endif
 #endif
 }

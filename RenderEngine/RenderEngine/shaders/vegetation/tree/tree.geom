@@ -7,23 +7,25 @@ layout(line_strip, max_vertices=3) out;
 layout(triangle_strip, max_vertices=3) out;
 #endif
 
-layout (location=0) in vec3 inPos[];
-layout (location=1) in vec3 inColor[];
-layout (location=2) in vec3 inNormal[];
-layout (location=3) in vec3 inEmission[];
+#ifndef SHADOW_MAP
+layout (location=0) in vec3 inColor[];
+layout (location=1) in vec3 inNormal[];
+layout (location=2) in vec3 inEmission[];
 
 layout (location=0) out vec3 outPos;
 layout (location=1) out vec3 outColor;
 layout (location=2) out vec3 outNormal;
 layout (location=3) out vec3 outEmission;
+layout (location=4) out vec3 lightDepth;
 
 uniform mat4 normal;
 uniform mat4 modelView;
 uniform mat4 modelViewProj;
-
-uniform vec2 tileUV;
+#endif
 
 uniform mat4 lightDepthMat;
+
+uniform vec2 tileUV;
 
 // ===============================================================================
 
@@ -85,7 +87,7 @@ void main()
 	
 	float height = noiseHeight(tileUV);
 
-	if(height > 0.1 && height < 0.35)
+	if(height > 0.1 && height < 0.2)
 	{
 		vec4 displacement = vec4(0, height * 1.5 * 5.0, 0, 0);
 
@@ -93,10 +95,12 @@ void main()
 		vec4 b = gl_in[1].gl_Position + displacement;
 		vec4 c = gl_in[2].gl_Position + displacement;
 
+#ifndef SHADOW_MAP
 		outColor = inColor[0];
 		outEmission = inEmission[0];
 		outNormal = (normal * vec4(inNormal[0], 0)).xyz;
 		outPos = (modelView * a).xyz;
+		lightDepth = (lightDepthMat * a).xyz;
 		gl_Position = modelViewProj * a;
 		EmitVertex();
 
@@ -104,6 +108,7 @@ void main()
 		outEmission = inEmission[1];
 		outNormal = (normal * vec4(inNormal[1], 0)).xyz;
 		outPos = (modelView * b).xyz;
+		lightDepth = (lightDepthMat * b).xyz;
 		gl_Position = modelViewProj * b;
 		EmitVertex();
 
@@ -111,9 +116,19 @@ void main()
 		outEmission = inEmission[2];
 		outNormal = (normal * vec4(inNormal[2], 0)).xyz;
 		outPos = (modelView * c).xyz;
+		lightDepth = (lightDepthMat * c).xyz;
 		gl_Position = modelViewProj * c;
 		EmitVertex();
+#else
+		gl_Position = lightDepthMat * a;
+		EmitVertex();
 
+		gl_Position = lightDepthMat * b;
+		EmitVertex();
+
+		gl_Position = lightDepthMat * c;
+		EmitVertex();
+#endif
 		EndPrimitive();
 	}
 }

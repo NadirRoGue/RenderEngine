@@ -144,6 +144,7 @@
     <ClInclude Include="include\datatables\VegetationTable.h" />
     <ClInclude Include="include\defaultobjects\Cube.h" />
     <ClInclude Include="include\defaultobjects\Plane.h" />
+    <ClInclude Include="include\defaultobjects\TreeShapes.h" />
     <ClInclude Include="include\DeferredNodeCallbacks.h" />
     <ClInclude Include="include\DeferredRenderObject.h" />
     <ClInclude Include="include\inputhandlers\keyboardhandlers\CameraMovementHandler.h" />

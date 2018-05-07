@@ -6,6 +6,9 @@
 
 const std::string Engine::TreeProgram::PROGRAM_NAME = "TreeProgram";
 
+const unsigned long long Engine::TreeProgram::SHADOW_MAP = 0x01;
+const unsigned long long Engine::TreeProgram::WIRE_MODE = 0x02;
+
 Engine::TreeProgram::TreeProgram(std::string name, unsigned long long params)
 	:Program(name, params)
 {
@@ -20,11 +23,13 @@ Engine::TreeProgram::TreeProgram(const TreeProgram & other)
 	uModelViewProj = other.uModelViewProj;
 	uModelView = other.uModelView;
 	uNormal = other.uNormal;
+	uLightDepthMat = other.uLightDepthMat;
 	uGridUV = other.uGridUV;
 	uAmplitude = other.uAmplitude;
 	uFrecuency = other.uFrecuency;
 	uScale = other.uScale;
 	uOctaves = other.uOctaves;
+	uLightDir = other.uLightDir;
 
 	uInPos = other.uInPos;
 	uInColor = other.uInColor;
@@ -34,9 +39,21 @@ Engine::TreeProgram::TreeProgram(const TreeProgram & other)
 
 void Engine::TreeProgram::initialize()
 {
-	vShader = loadShader(vShaderFile, GL_VERTEX_SHADER);
-	gShader = loadShader(gShaderFile, GL_GEOMETRY_SHADER);
-	fShader = loadShader(fShaderFile, GL_FRAGMENT_SHADER);
+	std::string config = "";
+
+	if (parameters & Engine::TreeProgram::SHADOW_MAP)
+	{
+		config += "#define SHADOW_MAP";
+	}
+
+	if (parameters & Engine::TreeProgram::WIRE_MODE)
+	{
+		config += "#define WIRE_MODE";
+	}
+
+	vShader = loadShader(vShaderFile, GL_VERTEX_SHADER, config);
+	gShader = loadShader(gShaderFile, GL_GEOMETRY_SHADER, config);
+	fShader = loadShader(fShaderFile, GL_FRAGMENT_SHADER, config);
 
 	glProgram = glCreateProgram();
 
@@ -72,6 +89,8 @@ void Engine::TreeProgram::configureProgram()
 	uFrecuency = glGetUniformLocation(glProgram, "frecuency");
 	uScale = glGetUniformLocation(glProgram, "scale");
 	uOctaves = glGetUniformLocation(glProgram, "octaves");
+	uLightDepthMat = glGetUniformLocation(glProgram, "lightDepthMat");
+	uLightDir = glGetUniformLocation(glProgram, "lightDir");
 
 	uInPos = glGetAttribLocation(glProgram, "inPos");
 	uInColor = glGetAttribLocation(glProgram, "inColor");
@@ -122,7 +141,6 @@ void Engine::TreeProgram::onRenderObject(const Engine::Object * obj, const glm::
 	glUniformMatrix4fv(uModelView, 1, GL_FALSE, &(modelView[0][0]));
 	glUniformMatrix4fv(uNormal, 1, GL_FALSE, &(normal[0][0]));
 
-
 	glUniform1f(uAmplitude, Engine::Settings::terrainAmplitude);
 	glUniform1f(uFrecuency, Engine::Settings::terrainFrecuency);
 	glUniform1f(uScale, Engine::Settings::terrainScale);
@@ -132,6 +150,23 @@ void Engine::TreeProgram::onRenderObject(const Engine::Object * obj, const glm::
 void Engine::TreeProgram::setUniformTileUV(float u, float v)
 {
 	glUniform2f(uGridUV, u, v);
+}
+
+void Engine::TreeProgram::setUniformLightDepthMat(const glm::mat4 & ldm)
+{
+	glUniformMatrix4fv(uLightDepthMat, 1, GL_FALSE, &(ldm[0][0]));
+}
+
+void Engine::TreeProgram::setUniformLightDir(const glm::vec3 & ld)
+{
+	glUniform3fv(uLightDir, 1, &ld[0]);
+}
+
+void Engine::TreeProgram::setUniformDepthMap(Engine::TextureInstance * ti)
+{
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, ti->getTexture()->getTextureId());
+	glUniform1i(uDepthMap, 0);
 }
 
 void Engine::TreeProgram::destroy()

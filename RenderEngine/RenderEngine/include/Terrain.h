@@ -61,7 +61,11 @@ namespace Engine
 
 		ProceduralWaterProgram * waterActiveShader;
 
+		TreeProgram * treeShadowMapShader;
 		TreeProgram * treeShader;
+		TreeProgram * treeWireShader;
+
+		TreeProgram * treeActiveShader;
 
 		Object * tileObject;
 
@@ -90,7 +94,7 @@ namespace Engine
 
 		void terrainShadowMapRender(Camera * cam, int i, int j);
 		void waterShadowMapRender(Camera * cam, int i, int j);
-		//void treesShadowMapRender(Camera * cam, int i, int j);
+		void treesShadowMapRender(Camera * cam, int i, int j);
 		void terrainRender(Camera * cam, int i, int j);
 		void waterRender(Camera * cam, int i, int j);
 		void treesRender(Camera * cam, int i, int j);

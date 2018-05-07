@@ -18,6 +18,7 @@ namespace Engine
 		std::vector<glm::vec3> colors;
 		std::vector<glm::vec3> emission;
 		Mesh * base;
+		Mesh * leaf;
 
 		std::uniform_real_distribution<float> randGen;
 		std::default_random_engine randEngine;
@@ -26,9 +27,9 @@ namespace Engine
 		FractalTree(const TreeGenerationData & data);
 		Mesh * generate();
 	private:
-		void processChunk(glm::mat4 & mat, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotation, unsigned int depth = 0);
-		void addLeaf(glm::mat4 & mat, glm::vec3 lastScaling);
-		void appendVerticesAndFaces(glm::mat4 & model, glm::vec3 scale, unsigned int depth, bool isLeaf = false);
+		void processChunk(glm::mat4 & mat, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotation, size_t vOffset, unsigned int depth);
+		void addLeaf(glm::mat4 & mat, glm::vec3 lastScaling, size_t offset, unsigned int depth);
+		void appendVerticesAndFaces(Mesh * source, glm::mat4 & model, glm::vec3 scale, unsigned int depth, size_t vOffset, bool keepBase, bool isLeaf = false);
 
 		float randSign();
 		float randInInterval(float a, float b);

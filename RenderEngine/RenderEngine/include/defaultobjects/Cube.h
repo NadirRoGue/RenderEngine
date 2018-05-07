@@ -9,7 +9,8 @@ namespace Engine
 		const int cubeNVertex = 24; 
 		const int cubeNTriangleIndex = 12; 
 
-		const unsigned int cubeTriangleIndex[] = {
+		const unsigned int cubeTriangleIndex[] = 
+		{
 			//Face z = 1
 			0,1,2,			1,3,2,
 			//Face z = -1
@@ -24,7 +25,8 @@ namespace Engine
 			20,22,21,		21,22,23,
 		};
 
-		const float cubeVertexPos[] = {
+		const float cubeVertexPos[] =
+		{
 			//Face z = 1
 			-1.0f,	-1.0f,	 1.0f, //0
 			 1.0f,	-1.0f,	 1.0f, //1
@@ -62,7 +64,8 @@ namespace Engine
 			 1.0f,	-1.0f,	 1.0f  //23
 		};
 
-		const float cubeVertexNormal[] = {
+		const float cubeVertexNormal[] = 
+		{
 			//Face z = 1
 			0.0f,	0.0f,	 1.0f,
 			0.0f,	0.0f,	 1.0f,
@@ -100,7 +103,8 @@ namespace Engine
 			0.0f,	-1.0f,	0.0f
 		};
 
-		const float cubeVertexColor[] = {
+		const float cubeVertexColor[] = 
+		{
 			//Face z = 1
 			0.0f,	0.0f,	 1.0f,
 			0.0f,	0.0f,	 1.0f,
@@ -138,7 +142,8 @@ namespace Engine
 			0.6f,	1.0f,	0.6f
 		};
 
-		const float cubeVertexTexCoord[] = {
+		const float cubeVertexTexCoord[] = 
+		{
 			//Face z = 1
 			 0.0f, 0.0f,
 			 1.0f, 0.0f,
@@ -176,7 +181,8 @@ namespace Engine
 			 1.0f, 1.0f,
 		};
 
-		const float cubeVertexTangent[] = {
+		const float cubeVertexTangent[] = 
+		{
 			//Face z = 1
 			1.0f,	0.0f,	0.0f,
 			1.0f,	0.0f,	0.0f,

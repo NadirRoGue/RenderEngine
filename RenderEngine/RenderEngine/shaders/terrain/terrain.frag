@@ -16,7 +16,7 @@ uniform mat4 normal;
 
 uniform sampler2D depthTexture;
 uniform vec3 lightDir;
-vec2 poissonDisk[4] = vec2[](
+uniform vec2 poissonDisk[4] = vec2[](
   vec2( -0.94201624, -0.39906216 ),
   vec2( 0.94558609, -0.76890725 ),
   vec2( -0.094184101, -0.92938870 ),
@@ -25,7 +25,7 @@ vec2 poissonDisk[4] = vec2[](
 
 uniform vec3 dirt = vec3(0.2, 0.1, 0.0);
 uniform vec3 snow = vec3(0.9, 0.9, 0.9);
-uniform vec3 grass = vec3(0.3, 0.6, 0.3);
+uniform vec3 grass = vec3(0.3, 1.0, 0.3);
 uniform vec3 sand = vec3(1,1,0.8);
 
 uniform ivec2 gridPos;
@@ -115,20 +115,21 @@ void main()
 	// COMPUTE COLOR
 	// ------------------------------------------------------------------------------
 	vec3 heightColor = vec3(0);
+	float visibility = 1.0;
 #ifndef WIRE_MODE
 	// Compute slope respect vertical axis
 	vec3 up = vec3(0, 1, 0);
 	float cos = abs(dot(rawNormal, up));
 
 	// Compute color gradient based on height / slope
-	heightColor = height < 0.1? sand : (height < 0.3? (cos > 0.75? grass : dirt) : (height < 0.4? (dirt) : (cos > 0.75? snow : dirt)));
-#endif
+	heightColor = height <= 0.1? sand : height < 0.2? mix(grass, dirt, height / 0.2) : height > 0.4 && cos > 0.75? snow : dirt;
+	//heightColor = height < 0.1? sand : (height < 0.3? (cos > 0.75? grass : dirt) : (height < 0.4? (dirt) : (cos > 0.75? snow : dirt)));
 
 	// APPLY SHADOW MAP
 	// ------------------------------------------------------------------------------
 	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
 	float curDepth = inShadowMapPos.z - bias;
-	float visibility = 1.0;
+	visibility = 1.0;
 	if(inShadowMapPos.x >= 0 && inShadowMapPos.x <= 1 && inShadowMapPos.y >= 0 && inShadowMapPos.y <= 1)
 	{
 		for (int i = 0; i < 4; i++)
@@ -136,6 +137,7 @@ void main()
 			visibility -= 0.25 * (( texture( depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0 ).x  <  curDepth )? 1.0 : 0.0);
 		}
 	}
+#endif
 
 	// OUTPUT G BUFFERS
 	// ------------------------------------------------------------------------------

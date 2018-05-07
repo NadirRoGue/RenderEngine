@@ -26,21 +26,15 @@ void main()
 	vec4 c = gl_in[2].gl_Position;
 	
 	outUV = inUV[0];
-	outShadowMapPos = lightDepthMat * a;
-	gl_Position = modelViewProj * a;
-	outPos = (modelView * a).xyz;
-	EmitVertex();
-
-	outUV = inUV[2];
-	outShadowMapPos = lightDepthMat * c;
-	gl_Position = modelViewProj * c;
-	outPos = (modelView * c).xyz;
+	gl_Position = a;
 	EmitVertex();
 
 	outUV = inUV[1];
-	outShadowMapPos = lightDepthMat * b;
-	gl_Position = modelViewProj * b;
-	outPos = (modelView * b).xyz;
+	gl_Position = b;
+	EmitVertex();
+
+	outUV = inUV[2];
+	gl_Position = c;
 	EmitVertex();
 
 	EndPrimitive();

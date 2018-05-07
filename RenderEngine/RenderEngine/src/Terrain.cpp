@@ -39,6 +39,8 @@ Engine::Terrain::~Terrain()
 
 void Engine::Terrain::render(Engine::Camera * camera)
 {
+	unsigned int previousRadius = renderRadius;
+
 	// Bind tile quad mesh
 	glBindVertexArray(tileObject->getMesh()->vao);
 
@@ -47,7 +49,7 @@ void Engine::Terrain::render(Engine::Camera * camera)
 	Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
 	const glm::vec3 & cameraPosition = camera->getPosition();
 	glm::vec3 target = glm::vec3(-cameraPosition.x, 0, -cameraPosition.z);
-	glm::mat4 depthViewMatrix = glm::lookAt(target + (dl->getDirection() * 40.0f), target, glm::vec3(0, 1, 0));
+	glm::mat4 depthViewMatrix = glm::lookAt(target + (dl->getDirection() * 30.0f), target, glm::vec3(0, 1, 0));
 	lightDepthMat = lightProjMatrix * depthViewMatrix;
 
 	// Bind the shadowmap frame buffer
@@ -58,10 +60,15 @@ void Engine::Terrain::render(Engine::Camera * camera)
 	// Render shadow maps
 	tiledRendering(camera, terrainShadowMapShader, &Terrain::terrainShadowMapRender);
 	tiledRendering(camera, waterShadowMapShader, &Terrain::waterShadowMapRender);
+	renderRadius = 4;
+	tiledRendering(camera, treeShadowMapShader, &Terrain::treesShadowMapRender);
+	renderRadius = previousRadius;
 	// Adjust depth matrix bias for shadow rendering
 	lightDepthMat = biasMat * lightDepthMat;
 	// Bind original framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, previousFrameBuffer);
+
+	glBindVertexArray(tileObject->getMesh()->vao);
 
 	// RENDER TERRAIN
 	tiledRendering(camera, terrainActiveShader, &Terrain::terrainRender);
@@ -75,9 +82,8 @@ void Engine::Terrain::render(Engine::Camera * camera)
 	glDisable(GL_BLEND);
 
 	// RENDER TREES
-	unsigned int previousRadius = renderRadius;
-	renderRadius = 5;
-	tiledRendering(camera, treeShader, &Terrain::treesRender);
+	renderRadius = 4;
+	tiledRendering(camera, treeActiveShader, &Terrain::treesRender);
 	renderRadius = previousRadius;
 }
 
@@ -109,7 +115,7 @@ void Engine::Terrain::tiledRendering(Engine::Camera * camera, Program * prog, vo
 		{
 			// Culling (skips almost half)
 			glm::vec3 test(i - x, 0, j - y);
-			if (abs(px) > 1 && abs(py) > 1 && glm::dot(glm::normalize(test), -fwd) <= 0)
+			if (abs(px) > 2 && abs(py) > 2 && glm::dot(glm::normalize(test), -fwd) <= 0)
 				continue;
 
 			(this->*func)(camera, i, j);
@@ -180,48 +186,93 @@ void Engine::Terrain::waterRender(Engine::Camera * camera, int i, int j)
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 }
 
-void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
+void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j)
 {
 	// We have to travel way to much to make this seed system not to work...
 	unsigned int seed = (i << 16) | j;
 	float posX = i * tileWidth;
 	float posZ = j * tileWidth;
 
-	std::uniform_int_distribution<unsigned long long> dTree(0, treeTypes.size() - 1);
-	std::default_random_engine eTree(seed);
+	std::uniform_real_distribution<float> dTerrain(0.0f, 1.0f);
+	std::default_random_engine eTerrain(seed);
+
+	size_t spawnTrees = 30;
+	size_t numTypeOfTrees = treeTypes.size();
+	size_t equalAmount = spawnTrees / numTypeOfTrees;
+	equalAmount = equalAmount < 1 ? 1 : equalAmount;
+
+	// 30 trees per terrain tile
+	size_t treeToSpawn = 0;
+	for (unsigned int z = 0; z < spawnTrees;)
+	{
+		Engine::Object * randomTree = treeTypes[treeToSpawn++];
+		glBindVertexArray(randomTree->getMesh()->vao);
+		for (unsigned int k = 0; k < equalAmount; k++, z++)
+		{
+			float uOffset = dTerrain(eTerrain);
+			float vOffset = dTerrain(eTerrain);
+
+			float treePosX = posX + uOffset * tileWidth;
+			float treePosZ = posZ + vOffset * tileWidth;
+
+			randomTree->setTranslation(glm::vec3(treePosX, 0.0f, treePosZ));
+
+			float u = abs(i + uOffset);
+			float v = abs(j + vOffset);
+
+			treeShadowMapShader->setUniformTileUV(u, v);
+			treeShadowMapShader->setUniformLightDepthMat(lightDepthMat *  randomTree->getModelMatrix());
+			treeShadowMapShader->onRenderObject(randomTree, camera->getViewMatrix(), camera->getProjectionMatrix());
+
+			glDrawElements(GL_TRIANGLES, randomTree->getMesh()->getNumFaces() * 3, GL_UNSIGNED_INT, (void*)0);
+		}
+	}
+}
+
+void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
+{
+	Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
+
+	// We have to travel way to much to make this seed system not to work...
+	unsigned int seed = (i << 16) | j;
+	float posX = i * tileWidth;
+	float posZ = j * tileWidth;
 
 	std::uniform_real_distribution<float> dTerrain(0.0f, 1.0f);
 	std::default_random_engine eTerrain(seed);
 
+	size_t spawnTrees = 30;
+	size_t numTypeOfTrees = treeTypes.size();
+	size_t equalAmount = spawnTrees / numTypeOfTrees;
+	equalAmount = equalAmount < 1 ? 1 : equalAmount;
+
 	// 30 trees per terrain tile
-	unsigned int lastVao = -1;
-	for (unsigned int z = 0; z < 6; z++)
+	size_t treeToSpawn = 0;
+	for (unsigned int z = 0; z < spawnTrees;)
 	{
-		Engine::Object * randomTree = treeTypes[1];// treeTypes[dTree(eTree)];
-		
-		unsigned int currentVao = randomTree->getMesh()->vao;
-		if (currentVao != lastVao)
+		Engine::Object * randomTree = treeTypes[treeToSpawn++];
+		glBindVertexArray(randomTree->getMesh()->vao);
+		for (unsigned int k = 0; k < equalAmount; k++, z++)
 		{
-			glBindVertexArray(currentVao);
-			lastVao = currentVao;
+			float uOffset = dTerrain(eTerrain);
+			float vOffset = dTerrain(eTerrain);
+
+			float treePosX = posX + uOffset * tileWidth;
+			float treePosZ = posZ + vOffset * tileWidth;
+
+			randomTree->setTranslation(glm::vec3(treePosX, 0.0f, treePosZ));
+
+			float u = abs(i + uOffset);
+			float v = abs(j + vOffset);
+
+			treeActiveShader->setUniformTileUV(u, v);
+			treeActiveShader->setUniformLightDir(dl->getDirection());
+			treeActiveShader->setUniformLightDepthMat(lightDepthMat * randomTree->getModelMatrix());
+			treeActiveShader->setUniformDepthMap(depthTexture);
+			treeActiveShader->onRenderObject(randomTree, camera->getViewMatrix(), camera->getProjectionMatrix());
+
+			glDrawElements(GL_TRIANGLES, randomTree->getMesh()->getNumFaces() * 3, GL_UNSIGNED_INT, (void*)0);
 		}
-
-		float xOffset = dTerrain(eTerrain) * tileWidth;
-		float yOffset = dTerrain(eTerrain) * tileWidth;
-
-		float treePosX = posX + xOffset;
-		float treePosZ = posZ + yOffset;
-
-		randomTree->setTranslation(glm::vec3(treePosX, 0.0f, treePosZ));
-
-		float u = i * xOffset;
-		float v = j * yOffset;
-
-		treeShader->setUniformTileUV(u, v);
-		treeShader->onRenderObject(randomTree, camera->getViewMatrix(), camera->getProjectionMatrix());
-
-		const Engine::Mesh * treeMesh = randomTree->getMesh();
-		glDrawElements(randomTree->getRenderMode(), treeMesh->getNumFaces() * 3, GL_UNSIGNED_INT, (void*)0);
 	}
 
 }
@@ -278,10 +329,23 @@ void Engine::Terrain::initialize()
 
 	// TREE SHADERS INSTANCING
 	const std::string & treeProgName = Engine::TreeProgram::PROGRAM_NAME;
+	// shading
 	treeShader = dynamic_cast<Engine::TreeProgram*>
 	(
 		Engine::ProgramTable::getInstance().getProgramByName(treeProgName)
 	);
+	// wire mode
+	treeWireShader = dynamic_cast<Engine::TreeProgram*>
+	(
+		Engine::ProgramTable::getInstance().getProgramByName(treeProgName, Engine::TreeProgram::WIRE_MODE)
+	);
+	// shadow map
+	treeShadowMapShader = dynamic_cast<Engine::TreeProgram*>
+	(
+		Engine::ProgramTable::getInstance().getProgramByName(treeProgName, Engine::TreeProgram::SHADOW_MAP)
+	);
+
+	treeActiveShader = treeShader;
 
 	// MESHES INSTANCING
 	createTileMesh();
@@ -353,10 +417,10 @@ void Engine::Terrain::addTrees()
 		treeData.startTrunkColor = glm::vec3(0.2f, 0.1f, 0.0f);
 		treeData.endTrunkColor = treeData.startTrunkColor;
 		treeData.leafColor = glm::vec3(0.2f, 0.4f, 0.0f);
-		treeData.maxBranchesSplit = 7;
-		treeData.maxBranchRotation = glm::vec3(45.0f, 45.0f, 45.0f);
-		treeData.minBranchRotation = glm::vec3(-45.0f, -45.0f, -45.0f);
-		treeData.maxDepth = 7;
+		treeData.maxBranchesSplit = 5;
+		treeData.maxBranchRotation = glm::vec3(10.0f, 10.0f, 10.0f);
+		treeData.minBranchRotation = glm::vec3(-10.0f, -10.0f, -10.0f);
+		treeData.maxDepth = 4;
 		treeData.rotateMainTrunk = false;
 		treeData.scalingFactor = glm::vec3(0.7, 0.9, 0.7);
 		treeData.seed = d(e);
@@ -364,7 +428,11 @@ void Engine::Terrain::addTrees()
 
 		Engine::Mesh * m = Engine::VegetationTable::getInstance().generateFractalTree(treeData, true);
 
+		std::cout << "Tree: " << m->getNumFaces() << " faces, " << m->getNumVertices() << " vertices" << std::endl;
+
 		treeShader->configureMeshBuffers(m);
+		treeWireShader->configureMeshBuffers(m);
+		treeShadowMapShader->configureMeshBuffers(m);
 
 		Engine::Object * tree = new Engine::Object(m);
 		
@@ -381,10 +449,12 @@ void Engine::Terrain::notifyRenderModeUpdate(Engine::RenderMode mode)
 	case Engine::RenderMode::RENDER_MODE_WIRE:
 		terrainActiveShader = terrainWireShader;
 		waterActiveShader = waterWireShader;
+		treeActiveShader = treeWireShader;
 		break;
 	default:
 		terrainActiveShader = terrainShadingShader;
 		waterActiveShader = waterShadingShader;
+		treeActiveShader = treeShader;
 		break;
 	}
 }

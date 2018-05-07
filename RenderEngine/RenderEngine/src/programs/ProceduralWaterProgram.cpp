@@ -10,12 +10,15 @@ Engine::ProceduralWaterProgram::ProceduralWaterProgram(std::string name, unsigne
 	:Engine::Program(name, params)
 {
 	vShaderFile = "shaders/water/water.vert";
+	gShaderFile = "shaders/water/water.geom";
 	fShaderFile = "shaders/water/water.frag";
 }
 
 Engine::ProceduralWaterProgram::ProceduralWaterProgram(const Engine::ProceduralWaterProgram & other)
 	:Engine::Program(other)
 {
+	gShader = other.gShader;
+
 	uModelView = other.uModelView;
 	uModelViewProj = other.uModelViewProj;
 	uNormal = other.uNormal;
@@ -49,11 +52,22 @@ void Engine::ProceduralWaterProgram::initialize()
 	}
 
 	vShader = loadShader(vShaderFile, GL_VERTEX_SHADER, configStr);
+
+	if (parameters & Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE)
+	{
+		gShader = loadShader(gShaderFile, GL_GEOMETRY_SHADER, configStr);
+	}
+
 	fShader = loadShader(fShaderFile, GL_FRAGMENT_SHADER, configStr);
 
 	glProgram = glCreateProgram();
 
 	glAttachShader(glProgram, vShader);
+	if (parameters & Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE)
+	{
+		glAttachShader(glProgram, gShader);
+	}
+
 	glAttachShader(glProgram, fShader);
 
 	glLinkProgram(glProgram);
@@ -159,6 +173,12 @@ void Engine::ProceduralWaterProgram::destroy()
 	{
 		glDetachShader(glProgram, vShader);
 		glDeleteShader(vShader);
+	}
+
+	if (gShader != -1)
+	{
+		glDetachShader(glProgram, gShader);
+		glDeleteShader(gShader);
 	}
 
 	if (fShader != -1)

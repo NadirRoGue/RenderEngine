@@ -9,6 +9,10 @@ namespace Engine
 	public:
 		static std::string PROGRAM_NAME;
 	private:
+		std::string gShaderFile;
+
+		unsigned int gShader;
+
 		unsigned int uInPos;
 		unsigned int uInUV;
 
