@@ -30,6 +30,7 @@ Engine::TreeProgram::TreeProgram(const TreeProgram & other)
 	uScale = other.uScale;
 	uOctaves = other.uOctaves;
 	uLightDir = other.uLightDir;
+	uWaterLevel = other.uWaterLevel;
 
 	uInPos = other.uInPos;
 	uInColor = other.uInColor;
@@ -91,6 +92,7 @@ void Engine::TreeProgram::configureProgram()
 	uOctaves = glGetUniformLocation(glProgram, "octaves");
 	uLightDepthMat = glGetUniformLocation(glProgram, "lightDepthMat");
 	uLightDir = glGetUniformLocation(glProgram, "lightDir");
+	uWaterLevel = glGetUniformLocation(glProgram, "waterHeight");
 
 	uInPos = glGetAttribLocation(glProgram, "inPos");
 	uInColor = glGetAttribLocation(glProgram, "inColor");
@@ -145,6 +147,7 @@ void Engine::TreeProgram::onRenderObject(const Engine::Object * obj, const glm::
 	glUniform1f(uFrecuency, Engine::Settings::terrainFrecuency);
 	glUniform1f(uScale, Engine::Settings::terrainScale);
 	glUniform1i(uOctaves, Engine::Settings::terrainOctaves);
+	glUniform1f(uWaterLevel, Engine::Settings::waterHeight);
 }
 
 void Engine::TreeProgram::setUniformTileUV(float u, float v)

@@ -416,11 +416,11 @@ void Engine::Terrain::addTrees()
 		treeData.emissiveLeaf = false;
 		treeData.startTrunkColor = glm::vec3(0.2f, 0.1f, 0.0f);
 		treeData.endTrunkColor = treeData.startTrunkColor;
-		treeData.leafColor = glm::vec3(0.2f, 0.4f, 0.0f);
-		treeData.maxBranchesSplit = 5;
+		treeData.leafColor = glm::vec3(0.1f, 0.3f, 0.1f);
+		treeData.maxBranchesSplit = 4;
 		treeData.maxBranchRotation = glm::vec3(10.0f, 10.0f, 10.0f);
 		treeData.minBranchRotation = glm::vec3(-10.0f, -10.0f, -10.0f);
-		treeData.maxDepth = 4;
+		treeData.maxDepth = 5;
 		treeData.rotateMainTrunk = false;
 		treeData.scalingFactor = glm::vec3(0.7, 0.9, 0.7);
 		treeData.seed = d(e);

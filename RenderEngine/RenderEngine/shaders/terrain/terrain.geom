@@ -18,6 +18,8 @@ layout (location=3) out vec4 outShadowMapPos;
 uniform mat4 modelView;
 uniform mat4 modelViewProj;
 
+uniform float waterHeight;
+
 uniform mat4 lightDepthMat;
 
 void main()
@@ -48,4 +50,42 @@ void main()
 	EmitVertex();
 
 	EndPrimitive();
+
+	/*
+	for(int i = 0; i < 3; i++)
+	{
+		float h = height[i];
+		if(h > waterHeight && h < waterHeight + 0.15)
+		{
+			vec3 posAround = gl_in[i].gl_Position.xyz;
+			// In camera space so grass blades are billboarded (if that word exists)
+			vec3 left = posAround - vec3(0.0005, 0, 0);
+			vec3 right = posAround + vec3(0.0005, 0, 0);
+			vec3 top = posAround + vec3(0, 0.007, 0);
+
+			vec4 c4 = vec4(left, 1);
+			outPos = (modelView * c4).xyz;
+			outShadowMapPos = lightDepthMat * c4;
+			outHeight = h;
+			gl_Position = modelViewProj * c4;
+			EmitVertex();
+
+			c4 = vec4(right, 1);
+			outPos = (modelView * c4).xyz;
+			outShadowMapPos = lightDepthMat * c4;
+			outHeight = h;
+			gl_Position = modelViewProj * c4;
+			EmitVertex();
+
+			c4 = vec4(top, 1);
+			outPos = (modelView * c4).xyz;
+			outShadowMapPos = lightDepthMat * c4;
+			outHeight = h;
+			gl_Position = modelViewProj * c4;
+			EmitVertex();
+
+			EndPrimitive();
+		}
+	}
+	*/
 }

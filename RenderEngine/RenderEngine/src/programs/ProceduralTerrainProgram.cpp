@@ -32,6 +32,8 @@ Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerra
 	uModelViewProj = other.uModelViewProj;
 	uNormal = other.uNormal;
 
+	uWaterLevel = other.uWaterLevel;
+
 	uLightDepthMatrix = other.uLightDepthMatrix;
 	uDepthTexture = other.uDepthTexture;
 	uLightDirection = other.uLightDirection;
@@ -114,6 +116,8 @@ void Engine::ProceduralTerrainProgram::configureProgram()
 	uLightDirection = glGetUniformLocation(glProgram, "lightDir");
 	uDepthTexture = glGetUniformLocation(glProgram, "depthTexture");
 
+	uWaterLevel = glGetUniformLocation(glProgram, "waterHeight");
+
 	uAmplitude = glGetUniformLocation(glProgram, "amplitude");
 	uFrecuency = glGetUniformLocation(glProgram, "frecuency");
 	uScale = glGetUniformLocation(glProgram, "scale");
@@ -159,6 +163,7 @@ void Engine::ProceduralTerrainProgram::onRenderObject(const Engine::Object * obj
 	glUniform1f(uFrecuency, Engine::Settings::terrainFrecuency);
 	glUniform1f(uScale, Engine::Settings::terrainScale);
 	glUniform1i(uOctaves, Engine::Settings::terrainOctaves);
+	glUniform1f(uWaterLevel, Engine::Settings::waterHeight);
 }
 
 void Engine::ProceduralTerrainProgram::setUniformGridPosition(unsigned int i, unsigned int j)

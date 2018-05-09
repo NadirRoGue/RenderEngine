@@ -27,6 +27,7 @@ namespace Engine
 		unsigned int uOctaves;
 		unsigned int uLightDir;
 		unsigned int uDepthMap;
+		unsigned int uWaterLevel;
 
 		unsigned int uInPos;
 		unsigned int uInColor;

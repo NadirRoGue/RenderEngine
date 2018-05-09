@@ -29,6 +29,8 @@ namespace Engine
 		unsigned int uDepthTexture;
 		unsigned int uLightDirection;
 
+		unsigned int uWaterLevel;
+
 		unsigned int uGridPos;
 
 		unsigned int uAmplitude;

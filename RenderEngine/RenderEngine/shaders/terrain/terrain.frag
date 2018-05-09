@@ -28,6 +28,8 @@ uniform vec3 snow = vec3(0.9, 0.9, 0.9);
 uniform vec3 grass = vec3(0.3, 1.0, 0.3);
 uniform vec3 sand = vec3(1,1,0.8);
 
+uniform float waterHeight;
+
 uniform ivec2 gridPos;
 
 uniform float amplitude;
@@ -122,7 +124,7 @@ void main()
 	float cos = abs(dot(rawNormal, up));
 
 	// Compute color gradient based on height / slope
-	heightColor = height <= 0.1? sand : height < 0.2? mix(grass, dirt, height / 0.2) : height > 0.4 && cos > 0.75? snow : dirt;
+	heightColor = height <= waterHeight + 0.01? sand : height < waterHeight + 0.1? mix(grass, dirt, height / (waterHeight + 0.1)) : height > waterHeight + 0.3 && cos > 0.75? snow : dirt;
 	//heightColor = height < 0.1? sand : (height < 0.3? (cos > 0.75? grass : dirt) : (height < 0.4? (dirt) : (cos > 0.75? snow : dirt)));
 
 	// APPLY SHADOW MAP
