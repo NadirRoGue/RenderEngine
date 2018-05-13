@@ -17,6 +17,7 @@
 #include "Renderer.h"
 #include "renderers/DeferredRenderer.h"
 #include "Terrain.h"
+#include "skybox/SkyBox.h"
 
 #include "StorageTable.h"
 #include "datatables/ProgramTable.h"
@@ -32,6 +33,7 @@
 #include "programs/ProceduralTerrainProgram.h"
 #include "programs/ProceduralWaterProgram.h"
 #include "programs/TreeProgram.h"
+#include "programs/SkyProgram.h"
 #include "postprocessprograms/DeferredShadingProgram.h"
 #include "postprocessprograms/SSAAProgram.h"
 #include "postprocessprograms/BloomProgram.h"

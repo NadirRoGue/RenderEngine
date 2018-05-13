@@ -1,5 +1,7 @@
 #include "WorldConfig.h"
 
+unsigned int Engine::Settings::worldSeed = 0;
+
 unsigned int Engine::Settings::drawingMethod = 0;
 unsigned int Engine::Settings::travelMethod = 0;
 

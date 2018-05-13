@@ -20,6 +20,8 @@ namespace Engine
 	class Settings
 	{
 	public:
+		static unsigned int worldSeed;
+
 		static unsigned int drawingMethod;
 		static unsigned int travelMethod;
 

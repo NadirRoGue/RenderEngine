@@ -127,6 +127,18 @@
     <Filter Include="shaders\vegetation\tree">
       <UniqueIdentifier>{b5bb3fcd-02b2-415e-a20e-db00483148df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de encabezado\skybox">
+      <UniqueIdentifier>{0c49fd2f-037d-4072-b6da-8f9ab9e51c10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\skybox">
+      <UniqueIdentifier>{ec6dcc4d-f510-4218-b509-f20eae6c1f88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\volumetricclouds">
+      <UniqueIdentifier>{e2c3b0e9-5d4d-4cd9-8493-211772676ab2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\volumetricclouds">
+      <UniqueIdentifier>{1a0a209f-2dba-4bce-88a4-af1451a3747d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Animation.h">
@@ -182,9 +194,6 @@
     </ClInclude>
     <ClInclude Include="include\programs\StandardProgram.h">
       <Filter>Archivos de encabezado\programs</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SkyBox.h">
-      <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="include\datatables\MeshTable.h">
       <Filter>Archivos de encabezado\datatables</Filter>
@@ -336,6 +345,21 @@
     <ClInclude Include="include\defaultobjects\TreeShapes.h">
       <Filter>Archivos de encabezado\defaultobjects</Filter>
     </ClInclude>
+    <ClInclude Include="include\skybox\AbstractSkyBox.h">
+      <Filter>Archivos de encabezado\skybox</Filter>
+    </ClInclude>
+    <ClInclude Include="include\skybox\DummySkybox.h">
+      <Filter>Archivos de encabezado\skybox</Filter>
+    </ClInclude>
+    <ClInclude Include="include\skybox\SkyBox.h">
+      <Filter>Archivos de encabezado\skybox</Filter>
+    </ClInclude>
+    <ClInclude Include="include\volumetricclouds\NoiseInitializer.h">
+      <Filter>Archivos de encabezado\volumetricclouds</Filter>
+    </ClInclude>
+    <ClInclude Include="include\postprocessprograms\VolumetricTextureProgram.h">
+      <Filter>Archivos de encabezado\postprocessprograms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -394,9 +418,6 @@
     </ClCompile>
     <ClCompile Include="src\programs\StandardProgram.cpp">
       <Filter>Archivos de origen\programs</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SkyBox.cpp">
-      <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="src\lights\DirectionalLight.cpp">
       <Filter>Archivos de origen\lights</Filter>
@@ -526,6 +547,15 @@
     </ClCompile>
     <ClCompile Include="src\datatables\VegetationTable.cpp">
       <Filter>Archivos de origen\datatables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\skybox\SkyBox.cpp">
+      <Filter>Archivos de origen\skybox</Filter>
+    </ClCompile>
+    <ClCompile Include="src\volumetricclouds\NoiseInitializer.cpp">
+      <Filter>Archivos de origen\volumetricclouds</Filter>
+    </ClCompile>
+    <ClCompile Include="src\postprocessprograms\VolumetricTextureProgram.cpp">
+      <Filter>Archivos de origen\postprocessprograms</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

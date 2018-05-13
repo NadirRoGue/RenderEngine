@@ -71,6 +71,12 @@ void Engine::RenderManager::setRenderer(Engine::Renderer * renderer)
 		delete activeRender;
 	}
 
+	if (Engine::SceneManager::getInstance().getActiveScene() == NULL)
+	{
+		std::cerr << "RenderManager: No active scene found" << std::endl;
+		exit(-1);
+	}
+
 	activeRender = renderer;
 	activeRender->initialize();
 }

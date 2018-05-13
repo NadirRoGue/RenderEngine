@@ -9,8 +9,8 @@
 #include <iostream>
 
 #include "datatables/ProgramTable.h"
-
 #include "LightBufferManager.h"
+#include "skybox/DummySkybox.h"
 
 Engine::Scene::Scene()
 {
@@ -21,7 +21,7 @@ Engine::Scene::Scene()
 	animations = new Engine::AnimationTable();
 	directionalLight = NULL;
 	terrain = NULL;
-	skybox = NULL;
+	skybox = new Engine::DummySkyBox();
 }
 
 Engine::Scene::~Scene()
@@ -72,12 +72,12 @@ Engine::Terrain * Engine::Scene::getTerrain()
 	return this->terrain;
 }
 
-void Engine::Scene::setSkybox(Engine::SkyBox * sb)
+void Engine::Scene::setSkybox(Engine::AbstractSkyBox * sb)
 {
 	skybox = sb;
 }
 
-Engine::SkyBox * Engine::Scene::getSkyBox()
+Engine::AbstractSkyBox * Engine::Scene::getSkyBox()
 {
 	return skybox;
 }

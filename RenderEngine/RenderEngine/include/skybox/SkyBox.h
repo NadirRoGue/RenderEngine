@@ -1,5 +1,7 @@
 #pragma once
 
+#include "skybox/AbstractSkyBox.h"
+
 #include "Texture.h"
 #include "programs/SkyProgram.h"
 #include "Camera.h"
@@ -7,7 +9,7 @@
 
 namespace Engine
 {
-	class SkyBox : public IRenderable
+	class SkyBox : public AbstractSkyBox, public IRenderable
 	{
 	private:
 		SkyProgram * shader;

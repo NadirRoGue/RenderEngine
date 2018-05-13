@@ -29,7 +29,7 @@ Engine::FractalTree::FractalTree(const TreeGenerationData & data) :Engine::Proce
 Engine::Mesh * Engine::FractalTree::generate()
 {
 	// Initial data to start growin the tree
-	glm::vec3 scale = glm::vec3(0.012f, 0.1f, 0.012f);
+	glm::vec3 scale = glm::vec3(0.012f, 0.12f, 0.012f);
 	glm::vec3 translation(0, 0, 0);
 	glm::vec3 rotation;
 
@@ -165,9 +165,9 @@ void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat
 	{
 		unsigned int index = i * 3;
 
-		unsigned int a = fac[index];
-		unsigned int b = fac[index + 1];
-		unsigned int c = fac[index + 2];
+		size_t a = fac[index];
+		size_t b = fac[index + 1];
+		size_t c = fac[index + 2];
 
 		if (!keepBase)
 		{

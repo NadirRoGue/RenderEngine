@@ -12,6 +12,8 @@ Engine::DeferredRenderer::DeferredRenderer()
 {
 	forwardPass = new Engine::ForwardRenderer();
 	initialized = false;
+
+	renderFunc = &DeferredRenderer::initializeLoop;
 }
 
 Engine::DeferredRenderer::~DeferredRenderer()
@@ -94,10 +96,17 @@ void Engine::DeferredRenderer::initialize()
 
 void Engine::DeferredRenderer::doRender()
 {
-	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
+	(this->*renderFunc)();
+}
 
-	if (scene == 0)
-		return;
+void Engine::DeferredRenderer::initializeLoop()
+{
+	renderFunc = &Engine::DeferredRenderer::renderLoop;
+}
+
+void Engine::DeferredRenderer::renderLoop()
+{
+	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
 
 	// Do forward pass
 	glBindFramebuffer(GL_FRAMEBUFFER, forwardPassBuffer->getFrameBufferId());
@@ -105,7 +114,7 @@ void Engine::DeferredRenderer::doRender()
 	glEnable(GL_CULL_FACE);
 	forwardPass->renderFromCamera(activeCam);
 	forwardPass->doRender();
-	
+
 	// Do deferred shading pass
 	glDisable(GL_CULL_FACE);
 	glBindFramebuffer(GL_FRAMEBUFFER, deferredPassBuffer->getFrameBufferId());
@@ -115,19 +124,15 @@ void Engine::DeferredRenderer::doRender()
 	deferredShading->onRenderObject(deferredDrawSurface, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-	if (scene->getSkyBox() != NULL)
-	{
-		glDepthFunc(GL_LEQUAL);
-		scene->getSkyBox()->render(activeCam);
-		glDepthFunc(GL_LESS);
-	}
+	// Render the skybox after shading is performed
+	scene->getSkyBox()->render(activeCam);
+
 	// Run the post-process chain
 	runPostProcesses();
 
 	// Enable default framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
 
 	// Output the final result to screen
 	glUseProgram(screenOutput->getProgramId());
@@ -150,10 +155,10 @@ void Engine::DeferredRenderer::runPostProcesses()
 		Engine::Program * prog = node->postProcessProgram;
 		glUseProgram(prog->getProgramId());
 
-		if (node->callBack != 0)
-		{
-			node->callBack->execute(node->obj, node->postProcessProgram, node->renderBuffer, activeCam);
-		}
+		//if (node->callBack != 0)
+		//{
+		//	node->callBack->execute(node->obj, node->postProcessProgram, node->renderBuffer, activeCam);
+		//}
 
 		glBindVertexArray(node->obj->getMesh()->vao);
 

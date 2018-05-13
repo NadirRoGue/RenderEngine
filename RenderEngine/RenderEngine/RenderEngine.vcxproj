@@ -169,6 +169,7 @@
     <ClInclude Include="include\postprocessprograms\GaussianBlurProgram.h" />
     <ClInclude Include="include\postprocessprograms\PerlinGeneratorProgram.h" />
     <ClInclude Include="include\postprocessprograms\SSAAProgram.h" />
+    <ClInclude Include="include\postprocessprograms\VolumetricTextureProgram.h" />
     <ClInclude Include="include\ProceduralVegetation.h" />
     <ClInclude Include="include\Program.h" />
     <ClInclude Include="include\programs\ProceduralTerrainProgram.h" />
@@ -182,7 +183,9 @@
     <ClInclude Include="include\renderers\ForwardRenderer.h" />
     <ClInclude Include="include\renderers\SideBySideRenderer.h" />
     <ClInclude Include="include\Scene.h" />
-    <ClInclude Include="include\SkyBox.h" />
+    <ClInclude Include="include\skybox\AbstractSkyBox.h" />
+    <ClInclude Include="include\skybox\DummySkybox.h" />
+    <ClInclude Include="include\skybox\SkyBox.h" />
     <ClInclude Include="include\StorageTable.h" />
     <ClInclude Include="include\Terrain.h" />
     <ClInclude Include="include\Texture.h" />
@@ -192,6 +195,7 @@
     <ClInclude Include="include\UserInterface.h" />
     <ClInclude Include="include\userinterfaces\WorldControllerUI.h" />
     <ClInclude Include="include\vegetation\FractalTree.h" />
+    <ClInclude Include="include\volumetricclouds\NoiseInitializer.h" />
     <ClInclude Include="include\windowmanagers\GLFWWindow.h" />
     <ClInclude Include="include\windowmanagers\GLUTWindow.h" />
     <ClInclude Include="include\windowmanagers\WindowManager.h" />
@@ -240,6 +244,7 @@
     <ClCompile Include="src\postprocessprograms\GaussianBlurProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\PerlinGeneratorProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\SSAAProgram.cpp" />
+    <ClCompile Include="src\postprocessprograms\VolumetricTextureProgram.cpp" />
     <ClCompile Include="src\ProceduralVegetation.cpp" />
     <ClCompile Include="src\Program.cpp" />
     <ClCompile Include="src\programs\ProceduralTerrainProgram.cpp" />
@@ -253,7 +258,7 @@
     <ClCompile Include="src\renderers\ForwardRenderer.cpp" />
     <ClCompile Include="src\renderers\SideBySideRenderer.cpp" />
     <ClCompile Include="src\Scene.cpp" />
-    <ClCompile Include="src\SkyBox.cpp" />
+    <ClCompile Include="src\skybox\SkyBox.cpp" />
     <ClCompile Include="src\StorageTable.cpp" />
     <ClCompile Include="src\Terrain.cpp" />
     <ClCompile Include="src\Texture.cpp" />
@@ -263,6 +268,7 @@
     <ClCompile Include="src\UserInterface.cpp" />
     <ClCompile Include="src\userinterfaces\WorldControllerUI.cpp" />
     <ClCompile Include="src\vegetation\FractalTree.cpp" />
+    <ClCompile Include="src\volumetricclouds\NoiseInitializer.cpp" />
     <ClCompile Include="src\windowmanagers\GLFWWindow.cpp" />
     <ClCompile Include="src\windowmanagers\GLUTWindow.cpp" />
     <ClCompile Include="src\windowmanagers\WindowManager.cpp" />

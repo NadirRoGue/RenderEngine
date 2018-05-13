@@ -39,6 +39,8 @@ namespace Engine
 
 		bool initialized;
 
+		void (DeferredRenderer::*renderFunc)();
+
 	public:
 		DeferredRenderer();
 		~DeferredRenderer();
@@ -50,6 +52,8 @@ namespace Engine
 		
 		DeferredRenderObject * getGBuffer();
 	private:
+		void initializeLoop();
+		void renderLoop();
 		void runPostProcesses();
 	};
 }
