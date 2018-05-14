@@ -180,9 +180,11 @@ void Engine::DeferredRenderObject::initialize()
 	for (unsigned int i = 0; i < colorBuffersSize; i++)
 	{
 		colorBuffers[i].texture->generateTexture();
+		colorBuffers[i].texture->configureTexture();
 	}
 
 	depthBuffer.texture->generateTexture();
+	depthBuffer.texture->configureTexture();
 }
 
 void Engine::DeferredRenderObject::resizeFBO(unsigned int w, unsigned int h)

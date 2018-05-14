@@ -190,6 +190,7 @@
     <ClInclude Include="include\Terrain.h" />
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\textures\Texture2D.h" />
+    <ClInclude Include="include\textures\Texture3D.h" />
     <ClInclude Include="include\textures\TextureCubemap.h" />
     <ClInclude Include="include\Time.h" />
     <ClInclude Include="include\UserInterface.h" />
@@ -263,6 +264,7 @@
     <ClCompile Include="src\Terrain.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\textures\Texture2D.cpp" />
+    <ClCompile Include="src\textures\Texture3D.cpp" />
     <ClCompile Include="src\textures\TextureCubemap.cpp" />
     <ClCompile Include="src\Time.cpp" />
     <ClCompile Include="src\UserInterface.cpp" />

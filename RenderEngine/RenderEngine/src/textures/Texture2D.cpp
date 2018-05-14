@@ -14,6 +14,10 @@ Engine::Texture2D::Texture2D(std::string name, unsigned char *data, unsigned int
 		this->data = new unsigned char[width * height];
 		memcpy(this->data, data, width * height * sizeof(unsigned char));
 	}
+	else
+	{
+		this->data = 0;
+	}
 }
 
 Engine::Texture2D::~Texture2D()
@@ -39,7 +43,7 @@ const unsigned int Engine::Texture2D::getHeight() const
 	return height;
 }
 
-void Engine::Texture2D::setSize(unsigned int w, unsigned int h)
+void Engine::Texture2D::setSize(unsigned int w, unsigned int h, unsigned int d)
 {
 	width = w;
 	height = h;

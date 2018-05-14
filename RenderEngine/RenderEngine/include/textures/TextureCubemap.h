@@ -19,7 +19,7 @@ namespace Engine
 		const unsigned int getTileWidth() const;
 		const unsigned int getTileHeight() const;
 
-		void setSize(unsigned int w, unsigned int h);
+		void setSize(unsigned int w, unsigned int h, unsigned int d = 1);
 		void uploadTexture();
 		GLenum getTextureType();
 	};

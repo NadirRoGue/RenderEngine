@@ -37,7 +37,7 @@ namespace Engine
 
 		void generateTexture();
 		virtual void uploadTexture() = 0;
-		virtual void setSize(unsigned int w, unsigned int h) = 0;
+		virtual void setSize(unsigned int w, unsigned int h, unsigned int d = 1) = 0;
 		virtual GLenum getTextureType() = 0;
 	};
 }

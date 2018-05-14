@@ -360,6 +360,9 @@
     <ClInclude Include="include\postprocessprograms\VolumetricTextureProgram.h">
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>
+    <ClInclude Include="include\textures\Texture3D.h">
+      <Filter>Archivos de encabezado\textures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -556,6 +559,9 @@
     </ClCompile>
     <ClCompile Include="src\postprocessprograms\VolumetricTextureProgram.cpp">
       <Filter>Archivos de origen\postprocessprograms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\textures\Texture3D.cpp">
+      <Filter>Archivos de origen\textures</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

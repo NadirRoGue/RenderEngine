@@ -55,7 +55,7 @@ const unsigned int Engine::TextureCubemap::getTileHeight() const
 	return tileHeight;
 }
 
-void Engine::TextureCubemap::setSize(unsigned int w, unsigned int h)
+void Engine::TextureCubemap::setSize(unsigned int w, unsigned int h, unsigned int d)
 {
 	tileWidth = w;
 	tileHeight = h;

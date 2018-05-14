@@ -4,11 +4,11 @@
 
 namespace Engine
 {
-	namespace CloudSystem
+	class VolumetricTextureProgram : public PostProcessProgram
 	{
-		class VolumetricTextureProgram : public PostProcessProgram
-		{
+	public:
+		static const std::string PROGRAM_NAME;
 
-		};
-	}
+		
+	};
 }
