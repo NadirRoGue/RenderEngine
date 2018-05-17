@@ -6,37 +6,10 @@
 #include "Program.h"
 
 #include <iostream>
-#include <fstream>
+
+#include "util/IOUtils.h"
 
 const size_t VERSION_HEADER_LENGHT = 17;
-
-char *loadStringFromFile(const char *fileName, unsigned long long &fileLen)
-{
-	//Se carga el fichero
-	std::ifstream file;
-	file.open(fileName, std::ios::in);
-	if (!file) return 0;
-
-	//Se calcula la longitud del fichero
-	file.seekg(0, std::ios::end);
-	fileLen = file.tellg();
-	file.seekg(std::ios::beg);
-
-	//Se lee el fichero
-	char *source = new char[fileLen + 1];
-
-	int i = 0;
-	while (file.good())
-	{
-		source[i] = char(file.get());
-		if (!file.eof()) i++;
-		else fileLen = i;
-	}
-	source[fileLen] = '\0';
-	file.close();
-
-	return source;
-}
 
 // ================================================================================
 
@@ -104,7 +77,7 @@ unsigned int Engine::Program::getProgramId() const
 unsigned int Engine::Program::loadShader(std::string fileName, GLenum type, std::string configString, bool outputToFile, std::string outputFileName)
 {
 	size_t fileLen;
-	char *source = loadStringFromFile(fileName.c_str(), fileLen);
+	char *source = Engine::IO::loadStringFromFile(fileName.c_str(), fileLen);
 	
 	std::string result(source);
 

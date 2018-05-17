@@ -131,7 +131,7 @@ void initTables()
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SkyProgram::PROGRAM_NAME, new Engine::SkyProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::BloomProgram::PROGRAM_NAME, new Engine::BloomProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::TreeProgram::PROGRAM_NAME, new Engine::TreeProgramFactory());
-
+	
 	// Mesh table
 	Engine::MeshTable::getInstance().addMeshToCache("cube", Engine::CreateCube());
 	Engine::MeshTable::getInstance().addMeshToCache("plane", Engine::CreatePlane());

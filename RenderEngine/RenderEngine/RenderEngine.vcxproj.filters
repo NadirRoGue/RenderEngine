@@ -139,6 +139,21 @@
     <Filter Include="Archivos de origen\volumetricclouds">
       <UniqueIdentifier>{1a0a209f-2dba-4bce-88a4-af1451a3747d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shaders\clouds">
+      <UniqueIdentifier>{743aa906-3a8b-4f7b-b6e8-c36055a116bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\util">
+      <UniqueIdentifier>{8afa07cb-fc44-4619-9b30-834f75cc623b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\util">
+      <UniqueIdentifier>{3bcd2326-6c97-4c6f-b798-efb3f71aa6fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\computeprograms">
+      <UniqueIdentifier>{fe953f9b-4b13-4cef-93c5-87577059ec24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\computeprograms">
+      <UniqueIdentifier>{0abfcdc2-f4e2-42c0-bf41-66a7af90a33f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Animation.h">
@@ -357,11 +372,20 @@
     <ClInclude Include="include\volumetricclouds\NoiseInitializer.h">
       <Filter>Archivos de encabezado\volumetricclouds</Filter>
     </ClInclude>
-    <ClInclude Include="include\postprocessprograms\VolumetricTextureProgram.h">
-      <Filter>Archivos de encabezado\postprocessprograms</Filter>
-    </ClInclude>
     <ClInclude Include="include\textures\Texture3D.h">
       <Filter>Archivos de encabezado\textures</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Threadpool.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ComputeProgram.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\util\IOUtils.h">
+      <Filter>Archivos de encabezado\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\computeprograms\VolumeTextureProgram.h">
+      <Filter>Archivos de encabezado\computeprograms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -557,11 +581,20 @@
     <ClCompile Include="src\volumetricclouds\NoiseInitializer.cpp">
       <Filter>Archivos de origen\volumetricclouds</Filter>
     </ClCompile>
-    <ClCompile Include="src\postprocessprograms\VolumetricTextureProgram.cpp">
-      <Filter>Archivos de origen\postprocessprograms</Filter>
-    </ClCompile>
     <ClCompile Include="src\textures\Texture3D.cpp">
       <Filter>Archivos de origen\textures</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Threadpool.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ComputeProgram.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\IOUtils.cpp">
+      <Filter>Archivos de origen\util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\computeprograms\VolumeTextureProgram.cpp">
+      <Filter>Archivos de origen\computeprograms</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -645,6 +678,9 @@
     </None>
     <None Include="shaders\vegetation\tree\tree.geom">
       <Filter>shaders\vegetation\tree</Filter>
+    </None>
+    <None Include="shaders\clouds\noisetexgenerator.frag">
+      <Filter>shaders\clouds</Filter>
     </None>
   </ItemGroup>
 </Project>

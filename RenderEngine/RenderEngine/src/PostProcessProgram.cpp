@@ -8,6 +8,8 @@
 #include "Renderer.h"
 #include "instances/TextureInstance.h"
 
+#include "volumetricclouds/NoiseInitializer.h"
+
 #include <iostream>
 
 std::string Engine::PostProcessProgram::PROGRAM_NAME = "PostProcessProgram";
@@ -67,7 +69,7 @@ void Engine::PostProcessProgram::configureMeshBuffers(Engine::Mesh * data)
 
 void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
 {
-
+	/*
 	std::map<std::string, TextureInstance *> all = ((PostProcessObject*)obj)->getAllCustomTextures();
 	std::map<std::string, TextureInstance *>::const_iterator it = all.cbegin();
 	
@@ -83,6 +85,11 @@ void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, cons
 		start++;
 		it++;
 	}
+	*/
+	const Engine::TextureInstance * pwfbm = Engine::CloudSystem::NoiseInitializer::getInstance().getPerlinWorleyFBM();
+	glUniform1i(uRenderedTextures[0], 0);
+	glActiveTexture(GL_TEXTURE0 + 0);
+	glBindTexture(GL_TEXTURE_3D, pwfbm->getTexture()->getTextureId());
 }
 
 // ==============================================================================

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "postprocessprograms/VolumetricTextureProgram.h"
+#include "computeprograms/VolumeTextureProgram.h"
 
 namespace Engine
 {
@@ -9,12 +9,12 @@ namespace Engine
 		class NoiseInitializer
 		{
 		public:
-			static const NoiseInitializer * INSTANCE;
+			static NoiseInitializer * INSTANCE;
 		private:
 			unsigned int uPWFbo;
 			unsigned int uWFbo;
 			unsigned int uCFbo;
-			unsigned int uWFbo;
+			unsigned int uWDFbo;
 
 			// We could go for more res, but it looks fine like this
 
@@ -48,14 +48,19 @@ namespace Engine
 			TextureInstance * WDDepth;
 
 			// Shader to write to textures from GPU (CPU generation would be slow)
-			VolumetricTextureProgram * generator;
+			VolumeTextureProgram * perlinWorleyGen;
+			VolumeTextureProgram * worleyGen;
+
+			bool initialized;
+		public:
+			static NoiseInitializer & getInstance();
 		public:
 			const TextureInstance * getPerlinWorleyFBM() const;
 			const TextureInstance * getWorleyFBM() const;
 			const TextureInstance * getCurlNoise() const;
 			const TextureInstance * getWeatherData() const;
 
-			void render() const;
+			void render();
 		private:
 			NoiseInitializer();
 			void init();

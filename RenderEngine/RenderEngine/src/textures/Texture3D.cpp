@@ -1,5 +1,7 @@
 #include "textures/Texture3D.h"
 
+#include <iostream>
+
 Engine::Texture3D::Texture3D(std::string name, unsigned int w, unsigned int h, unsigned int d)
 	:Engine::AbstractTexture(name), width(w), height(h), depth(d)
 {
@@ -45,7 +47,7 @@ void Engine::Texture3D::uploadTexture()
 {
 	glBindTexture(GL_TEXTURE_3D, textureId);
 	glTexImage3D(GL_TEXTURE_3D, 0, internalFormat, width, height, depth, 0, formatType, pixelType, data);
-
+	
 	if (generateMipMaps)
 	{
 		glGenerateMipmap(GL_TEXTURE_3D);

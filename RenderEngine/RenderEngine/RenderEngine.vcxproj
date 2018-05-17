@@ -137,6 +137,8 @@
     <ClInclude Include="include\Animation.h" />
     <ClInclude Include="include\animations\CameraBezier.h" />
     <ClInclude Include="include\Camera.h" />
+    <ClInclude Include="include\ComputeProgram.h" />
+    <ClInclude Include="include\computeprograms\VolumeTextureProgram.h" />
     <ClInclude Include="include\datatables\DeferredObjectsTable.h" />
     <ClInclude Include="include\datatables\MeshTable.h" />
     <ClInclude Include="include\datatables\ProgramTable.h" />
@@ -169,7 +171,6 @@
     <ClInclude Include="include\postprocessprograms\GaussianBlurProgram.h" />
     <ClInclude Include="include\postprocessprograms\PerlinGeneratorProgram.h" />
     <ClInclude Include="include\postprocessprograms\SSAAProgram.h" />
-    <ClInclude Include="include\postprocessprograms\VolumetricTextureProgram.h" />
     <ClInclude Include="include\ProceduralVegetation.h" />
     <ClInclude Include="include\Program.h" />
     <ClInclude Include="include\programs\ProceduralTerrainProgram.h" />
@@ -192,9 +193,11 @@
     <ClInclude Include="include\textures\Texture2D.h" />
     <ClInclude Include="include\textures\Texture3D.h" />
     <ClInclude Include="include\textures\TextureCubemap.h" />
+    <ClInclude Include="include\Threadpool.h" />
     <ClInclude Include="include\Time.h" />
     <ClInclude Include="include\UserInterface.h" />
     <ClInclude Include="include\userinterfaces\WorldControllerUI.h" />
+    <ClInclude Include="include\util\IOUtils.h" />
     <ClInclude Include="include\vegetation\FractalTree.h" />
     <ClInclude Include="include\volumetricclouds\NoiseInitializer.h" />
     <ClInclude Include="include\windowmanagers\GLFWWindow.h" />
@@ -216,6 +219,8 @@
     <ClCompile Include="src\Animation.cpp" />
     <ClCompile Include="src\animations\CameraBezier.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\ComputeProgram.cpp" />
+    <ClCompile Include="src\computeprograms\VolumeTextureProgram.cpp" />
     <ClCompile Include="src\datatables\DeferredObjectsTable.cpp" />
     <ClCompile Include="src\datatables\MeshTable.cpp" />
     <ClCompile Include="src\datatables\ProgramTable.cpp" />
@@ -245,7 +250,6 @@
     <ClCompile Include="src\postprocessprograms\GaussianBlurProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\PerlinGeneratorProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\SSAAProgram.cpp" />
-    <ClCompile Include="src\postprocessprograms\VolumetricTextureProgram.cpp" />
     <ClCompile Include="src\ProceduralVegetation.cpp" />
     <ClCompile Include="src\Program.cpp" />
     <ClCompile Include="src\programs\ProceduralTerrainProgram.cpp" />
@@ -266,9 +270,11 @@
     <ClCompile Include="src\textures\Texture2D.cpp" />
     <ClCompile Include="src\textures\Texture3D.cpp" />
     <ClCompile Include="src\textures\TextureCubemap.cpp" />
+    <ClCompile Include="src\Threadpool.cpp" />
     <ClCompile Include="src\Time.cpp" />
     <ClCompile Include="src\UserInterface.cpp" />
     <ClCompile Include="src\userinterfaces\WorldControllerUI.cpp" />
+    <ClCompile Include="src\utils\IOUtils.cpp" />
     <ClCompile Include="src\vegetation\FractalTree.cpp" />
     <ClCompile Include="src\volumetricclouds\NoiseInitializer.cpp" />
     <ClCompile Include="src\windowmanagers\GLFWWindow.cpp" />
@@ -278,6 +284,7 @@
     <ClCompile Include="src\WorldConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\clouds\noisetexgenerator.frag" />
     <None Include="shaders\postprocess\Bloom.frag" />
     <None Include="shaders\postprocess\DeferredShading.frag" />
     <None Include="shaders\postprocess\perlin.frag" />

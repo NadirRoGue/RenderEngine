@@ -7,6 +7,8 @@
 #include "datatables/MeshTable.h"
 #include "datatables/ProgramTable.h"
 
+#include "volumetricclouds/NoiseInitializer.h"
+
 Engine::DeferredRenderer::DeferredRenderer()
 	:Engine::Renderer()
 {
@@ -59,9 +61,9 @@ void Engine::DeferredRenderer::initialize()
 
 	// Creage deferred shading buffer
 	deferredPassBuffer = new Engine::DeferredRenderObject(3, true);
-	deferredPassBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);	// Color info
-	deferredPassBuffer->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);	// Depth info
-	deferredPassBuffer->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);	// Emission info
+	deferredPassBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Color info
+	deferredPassBuffer->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Depth info
+	deferredPassBuffer->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Emission info
 	deferredPassBuffer->addDepthBuffer24(500, 500);
 	deferredPassBuffer->initialize();
 
@@ -101,11 +103,14 @@ void Engine::DeferredRenderer::doRender()
 
 void Engine::DeferredRenderer::initializeLoop()
 {
+	Engine::CloudSystem::NoiseInitializer::getInstance().render();
+
 	renderFunc = &Engine::DeferredRenderer::renderLoop;
 }
 
 void Engine::DeferredRenderer::renderLoop()
 {
+	/*
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
 
 	// Do forward pass
@@ -129,7 +134,7 @@ void Engine::DeferredRenderer::renderLoop()
 
 	// Run the post-process chain
 	runPostProcesses();
-
+	*/
 	// Enable default framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -137,8 +142,13 @@ void Engine::DeferredRenderer::renderLoop()
 	// Output the final result to screen
 	glUseProgram(screenOutput->getProgramId());
 	glBindVertexArray(chainEnd->getMesh()->vao);
-	screenOutput->onRenderObject(chainEnd, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
+	//screenOutput->onRenderObject(chainEnd, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
+
+	
+
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	
+
 }
 
 void Engine::DeferredRenderer::runPostProcesses()
@@ -173,14 +183,4 @@ void Engine::DeferredRenderer::runPostProcesses()
 void Engine::DeferredRenderer::onResize(unsigned int w, unsigned int h)
 {
 	Engine::DeferredObjectsTable::getInstance().onResize(int(w), int(h));
-	/*
-	forwardPassBuffer->resizeFBO(w, h);
-
-	std::list<Engine::PostProcessChainNode *>::iterator it = postProcessChain.begin();
-	while (it != postProcessChain.end())
-	{
-		(*it)->renderBuffer->resizeFBO(w, h);
-		it++;
-	}
-	*/
 }
