@@ -154,6 +154,9 @@
     <Filter Include="Archivos de origen\computeprograms">
       <UniqueIdentifier>{0abfcdc2-f4e2-42c0-bf41-66a7af90a33f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shaders\clouds\generation">
+      <UniqueIdentifier>{88f7877e-7163-466a-b888-edcd5aa6ed49}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Animation.h">
@@ -387,6 +390,12 @@
     <ClInclude Include="include\computeprograms\VolumeTextureProgram.h">
       <Filter>Archivos de encabezado\computeprograms</Filter>
     </ClInclude>
+    <ClInclude Include="include\computeprograms\WeatherTextureProgram.h">
+      <Filter>Archivos de encabezado\computeprograms</Filter>
+    </ClInclude>
+    <ClInclude Include="include\postprocessprograms\VolumetricCloudProgram.h">
+      <Filter>Archivos de encabezado\postprocessprograms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -590,11 +599,17 @@
     <ClCompile Include="src\ComputeProgram.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="src\utils\IOUtils.cpp">
-      <Filter>Archivos de origen\util</Filter>
-    </ClCompile>
     <ClCompile Include="src\computeprograms\VolumeTextureProgram.cpp">
       <Filter>Archivos de origen\computeprograms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\IOUtils.cpp">
+      <Filter>Archivos de origen\util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\computeprograms\WeatherTextureProgram.cpp">
+      <Filter>Archivos de origen\computeprograms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\postprocessprograms\VolumetricCloudProgram.cpp">
+      <Filter>Archivos de origen\postprocessprograms</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -679,7 +694,16 @@
     <None Include="shaders\vegetation\tree\tree.geom">
       <Filter>shaders\vegetation\tree</Filter>
     </None>
-    <None Include="shaders\clouds\noisetexgenerator.frag">
+    <None Include="shaders\clouds\generation\perlinworley.comp">
+      <Filter>shaders\clouds\generation</Filter>
+    </None>
+    <None Include="shaders\clouds\generation\worley.comp">
+      <Filter>shaders\clouds\generation</Filter>
+    </None>
+    <None Include="shaders\clouds\generation\weather.comp">
+      <Filter>shaders\clouds\generation</Filter>
+    </None>
+    <None Include="shaders\clouds\volumetricclouds.frag">
       <Filter>shaders\clouds</Filter>
     </None>
   </ItemGroup>

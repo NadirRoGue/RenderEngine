@@ -116,3 +116,9 @@ void Engine::TextureInstance::configureTexture() const
 		glTexParameterf(type, GL_TEXTURE_MAX_ANISOTROPY_EXT, level);
 	}
 }
+
+void Engine::TextureInstance::generateMipMaps()
+{
+	glBindTexture(texture->getTextureType(), texture->getTextureId());
+	glGenerateMipmap(texture->getTextureType());
+}

@@ -1,9 +1,40 @@
 #include "ComputeProgram.h"
 
+#include <string>
 #include <iostream>
+#include <fstream>
 #include <GL/glew.h>
 
-#include "util/IOUtils.h"
+//#include "util/IOUtils.h"
+
+char * loadStringFromFile(const char * fileName, unsigned long long & fileLen)
+{
+	std::ifstream file;
+	file.open(fileName, std::ios::in);
+	if (!file)
+	{
+		return 0;
+	}
+
+	file.seekg(0, std::ios::end);
+	fileLen = file.tellg();
+	file.seekg(std::ios::beg);
+
+	char * content = new char[fileLen + 1];
+
+	int i = 0;
+	while (file.good())
+	{
+		content[i] = char(file.get());
+		if (!file.eof()) i++;
+		else fileLen = i;
+	}
+
+	content[fileLen] = '\0';
+	file.close();
+
+	return content;
+}
 
 Engine::ComputeProgram::ComputeProgram(std::string shaderFile)
 	:computeShaderFile(shaderFile)
@@ -65,17 +96,18 @@ void Engine::ComputeProgram::destroy()
 
 unsigned int Engine::ComputeProgram::loadShaderFile()
 {
-	if (computeShaderFile.empty())
-	{
-		return -1;
-	}
-
 	size_t fileLen;
-	char *source = Engine::IO::loadStringFromFile(computeShaderFile.c_str(), fileLen);
+	std::string temp = computeShaderFile;
+	char * source = loadStringFromFile(temp.c_str(), fileLen);
+
+	std::string buf(source);
+
+	char * result = new char[fileLen];
+	memcpy(result, buf.c_str(), fileLen);
 
 	GLuint shader;
 	shader = glCreateShader(GL_COMPUTE_SHADER);
-	glShaderSource(shader, 1, (const GLchar **)&source, (const GLint *)&fileLen);
+	glShaderSource(shader, 1, (const GLchar **)&result, (const GLint *)&fileLen);
 	glCompileShader(shader);
 	delete[] source;
 

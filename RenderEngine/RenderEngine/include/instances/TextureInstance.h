@@ -24,6 +24,7 @@ namespace Engine
 		void generateTexture();
 		void uploadTexture();
 
+		void generateMipMaps();
 		void setMinificationFilterType(const int min);
 		void setMagnificationFilterType(const int mag);
 		void setTComponentWrapType(const int wrapT);

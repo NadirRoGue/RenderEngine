@@ -1,0 +1,76 @@
+#version 430
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout (rgba8, binding = 0) uniform image3D outVolTex;
+
+
+// =====================================================================================
+// COMMON
+float random2D( in vec2 st ) 
+{
+    return fract( sin(dot( st.xy, vec2(12.9898,78.233 ) ) ) * 43758.5453123);
+}
+
+// =====================================================================================
+// WORLEY NOISE SPECIFIC
+
+uniform float worleyscale = 8.0;
+uniform int worleyOctaves = 3;
+uniform float worleyAmplitude = 1.0;
+uniform float worleyFrecuency = 1.0;
+
+float worleyNoise(vec2 uv, float freq)
+{
+	vec2 offset = vec2( -1.0, -1.0 );
+
+	float wa = worleyAmplitude;
+	float wf = freq;
+    
+    float total = 0.0;
+    
+    for(int i = 0; i < worleyOctaves; i++)
+    {
+        vec2 currentPos = uv * worleyscale * wf; 
+    	vec2 gridCoord  = floor( currentPos );
+        float dist0 = 1000.0;
+        
+        for( offset.y = -1.0f; offset.y <= 1.0f; offset.y += 1.0f )
+        {
+            for( offset.x = -1.0f; offset.x <= 1.0f; offset.x += 1.0f )
+            {
+                vec2 cellCenter = gridCoord + offset;
+                cellCenter      = cellCenter + random2D( cellCenter );
+
+                float dist = length( cellCenter - currentPos );
+
+                if( dist < dist0 )
+                {
+                    dist0 = dist;
+                }
+            }
+        }
+        
+        total += (0.7 - dist0 * dist0) * wa;
+        wa *= 0.25;
+        wf *= 3.0; 
+    }
+   
+   total = total + clamp((0.6 - total) * 0.4, 0.0, 0.5);
+   return total;
+}
+
+void main()
+{
+    ivec3 pixel = ivec3(gl_GlobalInvocationID.xyz);
+	
+	vec2 uv = vec2(float(pixel.x) / 32.0, float(pixel.y) / 32.0);
+
+	float w1 = worleyNoise(uv, worleyFrecuency * 0.5);
+	float w2 = worleyNoise(uv, worleyFrecuency * 0.5 + 0.5);
+	float w3 = worleyNoise(uv, worleyFrecuency * 0.5 + 1.0);
+
+	vec4 volumeData = vec4(w1, w2, w3, 1.0);
+	
+	imageStore (outVolTex, pixel, volumeData);
+}

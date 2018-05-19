@@ -1,12 +1,16 @@
 #include "util/IOUtils.h"
 
 #include <fstream>
+#include <iostream>
 
 char * Engine::IO::loadStringFromFile(const char * fileName, unsigned long long & fileLen)
 {
 	std::ifstream file;
 	file.open(fileName, std::ios::in);
-	if (!file) return 0;
+	if (!file)
+	{
+		return 0;
+	}
 
 	file.seekg(0, std::ios::end);
 	fileLen = file.tellg();

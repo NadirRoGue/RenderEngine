@@ -67,6 +67,10 @@ void Engine::DeferredRenderer::initialize()
 	deferredPassBuffer->addDepthBuffer24(500, 500);
 	deferredPassBuffer->initialize();
 
+	clouds = new Engine::VolumetricCloudProgram("VolumetricCloudProgram", 0);
+	clouds->initialize();
+	clouds->configureMeshBuffers(mi);
+
 	// Linke post processes as a chain
 	std::list<Engine::PostProcessChainNode *>::iterator it = postProcessChain.begin();
 	Engine::DeferredRenderObject * previousLink = deferredPassBuffer;
@@ -110,13 +114,13 @@ void Engine::DeferredRenderer::initializeLoop()
 
 void Engine::DeferredRenderer::renderLoop()
 {
-	/*
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
 
 	// Do forward pass
 	glBindFramebuffer(GL_FRAMEBUFFER, forwardPassBuffer->getFrameBufferId());
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
 	forwardPass->renderFromCamera(activeCam);
 	forwardPass->doRender();
 
@@ -132,9 +136,14 @@ void Engine::DeferredRenderer::renderLoop()
 	// Render the skybox after shading is performed
 	scene->getSkyBox()->render(activeCam);
 
+	glUseProgram(clouds->getProgramId());
+	glBindVertexArray(deferredDrawSurface->getMesh()->vao);
+	clouds->onRenderObject(deferredDrawSurface, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
 	// Run the post-process chain
 	runPostProcesses();
-	*/
+	
 	// Enable default framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -142,9 +151,7 @@ void Engine::DeferredRenderer::renderLoop()
 	// Output the final result to screen
 	glUseProgram(screenOutput->getProgramId());
 	glBindVertexArray(chainEnd->getMesh()->vao);
-	//screenOutput->onRenderObject(chainEnd, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
-
-	
+	screenOutput->onRenderObject(chainEnd, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	
