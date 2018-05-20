@@ -16,6 +16,9 @@ namespace Engine
 		unsigned int uPerlinWorley;
 		unsigned int uWorley;
 		unsigned int uWeather;
+
+		unsigned int uCamPos;
+		unsigned int uLightDir;
 	public:
 		VolumetricCloudProgram(std::string name, unsigned long long params);
 		VolumetricCloudProgram(const VolumetricCloudProgram & other);

@@ -19,12 +19,12 @@ float random2D( in vec2 st )
 // =====================================================================================
 // WORLEY NOISE SPECIFIC
 
-uniform float worleyscale = 8.0;
+uniform float worleyscale = 9.0;
 uniform int worleyOctaves = 3;
 uniform float worleyAmplitude = 1.0;
 uniform float worleyFrecuency = 1.0;
 
-float worleyNoise(vec2 uv, float freq, bool mod)
+float worleyNoise(vec2 uv, float freq, bool modV)
 {
 	vec2 offset = vec2( -1.0, -1.0 );
 
@@ -60,7 +60,7 @@ float worleyNoise(vec2 uv, float freq, bool mod)
         wf *= 3.0; 
     }
    
-   total = mod? total + clamp((0.6 - total) * 0.4, 0.0, 0.5) : total;
+   total = modV? total + clamp((0.6 - total) * 0.4, 0.0, 0.5) : total;
    return total;
 }
 
@@ -69,7 +69,7 @@ float worleyNoise(vec2 uv, float freq, bool mod)
 
 uniform float perlinAmplitude = 0.5;
 uniform float perlinFrecuency = 0.5;
-uniform float perlinScale = 12.0;
+uniform float perlinScale = 9.0;
 uniform int perlinOctaves = 8;
 
 float noiseInterpolation(in vec2 i_coord, in float i_size)
@@ -125,11 +125,11 @@ float perlinWorleyFBM(vec2 uv)
 	float perlin = perlinNoise(uv);
 	float worley = worleyNoise(uv, worleyFrecuency, false);
 
-	float result = 0.5 + (((worley - perlin) / (2.5 - worley)) * (0.5));
+	float result = 0.3 + (((worley - perlin) / (2.5 - worley)) * (0.5));
     
-    result *= 1.1;
+    //result *= 1.1;
 
-	return clamp(result, 0.0, 1.0);
+	return result;
 }
 
 // =====================================================================================
@@ -139,9 +139,9 @@ void main()
 {
     ivec3 pixel = ivec3(gl_GlobalInvocationID.xyz);
 	
-	seed1 = 12.9898;// * float(pixel.z + 1);
-	seed2 = 78.233;// + float(pixel.z) * 5.0;
-	seed3 = 43758.5453123;// + pixel.z * (seed2 - seed1);
+	seed1 = 12.9898 * float(pixel.z + 1);
+	seed2 = 78.233 + float(pixel.z) * 5.0;
+	seed3 = 43758.5453123 + pixel.z * (seed2 - seed1);
 
 	vec2 uv = vec2(float(pixel.x) / 128.0, float(pixel.y) / 128.0);
 
@@ -151,7 +151,7 @@ void main()
 	float w3 = clamp(worleyNoise(uv, worleyFrecuency + 1.4, true), 0.0, 1.0);
 
 	vec4 volumeData = vec4(pwFBM, w1, w2, w3);
-	//vec4 volumeData = vec4(1,0,0,1);
+	//vec4 volumeData = vec4(1,1,0,1);
 
 	imageStore (outVolTex, pixel, volumeData);
 }

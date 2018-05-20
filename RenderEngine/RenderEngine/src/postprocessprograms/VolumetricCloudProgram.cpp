@@ -1,6 +1,8 @@
 #include "postprocessprograms/VolumetricCloudProgram.h"
 
 #include "volumetricclouds/NoiseInitializer.h"
+#include "Scene.h"
+#include "WorldConfig.h"
 
 const std::string Engine::VolumetricCloudProgram::PROGRAM_NAME = "VolumetricCloudProgram";
 
@@ -20,6 +22,9 @@ Engine::VolumetricCloudProgram::VolumetricCloudProgram(const Engine::VolumetricC
 	uPerlinWorley = other.uPerlinWorley;
 	uWorley = other.uWorley;
 	uWeather = other.uWeather;
+
+	uCamPos = other.uCamPos;
+	uLightDir = other.uLightDir;
 }
 
 void Engine::VolumetricCloudProgram::configureProgram()
@@ -33,11 +38,13 @@ void Engine::VolumetricCloudProgram::configureProgram()
 	uPerlinWorley = glGetUniformLocation(glProgram, "perlinworley");
 	uWorley = glGetUniformLocation(glProgram, "worley");
 	uWeather = glGetUniformLocation(glProgram, "weather");
+
+	uCamPos = glGetUniformLocation(glProgram, "camPos");
+	uLightDir = glGetUniformLocation(glProgram, "lightDir");
 }
 
 void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
 {
-	//Engine::PostProcessProgram::onRenderObject(obj, view, proj);
 	glm::mat4 invView = glm::inverse(view);
 	glm::mat4 invProj = glm::inverse(proj);
 	glm::mat4 viewProj = proj * view;
@@ -45,6 +52,14 @@ void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const 
 	glUniformMatrix4fv(uInvView, 1, GL_FALSE, &(invView[0][0]));
 	glUniformMatrix4fv(uInvProj, 1, GL_FALSE, &(invProj[0][0]));
 	glUniformMatrix4fv(uViewProj, 1, GL_FALSE, &(viewProj[0][0]));
+
+	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
+	Engine::Camera * cam = scene->getCamera();
+
+	glm::vec3 camPos = -cam->getPosition();
+	
+	glUniform3fv(uCamPos, 1, &camPos[0]);
+	glUniform3fv(uLightDir, 1, &Engine::Settings::lightDirection[0]);
 
 	const Engine::TextureInstance * pw = Engine::CloudSystem::NoiseInitializer::getInstance().getPerlinWorleyFBM();
 	const Engine::TextureInstance * w = Engine::CloudSystem::NoiseInitializer::getInstance().getWorleyFBM();

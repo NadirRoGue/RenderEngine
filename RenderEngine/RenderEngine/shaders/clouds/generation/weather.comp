@@ -61,7 +61,8 @@ float perlinNoise(vec2 uv)
 
 	noiseValue = clamp(noiseValue, 0.0, 1.0);
 	noiseValue -= 0.4;
-	noiseValue = clamp(noiseValue, 0.0, 1.0); 
+	noiseValue = clamp(noiseValue, 0.0, 0.6); 
+	noiseValue /= 0.6;
 
 	return noiseValue;
 }

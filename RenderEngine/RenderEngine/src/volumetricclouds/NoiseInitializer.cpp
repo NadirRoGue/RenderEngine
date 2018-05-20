@@ -78,9 +78,9 @@ void Engine::CloudSystem::NoiseInitializer::initTextures()
 
 	PerlinWorleyFBM = new Engine::TextureInstance(perlinWorley);
 	PerlinWorleyFBM->setAnisotropicFilterEnabled(false);
-	PerlinWorleyFBM->setRComponentWrapType(GL_CLAMP_TO_EDGE);
-	PerlinWorleyFBM->setSComponentWrapType(GL_CLAMP_TO_EDGE);
-	PerlinWorleyFBM->setTComponentWrapType(GL_CLAMP_TO_EDGE);
+	PerlinWorleyFBM->setRComponentWrapType(GL_MIRRORED_REPEAT);
+	PerlinWorleyFBM->setSComponentWrapType(GL_MIRRORED_REPEAT);
+	PerlinWorleyFBM->setTComponentWrapType(GL_MIRRORED_REPEAT);
 	PerlinWorleyFBM->setMagnificationFilterType(GL_LINEAR);
 	PerlinWorleyFBM->setMinificationFilterType(GL_LINEAR);
 	PerlinWorleyFBM->generateTexture();
@@ -95,9 +95,9 @@ void Engine::CloudSystem::NoiseInitializer::initTextures()
 
 	WorleyFBM = new Engine::TextureInstance(worley);
 	WorleyFBM->setAnisotropicFilterEnabled(false);
-	WorleyFBM->setRComponentWrapType(GL_CLAMP_TO_EDGE);
-	WorleyFBM->setSComponentWrapType(GL_CLAMP_TO_EDGE);
-	WorleyFBM->setTComponentWrapType(GL_CLAMP_TO_EDGE);
+	WorleyFBM->setRComponentWrapType(GL_MIRRORED_REPEAT);
+	WorleyFBM->setSComponentWrapType(GL_MIRRORED_REPEAT);
+	WorleyFBM->setTComponentWrapType(GL_MIRRORED_REPEAT);
 	WorleyFBM->setMagnificationFilterType(GL_LINEAR);
 	WorleyFBM->setMinificationFilterType(GL_LINEAR);
 	WorleyFBM->generateTexture();

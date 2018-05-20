@@ -4,12 +4,15 @@ layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 layout (rgba8, binding = 0) uniform image3D outVolTex;
 
+float seed1;
+float seed2;
+float seed3;
 
 // =====================================================================================
 // COMMON
 float random2D( in vec2 st ) 
 {
-    return fract( sin(dot( st.xy, vec2(12.9898,78.233 ) ) ) * 43758.5453123);
+    return fract( sin(dot( st.xy, vec2(seed1,seed2 ) ) ) * seed3);
 }
 
 // =====================================================================================
@@ -65,6 +68,10 @@ void main()
     ivec3 pixel = ivec3(gl_GlobalInvocationID.xyz);
 	
 	vec2 uv = vec2(float(pixel.x) / 32.0, float(pixel.y) / 32.0);
+
+	seed1 = 12.9898 * float(pixel.z + 1);
+	seed2 = 78.233 + float(pixel.z) * 5.0;
+	seed3 = 43758.5453123 + pixel.z * (seed2 - seed1);
 
 	float w1 = worleyNoise(uv, worleyFrecuency * 0.5);
 	float w2 = worleyNoise(uv, worleyFrecuency * 0.5 + 0.5);

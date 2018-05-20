@@ -22,7 +22,7 @@ void Engine::ForwardRenderer::doRender()
 
 	if (scene->getTerrain() != NULL)
 	{
-		//scene->getTerrain()->render(activeCam);
+		scene->getTerrain()->render(activeCam);
 	}
 
 	const std::map<std::string, Engine::ProgramRenderables *> renders = scene->getObjects();

@@ -120,7 +120,6 @@ void Engine::DeferredRenderer::renderLoop()
 	glBindFramebuffer(GL_FRAMEBUFFER, forwardPassBuffer->getFrameBufferId());
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
 	forwardPass->renderFromCamera(activeCam);
 	forwardPass->doRender();
 
@@ -136,10 +135,15 @@ void Engine::DeferredRenderer::renderLoop()
 	// Render the skybox after shading is performed
 	scene->getSkyBox()->render(activeCam);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	glUseProgram(clouds->getProgramId());
 	glBindVertexArray(deferredDrawSurface->getMesh()->vao);
 	clouds->onRenderObject(deferredDrawSurface, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	glDisable(GL_BLEND);
 
 	// Run the post-process chain
 	runPostProcesses();
