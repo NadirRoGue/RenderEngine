@@ -67,7 +67,7 @@ float LightEnergy(vec3 l, vec3 v, float ca, float coneDensity, float realDensity
 
 vec3 ambientLight(float heightFrac)
 {
-	return mix(vec3(0.5f, 0.67f, 0.82f), vec3(1.0f, 1.0f, 1.0f), heightFrac);
+	return mix(vec3(0.5f, 0.67f, 0.7f), vec3(1.0f, 1.0f, 1.0f), heightFrac);
 }
 
 // ==========================================================================
@@ -103,10 +103,16 @@ float getDensityForCloud(vec3 p, float cloudType)
 
 float sampleCloudDensity(vec3 p, vec3 weatherData)
 {
+	vec3 wind = vec3(1,1,0);
+	float cloudTopOffset = 30.0;
+
 	float height_fraction = getHeightFraction (p);
 	height_fraction = clamp(height_fraction, 0.0, 1.0);
+
+	p += height_fraction * wind * cloudTopOffset;
+
 	vec2 uv = getPlanarUV(p);
-	vec3 tex3dsample = vec3(uv * 25.0, height_fraction);
+	vec3 tex3dsample = vec3(uv * 2.0, height_fraction);
 
 	vec4 pwfbm = textureLod(perlinworley, tex3dsample, 0.0);
 	float r = pwfbm.r;
@@ -115,23 +121,24 @@ float sampleCloudDensity(vec3 p, vec3 weatherData)
 	lowFreqFBM = clamp(lowFreqFBM, 0.0, 1.0);
 	float baseCloudShape = remapValue(r, -(1.0 - lowFreqFBM), 1.0, 0.0, 1.0);
 
-	float densityGradient = remapValue(height_fraction, 0, 0.1, 0, 1) * remapValue(height_fraction, 0.5, 0.85, 1, 0);
+	float densityGradient = remapValue(height_fraction, 0, 0.1, 0, 1) * remapValue(height_fraction, 0.2, 0.3, 1, 0);
 	baseCloudShape *= densityGradient;
 
-	float coverage = weatherData.r * (1.0 - height_fraction); // XXX
+	float coverage = weatherData.r;// * (1.0 - height_fraction); // XXX
 	//coverage = pow(coverage, remapValue(height_fraction, 0.7, 0.8, 1.0, mix(1.0, 0.5, 0.8)));
 	float coveragedCloud = remapValue(baseCloudShape, coverage, 1.0, 0.0, 1.0);
 	float base_cloud_with_coverage = coveragedCloud * coverage;
 
 	// Build−high frequency Worley noise FBM.
-	vec3 high_frequency_noises = texture(worley, vec3(uv * 2.5, height_fraction)).rgb;
+	height_fraction = clamp(getHeightFraction(p), 0.0, 1.0);
+
+	vec3 high_frequency_noises = texture(worley, vec3(uv * 25.0, height_fraction)).rgb;
 	float high_freq_FBM = (high_frequency_noises.r * 0.625) + (high_frequency_noises.g * 0.25) + (high_frequency_noises.b * 0.125);
 	float high_freq_noise_modifier = mix(high_freq_FBM, 1.0 - high_freq_FBM, clamp(height_fraction * 10.0, 0.0, 1.0));
-	base_cloud_with_coverage = base_cloud_with_coverage - high_freq_noise_modifier * (1.0 - base_cloud_with_coverage);
+	//base_cloud_with_coverage = base_cloud_with_coverage - high_freq_noise_modifier * (1.0 - base_cloud_with_coverage);
 	float final_cloud = remapValue(base_cloud_with_coverage, high_freq_noise_modifier * 0.2, 1.0, 0.0, 1.0);
 
 	return final_cloud;
-	
 }
 
 float raymarchToLight(vec3 pos, vec3 d, float stepSize)
@@ -184,7 +191,7 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 	return clamp(LightEnergy(normLightDir, d, ca, coneDensity, density), 0.0, 1.0);
 }
 
-float frontToBackRaymarch(vec3 startPos, vec3 endPos, out float color)
+float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 {
 	vec3 dir = endPos - startPos;
 	float density = 0.0;
@@ -223,7 +230,7 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out float color)
 
 		pos += st;
 	}
-	color = result.x;
+	color = result.xyz;
 	return result.a;
 }
 
@@ -304,7 +311,7 @@ void main()
 
 	if(IntersectBox(camPos, worldDir, pos, endPos)) 
 	{
-		float outColor;
+		vec3 outColor;
 		float density = frontToBackRaymarch(pos, endPos, outColor);
 		density = clamp(density, 0.0, 1.0);
 		
@@ -312,7 +319,7 @@ void main()
 			discard;
 		
 		//density = ;
-		color = vec4(outColor, outColor, outColor, density);
+		color = vec4(outColor, density);
 		emission = vec4(0,0,0,0);
 	}
 	else

@@ -91,7 +91,7 @@ void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, cons
 	const Engine::TextureInstance * we = Engine::CloudSystem::NoiseInitializer::getInstance().getWeatherData();
 	glUniform1i(uRenderedTextures[0], 0);
 	glActiveTexture(GL_TEXTURE0 + 0);
-	glBindTexture(GL_TEXTURE_3D, pwfbm->getTexture()->getTextureId());
+	glBindTexture(GL_TEXTURE_3D, w->getTexture()->getTextureId());
 	*/
 }
 
