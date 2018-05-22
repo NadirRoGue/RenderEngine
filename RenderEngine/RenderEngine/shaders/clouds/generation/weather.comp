@@ -60,9 +60,9 @@ float perlinNoise(vec2 uv)
 	//noiseValue = noiseValue < 0.4? 0.0 : noiseValue;
 
 	noiseValue = clamp(noiseValue, 0.0, 1.0);
-	noiseValue -= 0.4;
-	noiseValue = clamp(noiseValue, 0.0, 0.6); 
-	noiseValue /= 0.6;
+	noiseValue -= 0.2;
+	noiseValue = clamp(noiseValue, 0.0, 1.0); 
+	noiseValue /= 0.8;
 
 	return noiseValue;
 }
@@ -75,10 +75,9 @@ void main()
     ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
 	
 	vec2 uv = vec2(float(pixel.x) / 1024.0, float(pixel.y) / 1024.0);
+	vec2 suv = vec2(uv.x + 5.5, uv.y + 5.5);
 
-	float perlin = clamp(perlinNoise(uv), 0.0, 1.0);
-
-	vec4 weather = vec4(perlin, 0, 0, 1);
+	vec4 weather = vec4(perlinNoise(uv), perlinNoise(suv), 0, 1);
 
 	imageStore (outWeatherTex, pixel, weather);
 }

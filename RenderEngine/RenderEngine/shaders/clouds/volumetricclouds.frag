@@ -30,15 +30,19 @@ uniform vec3 noiseKernel[6u] = vec3[]
 	vec3(-0.16852403,  0.14748697,  0.97460106)
 );
 
+uniform float CLOUD_SCALE = 10.0;
+uniform float COVERAGE_THRESHOLD = 0.3;
+uniform float COVERAGE_MAX = 0.9;
+
 uniform vec3 sphereCenter = vec3(0,-40,0);
 uniform float sphereRadius = 60.0;
 
 uniform vec3 planeMin = vec3(-200, 30.0, -200);
-uniform vec3 planeMax = vec3(200, 70.0, 200);
+uniform vec3 planeMax = vec3(200, 100.0, 200);
 
-uniform vec4 STRATUS_GRADIENT = vec4(0.02f, 0.05f, 0.09f, 0.11f);
-uniform vec4 STRATOCUMULUS_GRADIENT = vec4(0.02f, 0.2f, 0.48f, 0.625f);
-uniform vec4 CUMULUS_GRADIENT = vec4(0.01f, 0.0625f, 0.78f, 1.0f);
+uniform vec4 STRATUS_GRADIENT = vec4(0.0, 0.1, 0.2, 0.3);
+uniform vec4 STRATOCUMULUS_GRADIENT = vec4(0.02, 0.2, 0.48, 0.625);
+uniform vec4 CUMULUS_GRADIENT = vec4(0.01, 0.0625, 0.78, 1.0);
 
 // ==========================================================================
 
@@ -58,16 +62,17 @@ float Powder(float density, float ca)
 {
 	float f = 1.0 - exp(-density * 2.0);
 	return mix(1.0, f, clamp(-ca * 0.5 + 0.5, 0.0, 1.0));
+	return f;
 }
 
 float LightEnergy(vec3 l, vec3 v, float ca, float coneDensity, float realDensity)
 {
-	return 2.0 * Beer(coneDensity) * Powder(realDensity, ca) * mix(HenyeyGreenstein(l, v, 0.8, ca), HenyeyGreenstein(l, v, -0.5, ca), 0.5);
+	return 2.0 * Beer(coneDensity) * Powder(realDensity, ca) * (1.0/3.1415) * mix(HenyeyGreenstein(l, v, 0.8, ca), HenyeyGreenstein(l, v, -0.5, ca), 0.5);
 }
 
 vec3 ambientLight(float heightFrac)
 {
-	return mix(vec3(0.5f, 0.67f, 0.7f), vec3(1.0f, 1.0f, 1.0f), heightFrac);
+	return mix(vec3(0.3f, 0.47f, 0.5f), vec3(0.7f, 0.7f, 0.7f), heightFrac);
 }
 
 // ==========================================================================
@@ -75,7 +80,7 @@ vec3 ambientLight(float heightFrac)
 float getHeightFraction(vec3 p)
 {
 	float fraction = (p.y - planeMin.y) / (planeMax.y - planeMin.y);
-	//fraction = clamp(fraction, 0.0, 1.0);
+	fraction = clamp(fraction, 0.0, 1.0);
 	return fraction;
 }
 
@@ -91,54 +96,83 @@ float remapValue(float original, float oMin, float oMax, float nMin, float nMax)
 	return nMin + ((original - oMin) / (oMax - oMin)) * (nMax - nMin);
 }
 
-float getDensityForCloud(vec3 p, float cloudType)
+float getDensityForCloud(float heightFraction, float cloudType)
 {
-	float normalY = getHeightFraction(p);
+	float stratusFactor = 1.0 - clamp(cloudType * 2.0, 0.0, 1.0);
+	float stratoCumulusFactor = 1.0 - abs(cloudType - 0.5) * 2.0;
+	float cumulusFactor = clamp(cloudType - 0.5, 0.0, 1.0) * 2.0;
 
-	//if(normalY > 0.6)
-	//	return 0.0;
+	vec4 baseGradient = stratusFactor * STRATUS_GRADIENT + stratoCumulusFactor * STRATOCUMULUS_GRADIENT + cumulusFactor * CUMULUS_GRADIENT;
 
-	return smoothstep(STRATOCUMULUS_GRADIENT.x, STRATOCUMULUS_GRADIENT.y, normalY) - smoothstep(STRATOCUMULUS_GRADIENT.z, STRATOCUMULUS_GRADIENT.w, normalY);
+	return remapValue(heightFraction, baseGradient.x, baseGradient.y, 0.0, 1.0) * remapValue(heightFraction, baseGradient.z, baseGradient.w, 1.0, 0.0);
+	//return smoothstep(baseGradient.x, baseGradient.y, heightFraction) - smoothstep(baseGradient.z, baseGradient.w, heightFraction);
 }
 
 float sampleCloudDensity(vec3 p, vec3 weatherData)
 {
+	// Position modifications
 	vec3 wind = vec3(1,1,0);
-	float cloudTopOffset = 30.0;
+	float cloudTopOffset = 500.0;
+	float heightFraction = getHeightFraction (p);
 
-	float height_fraction = getHeightFraction (p);
-	height_fraction = clamp(height_fraction, 0.0, 1.0);
+	//p += heightFraction * wind * cloudTopOffset;
 
-	p += height_fraction * wind * cloudTopOffset;
+	float hScale = planeMax.x - planeMin.x;
+	float vScale = planeMax.y - planeMin.y;
 
-	vec2 uv = getPlanarUV(p);
-	vec3 tex3dsample = vec3(uv * 2.0, height_fraction);
+	float uvScale = hScale / vScale;
 
-	vec4 pwfbm = textureLod(perlinworley, tex3dsample, 0.0);
-	float r = pwfbm.r;
+	// Sample base cloud shape noises (Perlin-Worley + 3 Worley)
+	vec2 uv = getPlanarUV(p) * uvScale;
+	vec3 tex3dsample = vec3(uv, heightFraction);
+	vec4 baseCloudNoise = textureLod(perlinworley, tex3dsample, 0.0);
+	
+	// Build the low frequency fbm modifier
+	//float lowFreqFBM = ( baseCloudNoise.g * 0.625) + ( baseCloudNoise.b * 0.25 ) + ( baseCloudNoise.a * 0.125 );
+	//float baseCloudShape = remapValue(baseCloudNoise.r, -(1.0 - lowFreqFBM), 1.0, 0.0, 1.0);
 
-	float lowFreqFBM = ( pwfbm.g * 0.625) + ( pwfbm.b * 0.25 ) + ( pwfbm.a * 0.125 );
-	lowFreqFBM = clamp(lowFreqFBM, 0.0, 1.0);
-	float baseCloudShape = remapValue(r, -(1.0 - lowFreqFBM), 1.0, 0.0, 1.0);
+	//float baseCloudShape = remapValue(baseCloudNoise.r, -lowFreqFBM * CLOUD_SCALE, 1.0, 0.0, 1.0);
 
-	float densityGradient = remapValue(height_fraction, 0, 0.1, 0, 1) * remapValue(height_fraction, 0.2, 0.3, 1, 0);
+	float coverageStart = weatherData.r;
+	float coverageEnd = weatherData.g;
+	//float coverage = 1.0 - weatherData.r * (1.0 - heightFraction);
+	float coverage = coverageStart;//mix(coverageStart, 0.0, heightFraction);
+	//float coverage = coverageStart * (1.0 - heightFraction / coverageStart);
+
+	float mask = (baseCloudNoise.r*0.6+baseCloudNoise.g*0.8+baseCloudNoise.b+baseCloudNoise.a*0.6)/3.0;
+	float denom = 1.0/(coverage*0.25+0.0001);
+	float lcov = 1.0-clamp((mask - coverage)*denom, 0.0, 1.0);
+	vec4 n = clamp((baseCloudNoise-lcov)/(1.0001-lcov), 0.0, 1.0);
+
+	float baseCloudShape = clamp(max(n.x*1.1,max(n.y*1.14,max(n.z*1.13,n.w*1.12))), 0.0, 1.0);
+
+
+	//baseCloudShape = remapValue(baseCloudShape, COVERAGE_THRESHOLD, COVERAGE_MAX, 0.0, 1.0);
+
+	// Apply density gradient based on cloud type
+	float densityGradient = getDensityForCloud(heightFraction, 0.5);
 	baseCloudShape *= densityGradient;
 
-	float coverage = weatherData.r;// * (1.0 - height_fraction); // XXX
-	//coverage = pow(coverage, remapValue(height_fraction, 0.7, 0.8, 1.0, mix(1.0, 0.5, 0.8)));
-	float coveragedCloud = remapValue(baseCloudShape, coverage, 1.0, 0.0, 1.0);
-	float base_cloud_with_coverage = coveragedCloud * coverage;
+	// Apply coverage
+	
+	//coverage = pow(coverage, remapValue(heightFraction, 0.7, 0.8, 1.0, mix(1.0, 0.5, 0.9)));
+	float coveragedCloud = remapValue(baseCloudShape, coverage * (1.0 - heightFraction), 1.0, 0.0, 1.0);
+	//coveragedCloud = clamp(coveragedCloud, 0, 1);
+	//float coveragedCloud = remapValue(baseCloudShape, clamp(CLOUD_SCALE * heightFraction, 0.0, 1.0)/ coverage, 1.0, 0.0, 1.0);
+	coveragedCloud *= clamp(coverage - heightFraction * heightFraction, 0, coverage);
 
 	// Build−high frequency Worley noise FBM.
-	height_fraction = clamp(getHeightFraction(p), 0.0, 1.0);
+	vec3 erodeCloudNoise = textureLod(worley, vec3(uv, heightFraction) * 0.1, 0.0).rgb;
+	float highFreqFBM = (erodeCloudNoise.r * 0.625) + (erodeCloudNoise.g * 0.25) + (erodeCloudNoise.b * 0.125);
 
-	vec3 high_frequency_noises = texture(worley, vec3(uv * 25.0, height_fraction)).rgb;
-	float high_freq_FBM = (high_frequency_noises.r * 0.625) + (high_frequency_noises.g * 0.25) + (high_frequency_noises.b * 0.125);
-	float high_freq_noise_modifier = mix(high_freq_FBM, 1.0 - high_freq_FBM, clamp(height_fraction * 10.0, 0.0, 1.0));
-	//base_cloud_with_coverage = base_cloud_with_coverage - high_freq_noise_modifier * (1.0 - base_cloud_with_coverage);
-	float final_cloud = remapValue(base_cloud_with_coverage, high_freq_noise_modifier * 0.2, 1.0, 0.0, 1.0);
+	heightFraction = getHeightFraction(p);
+	float highFreqNoiseModifier = mix(highFreqFBM, 1.0 - highFreqFBM, heightFraction);//clamp(heightFraction * 10.0, 0.0, 1.0));
 
-	return final_cloud;
+	coveragedCloud = coveragedCloud - highFreqNoiseModifier;// * (1.0 - coveragedCloud);
+
+	float finalCloud = remapValue(coveragedCloud, highFreqNoiseModifier * 0.2, 1.0, 0.0, 1.0);
+
+	return finalCloud;
 }
 
 float raymarchToLight(vec3 pos, vec3 d, float stepSize)
@@ -163,8 +197,8 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 			if(cloudDensity > 0.0)
 			{
 				density += cloudDensity;
-				float transmittance = 1.0 - (density * rcpThickness);
-				coneDensity += (cloudDensity * transmittance);
+				//float transmittance = 1.0 - (density * rcpThickness);
+				coneDensity += (cloudDensity);// * transmittance);
 			}
 		}
 
@@ -181,8 +215,8 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 		if(cloudDensity > 0.0)
 		{
 			density += cloudDensity;
-			float transmittance = 1.0 - clamp(density * rcpThickness, 0.0, 1.0);
-			coneDensity += (cloudDensity * transmittance);
+			//float transmittance = 1.0 - clamp(density * rcpThickness, 0.0, 1.0);
+			coneDensity += (cloudDensity);// * transmittance);
 		}
 	}
 
@@ -200,33 +234,44 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 	float delta = planeMax.y - planeMin.y;
 	int sampleCount = int(ceil(mix(64.0, 128.0, clamp(thick / delta, 0.0, 1.0))));
 
-	vec3 lightColor = vec3(1,1,1) * clamp(dot(vec3(0,1,0), normalize(lightDir)), 0.0, 1.0) + 0.1;
+	vec3 lightColor = vec3(3,3,3) * clamp(dot(vec3(0,1,0), normalize(lightDir)), 0.0, 1.0) + 0.01;
 
 	vec3 pos = startPos;
 	vec3 st = dir / float(sampleCount - 1);
 	float stepSize = length(st);
 	vec3 viewDir = normalize(dir);
 
+	//bool startCheck = false;
+	//int consecutiveZero = 0;
+
 	vec4 result = vec4(0.0);
 
 	for(int i = 0; i < sampleCount; i++)
 	{
 		vec2 planarSamplePos = getPlanarUV(pos);
-		float cloudDensity = sampleCloudDensity(pos, texture(weather, planarSamplePos).rgb); // SAMPLE CLOUD textureSamples
+		vec3 weatherData = texture(weather, planarSamplePos).rgb;
+		float cloudDensity = sampleCloudDensity(pos, weatherData); // SAMPLE CLOUD textureSamples
 
 		if(cloudDensity > 0.0)	// IF WE HAVE DENSITY, LAUNCH LIGHT SAMPLING
 		{
+			//startCheck = true;
 			density += cloudDensity;
-			float transmittance = 1.0 - (density * rcpThick);
-			float lightDensity = raymarchToLight(pos, viewDir, stepSize); // SAMPLE LIGHT
+			float lightEnergy = raymarchToLight(pos, viewDir, stepSize); // SAMPLE LIGHT
 
-			vec4 src = vec4(lightColor * lightDensity + ambientLight(getHeightFraction(pos)), cloudDensity * transmittance); // ACCUMULATE 
+			float height = getHeightFraction(pos);
+			vec4 src = vec4(lightColor * 0.7 * lightEnergy + ambientLight(height), cloudDensity); // ACCUMULATE 
 			src.rgb *= src.a;
 			result = (1.0 - result.a) * src + result;
 
 			if(result.a >= 1.0) // EARLY EXIT ON FULL OPACITY
 				break;
 		}
+		//else if(startCheck)
+		//{
+		//	consecutiveZero++;
+		//	if(consecutiveZero > 5)
+		//		break;
+		//}
 
 		pos += st;
 	}
@@ -261,7 +306,7 @@ float backToFrontRaymarch(vec3 startPos, vec3 endPos)
 		src.rgb *= src.a;
 		result = (1.0 - src.a) * result + src;
 
-		if(result.a > 0.95)
+		if(density > 0.95)
 			break;
 
 		//result += cloudDensity * stepDt;
@@ -315,8 +360,8 @@ void main()
 		float density = frontToBackRaymarch(pos, endPos, outColor);
 		density = clamp(density, 0.0, 1.0);
 		
-		if(density < 0.01)
-			discard;
+		//if(density < 0.01)
+		//	discard;
 		
 		//density = ;
 		color = vec4(outColor, density);

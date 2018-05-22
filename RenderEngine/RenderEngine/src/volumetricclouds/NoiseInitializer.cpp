@@ -71,7 +71,7 @@ void Engine::CloudSystem::NoiseInitializer::initShader()
 void Engine::CloudSystem::NoiseInitializer::initTextures()
 {
 	Engine::Texture3D * perlinWorley = new Engine::Texture3D("perlinworleyfbm", 128, 128, 128);
-	perlinWorley->setGenerateMipMaps(true);
+	perlinWorley->setGenerateMipMaps(false);
 	perlinWorley->setMemoryLayoutFormat(GL_RGBA8);
 	perlinWorley->setImageFormatType(GL_RGBA);
 	perlinWorley->setPixelFormatType(GL_FLOAT);
@@ -85,10 +85,10 @@ void Engine::CloudSystem::NoiseInitializer::initTextures()
 	PerlinWorleyFBM->setMinificationFilterType(GL_LINEAR);
 	PerlinWorleyFBM->generateTexture();
 	PerlinWorleyFBM->uploadTexture();
-	PerlinWorleyFBM->configureTexture();
+	//PerlinWorleyFBM->configureTexture();
 
 	Engine::Texture3D * worley = new Engine::Texture3D("worleyfbm", 32, 32, 32);
-	worley->setGenerateMipMaps(true);
+	worley->setGenerateMipMaps(false);
 	worley->setMemoryLayoutFormat(GL_RGBA8);
 	worley->setImageFormatType(GL_RGBA);
 	worley->setPixelFormatType(GL_FLOAT);
@@ -102,7 +102,7 @@ void Engine::CloudSystem::NoiseInitializer::initTextures()
 	WorleyFBM->setMinificationFilterType(GL_LINEAR);
 	WorleyFBM->generateTexture();
 	WorleyFBM->uploadTexture();
-	WorleyFBM->configureTexture();
+	//WorleyFBM->configureTexture();
 
 	Engine::Texture2D * curl = new Engine::Texture2D("curl", 0, 128, 128);
 	curl->setGenerateMipMaps(false);
@@ -130,8 +130,8 @@ void Engine::CloudSystem::NoiseInitializer::initTextures()
 	WeatherData->setAnisotropicFilterEnabled(false);
 	WeatherData->setSComponentWrapType(GL_CLAMP_TO_EDGE);
 	WeatherData->setTComponentWrapType(GL_CLAMP_TO_EDGE);
-	WeatherData->setMagnificationFilterType(GL_NEAREST);
-	WeatherData->setMinificationFilterType(GL_NEAREST);
+	WeatherData->setMagnificationFilterType(GL_LINEAR);
+	WeatherData->setMinificationFilterType(GL_LINEAR);
 	WeatherData->generateTexture();
 	WeatherData->uploadTexture();
 	WeatherData->configureTexture();
@@ -162,12 +162,20 @@ void Engine::CloudSystem::NoiseInitializer::render()
 	perlinWorleyGen->bindOutput(PerlinWorleyFBM);
 	perlinWorleyGen->dispatch(128, 128, 128, GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 	std::cout << "Done!" << std::endl;
+
+	glBindTexture(GL_TEXTURE_3D, PerlinWorleyFBM->getTexture()->getTextureId());
+	glGenerateMipmap(GL_TEXTURE_3D);
+	PerlinWorleyFBM->configureTexture();
 	
 	std::cout << "Generating 3 Worley octave volume texture (32x32x32)..." << std::endl;
 	glUseProgram(worleyGen->getProgramId());
 	worleyGen->bindOutput(WorleyFBM);
 	worleyGen->dispatch(32, 32, 32, GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 	std::cout << "Done!" << std::endl;
+
+	glBindTexture(GL_TEXTURE_3D, WorleyFBM->getTexture()->getTextureId());
+	glGenerateMipmap(GL_TEXTURE_3D);
+	WorleyFBM->configureTexture();
 
 	std::cout << "Generating Weather texture (1024x1024)..." << std::endl;
 	glUseProgram(weatherGen->getProgramId());

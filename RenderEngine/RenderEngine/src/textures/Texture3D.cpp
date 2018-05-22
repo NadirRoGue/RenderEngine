@@ -46,7 +46,8 @@ void Engine::Texture3D::setSize(unsigned int w, unsigned int h, unsigned int d)
 void Engine::Texture3D::uploadTexture()
 {
 	glBindTexture(GL_TEXTURE_3D, textureId);
-	glTexImage3D(GL_TEXTURE_3D, 0, internalFormat, width, height, depth, 0, formatType, pixelType, data);
+	glTexStorage3D(GL_TEXTURE_3D, 6, internalFormat, width, height, depth);
+	//glTexImage3D(GL_TEXTURE_3D, 0, internalFormat, width, height, depth, 0, formatType, pixelType, data);
 	
 	if (generateMipMaps)
 	{
