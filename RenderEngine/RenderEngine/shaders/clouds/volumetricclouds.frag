@@ -38,14 +38,14 @@ uniform vec3 sphereCenter = vec3(0,-40,0);
 uniform float sphereRadius = 60.0;
 
 uniform vec3 planeMin = vec3(-200, 30.0, -200);
-uniform vec3 planeMax = vec3(200, 100.0, 200);
+uniform vec3 planeMax = vec3(200, 130.0, 200);
 
 uniform vec4 STRATUS_GRADIENT = vec4(0.0, 0.1, 0.2, 0.3);
 uniform vec4 STRATOCUMULUS_GRADIENT = vec4(0.02, 0.2, 0.48, 0.625);
 uniform vec4 CUMULUS_GRADIENT = vec4(0.01, 0.0625, 0.78, 1.0);
 
 // ==========================================================================
-
+// Lighting functions
 float HenyeyGreenstein(vec3 l, vec3 v, float g, float ca)
 {
 	float g2 = g * g;
@@ -76,7 +76,7 @@ vec3 ambientLight(float heightFrac)
 }
 
 // ==========================================================================
-
+// Density functions
 float getHeightFraction(vec3 p)
 {
 	float fraction = (p.y - planeMin.y) / (planeMax.y - planeMin.y);
@@ -105,17 +105,19 @@ float getDensityForCloud(float heightFraction, float cloudType)
 	vec4 baseGradient = stratusFactor * STRATUS_GRADIENT + stratoCumulusFactor * STRATOCUMULUS_GRADIENT + cumulusFactor * CUMULUS_GRADIENT;
 
 	return remapValue(heightFraction, baseGradient.x, baseGradient.y, 0.0, 1.0) * remapValue(heightFraction, baseGradient.z, baseGradient.w, 1.0, 0.0);
-	//return smoothstep(baseGradient.x, baseGradient.y, heightFraction) - smoothstep(baseGradient.z, baseGradient.w, heightFraction);
 }
 
-float sampleCloudDensity(vec3 p, vec3 weatherData)
+float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 {
+	
 	// Position modifications
-	vec3 wind = vec3(1,1,0);
-	float cloudTopOffset = 500.0;
+	vec3 wind = vec3(1,0,1);
+	float cloudTopOffset = 10.0;
 	float heightFraction = getHeightFraction (p);
 
-	//p += heightFraction * wind * cloudTopOffset;
+	float cloudType = 1.0;
+
+	p += heightFraction * wind * cloudTopOffset;
 
 	float hScale = planeMax.x - planeMin.x;
 	float vScale = planeMax.y - planeMin.y;
@@ -125,55 +127,46 @@ float sampleCloudDensity(vec3 p, vec3 weatherData)
 	// Sample base cloud shape noises (Perlin-Worley + 3 Worley)
 	vec2 uv = getPlanarUV(p) * uvScale;
 	vec3 tex3dsample = vec3(uv, heightFraction);
-	vec4 baseCloudNoise = textureLod(perlinworley, tex3dsample, 0.0);
+	vec4 baseCloudNoise = textureLod(perlinworley, tex3dsample, lod);
 	
 	// Build the low frequency fbm modifier
-	//float lowFreqFBM = ( baseCloudNoise.g * 0.625) + ( baseCloudNoise.b * 0.25 ) + ( baseCloudNoise.a * 0.125 );
-	//float baseCloudShape = remapValue(baseCloudNoise.r, -(1.0 - lowFreqFBM), 1.0, 0.0, 1.0);
-
-	//float baseCloudShape = remapValue(baseCloudNoise.r, -lowFreqFBM * CLOUD_SCALE, 1.0, 0.0, 1.0);
-
-	float coverageStart = weatherData.r;
-	float coverageEnd = weatherData.g;
-	//float coverage = 1.0 - weatherData.r * (1.0 - heightFraction);
-	float coverage = coverageStart;//mix(coverageStart, 0.0, heightFraction);
-	//float coverage = coverageStart * (1.0 - heightFraction / coverageStart);
-
-	float mask = (baseCloudNoise.r*0.6+baseCloudNoise.g*0.8+baseCloudNoise.b+baseCloudNoise.a*0.6)/3.0;
-	float denom = 1.0/(coverage*0.25+0.0001);
-	float lcov = 1.0-clamp((mask - coverage)*denom, 0.0, 1.0);
-	vec4 n = clamp((baseCloudNoise-lcov)/(1.0001-lcov), 0.0, 1.0);
-
-	float baseCloudShape = clamp(max(n.x*1.1,max(n.y*1.14,max(n.z*1.13,n.w*1.12))), 0.0, 1.0);
-
-
-	//baseCloudShape = remapValue(baseCloudShape, COVERAGE_THRESHOLD, COVERAGE_MAX, 0.0, 1.0);
+	float lowFreqFBM = ( baseCloudNoise.g * 0.625) + ( baseCloudNoise.b * 0.25 ) + ( baseCloudNoise.a * 0.125 );
+	float baseCloudShape = remapValue(baseCloudNoise.r, -(1.0 - lowFreqFBM), 1.0, 0.0, 1.0);
 
 	// Apply density gradient based on cloud type
-	float densityGradient = getDensityForCloud(heightFraction, 0.5);
-	baseCloudShape *= densityGradient;
+	float densityGradient = getDensityForCloud(heightFraction, cloudType);
+	baseCloudShape *= densityGradient / heightFraction;
 
 	// Apply coverage
-	
-	//coverage = pow(coverage, remapValue(heightFraction, 0.7, 0.8, 1.0, mix(1.0, 0.5, 0.9)));
-	float coveragedCloud = remapValue(baseCloudShape, coverage * (1.0 - heightFraction), 1.0, 0.0, 1.0);
-	//coveragedCloud = clamp(coveragedCloud, 0, 1);
-	//float coveragedCloud = remapValue(baseCloudShape, clamp(CLOUD_SCALE * heightFraction, 0.0, 1.0)/ coverage, 1.0, 0.0, 1.0);
-	coveragedCloud *= clamp(coverage - heightFraction * heightFraction, 0, coverage);
+	float coverageStart = weatherData.r;
+	float coverageEnd = weatherData.g;
+	float coverageV = mix(coverageStart, 0.0, heightFraction);
+	float coverage = coverageV * 0.5;// * (1.0 - heightFraction);
+	//coverage = pow(coverage, remapValue(heightFraction, 0.7, 0.8, 1.0, mix(1.0, 0.5, 1.0)));
+	float coveragedCloud = remapValue(baseCloudShape, coverage, 1.0, 0.0, 1.0);
+	coveragedCloud *= coverage;
 
-	// Build−high frequency Worley noise FBM.
-	vec3 erodeCloudNoise = textureLod(worley, vec3(uv, heightFraction) * 0.1, 0.0).rgb;
-	float highFreqFBM = (erodeCloudNoise.r * 0.625) + (erodeCloudNoise.g * 0.25) + (erodeCloudNoise.b * 0.125);
+	float finalCloud = coveragedCloud;
 
-	heightFraction = getHeightFraction(p);
-	float highFreqNoiseModifier = mix(highFreqFBM, 1.0 - highFreqFBM, heightFraction);//clamp(heightFraction * 10.0, 0.0, 1.0));
+	if(expensive)
+	{
+		// Build−high frequency Worley noise FBM.
+		vec3 erodeCloudNoise = textureLod(worley, vec3(uv, heightFraction) * 0.1, lod).rgb;
+		float highFreqFBM = (erodeCloudNoise.r * 0.625) + (erodeCloudNoise.g * 0.25) + (erodeCloudNoise.b * 0.125);
 
-	coveragedCloud = coveragedCloud - highFreqNoiseModifier;// * (1.0 - coveragedCloud);
+		heightFraction = getHeightFraction(p);
+		float highFreqNoiseModifier = mix(highFreqFBM, 1.0 - highFreqFBM, clamp(heightFraction * 10.0, 0.0, 1.0));
 
-	float finalCloud = remapValue(coveragedCloud, highFreqNoiseModifier * 0.2, 1.0, 0.0, 1.0);
+		coveragedCloud = coveragedCloud - highFreqNoiseModifier * (1.0 - coveragedCloud);
 
-	return finalCloud;
+		finalCloud = remapValue(coveragedCloud, highFreqNoiseModifier * 0.2, 1.0, 0.0, 1.0);
+	}
+
+	return clamp(finalCloud, 0.0, 1.0);
 }
+
+// ==========================================================================
+// Raymarchers
 
 float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 {
@@ -193,7 +186,7 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 		if(heightFraction <= 1.0)
 		{
 			vec3 weatherData = texture(weather, getPlanarUV(posInCone)).rgb;
-			float cloudDensity = sampleCloudDensity(posInCone, weatherData);
+			float cloudDensity = sampleCloudDensity(posInCone, weatherData, float(i), true);
 			if(cloudDensity > 0.0)
 			{
 				density += cloudDensity;
@@ -211,7 +204,7 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 	if(heightFraction <= 1.0)
 	{
 		vec3 weatherData = texture(weather, getPlanarUV(pos)).rgb;
-		float cloudDensity = sampleCloudDensity(pos, weatherData);
+		float cloudDensity = sampleCloudDensity(pos, weatherData, 6.0, true);
 		if(cloudDensity > 0.0)
 		{
 			density += cloudDensity;
@@ -250,7 +243,7 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 	{
 		vec2 planarSamplePos = getPlanarUV(pos);
 		vec3 weatherData = texture(weather, planarSamplePos).rgb;
-		float cloudDensity = sampleCloudDensity(pos, weatherData); // SAMPLE CLOUD textureSamples
+		float cloudDensity = sampleCloudDensity(pos, weatherData, 0.0, true); // SAMPLE CLOUD textureSamples
 
 		if(cloudDensity > 0.0)	// IF WE HAVE DENSITY, LAUNCH LIGHT SAMPLING
 		{
@@ -279,44 +272,10 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 	return result.a;
 }
 
-float backToFrontRaymarch(vec3 startPos, vec3 endPos)
-{
-	int sample_count = 64;
-	vec3 dir = startPos - endPos;
+// ==========================================================================
+// Collision detection
 
-	float thick = length(dir);
-	float delta = planeMax.y - planeMin.y;
-	sample_count = int(ceil(mix(64.0, 128.0, clamp(thick / delta, 0.0, 1.0))));
-
-	vec3 pos = endPos;
-	vec3 st = dir / float(sample_count - 1);
-
-	vec4 result = vec4(0.0);
-
-	float density = 0.0;
-	int samplesWithoutDensity = 0;
-
-	for(int i = 0; i < sample_count; i++)
-	{
-		vec2 planarSamplePos = getPlanarUV(pos);
-		float cloudDensity = sampleCloudDensity(pos, texture(weather, planarSamplePos).rgb);
-
-		vec4 src = vec4(1,1,1,cloudDensity);
-		//src.a *= 0.5;
-		src.rgb *= src.a;
-		result = (1.0 - src.a) * result + src;
-
-		if(density > 0.95)
-			break;
-
-		//result += cloudDensity * stepDt;
-		pos += st;
-	}
-
-	return result.x;
-}
-
-bool IntersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
+bool intersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 {
 	// compute intersection of ray with all six bbox planes
 	vec3 invR = 1.0 / d;
@@ -333,12 +292,12 @@ bool IntersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 	
 	// check for hit
 	bool hit;
-	if ((tnear > tfar) || tnear < 0.0 || tfar < 0.0)
+	if ((tnear > tfar) || tfar < 0.0)
 		hit = false;
 	else
 		hit = true;
 
-	minT = o + d * tnear;
+	minT = tnear < 0.0? o : o + d * tnear; // if we are inside the bb, start point is cam pos
 	maxT = o + d * tfar;
 
 	return hit;
@@ -352,18 +311,14 @@ void main()
 	vec3 viewDir = normalize(vec3(fulluv, -z));
 	vec3 worldDir = normalize( (invView * vec4(viewDir, 0)).xyz);
 	// Volume intersection points
-	vec3 pos, endPos;
+	vec3 startPos, endPos;
 
-	if(IntersectBox(camPos, worldDir, pos, endPos)) 
+	if(intersectBox(camPos, worldDir, startPos, endPos)) 
 	{
 		vec3 outColor;
-		float density = frontToBackRaymarch(pos, endPos, outColor);
+		float density = frontToBackRaymarch(startPos, endPos, outColor);
 		density = clamp(density, 0.0, 1.0);
 		
-		//if(density < 0.01)
-		//	discard;
-		
-		//density = ;
 		color = vec4(outColor, density);
 		emission = vec4(0,0,0,0);
 	}
