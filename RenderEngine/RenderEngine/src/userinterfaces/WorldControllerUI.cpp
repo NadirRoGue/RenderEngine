@@ -7,14 +7,14 @@
 Engine::Window::WorldControllerUI::WorldControllerUI(GLFWwindow * surface)
 	:Engine::Window::UserInterface(surface)
 {
-	
 }
 
 void Engine::Window::WorldControllerUI::drawGraphics()
 {
+	
 	ImVec2 pos(1024.0f - 300.0f, 0.0f);
 	ImGui::SetNextWindowPos(pos);
-	ImVec2 size(300.0f, 800.0f);
+	ImVec2 size(300.0f, 1000.0f);
 	ImGui::SetNextWindowSize(size);
 	ImGui::StyleColorsDark();
 	
@@ -64,6 +64,14 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::SliderFloat("Water speed", &Engine::Settings::waterSpeed, 0.0f, 1.0f);
 		ImGui::Spacing();
 		ImGui::SliderFloat("Water height", &Engine::Settings::waterHeight, 0.0f, 1.0f);
+
+		ImGui::Spacing(); ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing(); ImGui::Spacing();
+		ImGui::Text("Cloud settings");
+		ImGui::SliderFloat("Cloud Type##app", &Engine::Settings::cloudType, 0.0f, 1.0f);
+		ImGui::SliderFloat("Coverage##app", &Engine::Settings::coverageMultiplier, 0.0f, 1.0f);
+		ImGui::SliderFloat("Speed#app", &Engine::Settings::cloudSpeed, 0.0f, 50.0f);
 
 		ImGui::End();
 	}

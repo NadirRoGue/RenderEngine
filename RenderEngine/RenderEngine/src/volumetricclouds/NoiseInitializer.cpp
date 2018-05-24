@@ -112,8 +112,8 @@ void Engine::CloudSystem::NoiseInitializer::initTextures()
 
 	CurlNoise = new Engine::TextureInstance(curl);
 	CurlNoise->setAnisotropicFilterEnabled(false);
-	CurlNoise->setSComponentWrapType(GL_CLAMP_TO_EDGE);
-	CurlNoise->setTComponentWrapType(GL_CLAMP_TO_EDGE);
+	CurlNoise->setSComponentWrapType(GL_REPEAT);
+	CurlNoise->setTComponentWrapType(GL_REPEAT);
 	CurlNoise->setMagnificationFilterType(GL_LINEAR_MIPMAP_LINEAR);
 	CurlNoise->setMinificationFilterType(GL_LINEAR_MIPMAP_LINEAR);
 	CurlNoise->generateTexture();

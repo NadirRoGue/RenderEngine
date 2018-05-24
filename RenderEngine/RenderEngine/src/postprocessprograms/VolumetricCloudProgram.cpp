@@ -3,6 +3,7 @@
 #include "volumetricclouds/NoiseInitializer.h"
 #include "Scene.h"
 #include "WorldConfig.h"
+#include "Time.h"
 
 const std::string Engine::VolumetricCloudProgram::PROGRAM_NAME = "VolumetricCloudProgram";
 
@@ -25,6 +26,11 @@ Engine::VolumetricCloudProgram::VolumetricCloudProgram(const Engine::VolumetricC
 
 	uCamPos = other.uCamPos;
 	uLightDir = other.uLightDir;
+	uTime = other.uTime;
+
+	uCloudSpeed = other.uCloudSpeed;
+	uCloudType = other.uCloudType;
+	uCoverageMultiplier = other.uCoverageMultiplier;
 }
 
 void Engine::VolumetricCloudProgram::configureProgram()
@@ -41,6 +47,11 @@ void Engine::VolumetricCloudProgram::configureProgram()
 
 	uCamPos = glGetUniformLocation(glProgram, "camPos");
 	uLightDir = glGetUniformLocation(glProgram, "lightDir");
+	uTime = glGetUniformLocation(glProgram, "time");
+
+	uCloudSpeed = glGetUniformLocation(glProgram, "cloudSpeed");
+	uCloudType = glGetUniformLocation(glProgram, "cloudType");
+	uCoverageMultiplier = glGetUniformLocation(glProgram, "coverageMultiplier");
 }
 
 void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
@@ -60,6 +71,11 @@ void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const 
 	
 	glUniform3fv(uCamPos, 1, &camPos[0]);
 	glUniform3fv(uLightDir, 1, &Engine::Settings::lightDirection[0]);
+
+	glUniform1f(uTime, Engine::Time::timeSinceBegining);
+	glUniform1f(uCloudSpeed, Engine::Settings::cloudSpeed);
+	glUniform1f(uCloudType, Engine::Settings::cloudType);
+	glUniform1f(uCoverageMultiplier, Engine::Settings::coverageMultiplier);
 
 	const Engine::TextureInstance * pw = Engine::CloudSystem::NoiseInitializer::getInstance().getPerlinWorleyFBM();
 	const Engine::TextureInstance * w = Engine::CloudSystem::NoiseInitializer::getInstance().getWorleyFBM();

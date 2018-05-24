@@ -15,10 +15,12 @@ uniform sampler3D perlinworley;
 uniform sampler3D worley;
 uniform sampler2D weather;
 
-
 uniform vec3 lightDir;
 
-//uniform float time;
+uniform float time;
+uniform float cloudType;
+uniform float cloudSpeed;
+uniform float coverageMultiplier;
 
 uniform vec3 noiseKernel[6u] = vec3[] 
 (
@@ -30,15 +32,12 @@ uniform vec3 noiseKernel[6u] = vec3[]
 	vec3(-0.16852403,  0.14748697,  0.97460106)
 );
 
-uniform float CLOUD_SCALE = 10.0;
-uniform float COVERAGE_THRESHOLD = 0.3;
-uniform float COVERAGE_MAX = 0.9;
+uniform vec3 sphereCenter = vec3(0,-2000,0);
+uniform float sphereInnerRadius = 2000.0;
+uniform float sphereOuterRadius = 2300.0;
 
-uniform vec3 sphereCenter = vec3(0,-40,0);
-uniform float sphereRadius = 60.0;
-
-uniform vec3 planeMin = vec3(-200, 30.0, -200);
-uniform vec3 planeMax = vec3(200, 130.0, 200);
+uniform vec3 planeMin = vec3(-2000, 30.0, -2000);
+uniform vec3 planeMax = vec3(2000, 500.0, 2000);
 
 uniform vec4 STRATUS_GRADIENT = vec4(0.0, 0.1, 0.2, 0.3);
 uniform vec4 STRATOCUMULUS_GRADIENT = vec4(0.02, 0.2, 0.48, 0.625);
@@ -46,28 +45,28 @@ uniform vec4 CUMULUS_GRADIENT = vec4(0.01, 0.0625, 0.78, 1.0);
 
 // ==========================================================================
 // Lighting functions
-float HenyeyGreenstein(vec3 l, vec3 v, float g, float ca)
+float henyeyGreenstein(vec3 l, vec3 v, float g, float ca)
 {
 	float g2 = g * g;
 
 	return ((1.0 - g2) / pow((1.0 + g2 - 2.0 * g * ca), 1.5 )) / 4.0 * 3.1415;
 }
 
-float Beer(float density)
+float beer(float density)
 {
 	return exp(-density);
 }
 
-float Powder(float density, float ca)
+float powder(float density, float ca)
 {
 	float f = 1.0 - exp(-density * 2.0);
 	return mix(1.0, f, clamp(-ca * 0.5 + 0.5, 0.0, 1.0));
 	return f;
 }
 
-float LightEnergy(vec3 l, vec3 v, float ca, float coneDensity, float realDensity)
+float lightEnergy(vec3 l, vec3 v, float ca, float coneDensity, float realDensity)
 {
-	return 2.0 * Beer(coneDensity) * Powder(realDensity, ca) * (1.0/3.1415) * mix(HenyeyGreenstein(l, v, 0.8, ca), HenyeyGreenstein(l, v, -0.5, ca), 0.5);
+	return 2.0 * beer(coneDensity) * powder(realDensity, ca) * (1.0/3.1415) * mix(henyeyGreenstein(l, v, 0.8, ca), henyeyGreenstein(l, v, -0.5, ca), 0.5);
 }
 
 vec3 ambientLight(float heightFrac)
@@ -77,9 +76,11 @@ vec3 ambientLight(float heightFrac)
 
 // ==========================================================================
 // Density functions
+
 float getHeightFraction(vec3 p)
 {
 	float fraction = (p.y - planeMin.y) / (planeMax.y - planeMin.y);
+	//float fraction = (length(p - sphereCenter) - sphereInnerRadius) / (sphereOuterRadius - sphereInnerRadius);
 	fraction = clamp(fraction, 0.0, 1.0);
 	return fraction;
 }
@@ -88,7 +89,17 @@ vec2 getPlanarUV(vec3 p)
 {
 	vec2 local = p.xz - planeMin.xz;
 	vec2 normalized = local / (planeMax.xz - planeMin.xz);
+	normalized = abs(normalized.x) > 1.0 || abs(normalized.y) > 1.0? fract(normalized) : normalized;
+	//vec2 local = p.xz - vec2(-sphereOuterRadius);
+	//vec2 normalized = local / (sphereOuterRadius * 2.0);
+
 	return clamp(normalized, 0.0, 1.0);
+}
+
+vec3 getWeatherData(vec3 p)
+{
+	vec2 uv = getPlanarUV(p);
+	return texture(weather, uv).rgb;
 }
 
 float remapValue(float original, float oMin, float oMax, float nMin, float nMax)
@@ -109,15 +120,13 @@ float getDensityForCloud(float heightFraction, float cloudType)
 
 float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 {
-	
 	// Position modifications
 	vec3 wind = vec3(1,0,1);
 	float cloudTopOffset = 10.0;
 	float heightFraction = getHeightFraction (p);
 
-	float cloudType = 1.0;
-
 	p += heightFraction * wind * cloudTopOffset;
+	p += wind * time * cloudSpeed;
 
 	float hScale = planeMax.x - planeMin.x;
 	float vScale = planeMax.y - planeMin.y;
@@ -141,7 +150,7 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 	float coverageStart = weatherData.r;
 	float coverageEnd = weatherData.g;
 	float coverageV = mix(coverageStart, 0.0, heightFraction);
-	float coverage = coverageV * 0.5;// * (1.0 - heightFraction);
+	float coverage = coverageV * coverageMultiplier;// * (1.0 - heightFraction);
 	//coverage = pow(coverage, remapValue(heightFraction, 0.7, 0.8, 1.0, mix(1.0, 0.5, 1.0)));
 	float coveragedCloud = remapValue(baseCloudShape, coverage, 1.0, 0.0, 1.0);
 	coveragedCloud *= coverage;
@@ -185,8 +194,7 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 		float heightFraction = getHeightFraction(posInCone);
 		if(heightFraction <= 1.0)
 		{
-			vec3 weatherData = texture(weather, getPlanarUV(posInCone)).rgb;
-			float cloudDensity = sampleCloudDensity(posInCone, weatherData, float(i), true);
+			float cloudDensity = sampleCloudDensity(posInCone, getWeatherData(posInCone), float(i), true);
 			if(cloudDensity > 0.0)
 			{
 				density += cloudDensity;
@@ -203,8 +211,7 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 	float heightFraction = getHeightFraction(pos);
 	if(heightFraction <= 1.0)
 	{
-		vec3 weatherData = texture(weather, getPlanarUV(pos)).rgb;
-		float cloudDensity = sampleCloudDensity(pos, weatherData, 6.0, true);
+		float cloudDensity = sampleCloudDensity(pos, getWeatherData(pos), 6.0, true);
 		if(cloudDensity > 0.0)
 		{
 			density += cloudDensity;
@@ -215,7 +222,7 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 
 	float ca = dot(normLightDir, d);
 
-	return clamp(LightEnergy(normLightDir, d, ca, coneDensity, density), 0.0, 1.0);
+	return clamp(lightEnergy(normLightDir, d, ca, coneDensity, density), 0.0, 1.0);
 }
 
 float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
@@ -241,9 +248,7 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 
 	for(int i = 0; i < sampleCount; i++)
 	{
-		vec2 planarSamplePos = getPlanarUV(pos);
-		vec3 weatherData = texture(weather, planarSamplePos).rgb;
-		float cloudDensity = sampleCloudDensity(pos, weatherData, 0.0, true); // SAMPLE CLOUD textureSamples
+		float cloudDensity = sampleCloudDensity(pos, getWeatherData(pos), 0.0, true); // SAMPLE CLOUD textureSamples
 
 		if(cloudDensity > 0.0)	// IF WE HAVE DENSITY, LAUNCH LIGHT SAMPLING
 		{
@@ -303,6 +308,46 @@ bool intersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 	return hit;
 }
 
+bool intersectSphere(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
+{
+	vec3 sphereToOrigin = o - sphereCenter;
+	float b = dot(d, sphereToOrigin);
+	float c = dot(sphereToOrigin, sphereToOrigin);
+	float sqrtOpInner = b*b - (c - sphereInnerRadius*sphereInnerRadius);
+
+	if(sqrtOpInner < 0.0)
+	{
+		return false;
+	}
+
+	float solAInner = -b - sqrt(sqrtOpInner);
+	float solBInner = -b + sqrt(sqrtOpInner);
+
+	float maxSInner = max(solAInner, solBInner);
+	maxSInner = maxSInner < 0.0? 0.0 : maxSInner;
+
+	float sqrtOpOuter = b*b - (c - sphereOuterRadius*sphereOuterRadius);
+
+	if(sqrtOpOuter < 0.0)
+	{
+		return false;
+	}
+
+	float solAOuter = -b - sqrt(sqrtOpOuter);
+	float solBOuter = -b + sqrt(sqrtOpOuter);
+
+	float maxSOuter = max(solAOuter, solBOuter);
+	maxSOuter = maxSOuter < 0.0? 0.0 : maxSOuter;
+
+	float minSol = min(maxSInner, maxSOuter);
+	float maxSol = max(maxSInner, maxSOuter);
+
+	minT = o + d * minSol;
+	maxT = o + d * maxSol;
+
+	return true;
+}
+
 void main()
 {
 	// Ray direction
@@ -313,7 +358,8 @@ void main()
 	// Volume intersection points
 	vec3 startPos, endPos;
 
-	if(intersectBox(camPos, worldDir, startPos, endPos)) 
+	//if(intersectBox(camPos, worldDir, startPos, endPos)) 
+	if(intersectBox(camPos, worldDir, startPos, endPos))
 	{
 		vec3 outColor;
 		float density = frontToBackRaymarch(startPos, endPos, outColor);

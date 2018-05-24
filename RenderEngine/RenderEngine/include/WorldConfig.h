@@ -37,6 +37,10 @@ namespace Engine
 		static float waterSpeed;
 		static float waterHeight;
 
+		static float cloudType;
+		static float cloudSpeed;
+		static float coverageMultiplier;
+
 		static bool showUI;
 	};
 
