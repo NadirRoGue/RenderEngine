@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include "WorldConfig.h"
 #include "Time.h"
+#include "Renderer.h"
 
 const std::string Engine::VolumetricCloudProgram::PROGRAM_NAME = "VolumetricCloudProgram";
 
@@ -17,8 +18,8 @@ Engine::VolumetricCloudProgram::VolumetricCloudProgram(const Engine::VolumetricC
 	: Engine::PostProcessProgram(other)
 {
 	uInvView = other.uInvView;
-	uInvProj = other.uInvProj;
-	uViewProj = other.uViewProj;
+
+	uResolution = other.uResolution;
 
 	uPerlinWorley = other.uPerlinWorley;
 	uWorley = other.uWorley;
@@ -26,6 +27,7 @@ Engine::VolumetricCloudProgram::VolumetricCloudProgram(const Engine::VolumetricC
 
 	uCamPos = other.uCamPos;
 	uLightDir = other.uLightDir;
+	uLightColor = other.uLightColor;
 	uTime = other.uTime;
 
 	uCloudSpeed = other.uCloudSpeed;
@@ -38,8 +40,8 @@ void Engine::VolumetricCloudProgram::configureProgram()
 	Engine::PostProcessProgram::configureProgram();
 
 	uInvView = glGetUniformLocation(glProgram, "invView");
-	uInvProj = glGetUniformLocation(glProgram, "invProj");
-	uViewProj = glGetUniformLocation(glProgram, "viewProj");
+
+	uResolution = glGetUniformLocation(glProgram, "screenResolution");
 
 	uPerlinWorley = glGetUniformLocation(glProgram, "perlinworley");
 	uWorley = glGetUniformLocation(glProgram, "worley");
@@ -47,6 +49,7 @@ void Engine::VolumetricCloudProgram::configureProgram()
 
 	uCamPos = glGetUniformLocation(glProgram, "camPos");
 	uLightDir = glGetUniformLocation(glProgram, "lightDir");
+	uLightColor = glGetUniformLocation(glProgram, "lightColor");
 	uTime = glGetUniformLocation(glProgram, "time");
 
 	uCloudSpeed = glGetUniformLocation(glProgram, "cloudSpeed");
@@ -57,12 +60,8 @@ void Engine::VolumetricCloudProgram::configureProgram()
 void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
 {
 	glm::mat4 invView = glm::inverse(view);
-	glm::mat4 invProj = glm::inverse(proj);
-	glm::mat4 viewProj = proj * view;
 
 	glUniformMatrix4fv(uInvView, 1, GL_FALSE, &(invView[0][0]));
-	glUniformMatrix4fv(uInvProj, 1, GL_FALSE, &(invProj[0][0]));
-	glUniformMatrix4fv(uViewProj, 1, GL_FALSE, &(viewProj[0][0]));
 
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
 	Engine::Camera * cam = scene->getCamera();
@@ -71,11 +70,15 @@ void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const 
 	
 	glUniform3fv(uCamPos, 1, &camPos[0]);
 	glUniform3fv(uLightDir, 1, &Engine::Settings::lightDirection[0]);
+	glUniform3fv(uLightColor, 1, &Engine::Settings::lightColor[0]);
 
 	glUniform1f(uTime, Engine::Time::timeSinceBegining);
 	glUniform1f(uCloudSpeed, Engine::Settings::cloudSpeed);
 	glUniform1f(uCloudType, Engine::Settings::cloudType);
 	glUniform1f(uCoverageMultiplier, Engine::Settings::coverageMultiplier);
+
+	float res[2] = { float(Engine::ScreenManager::SCREEN_WIDTH), float(Engine::ScreenManager::SCREEN_HEIGHT) };
+	glUniform2fv(uResolution, 1, res);
 
 	const Engine::TextureInstance * pw = Engine::CloudSystem::NoiseInitializer::getInstance().getPerlinWorleyFBM();
 	const Engine::TextureInstance * w = Engine::CloudSystem::NoiseInitializer::getInstance().getWorleyFBM();

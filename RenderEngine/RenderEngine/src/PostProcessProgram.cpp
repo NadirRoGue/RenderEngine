@@ -8,8 +8,6 @@
 #include "Renderer.h"
 #include "instances/TextureInstance.h"
 
-#include "volumetricclouds/NoiseInitializer.h"
-
 #include <iostream>
 
 std::string Engine::PostProcessProgram::PROGRAM_NAME = "PostProcessProgram";
@@ -85,14 +83,6 @@ void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, cons
 		start++;
 		it++;
 	}
-	/*
-	const Engine::TextureInstance * pwfbm = Engine::CloudSystem::NoiseInitializer::getInstance().getPerlinWorleyFBM();
-	const Engine::TextureInstance * w = Engine::CloudSystem::NoiseInitializer::getInstance().getWorleyFBM();
-	const Engine::TextureInstance * we = Engine::CloudSystem::NoiseInitializer::getInstance().getWeatherData();
-	glUniform1i(uRenderedTextures[0], 0);
-	glActiveTexture(GL_TEXTURE0 + 0);
-	glBindTexture(GL_TEXTURE_2D, we->getTexture()->getTextureId());
-	*/
 }
 
 // ==============================================================================

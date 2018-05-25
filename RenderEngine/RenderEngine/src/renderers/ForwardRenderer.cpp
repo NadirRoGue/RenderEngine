@@ -22,7 +22,7 @@ void Engine::ForwardRenderer::doRender()
 
 	if (scene->getTerrain() != NULL)
 	{
-		//scene->getTerrain()->render(activeCam);
+		scene->getTerrain()->render(activeCam);
 	}
 
 	const std::map<std::string, Engine::ProgramRenderables *> renders = scene->getObjects();
@@ -68,10 +68,6 @@ void Engine::ForwardRenderer::renderProgram(Engine::Camera * camera, Engine::Pro
 
 void Engine::ForwardRenderer::onResize(unsigned int w, unsigned int h)
 {
-
-}
-
-Engine::DeferredRenderObject * Engine::ForwardRenderer::getGBuffer()
-{
-	return NULL;
+	Engine::ScreenManager::REAL_SCREEN_HEIGHT = Engine::ScreenManager::SCREEN_WIDTH = h;
+	Engine::ScreenManager::REAL_SCREEN_WIDTH = Engine::ScreenManager::SCREEN_WIDTH = w;
 }

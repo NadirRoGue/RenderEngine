@@ -24,8 +24,6 @@ namespace Engine
 		unsigned int uBackground;
 
 		unsigned int uProjMat;
-		unsigned int uViewMat;
-		unsigned int uCamPos;
 
 	public:
 		DeferredShadingProgram(std::string name, unsigned long long params);

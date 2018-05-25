@@ -396,6 +396,12 @@
     <ClInclude Include="include\postprocessprograms\VolumetricCloudProgram.h">
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>
+    <ClInclude Include="include\volumetricclouds\VolumetricClouds.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\postprocessprograms\SSReflectionProgram.h">
+      <Filter>Archivos de encabezado\postprocessprograms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -611,6 +617,9 @@
     <ClCompile Include="src\postprocessprograms\VolumetricCloudProgram.cpp">
       <Filter>Archivos de origen\postprocessprograms</Filter>
     </ClCompile>
+    <ClCompile Include="src\postprocessprograms\SSReflectionProgram.cpp">
+      <Filter>Archivos de origen\postprocessprograms</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\sky\sky.frag">
@@ -705,6 +714,9 @@
     </None>
     <None Include="shaders\clouds\volumetricclouds.frag">
       <Filter>shaders\clouds</Filter>
+    </None>
+    <None Include="shaders\postprocess\SSReflections.frag">
+      <Filter>shaders\postprocess</Filter>
     </None>
   </ItemGroup>
 </Project>

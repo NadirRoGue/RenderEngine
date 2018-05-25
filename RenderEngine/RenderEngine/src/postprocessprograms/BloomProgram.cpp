@@ -1,9 +1,5 @@
 #include "postprocessprograms/BloomProgram.h"
 
-#include "DeferredRenderObject.h"
-
-#include <iostream>
-
 const std::string Engine::BloomProgram::PROGRAM_NAME = "BloomProgram";
 
 Engine::BloomProgram::BloomProgram(std::string name, unsigned long long parameters)
@@ -11,17 +7,15 @@ Engine::BloomProgram::BloomProgram(std::string name, unsigned long long paramete
 {
 	fShaderFile = "shaders/postprocess/Bloom.frag";
 
-	buf[0].pass = new Engine::DeferredRenderObject(3, true);
+	buf[0].pass = new Engine::DeferredRenderObject(2, false);
 	buf[0].color = buf[0].pass->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
-	buf[0].depth = buf[0].pass->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
-	buf[0].emissive = buf[0].pass->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	buf[0].emissive = buf[0].pass->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	buf[0].pass->addDepthBuffer24(500, 500);
 	buf[0].pass->initialize();
 
-	buf[1].pass = new Engine::DeferredRenderObject(3, true);
+	buf[1].pass = new Engine::DeferredRenderObject(2, false);
 	buf[1].color = buf[1].pass->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
-	buf[1].depth = buf[1].pass->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
-	buf[1].emissive = buf[1].pass->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	buf[1].emissive = buf[1].pass->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	buf[1].pass->addDepthBuffer24(500, 500);
 	buf[1].pass->initialize();
 
@@ -72,10 +66,6 @@ void Engine::BloomProgram::onRenderObject(const Engine::Object * obj, const glm:
 
 		glUniform1i(uRenderedTextures[1], 1);
 		glActiveTexture(GL_TEXTURE0 + 1);
-		glBindTexture(GL_TEXTURE_2D, sb.depth->getTexture()->getTextureId());
-
-		glUniform1i(uRenderedTextures[2], 2);
-		glActiveTexture(GL_TEXTURE0 + 2);
 		glBindTexture(GL_TEXTURE_2D, sb.emissive->getTexture()->getTextureId());
 	}
 

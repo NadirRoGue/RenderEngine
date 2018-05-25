@@ -36,8 +36,6 @@ namespace Engine
 		virtual void doRender() = 0;
 
 		virtual void onResize(unsigned int w, unsigned int h) = 0;
-
-		virtual DeferredRenderObject * getGBuffer() = 0;
 	};	
 
 	// ==================================================================

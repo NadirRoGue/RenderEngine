@@ -3,7 +3,7 @@
 #include "WorldConfig.h"
 #include "Time.h"
 
-const float Engine::CameraMovement::MOVE_SPEED = 100.0f;
+const float Engine::CameraMovement::MOVE_SPEED = 10.0f;
 
 Engine::CameraMovement::CameraMovement(Engine::Camera * cam)
 {

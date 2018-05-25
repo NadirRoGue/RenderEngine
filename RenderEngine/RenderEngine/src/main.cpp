@@ -37,6 +37,7 @@
 #include "postprocessprograms/DeferredShadingProgram.h"
 #include "postprocessprograms/SSAAProgram.h"
 #include "postprocessprograms/BloomProgram.h"
+#include "postprocessprograms/SSReflectionProgram.h"
 
 #include "inputhandlers/keyboardhandlers/CameraMovementHandler.h"
 #include "inputhandlers/keyboardhandlers/ToggleUIHandler.h"
@@ -58,6 +59,7 @@ void destroy();
 
 Engine::PostProcessChainNode * createBloomNode();
 Engine::PostProcessChainNode * createSSAANode();
+Engine::PostProcessChainNode * createSSReflectionNode();
 
 
 /**
@@ -131,6 +133,7 @@ void initTables()
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SkyProgram::PROGRAM_NAME, new Engine::SkyProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::BloomProgram::PROGRAM_NAME, new Engine::BloomProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::TreeProgram::PROGRAM_NAME, new Engine::TreeProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SSReflectionProgram::PROGRAM_NAME, new Engine::SSReflectionProgramFactory());
 	
 	// Mesh table
 	Engine::MeshTable::getInstance().addMeshToCache("cube", Engine::CreateCube());
@@ -175,7 +178,7 @@ void initHandlers()
 	handlers->registerHandler(cm);
 	handlers->registerHandler(uiHandler);
 	
-	Engine::CameraBezier * camBezier = new Engine::CameraBezier(scene->getCamera(), glm::vec3(100,10,100), 50.0f, 3.0f);
+	Engine::CameraBezier * camBezier = new Engine::CameraBezier(scene->getCamera(), glm::vec3(100,6,100), 50.0f, 3.0f);
 	scene->getAnimationHandler()->registerAnimation(camBezier);
 
 	// Mouse pitch & yaw
@@ -188,6 +191,7 @@ void initRenderEngine()
 {
 	Engine::DeferredRenderer * dr = new Engine::DeferredRenderer();
 	dr->addPostProcess(createBloomNode());
+	dr->addPostProcess(createSSReflectionNode());
 
 	Engine::RenderManager::getInstance().setRenderer(dr);
 	Engine::RenderManager::getInstance().doResize(1024, 1024);
@@ -203,13 +207,10 @@ void destroy()
 Engine::PostProcessChainNode * createSSAANode()
 {
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
-	//Engine::Program * gaussSource = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSAAProgram::PROGRAM_NAME);
 	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSAAProgram::PROGRAM_NAME);
-	//new Engine::SSAAProgram(*dynamic_cast<Engine::SSAAProgram*>(gaussSource));
 
-	node->renderBuffer = new Engine::DeferredRenderObject(2, true);
+	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
 	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
-	node->renderBuffer->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addDepthBuffer24(500, 500);
 	node->callBack = 0;
 
@@ -229,10 +230,30 @@ Engine::PostProcessChainNode * createBloomNode()
 	
 	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::BloomProgram::PROGRAM_NAME);
 
-	node->renderBuffer = new Engine::DeferredRenderObject(3, true);
+	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
 	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
-	node->renderBuffer->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addDepthBuffer24(500, 500);
+	node->callBack = 0;
+
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
+	if (mi != 0)
+	{
+		node->postProcessProgram->configureMeshBuffers(mi);
+		node->obj = new Engine::PostProcessObject(mi);
+	}
+
+	return node;
+}
+
+Engine::PostProcessChainNode * createSSReflectionNode()
+{
+	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
+
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSReflectionProgram::PROGRAM_NAME);
+
+	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
+	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addDepthBuffer24(500, 500);
 	node->callBack = 0;
 

@@ -82,7 +82,7 @@ void Engine::Terrain::render(Engine::Camera * camera)
 	glDisable(GL_BLEND);
 
 	// RENDER TREES
-	renderRadius = 4;
+	renderRadius = renderRadius < 6? renderRadius : 6;
 	tiledRendering(camera, treeActiveShader, &Terrain::treesRender);
 	renderRadius = previousRadius;
 }
@@ -409,14 +409,18 @@ void Engine::Terrain::addTrees()
 {
 	std::uniform_int_distribution<unsigned int> d(0, 50000);
 	std::default_random_engine e(0);
+
+	std::uniform_real_distribution<float> leafColor(0.0f, 1.0f);
+	std::default_random_engine eLeaf(0);
+
 	for (int i = 0; i < 10; i++)
 	{
 		Engine::TreeGenerationData treeData;
 		treeData.treeName = std::string("CherryTree") + std::to_string(i);
-		treeData.emissiveLeaf = false;
+		treeData.emissiveLeaf = leafColor(eLeaf) > 0.5f;
 		treeData.startTrunkColor = glm::vec3(0.2f, 0.1f, 0.0f);
 		treeData.endTrunkColor = treeData.startTrunkColor;
-		treeData.leafColor = glm::vec3(0.1f, 0.3f, 0.1f);
+		treeData.leafColor = glm::vec3(leafColor(eLeaf), leafColor(eLeaf), leafColor(eLeaf));
 		treeData.maxBranchesSplit = 4;
 		treeData.maxBranchRotation = glm::vec3(20.0f, 10.0f, 10.0f);
 		treeData.minBranchRotation = glm::vec3(-20.0f, -10.0f, -10.0f);

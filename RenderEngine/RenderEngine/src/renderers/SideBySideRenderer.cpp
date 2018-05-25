@@ -45,16 +45,6 @@ void Engine::SideBySideRenderer::setClearScreen(bool val)
 	clearScreen = val;
 }
 
-Engine::DeferredRenderObject * Engine::SideBySideRenderer::getGBuffer()
-{
-	if (leftRenderer != NULL)
-	{
-		return leftRenderer->getGBuffer();
-	}
-
-	return NULL;
-}
-
 void Engine::SideBySideRenderer::initialize()
 {
 	if (initialized)

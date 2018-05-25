@@ -152,7 +152,7 @@ void Engine::FractalTree::addLeaf(glm::mat4 & origin, glm::vec3 lastScaling, siz
 	
 	glm::mat4 model = origin * glm::translate(glm::mat4(1.0f), t);
 	//std::cout << minScale << " - " << maxScale << std::endl;
-	appendVerticesAndFaces(base, model, glm::vec3(0.08f, 0.08f, 0.08f), 0, offset, true, true);
+	appendVerticesAndFaces(base, model, glm::vec3(maxScale) * 0.5f, 0, offset, true, true);
 }
 
 void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat4 & model, glm::vec3 scale, unsigned int depth, size_t vOffset, bool keepBase, bool isLeaf)

@@ -11,8 +11,8 @@ Engine::Window::WorldControllerUI::WorldControllerUI(GLFWwindow * surface)
 
 void Engine::Window::WorldControllerUI::drawGraphics()
 {
-	
-	ImVec2 pos(1024.0f - 300.0f, 0.0f);
+	glm::ivec2 windowSize = getWindowSize();
+	ImVec2 pos(float(windowSize.x) - 300.0f, 0.0f);
 	ImGui::SetNextWindowPos(pos);
 	ImVec2 size(300.0f, 1000.0f);
 	ImGui::SetNextWindowSize(size);

@@ -1,8 +1,7 @@
 #version 430 core
 
 layout (location=0) out vec4 outColor;
-layout (location=1) out vec4 outDepth;
-layout (location=2) out vec4 outEmission;
+layout (location=1) out vec4 outEmission;
 
 in vec2 texCoord;
 
@@ -18,8 +17,6 @@ uniform sampler2D postProcessing_5; // depth
 uniform vec3 backgroundColor;
 
 uniform mat4 projMat;
-uniform mat4 viewMat;
-uniform vec3 cameraPos;
 
 // Different lights data
 
@@ -99,57 +96,6 @@ vec3 processAtmosphericFog(in vec3 shadedColor)
 }
 
 // ================================================================================
-// REFLECTION FUNCTIONALITY
-
-vec3 raymarch(vec3 position, vec3 direction)
-{
-	vec3 PrevRaySample, RaySample;
-	for (int RayStepIdx = 0; RayStepIdx < 16; RayStepIdx++)
-	{
-		PrevRaySample = RaySample;
-		RaySample = (RayStepIdx * 0.02) * direction + position;
-		float ZBufferVal = texture(postProcessing_5, RaySample.xy).x;
-				
-		if (RaySample.z > ZBufferVal )
-		{
-			vec3 MinRaySample = PrevRaySample;
-			vec3 MaxRaySample = RaySample;
-			vec3 MidRaySample;
-			for (int i = 0; i < 6; i++)
-			{
-				MidRaySample = mix(MinRaySample, MaxRaySample, 0.5);
-				float ZBufferVal = texture(postProcessing_5, MidRaySample.xy).x;
-
-				if (MidRaySample.z > ZBufferVal)
-					MaxRaySample = MidRaySample;
-				else
-					MinRaySample = MidRaySample;
-			}
-
-			return texture(postProcessing_0, MidRaySample.xy).rgb;
-		}
-	}
-
-	return vec3(1,1,1);
-}
-
-vec3 computeReflectionColor()
-{
-	vec3 ssPos = vec3(texCoord, depth);
-
-	vec3 camReflect = reflect(-pos, N);
-
-	vec3 pointAlongRefl = camReflect * 10.0 + pos;
-	vec4 projPointAlong = projMat * vec4(pointAlongRefl, 1);
-	projPointAlong /= projPointAlong.w;
-	projPointAlong.xy = projPointAlong.xy * vec2(0.5, 0.5) + vec2(0.5, 0.5);
-
-	vec3 ssreflectdir = normalize(projPointAlong.xyz - ssPos);
-
-	return raymarch(ssPos, ssreflectdir);
-}
-
-// ================================================================================
 
 void main()
 {
@@ -160,19 +106,9 @@ void main()
 	depth = texture(postProcessing_5, texCoord).x;
 	vec4 gbuffercolor = texture(postProcessing_0,  texCoord);
 
-	distToCam = gbufferpos.w;
 	N = gbuffernormal.xyz;
 	pos = gbufferpos.xyz;
-
-	// REFRACTION
-	float camFactor = max(distToCam, 1);
-	vec3 realColor = gbufferspec.w > 0? texture(postProcessing_0, texCoord + normalize(gbuffernormal.xz) * 0.01 / camFactor).rgb * gbuffercolor.rgb : gbuffercolor.rgb;
-
-	// REFLECTION
-	realColor = gbufferspec.w > 0? computeReflectionColor() * realColor : realColor;
-
-	
-	Ka = realColor;
+	Ka = gbuffercolor.rgb;;
 	Kd = Ka;
 	Ks = gbufferspec.xyz;
 	Ke = gbufferemissive.xyz;
@@ -181,7 +117,6 @@ void main()
 	shaded = processAtmosphericFog(shaded);
 
 	outColor = vec4(shaded, 1.0);
-	outDepth = vec4(depth, 0, 0, 1);
 	outEmission = gbufferemissive;
 	gl_FragDepth = depth;
 }

@@ -101,6 +101,9 @@ void Engine::Camera::updateViewMatrix()
 
 	viewMatrix = pitchMat * yawMat * glm::translate(identity, translation);
 
+	//invViewMatrix = glm::inverse(viewMatrix);
+	//transposeInvViewMatrix = glm::transpose(invViewMatrix);
+
 	forward = glm::normalize(glm::vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]));
 }
 
@@ -137,4 +140,14 @@ glm::mat4 & Engine::Camera::getProjectionMatrix()
 glm::mat4 & Engine::Camera::getViewMatrix()
 {
 	return viewMatrix;
+}
+
+glm::mat4 & Engine::Camera::getInvViewMatrix()
+{
+	return invViewMatrix;
+}
+
+glm::mat4 & Engine::Camera::getTransposeInvViewMatrix()
+{
+	return transposeInvViewMatrix;
 }

@@ -10,15 +10,16 @@ namespace Engine
 		static const std::string PROGRAM_NAME;
 	private:
 		unsigned int uInvView;
-		unsigned int uInvProj;
-		unsigned int uViewProj;
 
 		unsigned int uPerlinWorley;
 		unsigned int uWorley;
 		unsigned int uWeather;
 
+		unsigned int uResolution;
+
 		unsigned int uCamPos;
 		unsigned int uLightDir;
+		unsigned int uLightColor;
 		unsigned int uTime;
 		unsigned int uCloudType;
 		unsigned int uCloudSpeed;

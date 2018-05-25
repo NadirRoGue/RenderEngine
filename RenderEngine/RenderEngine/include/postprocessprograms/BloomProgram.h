@@ -15,7 +15,6 @@ namespace Engine
 		{
 			DeferredRenderObject * pass;
 			TextureInstance * color;
-			TextureInstance * depth;
 			TextureInstance * emissive;
 		} SwitchableBuffers;
 	private:

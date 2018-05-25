@@ -25,7 +25,5 @@ namespace Engine
 		void initialize();
 		void doRender();
 		void onResize(unsigned int w, unsigned int h);
-
-		DeferredRenderObject * getGBuffer();
 	};
 }

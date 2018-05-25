@@ -1,8 +1,8 @@
 #version 410 core
 
 layout (location=0) out vec4 color;
-layout (location=1) out vec4 depth;
-layout (location=2) out vec4 emission;
+//layout (location=1) out vec4 depth;
+layout (location=1) out vec4 emission;
 
 layout (location=0) in vec3 inCubeUV;
 
@@ -50,6 +50,6 @@ void main()
 	}
 
 	color = vec4(skyColor, 1.0);
-	depth = vec4(gl_FragDepth, 0, 0, 1);
+	//depth = vec4(gl_FragDepth, 0, 0, 1);
 	emission = vec4(emissive, 1);
 }

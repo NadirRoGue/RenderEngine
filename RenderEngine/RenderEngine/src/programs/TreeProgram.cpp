@@ -97,7 +97,7 @@ void Engine::TreeProgram::configureProgram()
 	uInPos = glGetAttribLocation(glProgram, "inPos");
 	uInColor = glGetAttribLocation(glProgram, "inColor");
 	uInNormal = glGetAttribLocation(glProgram, "inNormal");
-	uInEmissive = glGetAttribLocation(glProgram, "inEmissive");
+	uInEmissive = glGetAttribLocation(glProgram, "inEmission");
 }
 
 void Engine::TreeProgram::configureMeshBuffers(Mesh * mesh)

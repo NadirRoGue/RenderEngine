@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include <string>
+#include <glm/glm.hpp>
 
 namespace Engine
 {
@@ -54,6 +55,7 @@ namespace Engine
 
 			void setFont(std::string name);
 			void setUIStyle(UIStyle style);
+			glm::ivec2 getWindowSize();
 
 			std::string getFont();
 		private:

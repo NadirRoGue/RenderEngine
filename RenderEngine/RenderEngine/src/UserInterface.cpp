@@ -253,20 +253,6 @@ void Engine::Window::UserInterface::updateGraphics()
 	if (last_enable_scissor_test) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
 	glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
 	glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
-
-	/*
-	io.AddInputCharacter(unsigned char('0'));
-	io.AddInputCharacter(unsigned char('1'));
-	io.AddInputCharacter(unsigned char('2'));
-	io.AddInputCharacter(unsigned char('3'));
-	io.AddInputCharacter(unsigned char('4'));
-	io.AddInputCharacter(unsigned char('5'));
-	io.AddInputCharacter(unsigned char('6'));
-	io.AddInputCharacter(unsigned char('7'));
-	io.AddInputCharacter(unsigned char('8'));
-	io.AddInputCharacter(unsigned char('9'));
-	io.AddInputCharacter(unsigned char('.'));
-	*/
 }
 
 void Engine::Window::UserInterface::render(double deltaTime)
@@ -388,4 +374,12 @@ void Engine::Window::UserInterface::setUIStyle(UIStyle style)
 std::string Engine::Window::UserInterface::getFont()
 {
 	return font;
+}
+
+glm::ivec2 Engine::Window::UserInterface::getWindowSize()
+{
+	int width, height;
+	glfwGetWindowSize(this->surface, &width, &height);
+
+	return glm::ivec2(width, height);
 }

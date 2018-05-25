@@ -44,6 +44,12 @@ namespace Engine
 
 		VolumetricCloudProgram * clouds;
 
+		TextureInstance * gBufferPos;
+		TextureInstance * gBufferNormal;
+		TextureInstance * gBufferEmissive;
+		TextureInstance * gBufferSpecular;
+		TextureInstance * gBufferColor;
+		TextureInstance * gBufferDepth;
 	public:
 		DeferredRenderer();
 		~DeferredRenderer();
@@ -53,7 +59,12 @@ namespace Engine
 		void doRender();
 		void onResize(unsigned int w, unsigned int h);
 		
-		DeferredRenderObject * getGBuffer();
+		const TextureInstance * getGBufferPos();
+		const TextureInstance * getGBufferNormal();
+		const TextureInstance * getGBufferEmissive();
+		const TextureInstance * getGBufferSpecular();
+		const TextureInstance * getGBufferColor();
+		const TextureInstance * getGBufferDepth();
 	private:
 		void initializeLoop();
 		void renderLoop();

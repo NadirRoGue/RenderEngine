@@ -27,9 +27,34 @@ void Engine::DeferredRenderer::addPostProcess(Engine::PostProcessChainNode * obj
 	postProcessChain.push_back(object);
 }
 
-Engine::DeferredRenderObject * Engine::DeferredRenderer::getGBuffer()
+const Engine::TextureInstance * Engine::DeferredRenderer::getGBufferPos()
 {
-	return forwardPassBuffer;
+	return gBufferPos;
+}
+
+const Engine::TextureInstance * Engine::DeferredRenderer::getGBufferColor()
+{
+	return gBufferColor;
+}
+
+const Engine::TextureInstance * Engine::DeferredRenderer::getGBufferEmissive()
+{
+	return gBufferEmissive;
+}
+
+const Engine::TextureInstance * Engine::DeferredRenderer::getGBufferNormal()
+{
+	return gBufferNormal;
+}
+
+const Engine::TextureInstance * Engine::DeferredRenderer::getGBufferSpecular()
+{
+	return gBufferSpecular;
+}
+
+const Engine::TextureInstance * Engine::DeferredRenderer::getGBufferDepth()
+{
+	return gBufferDepth;
 }
 
 void Engine::DeferredRenderer::initialize()
@@ -43,12 +68,12 @@ void Engine::DeferredRenderer::initialize()
 
 	// Create G Buffers
 	forwardPassBuffer = new Engine::DeferredRenderObject(5, true);
-	forwardPassBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_COLOR, GL_NEAREST);
-	forwardPassBuffer->addColorBuffer(1, GL_RGB32F, GL_RGBA, GL_UNSIGNED_BYTE, 500, 500, Engine::DeferredRenderObject::G_BUFFER_NORMAL, GL_NEAREST);
-	forwardPassBuffer->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_SPECULAR, GL_NEAREST);
-	forwardPassBuffer->addColorBuffer(3, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_EMISSIVE, GL_NEAREST);
-	forwardPassBuffer->addColorBuffer(4, GL_RGB32F, GL_RGBA, GL_UNSIGNED_BYTE, 500, 500, Engine::DeferredRenderObject::G_BUFFER_POS, GL_NEAREST);
-	forwardPassBuffer->addDepthBuffer24(500, 500);
+	gBufferColor = forwardPassBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_COLOR, GL_NEAREST);
+	gBufferNormal = forwardPassBuffer->addColorBuffer(1, GL_RGB32F, GL_RGBA, GL_UNSIGNED_BYTE, 500, 500, Engine::DeferredRenderObject::G_BUFFER_NORMAL, GL_NEAREST);
+	gBufferSpecular = forwardPassBuffer->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_SPECULAR, GL_NEAREST);
+	gBufferEmissive = forwardPassBuffer->addColorBuffer(3, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_EMISSIVE, GL_NEAREST);
+	gBufferPos = forwardPassBuffer->addColorBuffer(4, GL_RGB32F, GL_RGBA, GL_UNSIGNED_BYTE, 500, 500, Engine::DeferredRenderObject::G_BUFFER_POS, GL_NEAREST);
+	gBufferDepth = forwardPassBuffer->addDepthBuffer24(500, 500);
 	forwardPassBuffer->initialize();
 
 	// Instantiate deferred shading program
@@ -60,10 +85,9 @@ void Engine::DeferredRenderer::initialize()
 	forwardPassBuffer->populateDeferredObject(deferredDrawSurface);
 
 	// Creage deferred shading buffer
-	deferredPassBuffer = new Engine::DeferredRenderObject(3, true);
+	deferredPassBuffer = new Engine::DeferredRenderObject(2, false);
 	deferredPassBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Color info
-	deferredPassBuffer->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Depth info
-	deferredPassBuffer->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Emission info
+	deferredPassBuffer->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Emission info
 	deferredPassBuffer->addDepthBuffer24(500, 500);
 	deferredPassBuffer->initialize();
 
