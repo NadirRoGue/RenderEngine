@@ -5,7 +5,7 @@ std::string Engine::DepthOfFieldProgram::PROGRAM_NAME = "DepthOfFieldProgram";
 Engine::DepthOfFieldProgram::DepthOfFieldProgram(std::string name, unsigned long long params)
 	:Engine::GaussianBlurProgram(name, params)
 {
-	fShaderFile = "shaders/postprocess/postProcessing.DepthOfFieldZBuffer.frag";
+	fShaderFile = "shaders/postprocess/DepthOfFieldZBuffer.frag";
 }
 
 Engine::DepthOfFieldProgram::DepthOfFieldProgram(const Engine::DepthOfFieldProgram & other)

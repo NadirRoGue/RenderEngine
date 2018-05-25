@@ -10,7 +10,8 @@ uniform sampler2D postProcessing_1; // normal
 uniform sampler2D postProcessing_2; // specular
 uniform sampler2D postProcessing_3; // emissive
 uniform sampler2D postProcessing_4; // pos
-uniform sampler2D postProcessing_5; // depth
+uniform sampler2D postProcessing_5; // info
+uniform sampler2D postProcessing_6; // depth
 
 // ===============================================
 // back ground color, used for fog effect
@@ -103,7 +104,7 @@ void main()
 	vec4 gbuffernormal = texture(postProcessing_1, texCoord);
 	vec4 gbufferspec = texture(postProcessing_2, texCoord);
 	vec4 gbufferpos = texture(postProcessing_4, texCoord);
-	depth = texture(postProcessing_5, texCoord).x;
+	depth = texture(postProcessing_6, texCoord).x;
 	vec4 gbuffercolor = texture(postProcessing_0,  texCoord);
 
 	N = gbuffernormal.xyz;

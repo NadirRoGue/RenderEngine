@@ -29,7 +29,7 @@ Engine::FractalTree::FractalTree(const TreeGenerationData & data) :Engine::Proce
 Engine::Mesh * Engine::FractalTree::generate()
 {
 	// Initial data to start growin the tree
-	glm::vec3 scale = glm::vec3(0.012f, 0.12f, 0.012f);
+	glm::vec3 scale = glm::vec3(0.02f, 0.2f, 0.02f);
 	glm::vec3 translation(0, 0, 0);
 	glm::vec3 rotation;
 
@@ -148,11 +148,12 @@ void Engine::FractalTree::addLeaf(glm::mat4 & origin, glm::vec3 lastScaling, siz
 	//minScale *= depth / 2;
 	float maxScale = lastScaling.x > lastScaling.y && lastScaling.x > lastScaling.z ? lastScaling.x : lastScaling.y > lastScaling.z ? lastScaling.y : lastScaling.z;;
 
-	glm::vec3 t(0, lastScaling.y * 0.5f, 0);
+	float yScale = 0.5f;
+	glm::vec3 t(0, maxScale * 1.0, 0);
 	
 	glm::mat4 model = origin * glm::translate(glm::mat4(1.0f), t);
 	//std::cout << minScale << " - " << maxScale << std::endl;
-	appendVerticesAndFaces(base, model, glm::vec3(maxScale) * 0.5f, 0, offset, true, true);
+	appendVerticesAndFaces(base, model, glm::vec3(maxScale) * glm::vec3(0.3, 0.3, 0.3), 0, offset, true, true);
 }
 
 void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat4 & model, glm::vec3 scale, unsigned int depth, size_t vOffset, bool keepBase, bool isLeaf)

@@ -15,30 +15,36 @@ uniform sampler2D specularBuffer;
 
 vec3 raymarch(vec3 position, vec3 direction)
 {
-	vec3 PrevRaySample, RaySample;
-	for (int RayStepIdx = 0; RayStepIdx < 16; RayStepIdx++)
+	vec3 prevRaySample, raySample;
+	// Screen space ray march
+	for (int rayStepIdx = 0; rayStepIdx < 16; rayStepIdx++)
 	{
-		PrevRaySample = RaySample;
-		RaySample = (RayStepIdx * 0.02) * direction + position;
-		float ZBufferVal = texture(depthBuffer, RaySample.xy).x;
+		// Compare current ray depth with scene's depth
+		prevRaySample = raySample;
+		raySample = (rayStepIdx * 0.02) * direction + position;
+		float zBufferVal = texture(depthBuffer, raySample.xy).x;
 				
-		if (RaySample.z > ZBufferVal )
+		// If we are in a position with a higher depth,
+		// it means there was something with less depth,
+		// thus we have gone throught it, and should be reflected
+		if (raySample.z > zBufferVal )
 		{
-			vec3 MinRaySample = PrevRaySample;
-			vec3 MaxRaySample = RaySample;
-			vec3 MidRaySample;
+			vec3 minRaySample = prevRaySample;
+			vec3 maxRaySample = raySample;
+			vec3 midRaySample;
+			// Binary search
 			for (int i = 0; i < 6; i++)
 			{
-				MidRaySample = mix(MinRaySample, MaxRaySample, 0.5);
-				float ZBufferVal = texture(depthBuffer, MidRaySample.xy).x;
+				midRaySample = mix(minRaySample, maxRaySample, 0.5);
+				zBufferVal = texture(depthBuffer, midRaySample.xy).x;
 
-				if (MidRaySample.z > ZBufferVal)
-					MaxRaySample = MidRaySample;
+				if (midRaySample.z > zBufferVal)
+					maxRaySample = midRaySample;
 				else
-					MinRaySample = MidRaySample;
+					minRaySample = midRaySample;
 			}
 
-			return texture(postProcessing_0, MidRaySample.xy).rgb;
+			return texture(postProcessing_0, midRaySample.xy).rgb;
 		}
 	}
 
@@ -47,15 +53,19 @@ vec3 raymarch(vec3 position, vec3 direction)
 
 vec3 computeReflectionColor(float depth, vec3 pos, vec3 N)
 {
+	// screen space pos as depth
 	vec3 ssPos = vec3(texCoord, depth);
 
+	// Reflect view dir
 	vec3 camReflect = reflect(-pos, N);
 
+	// Screen space position from reflected view dir
 	vec3 pointAlongRefl = camReflect * 10.0 + pos;
 	vec4 projPointAlong = projMat * vec4(pointAlongRefl, 1);
 	projPointAlong /= projPointAlong.w;
 	projPointAlong.xy = projPointAlong.xy * vec2(0.5, 0.5) + vec2(0.5, 0.5);
 
+	// Screen space reflection dir
 	vec3 ssreflectdir = normalize(projPointAlong.xyz - ssPos);
 
 	return raymarch(ssPos, ssreflectdir);
@@ -67,6 +77,8 @@ void main()
 	vec3 N = texture(normalBuffer, texCoord).xyz;
 	float depth = texture(depthBuffer, texCoord).x;
 	float reflection = texture(specularBuffer, texCoord).w;
+
+	// Compute relfection only for specular surfaces
 	if(reflection > 0.0)
 	{
 		outColor = vec4(computeReflectionColor(depth, pos, N), 1.0);

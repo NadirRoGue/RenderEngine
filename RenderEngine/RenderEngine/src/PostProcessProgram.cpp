@@ -6,6 +6,7 @@
 #include "PostProcessProgram.h"
 
 #include "Renderer.h"
+#include "renderers/DeferredRenderer.h"
 #include "instances/TextureInstance.h"
 
 #include <iostream>
@@ -15,8 +16,8 @@ std::string Engine::PostProcessProgram::PROGRAM_NAME = "PostProcessProgram";
 Engine::PostProcessProgram::PostProcessProgram(std::string name, unsigned long long params)
 	:Engine::Program(name, params)
 {
-	vShaderFile = "shaders/postprocess/postProcessing.v0.vert";
-	fShaderFile = "shaders/postprocess/postProcessing.v0.frag";
+	vShaderFile = "shaders/postprocess/PostProcessRender.vert";
+	fShaderFile = "shaders/postprocess/PostProcessRender.frag";
 }
 
 Engine::PostProcessProgram::PostProcessProgram(unsigned long long params)
@@ -67,7 +68,6 @@ void Engine::PostProcessProgram::configureMeshBuffers(Engine::Mesh * data)
 
 void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
 {
-	
 	std::map<std::string, TextureInstance *> all = ((PostProcessObject*)obj)->getAllCustomTextures();
 	std::map<std::string, TextureInstance *>::const_iterator it = all.cbegin();
 	
@@ -83,6 +83,12 @@ void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, cons
 		start++;
 		it++;
 	}
+	/*
+	Engine::DeferredRenderer * dr = static_cast<Engine::DeferredRenderer*>(Engine::RenderManager::getInstance().getRenderer());
+	glUniform1i(uRenderedTextures[0], 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, dr->getGBufferInfo()->getTexture()->getTextureId());
+	*/
 }
 
 // ==============================================================================

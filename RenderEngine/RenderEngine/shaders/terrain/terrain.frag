@@ -6,6 +6,7 @@ layout (location=1) out vec4 outNormal;
 layout (location=2) out vec4 outSpecular;
 layout (location=3) out vec4 outEmissive;
 layout (location=4) out vec4 outPos;
+layout (location=5) out vec4 outInfo;
 
 layout (location=0) in vec2 inUV;
 layout (location=1) in vec3 inPos;
@@ -25,7 +26,7 @@ uniform vec2 poissonDisk[4] = vec2[](
 
 uniform vec3 dirt = vec3(0.2, 0.1, 0.0);
 uniform vec3 snow = vec3(0.9, 0.9, 0.9);
-uniform vec3 grass = vec3(0.3, 1.0, 0.3);
+uniform vec3 grass = vec3(0.2, 0.4, 0.0);
 uniform vec3 sand = vec3(1,1,0.8);
 
 uniform float waterHeight;
@@ -118,15 +119,17 @@ void main()
 	// ------------------------------------------------------------------------------
 	vec3 heightColor = vec3(0);
 	float visibility = 1.0;
+	float grassData = 0.0;
 #ifndef WIRE_MODE
 	// Compute slope respect vertical axis
 	vec3 up = vec3(0, 1, 0);
-	float cos = abs(dot(rawNormal, up));
+	float cosV = abs(dot(rawNormal, up));
 
 	// Compute color gradient based on height / slope
-	heightColor = height <= waterHeight + 0.01? sand : height < waterHeight + 0.1? mix(grass, dirt, height / (waterHeight + 0.1)) : height > waterHeight + 0.3 && cos > 0.75? snow : dirt;
-	//heightColor = height < 0.1? sand : (height < 0.3? (cos > 0.75? grass : dirt) : (height < 0.4? (dirt) : (cos > 0.75? snow : dirt)));
-
+	// mix(grass, dirt, height / (waterHeight + 0.1))
+	heightColor = height <= waterHeight + 0.01? sand : (height < waterHeight + 0.1 && cosV > 0.7) || (height < waterHeight + 0.3 && cosV > 0.85)? grass : height > waterHeight + 0.3 && cosV > 0.75? snow : dirt;
+	
+	grassData = heightColor == grass? 1.0 : 0.0;
 	// APPLY SHADOW MAP
 	// ------------------------------------------------------------------------------
 	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
@@ -148,5 +151,6 @@ void main()
 	outPos = vec4(inPos, 1.0);
 	outSpecular = vec4(0,0,0,0);
 	outEmissive = vec4(0,0,0,0);
+	outInfo = vec4(grassData, 0, 0, 0);
 #endif
 }

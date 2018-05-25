@@ -6,6 +6,7 @@ layout (location=1) out vec4 outNormal;
 layout (location=2) out vec4 outSpecular;
 layout (location=3) out vec4 outEmissive;
 layout (location=4) out vec4 outPos;
+layout (location=5) out vec4 outInfo;
 
 layout (location=0) in vec3 inPos;
 layout (location=1) in vec3 inColor;
@@ -38,6 +39,7 @@ void main()
 	outSpecular = vec4(0,0,0,0);
 	outEmissive = vec4(0,0,0,0);
 	outPos = vec4(inPos, 1);
+	outInfo = vec4(0);
 #else
 	// APPLY SHADOW MAP
 	// ------------------------------------------------------------------------------
@@ -58,6 +60,7 @@ void main()
 	outSpecular = vec4(0,0,0,0);
 	outEmissive = vec4(inEmission,0);
 	outPos = vec4(inPos, 1);
+	outInfo = vec4(0);
 #endif
 #else
 	lightdepth = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, 0);

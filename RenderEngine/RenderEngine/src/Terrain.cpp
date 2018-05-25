@@ -417,14 +417,14 @@ void Engine::Terrain::addTrees()
 	{
 		Engine::TreeGenerationData treeData;
 		treeData.treeName = std::string("CherryTree") + std::to_string(i);
-		treeData.emissiveLeaf = leafColor(eLeaf) > 0.5f;
+		treeData.emissiveLeaf = false;
 		treeData.startTrunkColor = glm::vec3(0.2f, 0.1f, 0.0f);
 		treeData.endTrunkColor = treeData.startTrunkColor;
 		treeData.leafColor = glm::vec3(leafColor(eLeaf), leafColor(eLeaf), leafColor(eLeaf));
 		treeData.maxBranchesSplit = 4;
 		treeData.maxBranchRotation = glm::vec3(20.0f, 10.0f, 10.0f);
 		treeData.minBranchRotation = glm::vec3(-20.0f, -10.0f, -10.0f);
-		treeData.maxDepth = 5;
+		treeData.maxDepth = 7;
 		treeData.rotateMainTrunk = false;
 		treeData.scalingFactor = glm::vec3(0.7, 1.0, 0.7);
 		treeData.seed = d(e);

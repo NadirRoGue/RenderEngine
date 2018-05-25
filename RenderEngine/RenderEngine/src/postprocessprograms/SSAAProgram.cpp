@@ -9,7 +9,7 @@ std::string Engine::SSAAProgram::PROGRAM_NAME = "SSAAProgram";
 Engine::SSAAProgram::SSAAProgram(std::string name, unsigned long long params)
 	:Engine::PostProcessProgram(name, params)
 {
-	fShaderFile = "shaders/postprocess/postProcessing.SSAA.frag";
+	fShaderFile = "shaders/postprocess/SSAA.frag";
 }
 
 Engine::SSAAProgram::SSAAProgram(const Engine::SSAAProgram & other)

@@ -57,6 +57,11 @@ const Engine::TextureInstance * Engine::DeferredRenderer::getGBufferDepth()
 	return gBufferDepth;
 }
 
+const Engine::TextureInstance * Engine::DeferredRenderer::getGBufferInfo()
+{
+	return gBufferInfo;
+}
+
 void Engine::DeferredRenderer::initialize()
 {
 	Engine::Renderer::initialize();
@@ -67,12 +72,13 @@ void Engine::DeferredRenderer::initialize()
 	initialized = true;
 
 	// Create G Buffers
-	forwardPassBuffer = new Engine::DeferredRenderObject(5, true);
+	forwardPassBuffer = new Engine::DeferredRenderObject(6, true);
 	gBufferColor = forwardPassBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_COLOR, GL_NEAREST);
 	gBufferNormal = forwardPassBuffer->addColorBuffer(1, GL_RGB32F, GL_RGBA, GL_UNSIGNED_BYTE, 500, 500, Engine::DeferredRenderObject::G_BUFFER_NORMAL, GL_NEAREST);
 	gBufferSpecular = forwardPassBuffer->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_SPECULAR, GL_NEAREST);
 	gBufferEmissive = forwardPassBuffer->addColorBuffer(3, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_EMISSIVE, GL_NEAREST);
 	gBufferPos = forwardPassBuffer->addColorBuffer(4, GL_RGB32F, GL_RGBA, GL_UNSIGNED_BYTE, 500, 500, Engine::DeferredRenderObject::G_BUFFER_POS, GL_NEAREST);
+	gBufferInfo = forwardPassBuffer->addColorBuffer(5, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "InfoBuffer", GL_LINEAR);
 	gBufferDepth = forwardPassBuffer->addDepthBuffer24(500, 500);
 	forwardPassBuffer->initialize();
 
@@ -142,6 +148,7 @@ void Engine::DeferredRenderer::renderLoop()
 
 	// Do forward pass
 	glBindFramebuffer(GL_FRAMEBUFFER, forwardPassBuffer->getFrameBufferId());
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	forwardPass->renderFromCamera(activeCam);

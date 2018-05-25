@@ -38,6 +38,7 @@
 #include "postprocessprograms/SSAAProgram.h"
 #include "postprocessprograms/BloomProgram.h"
 #include "postprocessprograms/SSReflectionProgram.h"
+#include "postprocessprograms/SSGrassProgram.h"
 
 #include "inputhandlers/keyboardhandlers/CameraMovementHandler.h"
 #include "inputhandlers/keyboardhandlers/ToggleUIHandler.h"
@@ -60,6 +61,7 @@ void destroy();
 Engine::PostProcessChainNode * createBloomNode();
 Engine::PostProcessChainNode * createSSAANode();
 Engine::PostProcessChainNode * createSSReflectionNode();
+Engine::PostProcessChainNode * createSSGrassNode();
 
 
 /**
@@ -134,6 +136,7 @@ void initTables()
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::BloomProgram::PROGRAM_NAME, new Engine::BloomProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::TreeProgram::PROGRAM_NAME, new Engine::TreeProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SSReflectionProgram::PROGRAM_NAME, new Engine::SSReflectionProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SSGrassProgram::PROGRAM_NAME, new Engine::SSGrassProgramFactory());
 	
 	// Mesh table
 	Engine::MeshTable::getInstance().addMeshToCache("cube", Engine::CreateCube());
@@ -192,6 +195,7 @@ void initRenderEngine()
 	Engine::DeferredRenderer * dr = new Engine::DeferredRenderer();
 	dr->addPostProcess(createBloomNode());
 	dr->addPostProcess(createSSReflectionNode());
+	dr->addPostProcess(createSSGrassNode());
 
 	Engine::RenderManager::getInstance().setRenderer(dr);
 	Engine::RenderManager::getInstance().doResize(1024, 1024);
@@ -251,6 +255,27 @@ Engine::PostProcessChainNode * createSSReflectionNode()
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 
 	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSReflectionProgram::PROGRAM_NAME);
+
+	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
+	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addDepthBuffer24(500, 500);
+	node->callBack = 0;
+
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
+	if (mi != 0)
+	{
+		node->postProcessProgram->configureMeshBuffers(mi);
+		node->obj = new Engine::PostProcessObject(mi);
+	}
+
+	return node;
+}
+
+Engine::PostProcessChainNode * createSSGrassNode()
+{
+	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
+
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSGrassProgram::PROGRAM_NAME);
 
 	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
 	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);

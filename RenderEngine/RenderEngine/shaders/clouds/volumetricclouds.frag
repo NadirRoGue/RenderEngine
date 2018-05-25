@@ -146,7 +146,7 @@ float getDensityForCloud(float heightFraction, float cloudType)
 float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 {
 	// Position modifications
-	vec3 wind = vec3(1,0.2,1);
+	vec3 wind = vec3(1,0,0);
 	float cloudTopOffset = 50.0;
 	float heightFraction = getHeightFraction (p);
 
@@ -254,7 +254,7 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 		}
 	}
 
-	float ca = dot(normLightDir, d);
+	float ca = clamp(dot(normLightDir, d), 0, 1);
 
 	// Compute light energy arriving at point
 	return lightEnergy(normLightDir, d, ca, coneDensity, density);
@@ -414,7 +414,7 @@ void main()
 		density = clamp(density, 0.0, 1.0);
 		
 		color = vec4(outColor, density);
-		emission = vec4(0,0,0,0);
+		emission = vec4(0,0,0,density);
 		gl_FragDepth = 0.999; // behind everything, but in front of the cubemap
 	}
 	else

@@ -50,6 +50,7 @@ namespace Engine
 		TextureInstance * gBufferSpecular;
 		TextureInstance * gBufferColor;
 		TextureInstance * gBufferDepth;
+		TextureInstance * gBufferInfo;
 	public:
 		DeferredRenderer();
 		~DeferredRenderer();
@@ -65,6 +66,7 @@ namespace Engine
 		const TextureInstance * getGBufferSpecular();
 		const TextureInstance * getGBufferColor();
 		const TextureInstance * getGBufferDepth();
+		const TextureInstance * getGBufferInfo();
 	private:
 		void initializeLoop();
 		void renderLoop();
