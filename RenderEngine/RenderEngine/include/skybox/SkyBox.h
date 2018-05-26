@@ -6,6 +6,7 @@
 #include "programs/SkyProgram.h"
 #include "Camera.h"
 #include "Object.h"
+#include "volumetricclouds/CloudSystem.h"
 
 namespace Engine
 {
@@ -14,6 +15,8 @@ namespace Engine
 	private:
 		SkyProgram * shader;
 		Object * cubeMesh;
+
+		CloudSystem::VolumetricClouds * clouds;
 
 		GLenum renderMode;
 	public:

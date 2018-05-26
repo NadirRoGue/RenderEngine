@@ -8,6 +8,8 @@ Engine::SkyBox::SkyBox()
 {
 	initialize();
 
+	clouds = new Engine::CloudSystem::VolumetricClouds();
+
 	renderMode = GL_TRIANGLES;
 }
 
@@ -36,6 +38,8 @@ void Engine::SkyBox::render(Engine::Camera * camera)
 	glDrawElements(renderMode, data->getNumFaces() * data->getNumVerticesPerFace(), GL_UNSIGNED_INT, (void*)0);
 
 	glDepthFunc(GL_LESS);
+
+	clouds->render(camera);
 }
 
 void Engine::SkyBox::initialize()

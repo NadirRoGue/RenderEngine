@@ -402,6 +402,12 @@
     <ClInclude Include="include\postprocessprograms\SSGrassProgram.h">
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>
+    <ClInclude Include="include\volumetricclouds\CloudSystem.h">
+      <Filter>Archivos de encabezado\volumetricclouds</Filter>
+    </ClInclude>
+    <ClInclude Include="include\postprocessprograms\HDRToneMappingProgram.h">
+      <Filter>Archivos de encabezado\postprocessprograms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -620,6 +626,12 @@
     <ClCompile Include="src\postprocessprograms\SSGrassProgram.cpp">
       <Filter>Archivos de origen\postprocessprograms</Filter>
     </ClCompile>
+    <ClCompile Include="src\volumetricclouds\CloudSystem.cpp">
+      <Filter>Archivos de origen\volumetricclouds</Filter>
+    </ClCompile>
+    <ClCompile Include="src\postprocessprograms\HDRToneMappingProgram.cpp">
+      <Filter>Archivos de origen\postprocessprograms</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\sky\sky.frag">
@@ -716,6 +728,9 @@
       <Filter>shaders\postprocess</Filter>
     </None>
     <None Include="shaders\postprocess\SSGrass.frag">
+      <Filter>shaders\postprocess</Filter>
+    </None>
+    <None Include="shaders\postprocess\HDRToneMapping.frag">
       <Filter>shaders\postprocess</Filter>
     </None>
   </ItemGroup>

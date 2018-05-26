@@ -1,7 +1,5 @@
 #include "renderers/DeferredRenderer.h"
 
-#include <iostream>
-
 #include "Scene.h"
 #include "datatables/DeferredObjectsTable.h"
 #include "datatables/MeshTable.h"
@@ -73,10 +71,10 @@ void Engine::DeferredRenderer::initialize()
 
 	// Create G Buffers
 	forwardPassBuffer = new Engine::DeferredRenderObject(6, true);
-	gBufferColor = forwardPassBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_COLOR, GL_NEAREST);
+	gBufferColor = forwardPassBuffer->addColorBuffer(0, GL_RGBA32F, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_COLOR, GL_NEAREST);
 	gBufferNormal = forwardPassBuffer->addColorBuffer(1, GL_RGB32F, GL_RGBA, GL_UNSIGNED_BYTE, 500, 500, Engine::DeferredRenderObject::G_BUFFER_NORMAL, GL_NEAREST);
 	gBufferSpecular = forwardPassBuffer->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_SPECULAR, GL_NEAREST);
-	gBufferEmissive = forwardPassBuffer->addColorBuffer(3, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_EMISSIVE, GL_NEAREST);
+	gBufferEmissive = forwardPassBuffer->addColorBuffer(3, GL_RGBA32F, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_EMISSIVE, GL_NEAREST);
 	gBufferPos = forwardPassBuffer->addColorBuffer(4, GL_RGB32F, GL_RGBA, GL_UNSIGNED_BYTE, 500, 500, Engine::DeferredRenderObject::G_BUFFER_POS, GL_NEAREST);
 	gBufferInfo = forwardPassBuffer->addColorBuffer(5, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "InfoBuffer", GL_LINEAR);
 	gBufferDepth = forwardPassBuffer->addDepthBuffer24(500, 500);
@@ -92,14 +90,10 @@ void Engine::DeferredRenderer::initialize()
 
 	// Creage deferred shading buffer
 	deferredPassBuffer = new Engine::DeferredRenderObject(2, false);
-	deferredPassBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Color info
-	deferredPassBuffer->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Emission info
+	deferredPassBuffer->addColorBuffer(0, GL_RGBA32F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Color info
+	deferredPassBuffer->addColorBuffer(1, GL_RGBA32F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Emission info
 	deferredPassBuffer->addDepthBuffer24(500, 500);
 	deferredPassBuffer->initialize();
-
-	clouds = new Engine::VolumetricCloudProgram("VolumetricCloudProgram", 0);
-	clouds->initialize();
-	clouds->configureMeshBuffers(mi);
 
 	// Linke post processes as a chain
 	std::list<Engine::PostProcessChainNode *>::iterator it = postProcessChain.begin();
@@ -165,16 +159,6 @@ void Engine::DeferredRenderer::renderLoop()
 
 	// Render the skybox after shading is performed
 	scene->getSkyBox()->render(activeCam);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glUseProgram(clouds->getProgramId());
-	glBindVertexArray(deferredDrawSurface->getMesh()->vao);
-	clouds->onRenderObject(deferredDrawSurface, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glDisable(GL_BLEND);
 
 	// Run the post-process chain
 	runPostProcesses();

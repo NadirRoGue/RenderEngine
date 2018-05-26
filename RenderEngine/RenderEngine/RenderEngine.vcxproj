@@ -170,6 +170,7 @@
     <ClInclude Include="include\postprocessprograms\DeferredShadingProgram.h" />
     <ClInclude Include="include\postprocessprograms\DepthOfFieldProgram.h" />
     <ClInclude Include="include\postprocessprograms\GaussianBlurProgram.h" />
+    <ClInclude Include="include\postprocessprograms\HDRToneMappingProgram.h" />
     <ClInclude Include="include\postprocessprograms\SSAAProgram.h" />
     <ClInclude Include="include\postprocessprograms\SSGrassProgram.h" />
     <ClInclude Include="include\postprocessprograms\SSReflectionProgram.h" />
@@ -202,6 +203,7 @@
     <ClInclude Include="include\userinterfaces\WorldControllerUI.h" />
     <ClInclude Include="include\util\IOUtils.h" />
     <ClInclude Include="include\vegetation\FractalTree.h" />
+    <ClInclude Include="include\volumetricclouds\CloudSystem.h" />
     <ClInclude Include="include\volumetricclouds\NoiseInitializer.h" />
     <ClInclude Include="include\volumetricclouds\VolumetricClouds.h" />
     <ClInclude Include="include\windowmanagers\GLFWWindow.h" />
@@ -253,6 +255,7 @@
     <ClCompile Include="src\postprocessprograms\DeferredShadingProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\DepthOfFieldProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\GaussianBlurProgram.cpp" />
+    <ClCompile Include="src\postprocessprograms\HDRToneMappingProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\SSAAProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\SSGrassProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\SSReflectionProgram.cpp" />
@@ -283,6 +286,7 @@
     <ClCompile Include="src\userinterfaces\WorldControllerUI.cpp" />
     <ClCompile Include="src\util\IOUtils.cpp" />
     <ClCompile Include="src\vegetation\FractalTree.cpp" />
+    <ClCompile Include="src\volumetricclouds\CloudSystem.cpp" />
     <ClCompile Include="src\volumetricclouds\NoiseInitializer.cpp" />
     <ClCompile Include="src\windowmanagers\GLFWWindow.cpp" />
     <ClCompile Include="src\windowmanagers\GLUTWindow.cpp" />
@@ -299,6 +303,7 @@
     <None Include="shaders\postprocess\DeferredShading.frag" />
     <None Include="shaders\postprocess\DepthOfField.frag" />
     <None Include="shaders\postprocess\GaussianBlur.frag" />
+    <None Include="shaders\postprocess\HDRToneMapping.frag" />
     <None Include="shaders\postprocess\PostProcessRender.frag" />
     <None Include="shaders\postprocess\PostProcessRender.vert" />
     <None Include="shaders\postprocess\SSAA.frag" />

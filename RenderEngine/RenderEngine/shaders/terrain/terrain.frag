@@ -24,8 +24,9 @@ uniform vec2 poissonDisk[4] = vec2[](
   vec2( 0.34495938, 0.29387760 )
 );
 
-uniform vec3 dirt = vec3(0.2, 0.1, 0.0);
-uniform vec3 snow = vec3(0.9, 0.9, 0.9);
+//uniform vec3 dirt = vec3(0.2, 0.1, 0.0);
+//uniform vec3 snow = vec3(0.9, 0.9, 0.9);
+uniform vec3 rock = vec3(0.5);
 uniform vec3 grass = vec3(0.2, 0.4, 0.0);
 uniform vec3 sand = vec3(1,1,0.8);
 
@@ -42,6 +43,40 @@ uniform int octaves;
 float Random2D(in vec2 st)
 {
 	return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+uniform float cellularScale = 1500.0;
+
+float cellularNoise(vec2 uv)
+{	
+	//obtenemos su coordenada en el grid y su coordenada real
+    vec2 currentPos = uv * cellularScale; 
+    vec2 gridCoord  = floor( currentPos );
+    
+	float dist0 = 1000.0;
+    vec2 offset = vec2( -1.0, -1.0 );
+    
+    //recorremos los vecinos buscando la distancia mas cortas
+    for( offset.y = -1.0f; offset.y <= 1.0f; offset.y += 1.0f )
+    {
+        for( offset.x = -1.0f; offset.x <= 1.0f; offset.x += 1.0f )
+        {
+            vec2 cellCenter = gridCoord + offset;
+            cellCenter      = cellCenter + Random2D( cellCenter );
+            
+            float dist = length( cellCenter - currentPos );
+            
+            if( dist < dist0 )
+            {
+                dist0 = dist;
+            }
+        }
+    }
+    
+    //dist0 = 1.0 - dist0;
+    dist0 = dist0 * 0.5 + 0.5;
+	//dist0 = clamp(dist0, 0.3, 1.0);
+    return dist0 * dist0 * dist0 * 0.01;
 }
 
 float NoiseInterpolation(in vec2 i_coord, in float i_size)
@@ -108,6 +143,18 @@ void main()
 
 	vec3 rawNormal = normalize(vec3(lH - rH, step * step, bH - tH));
 
+	//if(height <= waterHeight + 0.01)
+	{
+		float bumptH = cellularNoise(vec2(u, v + step)); 
+		float bumpbH = cellularNoise(vec2(u, v - step));
+		float bumprH = cellularNoise(vec2(u + step, v));
+		float bumplH = cellularNoise(vec2(u - step, v)); 
+
+		vec3 bumpNormal = normalize(vec3(bumplH - bumprH, step * step, bumpbH - bumptH));
+
+		rawNormal += bumpNormal * 0.1;
+	}
+
 	// Correct normal if we have pass from +X to -X, from +Z to -Z, viceversa, or both
 	int xSign = sign(gridPos.x);
 	int ySign = sign(gridPos.y);
@@ -126,8 +173,7 @@ void main()
 	float cosV = abs(dot(rawNormal, up));
 
 	// Compute color gradient based on height / slope
-	// mix(grass, dirt, height / (waterHeight + 0.1))
-	heightColor = height <= waterHeight + 0.01? sand : (height < waterHeight + 0.1 && cosV > 0.7) || (height < waterHeight + 0.3 && cosV > 0.85)? grass : height > waterHeight + 0.3 && cosV > 0.75? snow : dirt;
+	heightColor = height <= waterHeight + 0.01? sand : cosV > 0.5? grass : rock;
 	
 	grassData = heightColor == grass? 1.0 : 0.0;
 	// APPLY SHADOW MAP

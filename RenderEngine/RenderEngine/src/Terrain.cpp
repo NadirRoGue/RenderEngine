@@ -196,7 +196,7 @@ void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j
 	std::uniform_real_distribution<float> dTerrain(0.0f, 1.0f);
 	std::default_random_engine eTerrain(seed);
 
-	size_t spawnTrees = 30;
+	size_t spawnTrees = 20;
 	size_t numTypeOfTrees = treeTypes.size();
 	size_t equalAmount = spawnTrees / numTypeOfTrees;
 	equalAmount = equalAmount < 1 ? 1 : equalAmount;
@@ -417,7 +417,7 @@ void Engine::Terrain::addTrees()
 	{
 		Engine::TreeGenerationData treeData;
 		treeData.treeName = std::string("CherryTree") + std::to_string(i);
-		treeData.emissiveLeaf = false;
+		treeData.emissiveLeaf = leafColor(eLeaf) > 0.8f;
 		treeData.startTrunkColor = glm::vec3(0.2f, 0.1f, 0.0f);
 		treeData.endTrunkColor = treeData.startTrunkColor;
 		treeData.leafColor = glm::vec3(leafColor(eLeaf), leafColor(eLeaf), leafColor(eLeaf));

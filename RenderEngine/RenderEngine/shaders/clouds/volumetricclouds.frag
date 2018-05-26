@@ -44,9 +44,10 @@ uniform vec3 noiseKernel[6u] = vec3[]
 
 // Cloud layer data
 #ifdef SPHERE_PROJECTION
-uniform vec3 sphereCenter = vec3(0,-1950,0);
+vec3 sphereCenter;// = vec3(0,-1950,0);
+float chunkLen;
 uniform float sphereInnerRadius = 2000.0;
-uniform float sphereOuterRadius = 2300.0;
+uniform float sphereOuterRadius = 2150.0;
 #else
 uniform vec3 planeMin = vec3(-2000, 30.0, -2000);
 uniform vec3 planeMax = vec3(2000, 500.0, 2000);
@@ -96,8 +97,11 @@ vec3 ambientLight(float heightFrac)
 float getHeightFraction(vec3 p)
 {
 #ifdef SPHERE_PROJECTION
-	float y = p.y < 0.0? 1.0 - p.y : p.y;
-	float fraction = fract(y / (0.5 * (sphereOuterRadius - sphereInnerRadius)) * 0.5 + 0.5);
+	//float y = p.y < 0.0? 1.0 - p.y : p.y;
+	//float div = (0.5 * sphereOuterRadius) / (sphereOuterRadius - sphereOuterRadius);
+	//float fraction = fract(y / (0.5 * (sphereOuterRadius - sphereInnerRadius)) * 0.5 + 0.5);
+	float fraction = fract(p.y / (sphereOuterRadius - sphereInnerRadius));
+	//float fraction = (y / div) / (sphereOuterRadius - sphereInnerRadius);
 #else
 	float fraction = (p.y - planeMin.y) / (planeMax.y - planeMin.y);
 #endif
@@ -156,12 +160,12 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 	// Apply uv (xz) scale to keep clouds un-stretched based on cloud layer thickness
 #ifdef SPHERE_PROJECTION
 	float hScale = sphereOuterRadius * 2.0;
-	float vScale = sphereOuterRadius - sphereInnerRadius;
+	float vScale = (sphereOuterRadius - sphereInnerRadius);
 #else
 	float hScale = planeMax.x - planeMin.x;
 	float vScale = planeMax.y - planeMin.y;
 #endif
-	float uvScale = hScale / vScale;
+	float uvScale = hScale / (vScale);
 
 	// Sample base cloud shape noises (Perlin-Worley + 3 Worley)
 	vec2 uv = getPlanarUV(p) * uvScale;
@@ -358,6 +362,8 @@ bool intersectSphere(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 	minT = o + d * minSol;
 	maxT = o + d * maxSol;
 
+	chunkLen = length(maxT - minT);
+
 	return minT.y > -100.0; // only above the horizon
 }
 #else 
@@ -392,6 +398,7 @@ bool intersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 
 void main()
 {
+	sphereCenter = vec3(camPos.x, -1950.0, camPos.z);
 	// Ray direction
 	float ar = screenResolution.x / screenResolution.y;
 	vec2 fulluv = texCoord * vec2(ar, 1.0) * 2.0 - 1.0;
@@ -415,6 +422,7 @@ void main()
 		
 		color = vec4(outColor, density);
 		emission = vec4(0,0,0,density);
+
 		gl_FragDepth = 0.999; // behind everything, but in front of the cubemap
 	}
 	else

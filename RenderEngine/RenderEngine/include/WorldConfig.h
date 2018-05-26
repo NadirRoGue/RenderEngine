@@ -41,6 +41,9 @@ namespace Engine
 		static float cloudSpeed;
 		static float coverageMultiplier;
 
+		static float hdrExposure;
+		static float hdrGamma;
+
 		static bool showUI;
 	};
 

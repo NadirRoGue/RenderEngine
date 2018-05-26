@@ -39,6 +39,8 @@
 #include "postprocessprograms/BloomProgram.h"
 #include "postprocessprograms/SSReflectionProgram.h"
 #include "postprocessprograms/SSGrassProgram.h"
+#include "postprocessprograms/VolumetricCloudProgram.h"
+#include "postprocessprograms/HDRToneMappingProgram.h"
 
 #include "inputhandlers/keyboardhandlers/CameraMovementHandler.h"
 #include "inputhandlers/keyboardhandlers/ToggleUIHandler.h"
@@ -62,6 +64,7 @@ Engine::PostProcessChainNode * createBloomNode();
 Engine::PostProcessChainNode * createSSAANode();
 Engine::PostProcessChainNode * createSSReflectionNode();
 Engine::PostProcessChainNode * createSSGrassNode();
+Engine::PostProcessChainNode * createHDRNode();
 
 
 /**
@@ -137,6 +140,8 @@ void initTables()
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::TreeProgram::PROGRAM_NAME, new Engine::TreeProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SSReflectionProgram::PROGRAM_NAME, new Engine::SSReflectionProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SSGrassProgram::PROGRAM_NAME, new Engine::SSGrassProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::VolumetricCloudProgram::PROGRAM_NAME, new Engine::VolumetricCloudProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::HDRToneMappingProgram::PROGRAM_NAME, new Engine::HDRToneMappingProgramFactory());
 	
 	// Mesh table
 	Engine::MeshTable::getInstance().addMeshToCache("cube", Engine::CreateCube());
@@ -196,6 +201,7 @@ void initRenderEngine()
 	dr->addPostProcess(createBloomNode());
 	dr->addPostProcess(createSSReflectionNode());
 	dr->addPostProcess(createSSGrassNode());
+	dr->addPostProcess(createHDRNode());
 
 	Engine::RenderManager::getInstance().setRenderer(dr);
 	Engine::RenderManager::getInstance().doResize(1024, 1024);
@@ -235,8 +241,8 @@ Engine::PostProcessChainNode * createBloomNode()
 	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::BloomProgram::PROGRAM_NAME);
 
 	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
-	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
-	node->renderBuffer->addColorBuffer(1, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addColorBuffer(0, GL_RGBA32F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addColorBuffer(1, GL_RGBA32F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addDepthBuffer24(500, 500);
 	node->callBack = 0;
 
@@ -257,7 +263,7 @@ Engine::PostProcessChainNode * createSSReflectionNode()
 	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSReflectionProgram::PROGRAM_NAME);
 
 	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
-	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addColorBuffer(0, GL_RGBA32F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addDepthBuffer24(500, 500);
 	node->callBack = 0;
 
@@ -276,6 +282,27 @@ Engine::PostProcessChainNode * createSSGrassNode()
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 
 	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSGrassProgram::PROGRAM_NAME);
+
+	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
+	node->renderBuffer->addColorBuffer(0, GL_RGBA32F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addDepthBuffer24(500, 500);
+	node->callBack = 0;
+
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
+	if (mi != 0)
+	{
+		node->postProcessProgram->configureMeshBuffers(mi);
+		node->obj = new Engine::PostProcessObject(mi);
+	}
+
+	return node;
+}
+
+Engine::PostProcessChainNode * createHDRNode()
+{
+	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
+
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::HDRToneMappingProgram::PROGRAM_NAME);
 
 	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
 	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);

@@ -23,15 +23,17 @@ void main()
 {
 	float isGrass = texture(grassBuffer, texCoord).x;
 	vec4 backColor = texture(postProcessing_0, texCoord);
-	if(isGrass > 0.9)
+	if(isGrass > 0.9 && backColor.g > backColor.r && backColor.g > backColor.b)
 	{
 		//vec2 perturbTexCoord = texCoord + (vec2(0.5) / screenSize);
 
 		vec3 pos = texture(posBuffer, texCoord).xyz;
 		float dist = length(pos);
 
-		float x = planePos.x / screenSize.x;
-		float y = planePos.y / screenSize.y;
+		float ar = screenSize.x / screenSize.y;
+
+		float x = planePos.x / (screenSize.x / ar);
+		float y = planePos.y / (screenSize.y * ar);
 
 		float d = blend(dist, 0, 500, 100, 500);
 		float dclose = blend(dist, 0, 1, 30, 2);
@@ -41,7 +43,7 @@ void main()
 		y += x * 1000.0;
 
 		float yOffset = fract(y * d) / d;
-		vec2 uvOffset = texCoord - vec2(0, yOffset * 2.0 * 1.0/(dist * 0.2));
+		vec2 uvOffset = texCoord - vec2(0, yOffset * 2.0 * 1.0/(dist * 0.2) * ar);
 
 		vec3 offsetColor = texture(postProcessing_0, uvOffset).rgb;
 		vec3 offsetPos = texture(posBuffer, uvOffset).xyz;

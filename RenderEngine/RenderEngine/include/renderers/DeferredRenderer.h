@@ -6,7 +6,6 @@
 #include "DeferredNodeCallbacks.h"
 
 #include "postprocessprograms/DeferredShadingProgram.h"
-#include "postprocessprograms/VolumetricCloudProgram.h"
 
 #include "renderers/ForwardRenderer.h"
 
@@ -41,8 +40,6 @@ namespace Engine
 		bool initialized;
 
 		void (DeferredRenderer::*renderFunc)();
-
-		VolumetricCloudProgram * clouds;
 
 		TextureInstance * gBufferPos;
 		TextureInstance * gBufferNormal;
