@@ -17,11 +17,11 @@ glm::vec3 Engine::Settings::waterColor = glm::vec3(0.f, 0.5f, 1.0f);
 float Engine::Settings::waterSpeed = 0.005f;
 float Engine::Settings::waterHeight = 0.09f;
 
-float Engine::Settings::cloudSpeed = 5.0f;
-float Engine::Settings::cloudType = 0.75f;
-float Engine::Settings::coverageMultiplier = 0.25f;
+float Engine::Settings::cloudSpeed = 1.0f;
+float Engine::Settings::cloudType = 0.5f;
+float Engine::Settings::coverageMultiplier = 0.7f;
 
-float Engine::Settings::hdrExposure = 5.0f;
+float Engine::Settings::hdrExposure = 3.0f;
 float Engine::Settings::hdrGamma = 0.5f;
 
 bool Engine::Settings::showUI = false;

@@ -46,5 +46,5 @@ void main()
 	vec3 finalColor = blend? inColor.rgb + result : inColor.rgb;
 
 	outColor = vec4(finalColor, 1.0);
-	outEmission = vec4(result * 1.12, 1.0);
+	outEmission = vec4(result * 1.2, 1.0);
 }

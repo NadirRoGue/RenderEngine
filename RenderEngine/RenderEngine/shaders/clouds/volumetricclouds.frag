@@ -50,7 +50,7 @@ uniform float sphereInnerRadius = 2000.0;
 uniform float sphereOuterRadius = 2150.0;
 #else
 uniform vec3 planeMin = vec3(-2000, 30.0, -2000);
-uniform vec3 planeMax = vec3(2000, 500.0, 2000);
+uniform vec3 planeMax = vec3(2000, 230.0, 2000);
 vec2 planeDim = vec2(planeMax.xz - planeMin.xz);
 #endif
 
@@ -65,7 +65,7 @@ float henyeyGreenstein(vec3 l, vec3 v, float g, float ca)
 {
 	float g2 = g * g;
 
-	return ((1.0 - g2) / pow((1.0 + g2 - 2.0 * g * ca), 1.5 )) / 4.0 * 3.1415;
+	return ((1.0 - g2) / pow((1.0 + g2 - 2.0 * g * ca), 1.5 )) * (1.0 / (4.0 * 3.1415));
 }
 
 float beer(float density)
@@ -85,9 +85,9 @@ float lightEnergy(vec3 l, vec3 v, float ca, float coneDensity, float realDensity
 	return 2.0 * beer(coneDensity) * powder(realDensity, ca) * (1.0/3.1415) * mix(henyeyGreenstein(l, v, 0.8, ca), henyeyGreenstein(l, v, -0.5, ca), 0.5);
 }
 
-vec3 ambientLight(float heightFrac)
+vec3 ambientLight(float heightFrac, float lightFactor)
 {
-	return mix(lightColor * 0.3, lightColor * 0.7, heightFrac);
+	return mix(lightColor * 0.5, lightColor * 0.9, heightFrac);// * (lightFactor * 0.5 + 0.5);
 }
 
 // ==========================================================================
@@ -99,7 +99,7 @@ float getHeightFraction(vec3 p)
 #ifdef SPHERE_PROJECTION
 	//float y = p.y < 0.0? 1.0 - p.y : p.y;
 	//float div = (0.5 * sphereOuterRadius) / (sphereOuterRadius - sphereOuterRadius);
-	//float fraction = fract(y / (0.5 * (sphereOuterRadius - sphereInnerRadius)) * 0.5 + 0.5);
+	//float fraction = fract(p.y / (0.5 * (sphereOuterRadius - sphereInnerRadius)) * 0.5 + 0.5);
 	float fraction = fract(p.y / (sphereOuterRadius - sphereInnerRadius));
 	//float fraction = (y / div) / (sphereOuterRadius - sphereInnerRadius);
 #else
@@ -151,7 +151,7 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 {
 	// Position modifications
 	vec3 wind = vec3(1,0,0);
-	float cloudTopOffset = 50.0;
+	float cloudTopOffset = 10.0;
 	float heightFraction = getHeightFraction (p);
 
 	p += heightFraction * wind * cloudTopOffset;
@@ -174,16 +174,16 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 	
 	// Build the low frequency fbm modifier
 	float lowFreqFBM = ( baseCloudNoise.g * 0.625) + ( baseCloudNoise.b * 0.25 ) + ( baseCloudNoise.a * 0.125 );
-	float baseCloudShape = remapValue(baseCloudNoise.r, -(1.0 - lowFreqFBM), 1.0, 0.0, 1.0);
+	float baseCloudShape = remapValue(baseCloudNoise.r * 2.0, -(1.0 - lowFreqFBM), 1.0, 0.0, 1.0);
 
 	// Apply density gradient based on cloud type
 	float densityGradient = getDensityForCloud(heightFraction, cloudType);
-	baseCloudShape *= densityGradient / heightFraction;
+	baseCloudShape *= densityGradient;// / heightFraction;
 
 	// Apply coverage
 	float coverageStart = weatherData.r;
 	float coverageEnd = weatherData.g;
-	float coverageV = mix(coverageStart, 0.0, heightFraction);
+	float coverageV = coverageStart;//mix(coverageStart, 0.0, heightFraction);
 	float coverage = coverageV * coverageMultiplier;
 	//coverage = pow(coverage, remapValue(heightFraction, 0.7, 0.8, 1.0, mix(1.0, 0.5, 1.0)));
 	float coveragedCloud = remapValue(baseCloudShape, coverage, 1.0, 0.0, 1.0);
@@ -194,13 +194,13 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 	if(expensive)
 	{
 		// Build−high frequency Worley noise FBM.
-		vec3 erodeCloudNoise = textureLod(worley, vec3(uv, heightFraction) * 0.05, lod).rgb;
+		vec3 erodeCloudNoise = textureLod(worley, vec3(uv, heightFraction) * 0.1, lod).rgb;
 		float highFreqFBM = (erodeCloudNoise.r * 0.625) + (erodeCloudNoise.g * 0.25) + (erodeCloudNoise.b * 0.125);
 
 		heightFraction = getHeightFraction(p);
-		float highFreqNoiseModifier = mix(highFreqFBM, 1.0 - highFreqFBM, clamp(heightFraction * 10.0, 0.0, 1.0));
+		float highFreqNoiseModifier = mix(highFreqFBM, 1.0 - highFreqFBM, clamp(heightFraction * 10.0, 0.0, 1.0)) * 1.5;
 
-		coveragedCloud = coveragedCloud - highFreqNoiseModifier;// * (1.0 - coveragedCloud);
+		coveragedCloud = coveragedCloud - highFreqNoiseModifier * (1.0 - coveragedCloud);
 
 		finalCloud = remapValue(coveragedCloud, highFreqNoiseModifier * 0.2, 1.0, 0.0, 1.0);
 	}
@@ -237,6 +237,9 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 				density += cloudDensity;
 				float transmittance = 1.0 - (density * rcpThickness);
 				coneDensity += (cloudDensity * transmittance);
+
+				//if(coneDensity >= 1.0)
+				//	break;
 			}
 		}
 
@@ -249,7 +252,7 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 	float heightFraction = getHeightFraction(pos);
 	if(heightFraction <= 1.0)
 	{
-		float cloudDensity = sampleCloudDensity(pos, getWeatherData(pos), 6.0, false);
+		float cloudDensity = sampleCloudDensity(pos, getWeatherData(pos), 6.0, true);
 		if(cloudDensity > 0.0)
 		{
 			density += cloudDensity;
@@ -258,7 +261,7 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 		}
 	}
 
-	float ca = clamp(dot(normLightDir, d), 0, 1);
+	float ca = (dot(normLightDir, -d), 0, 1);
 
 	// Compute light energy arriving at point
 	return lightEnergy(normLightDir, d, ca, coneDensity, density);
@@ -280,7 +283,8 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 	int sampleCount = int(ceil(mix(64.0, 128.0, clamp(thick / delta, 0.0, 1.0))));
 
 	// Light color attenuation based on sun's position
-	vec3 lc = lightColor * (clamp(dot(vec3(0,1,0), normalize(lightDir)), 0.0, 1.0) + 0.01);
+	float lightFactor = (clamp(dot(vec3(0,1,0), normalize(lightDir)), 0.0, 1.0) + 0.01);
+	vec3 lc = lightColor * lightFactor;
 
 	vec3 pos = startPos;
 	vec3 st = dir / float(sampleCount - 1);
@@ -299,7 +303,7 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 			float lightEnergy = raymarchToLight(pos, viewDir, stepSize); // SAMPLE LIGHT
 
 			float height = getHeightFraction(pos);
-			vec4 src = vec4(lightColor * 0.7 * lightEnergy + ambientLight(height), cloudDensity); // ACCUMULATE 
+			vec4 src = vec4(lightColor * 0.7 * lightEnergy + ambientLight(height, lightFactor), cloudDensity); // ACCUMULATE 
 			src.rgb *= src.a;
 			result = (1.0 - result.a) * src + result;
 
@@ -398,7 +402,9 @@ bool intersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 
 void main()
 {
+#ifdef SPHERE_PROJECTION
 	sphereCenter = vec3(camPos.x, -1950.0, camPos.z);
+#endif
 	// Ray direction
 	float ar = screenResolution.x / screenResolution.y;
 	vec2 fulluv = texCoord * vec2(ar, 1.0) * 2.0 - 1.0;

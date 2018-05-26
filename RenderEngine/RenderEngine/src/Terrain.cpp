@@ -358,9 +358,10 @@ void Engine::Terrain::initialize()
 	depthTexture = shadowMap->addDepthBuffer24(1024, 1024);
 	shadowMap->initialize();
 
-	float scope = renderRadius * tileWidth;
+	// Light depth projection matrix
 	lightProjMatrix = glm::ortho<float>(-20.f, 20.0f, -20.f, 20.0f, 0.1f, 100.0f);
 
+	// Shadow bias
 	biasMat = glm::mat4(
 		0.5, 0.0, 0.0, 0.0,
 		0.0, 0.5, 0.0, 0.0,
