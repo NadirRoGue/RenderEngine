@@ -32,8 +32,8 @@ void main()
 
 		float ar = screenSize.x / screenSize.y;
 
-		float x = planePos.x / (screenSize.x / ar);
-		float y = planePos.y / (screenSize.y * ar);
+		float x = planePos.x / (screenSize.x / ar) * ar;
+		float y = planePos.y / (screenSize.y * ar) * ar;
 
 		float d = blend(dist, 0, 500, 100, 500);
 		float dclose = blend(dist, 0, 1, 30, 2);

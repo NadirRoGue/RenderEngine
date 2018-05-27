@@ -24,6 +24,11 @@ float Engine::Settings::coverageMultiplier = 0.7f;
 float Engine::Settings::hdrExposure = 3.0f;
 float Engine::Settings::hdrGamma = 0.5f;
 
+float Engine::Settings::godRaysDecay = 0.85f;
+float Engine::Settings::godRaysDensity = 1.192f;
+float Engine::Settings::godRaysExposure = 1.0f;
+float Engine::Settings::godRaysWeight = 0.2f;
+
 bool Engine::Settings::showUI = false;
 
 // =====================================================================

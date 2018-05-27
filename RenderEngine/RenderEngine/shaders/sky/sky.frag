@@ -1,8 +1,8 @@
 #version 410 core
 
 layout (location=0) out vec4 color;
-//layout (location=1) out vec4 depth;
 layout (location=1) out vec4 emission;
+layout (location=2) out vec4 godRayInfo;
 
 layout (location=0) in vec3 inCubeUV;
 
@@ -20,10 +20,6 @@ void main()
 	vec3 camToSphere = normalize(uv * radius);
 	float dotValue = dot(camToSphere, lightDir);
 
-	float treeshold = 1.0 - 0.999;
-	float value = 1.0 - dotValue;
-	float alpha = value / treeshold;
-
 	float colorFactor = clamp(dot(vec3(0,1,0), -lightDir), 0.25, 1.0);//clamp(-lightDir.y, 0.25, 1.0);
 
 	vec3 centerColor = lightColor;
@@ -38,10 +34,12 @@ void main()
 	vec3 skyColor;
 	
 	vec3 emissive;
+	vec3 god = vec3(0);
 	if(realY < 0 && dotValue > 0.999)
 	{
 		skyColor = centerColor;
 		emissive = centerColor;
+		god = centerColor;
 	}
 	else
 	{
@@ -50,6 +48,6 @@ void main()
 	}
 
 	color = vec4(skyColor, 1.0);
-	//depth = vec4(gl_FragDepth, 0, 0, 1);
 	emission = vec4(emissive, 1);
+	godRayInfo = vec4(god, 1);
 }

@@ -26,9 +26,9 @@ uniform vec2 poissonDisk[4] = vec2[](
 
 //uniform vec3 dirt = vec3(0.2, 0.1, 0.0);
 //uniform vec3 snow = vec3(0.9, 0.9, 0.9);
-uniform vec3 rock = vec3(0.5);
+uniform vec3 rock = vec3(0.45);
 uniform vec3 grass = vec3(0.2, 0.4, 0.0);
-uniform vec3 sand = vec3(1,1,0.8);
+uniform vec3 sand = vec3(0.93,0.9,0.66);
 
 uniform float waterHeight;
 
@@ -100,7 +100,7 @@ float NoiseInterpolation(in vec2 i_coord, in float i_size)
 		(p3 - p1) * (weights.y * weights.x);
 }
 
-float noiseHeight(in vec2 pos)
+float noiseHeight(in vec2 pos, float localScale)
 {
 
 	float noiseValue = 0.0;
@@ -111,7 +111,7 @@ float noiseHeight(in vec2 pos)
 	for (int index = 0; index < octaves; index++)
 	{
 
-		noiseValue += NoiseInterpolation(pos, scale * localFrecuency) * localAplitude;
+		noiseValue += NoiseInterpolation(pos, localScale * localFrecuency) * localAplitude;
 
 		localAplitude /= 2.0;
 		localFrecuency *= 2.0;
@@ -136,19 +136,21 @@ void main()
 	float u = inUV.x;
 	float v = inUV.y;
 	float step = 0.01;
-	float tH = noiseHeight(vec2(u, v + step)); 
-	float bH = noiseHeight(vec2(u, v - step));
-	float rH = noiseHeight(vec2(u + step, v));
-	float lH = noiseHeight(vec2(u - step, v)); 
+	float tH = noiseHeight(vec2(u, v + step), scale); 
+	float bH = noiseHeight(vec2(u, v - step), scale);
+	float rH = noiseHeight(vec2(u + step, v), scale);
+	float lH = noiseHeight(vec2(u - step, v), scale); 
 
 	vec3 rawNormal = normalize(vec3(lH - rH, step * step, bH - tH));
 
-	//if(height <= waterHeight + 0.01)
+	//if(height <= waterHeight + 0.01) // "Bump mapping" to emulate sand
 	{
-		float bumptH = cellularNoise(vec2(u, v + step)); 
-		float bumpbH = cellularNoise(vec2(u, v - step));
-		float bumprH = cellularNoise(vec2(u + step, v));
-		float bumplH = cellularNoise(vec2(u - step, v)); 
+		float tScale = 200.0 / height;
+		float check = waterHeight + 0.01;
+		float bumptH = height <= check? cellularNoise(vec2(u, v + step)) : noiseHeight(vec2(u, v + step), tScale); 
+		float bumpbH = height <= check? cellularNoise(vec2(u, v - step)) : noiseHeight(vec2(u, v - step), tScale);
+		float bumprH = height <= check? cellularNoise(vec2(u + step, v)) : noiseHeight(vec2(u + step, v), tScale);
+		float bumplH = height <= check? cellularNoise(vec2(u - step, v)) : noiseHeight(vec2(u - step, v), tScale); 
 
 		vec3 bumpNormal = normalize(vec3(bumplH - bumprH, step * step, bumpbH - bumptH));
 

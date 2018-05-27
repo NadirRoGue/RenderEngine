@@ -71,10 +71,10 @@ void Engine::DeferredRenderer::initialize()
 
 	// Create G Buffers
 	forwardPassBuffer = new Engine::DeferredRenderObject(6, true);
-	gBufferColor = forwardPassBuffer->addColorBuffer(0, GL_RGBA32F, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_COLOR, GL_NEAREST);
+	gBufferColor = forwardPassBuffer->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_COLOR, GL_NEAREST);
 	gBufferNormal = forwardPassBuffer->addColorBuffer(1, GL_RGB32F, GL_RGBA, GL_UNSIGNED_BYTE, 500, 500, Engine::DeferredRenderObject::G_BUFFER_NORMAL, GL_NEAREST);
 	gBufferSpecular = forwardPassBuffer->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_SPECULAR, GL_NEAREST);
-	gBufferEmissive = forwardPassBuffer->addColorBuffer(3, GL_RGBA32F, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_EMISSIVE, GL_NEAREST);
+	gBufferEmissive = forwardPassBuffer->addColorBuffer(3, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, Engine::DeferredRenderObject::G_BUFFER_EMISSIVE, GL_NEAREST);
 	gBufferPos = forwardPassBuffer->addColorBuffer(4, GL_RGB32F, GL_RGBA, GL_UNSIGNED_BYTE, 500, 500, Engine::DeferredRenderObject::G_BUFFER_POS, GL_NEAREST);
 	gBufferInfo = forwardPassBuffer->addColorBuffer(5, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "InfoBuffer", GL_LINEAR);
 	gBufferDepth = forwardPassBuffer->addDepthBuffer24(500, 500);
@@ -89,9 +89,10 @@ void Engine::DeferredRenderer::initialize()
 	forwardPassBuffer->populateDeferredObject(deferredDrawSurface);
 
 	// Creage deferred shading buffer
-	deferredPassBuffer = new Engine::DeferredRenderObject(2, false);
-	deferredPassBuffer->addColorBuffer(0, GL_RGBA32F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Color info
-	deferredPassBuffer->addColorBuffer(1, GL_RGBA32F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Emission info
+	deferredPassBuffer = new Engine::DeferredRenderObject(3, false);
+	deferredPassBuffer->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Color info
+	deferredPassBuffer->addColorBuffer(1, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_NEAREST);	// Emission info
+	deferredPassBuffer->addColorBuffer(2, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);		// God rays info
 	deferredPassBuffer->addDepthBuffer24(500, 500);
 	deferredPassBuffer->initialize();
 
@@ -145,19 +146,20 @@ void Engine::DeferredRenderer::renderLoop()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	forwardPass->renderFromCamera(activeCam);
-	forwardPass->doRender();
+	
+	// RENDER TERRAIN (TERRAIN, WATER, TREES, & SHADOWS)
+	scene->getTerrain()->render(activeCam);
 
 	// Do deferred shading pass
 	glDisable(GL_CULL_FACE);
 	glBindFramebuffer(GL_FRAMEBUFFER, deferredPassBuffer->getFrameBufferId());
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
 	glUseProgram(deferredShading->getProgramId());
 	glBindVertexArray(deferredDrawSurface->getMesh()->vao);
 	deferredShading->onRenderObject(deferredDrawSurface, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-	// Render the skybox after shading is performed
+	// Render the skybox after shading is performed (SKY, SUN, & CLOUDS)
 	scene->getSkyBox()->render(activeCam);
 
 	// Run the post-process chain
@@ -165,7 +167,7 @@ void Engine::DeferredRenderer::renderLoop()
 	
 	// Enable default framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
 
 	// Output the final result to screen
 	glUseProgram(screenOutput->getProgramId());
@@ -173,8 +175,6 @@ void Engine::DeferredRenderer::renderLoop()
 	screenOutput->onRenderObject(chainEnd, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	
-
 }
 
 void Engine::DeferredRenderer::runPostProcesses()

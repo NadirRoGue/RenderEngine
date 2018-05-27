@@ -44,6 +44,11 @@ namespace Engine
 		static float hdrExposure;
 		static float hdrGamma;
 
+		static float godRaysExposure;
+		static float godRaysDensity;
+		static float godRaysDecay;
+		static float godRaysWeight;
+
 		static bool showUI;
 	};
 

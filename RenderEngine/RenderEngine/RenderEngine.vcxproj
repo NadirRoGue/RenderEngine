@@ -172,6 +172,7 @@
     <ClInclude Include="include\postprocessprograms\GaussianBlurProgram.h" />
     <ClInclude Include="include\postprocessprograms\HDRToneMappingProgram.h" />
     <ClInclude Include="include\postprocessprograms\SSAAProgram.h" />
+    <ClInclude Include="include\postprocessprograms\SSGodRayProgram.h" />
     <ClInclude Include="include\postprocessprograms\SSGrassProgram.h" />
     <ClInclude Include="include\postprocessprograms\SSReflectionProgram.h" />
     <ClInclude Include="include\postprocessprograms\VolumetricCloudProgram.h" />
@@ -257,6 +258,7 @@
     <ClCompile Include="src\postprocessprograms\GaussianBlurProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\HDRToneMappingProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\SSAAProgram.cpp" />
+    <ClCompile Include="src\postprocessprograms\SSGodRayProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\SSGrassProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\SSReflectionProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\VolumetricCloudProgram.cpp" />
@@ -307,6 +309,7 @@
     <None Include="shaders\postprocess\PostProcessRender.frag" />
     <None Include="shaders\postprocess\PostProcessRender.vert" />
     <None Include="shaders\postprocess\SSAA.frag" />
+    <None Include="shaders\postprocess\SSGodRays.frag" />
     <None Include="shaders\postprocess\SSGrass.frag" />
     <None Include="shaders\postprocess\SSReflections.frag" />
     <None Include="shaders\shader.full_color.frag" />

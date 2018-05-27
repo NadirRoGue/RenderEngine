@@ -72,7 +72,7 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::Text("Cloud settings");
 		ImGui::SliderFloat("Cloud Type##app", &Engine::Settings::cloudType, 0.0f, 1.0f);
 		ImGui::SliderFloat("Coverage##app", &Engine::Settings::coverageMultiplier, 0.0f, 1.0f);
-		ImGui::SliderFloat("Speed#app", &Engine::Settings::cloudSpeed, 0.0f, 50.0f);
+		ImGui::SliderFloat("Speed##app", &Engine::Settings::cloudSpeed, 0.0f, 50.0f);
 
 		ImGui::Spacing(); ImGui::Spacing();
 		ImGui::Separator();
@@ -82,6 +82,15 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::SliderFloat("Exposure##app", &Engine::Settings::hdrExposure, 0.0f, 10.0f);
 		ImGui::SliderFloat("Gamma##app", &Engine::Settings::hdrGamma, 0.0f, 10.0f);
 
+		ImGui::Spacing(); ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing(); ImGui::Spacing();
+
+		ImGui::Text("God Rays settings");
+		ImGui::SliderFloat("Exposure##app", &Engine::Settings::godRaysExposure, 0.0f, 10.0f);
+		ImGui::SliderFloat("Weight##app", &Engine::Settings::godRaysWeight, 0.0f, 10.0f);
+		ImGui::SliderFloat("Decay##app", &Engine::Settings::godRaysDecay, 0.0f, 10.0f);
+		ImGui::SliderFloat("Density##app", &Engine::Settings::godRaysDensity, 0.1f, 10.0f);
 		ImGui::End();
 	}
 }

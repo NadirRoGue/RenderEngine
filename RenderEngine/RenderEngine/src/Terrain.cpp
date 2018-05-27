@@ -82,7 +82,7 @@ void Engine::Terrain::render(Engine::Camera * camera)
 	glDisable(GL_BLEND);
 
 	// RENDER TREES
-	renderRadius = renderRadius < 6? renderRadius : 6;
+	renderRadius = renderRadius < 5? renderRadius : 5;
 	tiledRendering(camera, treeActiveShader, &Terrain::treesRender);
 	renderRadius = previousRadius;
 }
@@ -196,19 +196,22 @@ void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j
 	std::uniform_real_distribution<float> dTerrain(0.0f, 1.0f);
 	std::default_random_engine eTerrain(seed);
 
-	size_t spawnTrees = 20;
+	size_t spawnTrees = 16;
 	size_t numTypeOfTrees = treeTypes.size();
 	size_t equalAmount = spawnTrees / numTypeOfTrees;
 	equalAmount = equalAmount < 1 ? 1 : equalAmount;
 
 	// 30 trees per terrain tile
 	size_t treeToSpawn = 0;
-	for (unsigned int z = 0; z < spawnTrees;)
+	unsigned int z = 0;
+	while(z < spawnTrees)
 	{
-		Engine::Object * randomTree = treeTypes[treeToSpawn++];
+		Engine::Object * randomTree = treeTypes[treeToSpawn % numTypeOfTrees];
+		treeToSpawn++;
 		glBindVertexArray(randomTree->getMesh()->vao);
-		for (unsigned int k = 0; k < equalAmount; k++, z++)
+		for (unsigned int k = 0; k < equalAmount; k++)
 		{
+			z++;
 			float uOffset = dTerrain(eTerrain);
 			float vOffset = dTerrain(eTerrain);
 
@@ -241,16 +244,18 @@ void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
 	std::uniform_real_distribution<float> dTerrain(0.0f, 1.0f);
 	std::default_random_engine eTerrain(seed);
 
-	size_t spawnTrees = 30;
+	size_t spawnTrees = 16;
 	size_t numTypeOfTrees = treeTypes.size();
 	size_t equalAmount = spawnTrees / numTypeOfTrees;
 	equalAmount = equalAmount < 1 ? 1 : equalAmount;
 
 	// 30 trees per terrain tile
 	size_t treeToSpawn = 0;
-	for (unsigned int z = 0; z < spawnTrees;)
+	unsigned int z = 0;
+	while(z < spawnTrees)
 	{
-		Engine::Object * randomTree = treeTypes[treeToSpawn++];
+		Engine::Object * randomTree = treeTypes[treeToSpawn % numTypeOfTrees];
+		treeToSpawn++;
 		glBindVertexArray(randomTree->getMesh()->vao);
 		for (unsigned int k = 0; k < equalAmount; k++, z++)
 		{
@@ -414,7 +419,7 @@ void Engine::Terrain::addTrees()
 	std::uniform_real_distribution<float> leafColor(0.0f, 1.0f);
 	std::default_random_engine eLeaf(0);
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		Engine::TreeGenerationData treeData;
 		treeData.treeName = std::string("CherryTree") + std::to_string(i);

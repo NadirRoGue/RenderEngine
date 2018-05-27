@@ -2,6 +2,7 @@
 
 layout (location=0) out vec4 color;
 layout (location=1) out vec4 emission;
+layout (location=2) out vec4 godRayInfo;
 
 in vec2 texCoord;
 
@@ -428,6 +429,8 @@ void main()
 		
 		color = vec4(outColor, density);
 		emission = vec4(0,0,0,density);
+		vec3 godRay = outColor * (1.0 - density);
+		godRayInfo = vec4(godRay, density);
 
 		gl_FragDepth = 0.999; // behind everything, but in front of the cubemap
 	}
