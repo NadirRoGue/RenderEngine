@@ -18,7 +18,7 @@ uniform sampler2D postProcessing_6; // depth
 // back ground color, used for fog effect
 uniform vec3 backgroundColor;
 
-uniform mat4 projMat;
+uniform vec3 worldUp;
 
 // Different lights data
 
@@ -67,7 +67,7 @@ float colorFactor;
 // SHADING FUNCTIONALITY
 vec3 processDirectionalLight(in float visibility)
 {
-	colorFactor = clamp(dot(vec3(0,1,0), -DLdirection[0].xyz), 0.25, 1.0);
+	colorFactor = clamp(dot(worldUp, DLdirection[0].xyz), 0.0, 1.0);
 	vec3 c = vec3(0,0,0);
 
 	vec3 L = DLdirection[0].xyz;
@@ -92,9 +92,9 @@ vec3 processDirectionalLight(in float visibility)
 vec3 processAtmosphericFog(in vec3 shadedColor)
 {
 	float d = length(pos);
-	float lerpVal = 1 / exp(0.0025 * d * d);
+	float lerpVal = 1.0 / exp(0.001 * d * d);
 	
-	return mix(backgroundColor * colorFactor, shadedColor, lerpVal);
+	return mix(backgroundColor * colorFactor * 0.9, shadedColor, lerpVal);
 }
 
 // ================================================================================

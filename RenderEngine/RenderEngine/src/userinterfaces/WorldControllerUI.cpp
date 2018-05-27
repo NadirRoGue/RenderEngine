@@ -39,7 +39,7 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::Spacing(); ImGui::Spacing();
 
 		ImGui::Text("Light settings");
-		ImGui::ColorPicker3("Light color", &Engine::Settings::lightColor[0], ImGuiColorEditFlags_PickerHueWheel);
+		ImGui::ColorPicker3("Light color", &Engine::Settings::lightColor[0], ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoInputs);
 		ImGui::Spacing();
 		ImGui::SliderFloat3("Light Direction", &Engine::Settings::lightDirection[0], -1.f, 1.f);
 
@@ -59,7 +59,7 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::Spacing(); ImGui::Spacing();
 
 		ImGui::Text("Water settings");
-		ImGui::ColorPicker3("Water Color", &Engine::Settings::waterColor[0], ImGuiColorEditFlags_PickerHueWheel);
+		ImGui::ColorPicker3("Water Color", &Engine::Settings::waterColor[0], ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoInputs);
 		ImGui::Spacing();
 		ImGui::SliderFloat("Water speed", &Engine::Settings::waterSpeed, 0.0f, 1.0f);
 		ImGui::Spacing();
@@ -71,25 +71,25 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 
 		ImGui::Text("Cloud settings");
 		ImGui::SliderFloat("Cloud Type##app", &Engine::Settings::cloudType, 0.0f, 1.0f);
-		ImGui::SliderFloat("Coverage##app", &Engine::Settings::coverageMultiplier, 0.0f, 1.0f);
-		ImGui::SliderFloat("Speed##app", &Engine::Settings::cloudSpeed, 0.0f, 50.0f);
+		ImGui::SliderFloat("Cloud Coverage##app", &Engine::Settings::coverageMultiplier, 0.0f, 1.0f);
+		ImGui::SliderFloat("Cloud Speed##app", &Engine::Settings::cloudSpeed, 0.0f, 50.0f);
 
 		ImGui::Spacing(); ImGui::Spacing();
 		ImGui::Separator();
 		ImGui::Spacing(); ImGui::Spacing();
 
 		ImGui::Text("HDR settings");
-		ImGui::SliderFloat("Exposure##app", &Engine::Settings::hdrExposure, 0.0f, 10.0f);
-		ImGui::SliderFloat("Gamma##app", &Engine::Settings::hdrGamma, 0.0f, 10.0f);
+		ImGui::SliderFloat("HDR Exposure##app", &Engine::Settings::hdrExposure, 0.0f, 10.0f);
+		ImGui::SliderFloat("HDR Gamma##app", &Engine::Settings::hdrGamma, 0.0f, 10.0f);
 
 		ImGui::Spacing(); ImGui::Spacing();
 		ImGui::Separator();
 		ImGui::Spacing(); ImGui::Spacing();
 
 		ImGui::Text("God Rays settings");
-		ImGui::SliderFloat("Exposure##app", &Engine::Settings::godRaysExposure, 0.0f, 10.0f);
+		ImGui::SliderFloat("God Rays Exposure##app", &Engine::Settings::godRaysExposure, 0.0f, 10.0f);
 		ImGui::SliderFloat("Weight##app", &Engine::Settings::godRaysWeight, 0.0f, 10.0f);
-		ImGui::SliderFloat("Decay##app", &Engine::Settings::godRaysDecay, 0.0f, 10.0f);
+		ImGui::SliderFloat("Decay##app", &Engine::Settings::godRaysDecay, 0.0f, 1.0f);
 		ImGui::SliderFloat("Density##app", &Engine::Settings::godRaysDensity, 0.1f, 10.0f);
 		ImGui::End();
 	}

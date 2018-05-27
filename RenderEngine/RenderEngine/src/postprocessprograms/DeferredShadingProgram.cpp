@@ -25,7 +25,7 @@ Engine::DeferredShadingProgram::DeferredShadingProgram(const Engine::DeferredSha
 
 	uBackground = other.uBackground;
 
-	uProjMat = other.uProjMat;
+	uWorldUp = other.uWorldUp;
 }
 
 void Engine::DeferredShadingProgram::processDirectionalLights(Engine::DirectionalLight * dl, const glm::mat4 & view)
@@ -53,9 +53,11 @@ void Engine::DeferredShadingProgram::onRenderObject(const Engine::Object * obj, 
 		processDirectionalLights(dl, view);
 	}
 
-	glUniformMatrix4fv(uProjMat, 1, GL_FALSE, &(proj[0][0]));
-
 	glUniform3fv(uBackground, 1, &scene->getClearColor()[0]);
+
+	glm::vec4 worldUp = view * glm::vec4(0, 1, 0, 0);
+	glUniform3fv(uWorldUp, 1, &worldUp[0]);
+
 }
 
 void Engine::DeferredShadingProgram::configureProgram()
@@ -68,12 +70,12 @@ void Engine::DeferredShadingProgram::configureProgram()
 	uPLBuffer = glGetUniformBlockIndex(glProgram, "PLBuffer");
 	uSLBuffer = glGetUniformBlockIndex(glProgram, "SLBuffer");
 
-	uProjMat = glGetUniformLocation(glProgram, "projMat");
-
 	uDLIa = glGetUniformLocation(glProgram, "DLIa");
 	uDLId = glGetUniformLocation(glProgram, "DLId");
 	uDLIs = glGetUniformLocation(glProgram, "DLIs");
 	uDirectionalLightDir = glGetUniformLocation(glProgram, "DLdir");
+
+	uWorldUp = glGetUniformLocation(glProgram, "worldUp");
 }
 
 

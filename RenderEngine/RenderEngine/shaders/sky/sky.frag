@@ -20,7 +20,7 @@ void main()
 	vec3 camToSphere = normalize(uv * radius);
 	float dotValue = dot(camToSphere, lightDir);
 
-	float colorFactor = clamp(dot(vec3(0,1,0), -lightDir), 0.25, 1.0);//clamp(-lightDir.y, 0.25, 1.0);
+	float colorFactor = clamp(dot(vec3(0,1,0), -lightDir), 0.0, 1.0);
 
 	vec3 centerColor = lightColor;
 	centerColor.y *= (colorFactor * 1.5);
@@ -30,24 +30,8 @@ void main()
 	vec3 horizon = vec3(0.8,0.85,1);
 	vec3 zenit = vec3(0.4, 0.7, 1);
 	vec3 cubeMapColor = mix(horizon, zenit, alphaSky);
-
-	vec3 skyColor;
 	
-	vec3 emissive;
-	vec3 god = vec3(0);
-	if(realY < 0 && dotValue > 0.999)
-	{
-		skyColor = centerColor;
-		emissive = centerColor;
-		god = centerColor;
-	}
-	else
-	{
-		skyColor = cubeMapColor * colorFactor;
-		emissive = vec3(0,0,0);
-	}
-
-	color = vec4(skyColor, 1.0);
-	emission = vec4(emissive, 1);
-	godRayInfo = vec4(god, 1);
+	color = realY < 0 && dotValue > 0.999? vec4(centerColor, 1.0) : vec4(cubeMapColor * colorFactor, 1.0);
+	emission = realY < 0 && dotValue > 0.999? vec4(centerColor, 1) : vec4(0,0,0,1);
+	godRayInfo = realY < 0 && dotValue > 0.999? vec4(centerColor, 1.0) : vec4(0);
 }

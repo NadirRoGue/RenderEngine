@@ -9,7 +9,6 @@
 #include "Scene.h"
 #include "Time.h"
 #include "WorldConfig.h"
-#include "Renderer.h"
 
 #include <random>
 
@@ -196,12 +195,12 @@ void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j
 	std::uniform_real_distribution<float> dTerrain(0.0f, 1.0f);
 	std::default_random_engine eTerrain(seed);
 
+	// 16 trees per tile
 	size_t spawnTrees = 16;
 	size_t numTypeOfTrees = treeTypes.size();
 	size_t equalAmount = spawnTrees / numTypeOfTrees;
 	equalAmount = equalAmount < 1 ? 1 : equalAmount;
 
-	// 30 trees per terrain tile
 	size_t treeToSpawn = 0;
 	unsigned int z = 0;
 	while(z < spawnTrees)
@@ -244,12 +243,12 @@ void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
 	std::uniform_real_distribution<float> dTerrain(0.0f, 1.0f);
 	std::default_random_engine eTerrain(seed);
 
+	// 16 trees per tile
 	size_t spawnTrees = 16;
 	size_t numTypeOfTrees = treeTypes.size();
 	size_t equalAmount = spawnTrees / numTypeOfTrees;
 	equalAmount = equalAmount < 1 ? 1 : equalAmount;
 
-	// 30 trees per terrain tile
 	size_t treeToSpawn = 0;
 	unsigned int z = 0;
 	while(z < spawnTrees)
@@ -426,7 +425,7 @@ void Engine::Terrain::addTrees()
 		treeData.emissiveLeaf = leafColor(eLeaf) > 0.8f;
 		treeData.startTrunkColor = glm::vec3(0.2f, 0.1f, 0.0f);
 		treeData.endTrunkColor = treeData.startTrunkColor;
-		treeData.leafColor = glm::vec3(leafColor(eLeaf), leafColor(eLeaf), leafColor(eLeaf));
+		treeData.leafColor = glm::vec3(leafColor(eLeaf), leafColor(eLeaf), 1.0 - leafColor(eLeaf));
 		treeData.maxBranchesSplit = 4;
 		treeData.maxBranchRotation = glm::vec3(20.0f, 10.0f, 10.0f);
 		treeData.minBranchRotation = glm::vec3(-20.0f, -10.0f, -10.0f);

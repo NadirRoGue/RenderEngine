@@ -21,10 +21,9 @@ namespace Engine
 		unsigned int uPLBuffer;
 		unsigned int uSLBuffer;
 
+		unsigned int uWorldUp;
+
 		unsigned int uBackground;
-
-		unsigned int uProjMat;
-
 	public:
 		DeferredShadingProgram(std::string name, unsigned long long params);
 		DeferredShadingProgram(const DeferredShadingProgram & other);

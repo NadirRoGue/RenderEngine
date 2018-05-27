@@ -411,6 +411,9 @@
     <ClInclude Include="include\postprocessprograms\SSGodRayProgram.h">
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>
+    <ClInclude Include="include\CascadeShadowMaps.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -637,6 +640,9 @@
     </ClCompile>
     <ClCompile Include="src\postprocessprograms\SSGodRayProgram.cpp">
       <Filter>Archivos de origen\postprocessprograms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CascadeShadowMaps.cpp">
+      <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
