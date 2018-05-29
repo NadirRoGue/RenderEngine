@@ -14,6 +14,7 @@ layout (location=0) out vec2 outUV;
 layout (location=1) out vec3 outPos;
 layout (location=2) out float outHeight;
 layout (location=3) out vec4 outShadowMapPos;
+layout (location=4) out vec4 outShadowMapPos1;
 
 uniform mat4 modelView;
 uniform mat4 modelViewProj;
@@ -21,6 +22,7 @@ uniform mat4 modelViewProj;
 uniform float waterHeight;
 
 uniform mat4 lightDepthMat;
+uniform mat4 lightDepthMat1;
 
 void main()
 {
@@ -31,6 +33,7 @@ void main()
 	outUV = inUV[0];
 	outHeight = height[0];
 	outShadowMapPos = lightDepthMat * a;
+	outShadowMapPos1 = lightDepthMat1 * a;
 	gl_Position = modelViewProj * a;
 	outPos = (modelView * a).xyz;
 	EmitVertex();
@@ -38,6 +41,7 @@ void main()
 	outUV = inUV[1];
 	outHeight = height[1];
 	outShadowMapPos = lightDepthMat * b;
+	outShadowMapPos1 = lightDepthMat1 * b;
 	gl_Position = modelViewProj * b;
 	outPos = (modelView * b).xyz;
 	EmitVertex();
@@ -45,47 +49,10 @@ void main()
 	outUV = inUV[2];
 	outHeight = height[2];
 	outShadowMapPos = lightDepthMat * c;
+	outShadowMapPos1 = lightDepthMat1 * c;
 	gl_Position = modelViewProj * c;
 	outPos = (modelView * c).xyz;
 	EmitVertex();
 
 	EndPrimitive();
-
-	/*
-	for(int i = 0; i < 3; i++)
-	{
-		float h = height[i];
-		if(h > waterHeight && h < waterHeight + 0.15)
-		{
-			vec3 posAround = gl_in[i].gl_Position.xyz;
-			// In camera space so grass blades are billboarded (if that word exists)
-			vec3 left = posAround - vec3(0.0005, 0, 0);
-			vec3 right = posAround + vec3(0.0005, 0, 0);
-			vec3 top = posAround + vec3(0, 0.007, 0);
-
-			vec4 c4 = vec4(left, 1);
-			outPos = (modelView * c4).xyz;
-			outShadowMapPos = lightDepthMat * c4;
-			outHeight = h;
-			gl_Position = modelViewProj * c4;
-			EmitVertex();
-
-			c4 = vec4(right, 1);
-			outPos = (modelView * c4).xyz;
-			outShadowMapPos = lightDepthMat * c4;
-			outHeight = h;
-			gl_Position = modelViewProj * c4;
-			EmitVertex();
-
-			c4 = vec4(top, 1);
-			outPos = (modelView * c4).xyz;
-			outShadowMapPos = lightDepthMat * c4;
-			outHeight = h;
-			gl_Position = modelViewProj * c4;
-			EmitVertex();
-
-			EndPrimitive();
-		}
-	}
-	*/
 }

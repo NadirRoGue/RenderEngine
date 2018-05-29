@@ -23,7 +23,7 @@ void main()
 {
 	float isGrass = texture(grassBuffer, texCoord).x;
 	vec4 backColor = texture(postProcessing_0, texCoord);
-	if(isGrass > 0.9 && backColor.g > backColor.r && backColor.g > backColor.b)
+	if(isGrass > 0.9)// && backColor.g > backColor.r && backColor.g > backColor.b)
 	{
 		//vec2 perturbTexCoord = texCoord + (vec2(0.5) / screenSize);
 

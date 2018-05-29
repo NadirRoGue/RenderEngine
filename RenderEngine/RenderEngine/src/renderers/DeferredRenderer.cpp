@@ -6,6 +6,7 @@
 #include "datatables/ProgramTable.h"
 
 #include "volumetricclouds/NoiseInitializer.h"
+#include "CascadeShadowMaps.h"
 
 Engine::DeferredRenderer::DeferredRenderer()
 	:Engine::Renderer()
@@ -139,6 +140,9 @@ void Engine::DeferredRenderer::initializeLoop()
 
 void Engine::DeferredRenderer::renderLoop()
 {
+	// Prepare shadow projection matrices
+	Engine::CascadeShadowMaps::getInstance().initializeFrame(activeCam);
+
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
 
 	// Do forward pass

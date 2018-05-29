@@ -32,6 +32,10 @@ namespace Engine
 		static float terrainFrecuency;
 		static float terrainScale;
 		static unsigned int terrainOctaves;
+		static float grassCoverage;
+		static glm::vec3 grassColor;
+		static glm::vec3 sandColor;
+		static glm::vec3 rockColor;
 
 		static glm::vec3 waterColor;
 		static float waterSpeed;

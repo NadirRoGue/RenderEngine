@@ -14,6 +14,7 @@ namespace Engine
 		unsigned int uNormalBuffer;
 		unsigned int uDepthBuffer;
 		unsigned int uSpecularBuffer;
+		unsigned int uLightDir;
 	public:
 		SSReflectionProgram(std::string name, unsigned long long params);
 		SSReflectionProgram(const SSReflectionProgram & other);

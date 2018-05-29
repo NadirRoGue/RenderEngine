@@ -13,12 +13,6 @@ layout (location=0) out vec2 outUV;
 layout (location=1) out vec3 outPos;
 layout (location=2) out vec4 outShadowMapPos;
 
-uniform mat4 modelView;
-uniform mat4 modelViewProj;
-uniform mat4 normal;
-
-uniform mat4 lightDepthMat;
-
 void main()
 {
 	vec4 a = gl_in[0].gl_Position;

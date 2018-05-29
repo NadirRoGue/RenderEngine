@@ -24,7 +24,9 @@ Engine::ProceduralWaterProgram::ProceduralWaterProgram(const Engine::ProceduralW
 	uNormal = other.uNormal;
 
 	uLightDepthMatrix = other.uLightDepthMatrix;
+	uLightDepthMatrix1 = other.uLightDepthMatrix1;
 	uDepthTexture = other.uDepthTexture;
+	uDepthTexture1 = other.uDepthTexture1;
 	uLightDirection = other.uLightDirection;
 
 	uTime = other.uTime;
@@ -96,7 +98,9 @@ void Engine::ProceduralWaterProgram::configureProgram()
 	uGridPos = glGetUniformLocation(glProgram, "gridPos");
 
 	uLightDepthMatrix = glGetUniformLocation(glProgram, "lightDepthMat");
+	uLightDepthMatrix1 = glGetUniformLocation(glProgram, "lightDepthMat1");
 	uDepthTexture = glGetUniformLocation(glProgram, "depthTexture");
+	uDepthTexture1 = glGetUniformLocation(glProgram, "depthTexture1");
 	uLightDirection = glGetUniformLocation(glProgram, "lightDir");
 	
 	uWaterColor = glGetUniformLocation(glProgram, "watercolor");
@@ -122,11 +126,23 @@ void Engine::ProceduralWaterProgram::setUniformLightDepthMatrix(const glm::mat4 
 	glUniformMatrix4fv(uLightDepthMatrix, 1, GL_FALSE, &(ldm[0][0]));
 }
 
-void Engine::ProceduralWaterProgram::setUniformDepthTexture(Engine::TextureInstance * depthTexture)
+void Engine::ProceduralWaterProgram::setUniformLightDepthMatrix1(const glm::mat4 & ldm)
+{
+	glUniformMatrix4fv(uLightDepthMatrix1, 1, GL_FALSE, &(ldm[0][0]));
+}
+
+void Engine::ProceduralWaterProgram::setUniformDepthTexture(const Engine::TextureInstance * depthTexture)
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, depthTexture->getTexture()->getTextureId());
 	glUniform1i(uDepthTexture, 0);
+}
+
+void Engine::ProceduralWaterProgram::setUniformDepthTexture1(const Engine::TextureInstance * dt)
+{
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, dt->getTexture()->getTextureId());
+	glUniform1i(uDepthTexture1, 1);
 }
 
 void Engine::ProceduralWaterProgram::setUniformLightDirection(const glm::vec3 & lightDir)

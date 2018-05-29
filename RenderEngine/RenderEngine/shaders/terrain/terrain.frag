@@ -12,10 +12,13 @@ layout (location=0) in vec2 inUV;
 layout (location=1) in vec3 inPos;
 layout (location=2) in float height;
 layout (location=3) in vec4 inShadowMapPos;
+layout (location=4) in vec4 inShadowMapPos1;
 
 uniform mat4 normal;
 
 uniform sampler2D depthTexture;
+uniform sampler2D depthTexture1;
+
 uniform vec3 lightDir;
 uniform vec2 poissonDisk[4] = vec2[](
   vec2( -0.94201624, -0.39906216 ),
@@ -26,13 +29,15 @@ uniform vec2 poissonDisk[4] = vec2[](
 
 //uniform vec3 dirt = vec3(0.2, 0.1, 0.0);
 //uniform vec3 snow = vec3(0.9, 0.9, 0.9);
-uniform vec3 rock = vec3(0.45);
-uniform vec3 grass = vec3(0.2, 0.4, 0.0);
-uniform vec3 sand = vec3(0.93,0.9,0.66);
+uniform vec3 rock;// = vec3(0.45);
+uniform vec3 grass;// = vec3(0.1, 0.3, 0.0);
+uniform vec3 sand;// = vec3(0.93,0.9,0.66);
 
 uniform float waterHeight;
 
 uniform ivec2 gridPos;
+
+uniform float grassCoverage;
 
 uniform float amplitude;
 uniform float frecuency;
@@ -45,9 +50,9 @@ float Random2D(in vec2 st)
 	return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
-uniform float cellularScale = 1500.0;
+//uniform float cellularScale = 1500.0;
 
-float cellularNoise(vec2 uv)
+float cellularNoise(vec2 uv, float cellularScale)
 {	
 	//obtenemos su coordenada en el grid y su coordenada real
     vec2 currentPos = uv * cellularScale; 
@@ -73,10 +78,7 @@ float cellularNoise(vec2 uv)
         }
     }
     
-    //dist0 = 1.0 - dist0;
-    dist0 = dist0 * 0.5 + 0.5;
-	//dist0 = clamp(dist0, 0.3, 1.0);
-    return dist0 * dist0 * dist0 * 0.01;
+    return dist0 * 0.5 + 0.5;
 }
 
 float NoiseInterpolation(in vec2 i_coord, in float i_size)
@@ -143,19 +145,23 @@ void main()
 
 	vec3 rawNormal = normalize(vec3(lH - rH, step * step, bH - tH));
 
-	//if(height <= waterHeight + 0.01) // "Bump mapping" to emulate sand
-	{
-		float tScale = 200.0 / height;
-		float check = waterHeight + 0.01;
-		float bumptH = height <= check? cellularNoise(vec2(u, v + step)) : noiseHeight(vec2(u, v + step), tScale); 
-		float bumpbH = height <= check? cellularNoise(vec2(u, v - step)) : noiseHeight(vec2(u, v - step), tScale);
-		float bumprH = height <= check? cellularNoise(vec2(u + step, v)) : noiseHeight(vec2(u + step, v), tScale);
-		float bumplH = height <= check? cellularNoise(vec2(u - step, v)) : noiseHeight(vec2(u - step, v), tScale); 
+	vec3 up = vec3(0, 1, 0);
+	float cosV = abs(dot(rawNormal, up));
 
+	bool check = height < waterHeight + 0.01;
+	if(check)
+	{
+		float bumptH = cellularNoise(vec2(u, v + step),  1500.0);
+		float bumpbH = cellularNoise(vec2(u, v - step),  1500.0);
+		float bumprH = cellularNoise(vec2(u + step, v),  1500.0);
+		float bumplH = cellularNoise(vec2(u - step, v),  1500.0);
+			
 		vec3 bumpNormal = normalize(vec3(bumplH - bumprH, step * step, bumpbH - bumptH));
 
 		rawNormal += bumpNormal * 0.1;
+		rawNormal = normalize(rawNormal);
 	}
+	
 
 	// Correct normal if we have pass from +X to -X, from +Z to -Z, viceversa, or both
 	int xSign = sign(gridPos.x);
@@ -170,12 +176,9 @@ void main()
 	float visibility = 1.0;
 	float grassData = 0.0;
 #ifndef WIRE_MODE
-	// Compute slope respect vertical axis
-	vec3 up = vec3(0, 1, 0);
-	float cosV = abs(dot(rawNormal, up));
 
 	// Compute color gradient based on height / slope
-	heightColor = height <= waterHeight + 0.01? sand : cosV > 0.5? grass : rock;
+	heightColor = height <= waterHeight + 0.01? sand : cosV > grassCoverage? grass : rock;
 	
 	grassData = heightColor == grass? 1.0 : 0.0;
 	// APPLY SHADOW MAP

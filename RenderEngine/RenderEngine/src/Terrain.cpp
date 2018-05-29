@@ -15,6 +15,8 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "CascadeShadowMaps.h"
+
 Engine::Terrain::Terrain()
 {
 	tileWidth = 1.0f;
@@ -45,27 +47,30 @@ void Engine::Terrain::render(Engine::Camera * camera)
 
 	// BUILD SHADOW MAPS
 	// build light depth projection matrix
-	Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
-	const glm::vec3 & cameraPosition = camera->getPosition();
-	glm::vec3 target = glm::vec3(-cameraPosition.x, 0, -cameraPosition.z);
-	glm::mat4 depthViewMatrix = glm::lookAt(target + (dl->getDirection() * 30.0f), target, glm::vec3(0, 1, 0));
-	lightDepthMat = lightProjMatrix * depthViewMatrix;
+	//Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
+	//const glm::vec3 & cameraPosition = camera->getPosition();
+	//glm::vec3 target = glm::vec3(-cameraPosition.x, 0, -cameraPosition.z);
+	//glm::mat4 depthViewMatrix = glm::lookAt(target + (dl->getDirection() * 30.0f), target, glm::vec3(0, 1, 0));
+	//lightDepthMat = lightProjMatrix * depthViewMatrix;
 
 	// Bind the shadowmap frame buffer
-	int previousFrameBuffer;
-	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFrameBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, shadowMap->getFrameBufferId());
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//int previousFrameBuffer;
+	//glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFrameBuffer);
+	//glBindFramebuffer(GL_FRAMEBUFFER, shadowMap->getFrameBufferId());
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// Render shadow maps
+	Engine::CascadeShadowMaps::getInstance().saveCurrentFBO();
+	Engine::CascadeShadowMaps::getInstance().beginShadowRender(1);
 	tiledRendering(camera, terrainShadowMapShader, &Terrain::terrainShadowMapRender);
 	tiledRendering(camera, waterShadowMapShader, &Terrain::waterShadowMapRender);
 	renderRadius = 4;
 	tiledRendering(camera, treeShadowMapShader, &Terrain::treesShadowMapRender);
 	renderRadius = previousRadius;
 	// Adjust depth matrix bias for shadow rendering
-	lightDepthMat = biasMat * lightDepthMat;
+	//lightDepthMat = biasMat * lightDepthMat;
 	// Bind original framebuffer
-	glBindFramebuffer(GL_FRAMEBUFFER, previousFrameBuffer);
+	//glBindFramebuffer(GL_FRAMEBUFFER, previousFrameBuffer);
+	Engine::CascadeShadowMaps::getInstance().endShadorRender();
 
 	glBindVertexArray(tileObject->getMesh()->vao);
 
@@ -74,11 +79,11 @@ void Engine::Terrain::render(Engine::Camera * camera)
 
 	// RENDER WATER
 	// enable blending to produce water transparency
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
-	glBlendColor(1.0f, 1.0f, 1.0f, 0.6f);
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+	//glBlendColor(1.0f, 1.0f, 1.0f, 0.6f);
 	tiledRendering(camera, waterActiveShader, &Terrain::waterRender);
-	glDisable(GL_BLEND);
+	//glDisable(GL_BLEND);
 
 	// RENDER TREES
 	renderRadius = renderRadius < 5? renderRadius : 5;
@@ -131,7 +136,7 @@ void Engine::Terrain::terrainShadowMapRender(Engine::Camera * camera, int i, int
 	tileObject->setTranslation(glm::vec3(poxX, 0.0f, posZ));
 
 	terrainShadowMapShader->setUniformGridPosition(i, j);
-	terrainShadowMapShader->setUniformLightDepthMatrix(lightDepthMat * tileObject->getModelMatrix());
+	terrainShadowMapShader->setUniformLightDepthMatrix(Engine::CascadeShadowMaps::getInstance().getShadowProjectionMat() * tileObject->getModelMatrix());
 
 	terrainShadowMapShader->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
 
@@ -143,7 +148,7 @@ void Engine::Terrain::waterShadowMapRender(Engine::Camera * camera, int i, int j
 	float poxX = i * tileWidth;
 	float posZ = j * tileWidth;
 	tileObject->setTranslation(glm::vec3(poxX, 0.0f, posZ));
-	waterShadowMapShader->setUniformLightDepthMatrix(lightDepthMat * tileObject->getModelMatrix());
+	waterShadowMapShader->setUniformLightDepthMatrix(Engine::CascadeShadowMaps::getInstance().getShadowProjectionMat() * tileObject->getModelMatrix());
 	waterShadowMapShader->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
@@ -158,8 +163,8 @@ void Engine::Terrain::terrainRender(Engine::Camera * camera, int i, int j)
 	tileObject->setTranslation(glm::vec3(poxX, 0.0f, posZ));
 
 	terrainActiveShader->setUniformGridPosition(i, j);
-	terrainActiveShader->setUniformDepthTexture(depthTexture);
-	terrainActiveShader->setUniformLightDepthMatrix(lightDepthMat * tileObject->getModelMatrix());
+	terrainActiveShader->setUniformDepthTexture(Engine::CascadeShadowMaps::getInstance().getDepthTexture1());
+	terrainActiveShader->setUniformLightDepthMatrix(Engine::CascadeShadowMaps::getInstance().getDepthMatrix1() * tileObject->getModelMatrix());
 	terrainActiveShader->setUniformLightDirection(dl->getDirection());
 
 	terrainActiveShader->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
@@ -177,8 +182,8 @@ void Engine::Terrain::waterRender(Engine::Camera * camera, int i, int j)
 
 	waterActiveShader->setUniformGridPosition(i, j);
 	waterActiveShader->setTimeUniform(Engine::Time::timeSinceBegining);
-	waterActiveShader->setUniformLightDepthMatrix(lightDepthMat * tileObject->getModelMatrix());
-	waterActiveShader->setUniformDepthTexture(depthTexture);
+	waterActiveShader->setUniformLightDepthMatrix(Engine::CascadeShadowMaps::getInstance().getDepthMatrix1() * tileObject->getModelMatrix());
+	waterActiveShader->setUniformDepthTexture(Engine::CascadeShadowMaps::getInstance().getDepthTexture1());
 	waterActiveShader->setUniformLightDirection(dl->getDirection());
 	waterActiveShader->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
 
@@ -223,7 +228,7 @@ void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j
 			float v = abs(j + vOffset);
 
 			treeShadowMapShader->setUniformTileUV(u, v);
-			treeShadowMapShader->setUniformLightDepthMat(lightDepthMat *  randomTree->getModelMatrix());
+			treeShadowMapShader->setUniformLightDepthMat(Engine::CascadeShadowMaps::getInstance().getShadowProjectionMat() *  randomTree->getModelMatrix());
 			treeShadowMapShader->onRenderObject(randomTree, camera->getViewMatrix(), camera->getProjectionMatrix());
 
 			glDrawElements(GL_TRIANGLES, randomTree->getMesh()->getNumFaces() * 3, GL_UNSIGNED_INT, (void*)0);
@@ -271,8 +276,8 @@ void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
 
 			treeActiveShader->setUniformTileUV(u, v);
 			treeActiveShader->setUniformLightDir(dl->getDirection());
-			treeActiveShader->setUniformLightDepthMat(lightDepthMat * randomTree->getModelMatrix());
-			treeActiveShader->setUniformDepthMap(depthTexture);
+			treeActiveShader->setUniformLightDepthMat(Engine::CascadeShadowMaps::getInstance().getDepthMatrix1() * randomTree->getModelMatrix());
+			treeActiveShader->setUniformDepthMap(Engine::CascadeShadowMaps::getInstance().getDepthTexture1());
 			treeActiveShader->onRenderObject(randomTree, camera->getViewMatrix(), camera->getProjectionMatrix());
 
 			glDrawElements(GL_TRIANGLES, randomTree->getMesh()->getNumFaces() * 3, GL_UNSIGNED_INT, (void*)0);

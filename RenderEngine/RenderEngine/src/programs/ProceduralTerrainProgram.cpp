@@ -35,7 +35,9 @@ Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerra
 	uWaterLevel = other.uWaterLevel;
 
 	uLightDepthMatrix = other.uLightDepthMatrix;
+	uLightDepthMatrix1 = other.uLightDepthMatrix1;
 	uDepthTexture = other.uDepthTexture;
+	uDepthTexture1 = other.uDepthTexture1;
 	uLightDirection = other.uLightDirection;
 
 	uAmplitude = other.uAmplitude;
@@ -47,6 +49,11 @@ Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerra
 	uInUV = other.uInUV;
 
 	uGridPos = other.uGridPos;
+
+	uGrassCoverage = other.uGrassCoverage;
+	uGrassColor = other.uGrassColor;
+	uSandColor = other.uSandColor;
+	uRockColor = other.uRockColor;
 }
 
 void Engine::ProceduralTerrainProgram::initialize()
@@ -123,6 +130,11 @@ void Engine::ProceduralTerrainProgram::configureProgram()
 	uScale = glGetUniformLocation(glProgram, "scale");
 	uOctaves = glGetUniformLocation(glProgram, "octaves");
 
+	uGrassCoverage = glGetUniformLocation(glProgram, "grassCoverage");
+	uGrassColor = glGetUniformLocation(glProgram, "grass");
+	uRockColor = glGetUniformLocation(glProgram, "rock");
+	uSandColor = glGetUniformLocation(glProgram, "sand");
+
 	uInPos = glGetAttribLocation(glProgram, "inPos");
 	uInUV = glGetAttribLocation(glProgram, "inUV");
 }
@@ -164,6 +176,11 @@ void Engine::ProceduralTerrainProgram::onRenderObject(const Engine::Object * obj
 	glUniform1f(uScale, Engine::Settings::terrainScale);
 	glUniform1i(uOctaves, Engine::Settings::terrainOctaves);
 	glUniform1f(uWaterLevel, Engine::Settings::waterHeight);
+
+	glUniform1f(uGrassCoverage, 1.0f - Engine::Settings::grassCoverage);
+	glUniform3fv(uGrassColor, 1, &Engine::Settings::grassColor[0]);
+	glUniform3fv(uRockColor, 1, &Engine::Settings::rockColor[0]);
+	glUniform3fv(uSandColor, 1, &Engine::Settings::sandColor[0]);
 }
 
 void Engine::ProceduralTerrainProgram::setUniformGridPosition(unsigned int i, unsigned int j)
@@ -176,11 +193,23 @@ void Engine::ProceduralTerrainProgram::setUniformLightDepthMatrix(const glm::mat
 	glUniformMatrix4fv(uLightDepthMatrix, 1, GL_FALSE, &(ldm[0][0]));
 }
 
-void Engine::ProceduralTerrainProgram::setUniformDepthTexture(Engine::TextureInstance * depthTexture)
+void Engine::ProceduralTerrainProgram::setUniformLightDepthMatrix1(const glm::mat4 & ldm)
+{
+	glUniformMatrix4fv(uLightDepthMatrix1, 1, GL_FALSE, &(ldm[0][0]));
+}
+
+void Engine::ProceduralTerrainProgram::setUniformDepthTexture(const Engine::TextureInstance * depthTexture)
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, depthTexture->getTexture()->getTextureId());
 	glUniform1i(uDepthTexture, 0);
+}
+
+void Engine::ProceduralTerrainProgram::setUniformDepthTexture1(const Engine::TextureInstance * depthTexture)
+{
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, depthTexture->getTexture()->getTextureId());
+	glUniform1i(uDepthTexture1, 1);
 }
 
 void Engine::ProceduralTerrainProgram::setUniformLightDirection(const glm::vec3 & lightDir)

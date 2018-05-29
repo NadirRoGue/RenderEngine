@@ -11,10 +11,14 @@ glm::vec3 Engine::Settings::lightDirection = glm::vec3(1, 0.515, 0);
 float Engine::Settings::terrainAmplitude = 0.6f;
 float Engine::Settings::terrainFrecuency = 0.5f;
 float Engine::Settings::terrainScale = 0.9f;
-unsigned int Engine::Settings::terrainOctaves = 8;
+unsigned int Engine::Settings::terrainOctaves = 10;
+float Engine::Settings::grassCoverage = 0.5;
+glm::vec3 Engine::Settings::grassColor = glm::vec3(0.1f, 0.3f, 0.0f);
+glm::vec3 Engine::Settings::sandColor = glm::vec3(0.93, 0.9, 0.66);
+glm::vec3 Engine::Settings::rockColor = glm::vec3(0.40f);
 
-glm::vec3 Engine::Settings::waterColor = glm::vec3(0.f, 0.5f, 1.0f);
-float Engine::Settings::waterSpeed = 0.005f;
+glm::vec3 Engine::Settings::waterColor = glm::vec3(0.f, 0.171f, 0.101f);
+float Engine::Settings::waterSpeed = 0.0025f;
 float Engine::Settings::waterHeight = 0.09f;
 
 float Engine::Settings::cloudSpeed = 1.0f;

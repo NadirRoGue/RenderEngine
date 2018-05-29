@@ -13,8 +13,10 @@ layout (location=1) in vec3 inColor;
 layout (location=2) in vec3 inNormal;
 layout (location=3) in vec3 inEmission;
 layout (location=4) in vec3 inShadowMapPos;
+layout (location=5) in vec3 inShadowMapPos1;
 
 uniform sampler2D depthTexture;
+uniform sampler2D depthTexture1;
 
 uniform vec3 lightDir;
 

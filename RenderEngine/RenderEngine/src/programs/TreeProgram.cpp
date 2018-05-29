@@ -23,7 +23,8 @@ Engine::TreeProgram::TreeProgram(const TreeProgram & other)
 	uModelViewProj = other.uModelViewProj;
 	uModelView = other.uModelView;
 	uNormal = other.uNormal;
-	uLightDepthMat = other.uLightDepthMat;
+	uLightDepthMat0 = other.uLightDepthMat0;
+	uLightDepthMat1 = other.uLightDepthMat1;
 	uGridUV = other.uGridUV;
 	uAmplitude = other.uAmplitude;
 	uFrecuency = other.uFrecuency;
@@ -31,6 +32,8 @@ Engine::TreeProgram::TreeProgram(const TreeProgram & other)
 	uOctaves = other.uOctaves;
 	uLightDir = other.uLightDir;
 	uWaterLevel = other.uWaterLevel;
+	uDepthMap0 = other.uDepthMap0;
+	uDepthMap1 = other.uDepthMap1;
 
 	uInPos = other.uInPos;
 	uInColor = other.uInColor;
@@ -90,9 +93,12 @@ void Engine::TreeProgram::configureProgram()
 	uFrecuency = glGetUniformLocation(glProgram, "frecuency");
 	uScale = glGetUniformLocation(glProgram, "scale");
 	uOctaves = glGetUniformLocation(glProgram, "octaves");
-	uLightDepthMat = glGetUniformLocation(glProgram, "lightDepthMat");
+	uLightDepthMat0 = glGetUniformLocation(glProgram, "lightDepthMat");
+	uLightDepthMat1 = glGetUniformLocation(glProgram, "lightDepthMat1");
 	uLightDir = glGetUniformLocation(glProgram, "lightDir");
 	uWaterLevel = glGetUniformLocation(glProgram, "waterHeight");
+	uDepthMap0 = glGetUniformLocation(glProgram, "depthTexture");
+	uDepthMap1 = glGetUniformLocation(glProgram, "depthTexture1");
 
 	uInPos = glGetAttribLocation(glProgram, "inPos");
 	uInColor = glGetAttribLocation(glProgram, "inColor");
@@ -157,7 +163,12 @@ void Engine::TreeProgram::setUniformTileUV(float u, float v)
 
 void Engine::TreeProgram::setUniformLightDepthMat(const glm::mat4 & ldm)
 {
-	glUniformMatrix4fv(uLightDepthMat, 1, GL_FALSE, &(ldm[0][0]));
+	glUniformMatrix4fv(uLightDepthMat0, 1, GL_FALSE, &(ldm[0][0]));
+}
+
+void Engine::TreeProgram::setUniformLightDepthMat1(const glm::mat4 & ldp)
+{
+	glUniformMatrix4fv(uLightDepthMat1, 1, GL_FALSE, &(ldp[0][0]));
 }
 
 void Engine::TreeProgram::setUniformLightDir(const glm::vec3 & ld)
@@ -165,11 +176,18 @@ void Engine::TreeProgram::setUniformLightDir(const glm::vec3 & ld)
 	glUniform3fv(uLightDir, 1, &ld[0]);
 }
 
-void Engine::TreeProgram::setUniformDepthMap(Engine::TextureInstance * ti)
+void Engine::TreeProgram::setUniformDepthMap(const Engine::TextureInstance * ti)
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, ti->getTexture()->getTextureId());
-	glUniform1i(uDepthMap, 0);
+	glUniform1i(uDepthMap0, 0);
+}
+
+void Engine::TreeProgram::setUniformDepthMap1(const TextureInstance * ti)
+{
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, ti->getTexture()->getTextureId());
+	glUniform1i(uDepthMap1, 1);
 }
 
 void Engine::TreeProgram::destroy()

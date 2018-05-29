@@ -51,6 +51,8 @@
 
 #include "datatables/VegetationTable.h"
 
+#include "CascadeShadowMaps.h"
+
 #include "WorldConfig.h"
 
 void initOpenGL();
@@ -109,9 +111,7 @@ void initOpenGL()
 void initScene()
 {
 	Engine::Camera * camera = new Engine::Camera(0.5f, 1000.0f, 45.0f, 45.0f);
-	camera->translateView(glm::vec3(0, -6, 0));
-	//camera->translateView(glm::vec3(30.0f, -5.0f, -50.0f));
-	//camera->rotateView(glm::vec3(glm::radians(30.0f), glm::radians(60.0f), 0.0f));
+	camera->translateView(glm::vec3(30.0f, -5.0f, -50.0f));
 
 	Engine::Scene * scene = new Engine::Scene();
 	scene->setCamera(camera);
@@ -151,6 +151,9 @@ void initTables()
 	Engine::MeshTable::getInstance().addMeshToCache("plane", Engine::CreatePlane());
 	Engine::MeshTable::getInstance().addMeshToCache("trunk", Engine::CreateTrunk());
 	Engine::MeshTable::getInstance().addMeshToCache("leaf", Engine::createLeaf());
+
+	// Cascade shadow maps
+	Engine::CascadeShadowMaps::getInstance().init();
 }
 
 void initSceneObj()

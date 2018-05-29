@@ -10,10 +10,13 @@ layout (location=4) out vec4 outPos;
 layout (location=0) in vec2 inUV;
 layout (location=1) in vec3 inPos;
 layout (location=2) in vec4 inShadowMapPos;
+layout (location=3) in vec4 inShadowMapPos1;
 
 uniform mat4 normal;
 
 uniform sampler2D depthTexture;
+uniform sampler2D depthTexture1;
+
 uniform vec3 lightDir;
 vec2 poissonDisk[4] = vec2[](
   vec2( -0.94201624, -0.39906216 ),
@@ -136,7 +139,7 @@ void main()
 
 	// COMPUTE NORMAL
 	// ------------------------------------------------------------------------------
-	float step = 0.001;
+	float step = 0.0015;
 	float tH = noiseHeight(vec2(u, v + step)); 
 	float bH = noiseHeight(vec2(u, v - step));
 	float rH = noiseHeight(vec2(u + step, v)); 
@@ -179,12 +182,11 @@ void main()
 	outNormal = vec4(n, 1.0);
 	outPos = vec4(inPos, 1.0);
 #ifdef WIRE_MODE
-	outSpecular = vec4(0,0,0,0);
-	outEmissive = vec4(0,0,0,0);
+	outSpecular = vec4(0);
+	outEmissive = vec4(0);
 #else
-	outSpecular = vec4(1,1,1,1);
-	//outEmissive = vec4(color,0);
-	outEmissive = vec4(0,0,0,0);
+	outSpecular = vec4(0.5,0.5,0.5,1);
+	outEmissive = vec4(0);
 #endif
 #endif
 }

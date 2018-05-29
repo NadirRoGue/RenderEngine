@@ -26,7 +26,9 @@ namespace Engine
 		unsigned int uNormal;
 
 		unsigned int uLightDepthMatrix;
+		unsigned int uLightDepthMatrix1;
 		unsigned int uDepthTexture;
+		unsigned int uDepthTexture1;
 		unsigned int uLightDirection;
 
 		unsigned int uWaterLevel;
@@ -37,6 +39,11 @@ namespace Engine
 		unsigned int uFrecuency;
 		unsigned int uScale;
 		unsigned int uOctaves;
+
+		unsigned int uGrassCoverage;
+		unsigned int uGrassColor;
+		unsigned int uSandColor;
+		unsigned int uRockColor;
 	public:
 		ProceduralTerrainProgram(std::string name, unsigned long long params);
 		ProceduralTerrainProgram(const ProceduralTerrainProgram & other);
@@ -51,7 +58,9 @@ namespace Engine
 
 		void setUniformGridPosition(unsigned int i, unsigned int j);
 		void setUniformLightDepthMatrix(const glm::mat4 & ldm);
-		void setUniformDepthTexture(TextureInstance * depthTexture);
+		void setUniformLightDepthMatrix1(const glm::mat4 & ldm);
+		void setUniformDepthTexture(const TextureInstance * depthTexture);
+		void setUniformDepthTexture1(const TextureInstance * depthTexture);
 		void setUniformLightDirection(const glm::vec3 & lightDir);
 	};
 

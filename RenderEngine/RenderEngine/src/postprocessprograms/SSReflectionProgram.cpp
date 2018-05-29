@@ -1,8 +1,8 @@
 #include "postprocessprograms/SSReflectionProgram.h"
 
 #include "renderers/DeferredRenderer.h"
+#include "WorldConfig.h"
 
-#include <iostream>
 
 const std::string Engine::SSReflectionProgram::PROGRAM_NAME = "SSReflectionProgram";
 
@@ -20,6 +20,7 @@ Engine::SSReflectionProgram::SSReflectionProgram(const Engine::SSReflectionProgr
 	uNormalBuffer = other.uNormalBuffer;
 	uDepthBuffer = other.uDepthBuffer;
 	uSpecularBuffer = other.uSpecularBuffer;
+	uLightDir = other.uLightDir;
 }
 
 void Engine::SSReflectionProgram::configureProgram()
@@ -31,6 +32,7 @@ void Engine::SSReflectionProgram::configureProgram()
 	uNormalBuffer = glGetUniformLocation(glProgram, "normalBuffer");
 	uDepthBuffer = glGetUniformLocation(glProgram, "depthBuffer");
 	uSpecularBuffer = glGetUniformLocation(glProgram, "specularBuffer");
+	uLightDir = glGetUniformLocation(glProgram, "lightDirection");
 }
 
 void Engine::SSReflectionProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
@@ -52,6 +54,9 @@ void Engine::SSReflectionProgram::onRenderObject(const Engine::Object * obj, con
 	glUniform1i(uSpecularBuffer, 4);
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, deferred->getGBufferSpecular()->getTexture()->getTextureId());
+
+	glm::vec3 normalDir = glm::normalize(Engine::Settings::lightDirection);
+	glUniform3fv(uLightDir, 1, &normalDir[0]);
 }
 
 // =====================================================================

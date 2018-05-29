@@ -21,7 +21,9 @@ namespace Engine
 		unsigned int uNormal;
 
 		unsigned int uLightDepthMatrix;
+		unsigned int uLightDepthMatrix1;
 		unsigned int uDepthTexture;
+		unsigned int uDepthTexture1;
 		unsigned int uLightDirection;
 
 		unsigned int uGridPos;
@@ -43,7 +45,9 @@ namespace Engine
 		void setTimeUniform(float sinTime);
 		void setUniformGridPosition(unsigned int i, unsigned int j);
 		void setUniformLightDepthMatrix(const glm::mat4 & ldm);
-		void setUniformDepthTexture(TextureInstance * depthTexture);
+		void setUniformLightDepthMatrix1(const glm::mat4 & ldm);
+		void setUniformDepthTexture(const TextureInstance * depthTexture);
+		void setUniformDepthTexture1(const TextureInstance * depthTexture);
 		void setUniformLightDirection(const glm::vec3 & lightDir);
 	};
 

@@ -39,7 +39,7 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::Spacing(); ImGui::Spacing();
 
 		ImGui::Text("Light settings");
-		ImGui::ColorPicker3("Light color", &Engine::Settings::lightColor[0], ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoInputs);
+		ImGui::ColorEdit3("Light color", &Engine::Settings::lightColor[0]);
 		ImGui::Spacing();
 		ImGui::SliderFloat3("Light Direction", &Engine::Settings::lightDirection[0], -1.f, 1.f);
 
@@ -52,6 +52,10 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::SliderFloat("Frecuency##app",&Engine::Settings::terrainFrecuency, 0.0f, 10.0f);
 		ImGui::SliderFloat("Scale##app", &Engine::Settings::terrainScale, 0.0f, 50.0f);
 		ImGui::InputInt("Octaves##app", reinterpret_cast< int32_t*>(&Engine::Settings::terrainOctaves));
+		ImGui::SliderFloat("Grass Coverage##app", &Engine::Settings::grassCoverage, 0.0f, 1.0f);
+		ImGui::ColorEdit3("Grass Color##app", &Engine::Settings::grassColor[0]);
+		ImGui::ColorEdit3("Sand Color##app", &Engine::Settings::sandColor[0]);
+		ImGui::ColorEdit3("Rock Color##app", &Engine::Settings::rockColor[0]);
 
 
 		ImGui::Spacing(); ImGui::Spacing();
@@ -59,7 +63,7 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::Spacing(); ImGui::Spacing();
 
 		ImGui::Text("Water settings");
-		ImGui::ColorPicker3("Water Color", &Engine::Settings::waterColor[0], ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoInputs);
+		ImGui::ColorEdit3("Water Color", &Engine::Settings::waterColor[0]);
 		ImGui::Spacing();
 		ImGui::SliderFloat("Water speed", &Engine::Settings::waterSpeed, 0.0f, 1.0f);
 		ImGui::Spacing();

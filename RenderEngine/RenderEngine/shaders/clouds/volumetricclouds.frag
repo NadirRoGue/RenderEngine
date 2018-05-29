@@ -199,7 +199,7 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 		float highFreqFBM = (erodeCloudNoise.r * 0.625) + (erodeCloudNoise.g * 0.25) + (erodeCloudNoise.b * 0.125);
 
 		heightFraction = getHeightFraction(p);
-		float highFreqNoiseModifier = mix(highFreqFBM, 1.0 - highFreqFBM, clamp(heightFraction * 10.0, 0.0, 1.0)) * 1.5;
+		float highFreqNoiseModifier = mix(highFreqFBM, 1.0 - highFreqFBM, clamp(heightFraction * 10.0, 0.0, 1.0)) * 1.0;
 
 		coveragedCloud = coveragedCloud - highFreqNoiseModifier * (1.0 - coveragedCloud);
 
@@ -295,9 +295,11 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 
 	vec4 result = vec4(0.0);
 
+	float samplingLod = mix(0.0, 2.0, (length(startPos) - sphereInnerRadius) / (sphereOuterRadius - sphereInnerRadius));
+
 	for(int i = 0; i < sampleCount; i++)
 	{
-		float cloudDensity = sampleCloudDensity(pos, getWeatherData(pos), 0.0, true); // SAMPLE CLOUD textureSamples
+		float cloudDensity = sampleCloudDensity(pos, getWeatherData(pos), samplingLod, true); // SAMPLE CLOUD textureSamples
 
 		if(cloudDensity > 0.0)	// IF WE HAVE DENSITY, LAUNCH LIGHT SAMPLING
 		{

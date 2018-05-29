@@ -6,6 +6,8 @@ in vec2 texCoord;
 
 uniform mat4 projMat;
 
+uniform vec3 lightDirection;
+
 uniform sampler2D postProcessing_0;	// color
 
 uniform sampler2D posBuffer;
@@ -13,7 +15,7 @@ uniform sampler2D depthBuffer;
 uniform sampler2D normalBuffer;
 uniform sampler2D specularBuffer;
 
-vec3 raymarch(vec3 position, vec3 direction)
+vec3 raymarch(vec3 position, vec3 direction, float step)
 {
 	vec3 prevRaySample, raySample;
 	// Screen space ray march
@@ -21,7 +23,7 @@ vec3 raymarch(vec3 position, vec3 direction)
 	{
 		// Compare current ray depth with scene's depth
 		prevRaySample = raySample;
-		raySample = (rayStepIdx * 0.02) * direction + position;
+		raySample = (rayStepIdx * step) * direction + position;
 		float zBufferVal = texture(depthBuffer, raySample.xy).x;
 				
 		// If we are in a position with a higher depth,
@@ -67,8 +69,10 @@ vec3 computeReflectionColor(float depth, vec3 pos, vec3 N)
 
 	// Screen space reflection dir
 	vec3 ssreflectdir = normalize(projPointAlong.xyz - ssPos);
+	
+	float viewFactor = clamp(dot(normalize(-pos), N),0,1);
 
-	return raymarch(ssPos, ssreflectdir);
+	return raymarch(ssPos, ssreflectdir, 0.02);
 }
 
 void main()
@@ -81,7 +85,7 @@ void main()
 	// Compute relfection only for specular surfaces
 	if(reflection > 0.0)
 	{
-		outColor = vec4(computeReflectionColor(depth, pos, N), 1.0);
+		outColor = vec4(computeReflectionColor(depth, pos, N), 1.0) * 0.5 + texture(postProcessing_0, texCoord) * 0.5;
 	}
 	else
 	{

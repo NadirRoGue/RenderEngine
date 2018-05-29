@@ -19,14 +19,16 @@ namespace Engine
 		unsigned int uModelViewProj;
 		unsigned int uModelView;
 		unsigned int uNormal;
-		unsigned int uLightDepthMat;
+		unsigned int uLightDepthMat0;
+		unsigned int uLightDepthMat1;
 		unsigned int uGridUV;
 		unsigned int uAmplitude;
 		unsigned int uFrecuency;
 		unsigned int uScale;
 		unsigned int uOctaves;
 		unsigned int uLightDir;
-		unsigned int uDepthMap;
+		unsigned int uDepthMap0;
+		unsigned int uDepthMap1;
 		unsigned int uWaterLevel;
 
 		unsigned int uInPos;
@@ -45,8 +47,10 @@ namespace Engine
 
 		void setUniformTileUV(float u, float v);
 		void setUniformLightDepthMat(const glm::mat4 & ldp);
+		void setUniformLightDepthMat1(const glm::mat4 & ldp);
 		void setUniformLightDir(const glm::vec3 & ld);
-		void setUniformDepthMap(TextureInstance * ti);
+		void setUniformDepthMap(const TextureInstance * ti);
+		void setUniformDepthMap1(const TextureInstance * ti);
 
 		void destroy();
 	};

@@ -17,6 +17,7 @@ layout (location=1) out vec3 outColor;
 layout (location=2) out vec3 outNormal;
 layout (location=3) out vec3 outEmission;
 layout (location=4) out vec3 lightDepth;
+layout (location=5) out vec3 lightDepth1;
 
 uniform mat4 normal;
 uniform mat4 modelView;
@@ -26,6 +27,7 @@ uniform mat4 modelViewProj;
 uniform float waterHeight;
 
 uniform mat4 lightDepthMat;
+uniform mat4 lightDepthMat1;
 
 uniform vec2 tileUV;
 
@@ -103,6 +105,7 @@ void main()
 		outNormal = (normal * vec4(inNormal[0], 0)).xyz;
 		outPos = (modelView * a).xyz;
 		lightDepth = (lightDepthMat * a).xyz;
+		lightDepth1 = (lightDepthMat1 * a).xyz;
 		gl_Position = modelViewProj * a;
 		EmitVertex();
 
@@ -111,6 +114,7 @@ void main()
 		outNormal = (normal * vec4(inNormal[1], 0)).xyz;
 		outPos = (modelView * b).xyz;
 		lightDepth = (lightDepthMat * b).xyz;
+		lightDepth1 = (lightDepthMat1 * b).xyz;
 		gl_Position = modelViewProj * b;
 		EmitVertex();
 
@@ -119,6 +123,7 @@ void main()
 		outNormal = (normal * vec4(inNormal[2], 0)).xyz;
 		outPos = (modelView * c).xyz;
 		lightDepth = (lightDepthMat * c).xyz;
+		lightDepth1 = (lightDepthMat1 * c).xyz;
 		gl_Position = modelViewProj * c;
 		EmitVertex();
 #else
