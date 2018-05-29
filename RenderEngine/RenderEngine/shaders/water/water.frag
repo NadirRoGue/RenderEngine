@@ -119,6 +119,39 @@ float noiseHeight(in vec2 pos)
 
 	return noiseValue * 0.000001;
 }
+
+// =====================================================================
+// Shadow map look up
+bool whithinRange(vec2 texCoord)
+{
+	return texCoord.x >= 0.0 && texCoord.x <= 1.0 && texCoord.y >= 0.0 && texCoord.y <= 1.0;
+}
+
+float getShadowVisibility(vec3 rawNormal)
+{
+	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
+	float visibility = 1.0;
+
+	if(whithinRange(inShadowMapPos.xy))
+	{
+		float curDepth = inShadowMapPos.z - bias;
+		for (int i = 0; i < 4; i++)
+		{
+			visibility -= 0.25 * ( texture(depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0).x  <  curDepth? 1.0 : 0.0 );
+		}
+	}
+	else if(whithinRange(inShadowMapPos1.xy))
+	{
+		float curDepth = inShadowMapPos1.z - bias;
+		for (int i = 0; i < 4; i++)
+		{
+			visibility -= 0.25 * ( texture( depthTexture1, inShadowMapPos1.xy + poissonDisk[i] / 700.0 ).x  <  curDepth? 1.0 : 0.0 );
+		}
+	}
+
+	return visibility;
+}
+
 #else
 layout (location=0) out vec4 lightdepth;
 #endif
@@ -165,16 +198,7 @@ void main()
 
 	// APPLY SHADOW MAP
 	// ------------------------------------------------------------------------------
-	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
-	float curDepth = inShadowMapPos.z - bias;
-	float visibility = 1.0;
-	if(inShadowMapPos.x >= 0 && inShadowMapPos.x <= 1 && inShadowMapPos.y >= 0 && inShadowMapPos.y <= 1)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			visibility -= 0.25 * ( texture( depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0 ).x  <  curDepth? 1.0 : 0.0 );
-		}
-	}
+	float visibility = getShadowVisibility(rawNormal);
 
 	// OUTPUT TO G-BUFFERS
 	// ------------------------------------------------------------------------------

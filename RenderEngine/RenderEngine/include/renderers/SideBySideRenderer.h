@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Renderer.h"
 #include "renderers/DeferredRenderer.h"
 
 namespace Engine

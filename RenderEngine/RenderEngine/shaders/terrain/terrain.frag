@@ -27,11 +27,9 @@ uniform vec2 poissonDisk[4] = vec2[](
   vec2( 0.34495938, 0.29387760 )
 );
 
-//uniform vec3 dirt = vec3(0.2, 0.1, 0.0);
-//uniform vec3 snow = vec3(0.9, 0.9, 0.9);
-uniform vec3 rock;// = vec3(0.45);
-uniform vec3 grass;// = vec3(0.1, 0.3, 0.0);
-uniform vec3 sand;// = vec3(0.93,0.9,0.66);
+uniform vec3 rock;
+uniform vec3 grass;
+uniform vec3 sand;
 
 uniform float waterHeight;
 
@@ -122,6 +120,38 @@ float noiseHeight(in vec2 pos, float localScale)
 	return noiseValue * noiseValue * noiseValue * 0.01;
 }
 
+// =====================================================================
+// Shadow map look up
+bool whithinRange(vec2 texCoord)
+{
+	return texCoord.x >= 0.0 && texCoord.x <= 1.0 && texCoord.y >= 0.0 && texCoord.y <= 1.0;
+}
+
+float getShadowVisibility(vec3 rawNormal)
+{
+	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
+	float visibility = 1.0;
+
+	if(whithinRange(inShadowMapPos.xy))
+	{
+		float curDepth = inShadowMapPos.z - bias;
+		for (int i = 0; i < 4; i++)
+		{
+			visibility -= 0.25 * ( texture(depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0).x  <  curDepth? 1.0 : 0.0 );
+		}
+	}
+	else if(whithinRange(inShadowMapPos1.xy))
+	{
+		float curDepth = inShadowMapPos1.z - bias;
+		for (int i = 0; i < 4; i++)
+		{
+			visibility -= 0.25 * ( texture( depthTexture1, inShadowMapPos1.xy + poissonDisk[i] / 700.0 ).x  <  curDepth? 1.0 : 0.0 );
+		}
+	}
+
+	return visibility;
+}
+
 #else
 layout (location=0) out vec4 lightdepth;
 #endif
@@ -183,16 +213,7 @@ void main()
 	grassData = heightColor == grass? 1.0 : 0.0;
 	// APPLY SHADOW MAP
 	// ------------------------------------------------------------------------------
-	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
-	float curDepth = inShadowMapPos.z - bias;
-	visibility = 1.0;
-	if(inShadowMapPos.x >= 0 && inShadowMapPos.x <= 1 && inShadowMapPos.y >= 0 && inShadowMapPos.y <= 1)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			visibility -= 0.25 * (( texture( depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0 ).x  <  curDepth )? 1.0 : 0.0);
-		}
-	}
+	visibility = getShadowVisibility(rawNormal);
 #endif
 
 	// OUTPUT G BUFFERS

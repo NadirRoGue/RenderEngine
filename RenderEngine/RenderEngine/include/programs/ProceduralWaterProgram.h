@@ -1,6 +1,6 @@
 #pragma once
 
-#include "programs/ProceduralTerrainProgram.h"
+#include "Program.h"
 
 namespace Engine
 {
@@ -8,6 +8,9 @@ namespace Engine
 	{
 	public:
 		static std::string PROGRAM_NAME;
+
+		static const unsigned long long WIRE_DRAW_MODE;
+		static const unsigned long long SHADOW_MAP;
 	private:
 		std::string gShaderFile;
 

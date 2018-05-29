@@ -1,6 +1,5 @@
 #pragma once
 
-#include <glm\glm.hpp>
 #include <vector>
 
 #include "programs/ProceduralTerrainProgram.h"
@@ -8,7 +7,6 @@
 #include "programs/TreeProgram.h"
 #include "Object.h"
 #include "Camera.h"
-#include "DeferredRenderObject.h"
 
 namespace Engine
 {
@@ -68,13 +66,6 @@ namespace Engine
 		TreeProgram * treeActiveShader;
 
 		Object * tileObject;
-
-		glm::mat4 lightProjMatrix;
-		glm::mat4 lightDepthMat;
-		glm::mat4 biasMat;
-
-		DeferredRenderObject * shadowMap;
-		TextureInstance * depthTexture;
 
 		std::vector<Object *> treeTypes;
 	public:

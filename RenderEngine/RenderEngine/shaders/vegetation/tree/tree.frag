@@ -27,8 +27,35 @@ uniform vec2 poissonDisk[4] = vec2[](
   vec2( 0.34495938, 0.29387760 )
 );
 
+bool whithinRange(vec2 texCoord)
+{
+	return texCoord.x >= 0.0 && texCoord.x <= 1.0 && texCoord.y >= 0.0 && texCoord.y <= 1.0;
+}
+
+float getShadowVisibility(vec3 rawNormal)
+{
+	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
+	float visibility = 1.0;
+	if(whithinRange(inShadowMapPos.xy))
+	{
+		float curDepth = inShadowMapPos.z - bias;
+		for (int i = 0; i < 4; i++)
+		{
+			visibility -= 0.25 * ( texture(depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0).x  <  curDepth? 1.0 : 0.0 );
+		}
+	}
+	else if(whithinRange(inShadowMapPos1.xy))
+	{
+		float curDepth = inShadowMapPos1.z - bias;
+		visibility = texture(depthTexture1, inShadowMapPos1.xy).x < curDepth? 0.0 : 1.0;
+	}
+
+	return visibility;
+}
+
 #else
 layout (location=0) out vec4 lightdepth;
+
 #endif
 
 void main()
@@ -45,9 +72,8 @@ void main()
 #else
 	// APPLY SHADOW MAP
 	// ------------------------------------------------------------------------------
-	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
-	float curDepth = inShadowMapPos.z - bias;
-	float visibility = texture(depthTexture, inShadowMapPos.xy).x < curDepth? 0.0 : 1.0;
+	float visibility = getShadowVisibility(rawNormal);
+
 	/*
 	if(inShadowMapPos.x >= 0 && inShadowMapPos.x <= 1 && inShadowMapPos.y >= 0 && inShadowMapPos.y <= 1)
 	{
@@ -57,6 +83,7 @@ void main()
 		}
 	}
 	*/
+
 	outColor = vec4(inColor, visibility);
 	outNormal = vec4(rawNormal, 0);
 	outSpecular = vec4(0,0,0,0);

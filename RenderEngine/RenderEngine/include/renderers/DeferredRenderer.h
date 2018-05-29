@@ -1,13 +1,10 @@
 #pragma once
 
 #include "Renderer.h"
-#include "Program.h"
 #include "Object.h"
 #include "DeferredNodeCallbacks.h"
 
 #include "postprocessprograms/DeferredShadingProgram.h"
-
-#include "renderers/ForwardRenderer.h"
 
 namespace Engine
 {
@@ -24,8 +21,6 @@ namespace Engine
 	class DeferredRenderer : public Renderer
 	{
 	private:
-		ForwardRenderer * forwardPass;
-
 		DeferredRenderObject * forwardPassBuffer;
 		DeferredRenderObject * deferredPassBuffer;
 

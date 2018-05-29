@@ -39,7 +39,7 @@ namespace Engine
 		void initializeFrame(Camera * eye);
 		void saveCurrentFBO();
 		void beginShadowRender(int level);
-		void endShadorRender();
+		void endShadowRender();
 
 		const glm::mat4 & getShadowProjectionMat();
 		const glm::mat4 & getBiasMat();

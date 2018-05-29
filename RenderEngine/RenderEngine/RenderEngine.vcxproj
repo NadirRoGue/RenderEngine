@@ -181,9 +181,7 @@
     <ClInclude Include="include\Program.h" />
     <ClInclude Include="include\programs\ProceduralTerrainProgram.h" />
     <ClInclude Include="include\programs\ProceduralWaterProgram.h" />
-    <ClInclude Include="include\programs\ShadowMapProgram.h" />
     <ClInclude Include="include\programs\SkyProgram.h" />
-    <ClInclude Include="include\programs\StandardProgram.h" />
     <ClInclude Include="include\programs\TreeProgram.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\renderers\DeferredRenderer.h" />
@@ -268,9 +266,7 @@
     <ClCompile Include="src\Program.cpp" />
     <ClCompile Include="src\programs\ProceduralTerrainProgram.cpp" />
     <ClCompile Include="src\programs\ProceduralWaterProgram.cpp" />
-    <ClCompile Include="src\programs\ShadowMapProgram.cpp" />
     <ClCompile Include="src\programs\SkyProgram.cpp" />
-    <ClCompile Include="src\programs\StandardProgram.cpp" />
     <ClCompile Include="src\programs\TreeProgram.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\renderers\DeferredRenderer.cpp" />

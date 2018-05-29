@@ -50,7 +50,6 @@ void Engine::SkyBox::initialize()
 	shader->configureMeshBuffers(mesh);
 
 	cubeMesh = new Engine::Object(mesh);
-	//cubeMesh->setScale(glm::vec3(1, 1, 1));
 }
 
 void Engine::SkyBox::notifyRenderModeUpdate(Engine::RenderMode mode)

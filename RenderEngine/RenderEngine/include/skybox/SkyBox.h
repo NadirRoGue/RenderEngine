@@ -2,7 +2,6 @@
 
 #include "skybox/AbstractSkyBox.h"
 
-#include "Texture.h"
 #include "programs/SkyProgram.h"
 #include "Camera.h"
 #include "Object.h"

@@ -6,6 +6,9 @@
 
 std::string Engine::ProceduralWaterProgram::PROGRAM_NAME = "ProceduralWaterProgram";
 
+const unsigned long long Engine::ProceduralWaterProgram::WIRE_DRAW_MODE = 0x01;
+const unsigned long long Engine::ProceduralWaterProgram::SHADOW_MAP = 0x02;
+
 Engine::ProceduralWaterProgram::ProceduralWaterProgram(std::string name, unsigned long long params)
 	:Engine::Program(name, params)
 {
@@ -43,19 +46,19 @@ void Engine::ProceduralWaterProgram::initialize()
 {
 	std::string configStr = "";
 
-	if (parameters & Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE)
+	if (parameters & Engine::ProceduralWaterProgram::WIRE_DRAW_MODE)
 	{
 		configStr += "#define WIRE_MODE";
 	}
 
-	if (parameters & Engine::ProceduralTerrainProgram::SHADOW_MAP)
+	if (parameters & Engine::ProceduralWaterProgram::SHADOW_MAP)
 	{
 		configStr += "#define SHADOW_MAP";
 	}
 
 	vShader = loadShader(vShaderFile, GL_VERTEX_SHADER, configStr);
 
-	if (parameters & Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE)
+	if (parameters & Engine::ProceduralWaterProgram::WIRE_DRAW_MODE)
 	{
 		gShader = loadShader(gShaderFile, GL_GEOMETRY_SHADER, configStr);
 	}
@@ -65,7 +68,7 @@ void Engine::ProceduralWaterProgram::initialize()
 	glProgram = glCreateProgram();
 
 	glAttachShader(glProgram, vShader);
-	if (parameters & Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE)
+	if (parameters & Engine::ProceduralWaterProgram::WIRE_DRAW_MODE)
 	{
 		glAttachShader(glProgram, gShader);
 	}

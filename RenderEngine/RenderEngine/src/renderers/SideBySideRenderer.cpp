@@ -1,11 +1,9 @@
 #include "renderers/SideBySideRenderer.h"
 
-#include "renderers/DeferredRenderer.h"
 #include "datatables/MeshTable.h"
 #include "datatables/ProgramTable.h"
 
 #include "Scene.h"
-#include "PostProcessProgram.h"
 
 Engine::SideBySideRenderer::SideBySideRenderer()
 	:Engine::Renderer()

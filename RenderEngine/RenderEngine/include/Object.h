@@ -13,7 +13,6 @@
 #include "IRenderable.h"
 #include "Mesh.h"
 #include "instances/TextureInstance.h"
-#include "Texture.h"
 
 namespace Engine
 {

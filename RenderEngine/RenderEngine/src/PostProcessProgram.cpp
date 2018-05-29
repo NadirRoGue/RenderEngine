@@ -5,11 +5,7 @@
 
 #include "PostProcessProgram.h"
 
-#include "Renderer.h"
-#include "renderers/DeferredRenderer.h"
 #include "instances/TextureInstance.h"
-
-#include <iostream>
 
 std::string Engine::PostProcessProgram::PROGRAM_NAME = "PostProcessProgram";
 
@@ -68,6 +64,7 @@ void Engine::PostProcessProgram::configureMeshBuffers(Engine::Mesh * data)
 
 void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
 {
+	
 	std::map<std::string, TextureInstance *> all = ((PostProcessObject*)obj)->getAllCustomTextures();
 	std::map<std::string, TextureInstance *>::const_iterator it = all.cbegin();
 	
@@ -84,10 +81,9 @@ void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, cons
 		it++;
 	}
 	/*
-	Engine::DeferredRenderer * dr = static_cast<Engine::DeferredRenderer*>(Engine::RenderManager::getInstance().getRenderer());
 	glUniform1i(uRenderedTextures[0], 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, dr->getGBufferInfo()->getTexture()->getTextureId());
+	glBindTexture(GL_TEXTURE_2D, Engine::CascadeShadowMaps::getInstance().getDepthTexture1()->getTexture()->getTextureId());
 	*/
 }
 

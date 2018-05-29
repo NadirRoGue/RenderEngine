@@ -8,9 +8,7 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <iostream>
 
-#include "instances/TextureInstance.h"
 #include "WorldConfig.h"
 
 std::string Engine::Object::ALBEDO_TEX = "albedo";

@@ -210,9 +210,6 @@
     <ClInclude Include="include\programs\ProceduralTerrainProgram.h">
       <Filter>Archivos de encabezado\programs</Filter>
     </ClInclude>
-    <ClInclude Include="include\programs\StandardProgram.h">
-      <Filter>Archivos de encabezado\programs</Filter>
-    </ClInclude>
     <ClInclude Include="include\datatables\MeshTable.h">
       <Filter>Archivos de encabezado\datatables</Filter>
     </ClInclude>
@@ -329,9 +326,6 @@
     </ClInclude>
     <ClInclude Include="include\LightBufferManager.h">
       <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="include\programs\ShadowMapProgram.h">
-      <Filter>Archivos de encabezado\programs</Filter>
     </ClInclude>
     <ClInclude Include="include\datatables\DeferredObjectsTable.h">
       <Filter>Archivos de encabezado\datatables</Filter>
@@ -470,9 +464,6 @@
     <ClCompile Include="src\programs\ProceduralTerrainProgram.cpp">
       <Filter>Archivos de origen\programs</Filter>
     </ClCompile>
-    <ClCompile Include="src\programs\StandardProgram.cpp">
-      <Filter>Archivos de origen\programs</Filter>
-    </ClCompile>
     <ClCompile Include="src\lights\DirectionalLight.cpp">
       <Filter>Archivos de origen\lights</Filter>
     </ClCompile>
@@ -571,9 +562,6 @@
     </ClCompile>
     <ClCompile Include="src\LightBufferManager.cpp">
       <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="src\programs\ShadowMapProgram.cpp">
-      <Filter>Archivos de origen\programs</Filter>
     </ClCompile>
     <ClCompile Include="src\datatables\DeferredObjectsTable.cpp">
       <Filter>Archivos de origen\datatables</Filter>

@@ -11,7 +11,6 @@
 Engine::DeferredRenderer::DeferredRenderer()
 	:Engine::Renderer()
 {
-	forwardPass = new Engine::ForwardRenderer();
 	initialized = false;
 
 	renderFunc = &DeferredRenderer::initializeLoop;

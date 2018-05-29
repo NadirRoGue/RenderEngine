@@ -63,7 +63,7 @@ void Engine::CascadeShadowMaps::beginShadowRender(int level)
 	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
-void Engine::CascadeShadowMaps::endShadorRender()
+void Engine::CascadeShadowMaps::endShadowRender()
 {
 	shadowMaps[currentLevel].depth = biasMatrix * shadowMaps[currentLevel].depth;
 	glBindFramebuffer(GL_FRAMEBUFFER, previousFrameBuffer);

@@ -120,8 +120,10 @@ void Engine::ProceduralTerrainProgram::configureProgram()
 	uGridPos = glGetUniformLocation(glProgram, "gridPos");
 
 	uLightDepthMatrix = glGetUniformLocation(glProgram, "lightDepthMat");
+	uLightDepthMatrix1 = glGetUniformLocation(glProgram, "lightDepthMat1");
 	uLightDirection = glGetUniformLocation(glProgram, "lightDir");
 	uDepthTexture = glGetUniformLocation(glProgram, "depthTexture");
+	uDepthTexture1 = glGetUniformLocation(glProgram, "depthTexture1");
 
 	uWaterLevel = glGetUniformLocation(glProgram, "waterHeight");
 

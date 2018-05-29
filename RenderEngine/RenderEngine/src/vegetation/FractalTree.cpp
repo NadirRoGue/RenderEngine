@@ -29,7 +29,7 @@ Engine::FractalTree::FractalTree(const TreeGenerationData & data) :Engine::Proce
 Engine::Mesh * Engine::FractalTree::generate()
 {
 	// Initial data to start growin the tree
-	glm::vec3 scale = glm::vec3(0.06f, 0.2f, 0.06f);
+	glm::vec3 scale = glm::vec3(0.04f, 0.2f, 0.04f);
 	glm::vec3 translation(0, 0, 0);
 	glm::vec3 rotation;
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Program.h"
-#include "instances/TextureInstance.h"
 
 namespace Engine
 {
