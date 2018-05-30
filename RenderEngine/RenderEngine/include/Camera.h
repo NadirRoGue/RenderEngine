@@ -4,6 +4,8 @@
  */
 
 #pragma once
+#define GLM_FORCE_RADIANS
+
 #include <glm\glm.hpp>
 
 namespace Engine
@@ -22,6 +24,11 @@ namespace Engine
 		glm::vec3 rotation;
 		glm::mat4 viewMatrix;
 
+		glm::mat4 invViewMatrix;
+		glm::mat4 transposeInvViewMatrix;
+
+		glm::vec3 forward;
+
 	public:
 		Camera(float n, float f, float fy, float fx);
 		Camera(const Camera & other);
@@ -31,9 +38,29 @@ namespace Engine
 
 		glm::mat4 & getProjectionMatrix();
 		glm::mat4 & getViewMatrix();
+		glm::mat4 & getInvViewMatrix();
+		glm::mat4 & getTransposeInvViewMatrix();
 
+		void setPosition(glm::vec3 pos);
 		void translateView(glm::vec3 translation);
 		void rotateView(glm::vec3 rotation);
+
+		void setLookAt(glm::vec3 eye, glm::vec3 target);
+
+		const glm::vec3 & getForwardVector() const
+		{
+			return forward;
+		}
+
+		const glm::vec3 & getPosition() const
+		{
+			return translation;
+		}
+
+		const glm::vec3 & getRotation() const
+		{
+			return rotation;
+		}
 
 	private:
 		void initProjectionMatrix();

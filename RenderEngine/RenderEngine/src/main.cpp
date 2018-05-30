@@ -1,60 +1,75 @@
-#include "BOX.h"
-#include "auxiliar.h"
-
 #include <windows.h>
 
-#include <gl/glew.h>
+#include "windowmanagers/GLUTWindow.h"
+#include "windowmanagers/GLFWWindow.h"
+#include "windowmanagers/WindowManager.h"
+
+#include "userinterfaces/WorldControllerUI.h"
+
 #define SOLVE_FGLUT_WARNING
 #include <gl/freeglut.h> 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
-#include <vector>
 
-#include "PLANE.h"
 #include "Scene.h"
-#include "ProgramTable.h"
-#include "PostProcessProgram.h"
-#include "MeshLoader.h"
-#include "MeshInstanceTable.h"
-#include "Texture.h"
-#include "Light.h"
-#include "KeyboardHandler.h"
-#include "MouseHandler.h"
 #include "Renderer.h"
-#include "PostProcessManager.h"
-#include "DeferredRenderObject.h"
+#include "renderers/DeferredRenderer.h"
+#include "Terrain.h"
+#include "skybox/SkyBox.h"
 
-#include "InputImpl.h"
-#include "AnimImpl.h"
+#include "StorageTable.h"
+#include "datatables/ProgramTable.h"
+#include "datatables/MeshTable.h"
+#include "datatables/TextureTable.h"
+#include "datatables/DeferredObjectsTable.h"
+#include "LightBufferManager.h"
 
+#include "defaultobjects/Cube.h"
+#include "defaultobjects/Plane.h"
+#include "defaultobjects/TreeShapes.h"
 
-//////////////////////////////////////////////////////////////
-// Funciones auxiliares
-//////////////////////////////////////////////////////////////
+#include "programs/ProceduralTerrainProgram.h"
+#include "programs/ProceduralWaterProgram.h"
+#include "programs/TreeProgram.h"
+#include "programs/SkyProgram.h"
+#include "postprocessprograms/DeferredShadingProgram.h"
+#include "postprocessprograms/SSAAProgram.h"
+#include "postprocessprograms/BloomProgram.h"
+#include "postprocessprograms/SSReflectionProgram.h"
+#include "postprocessprograms/SSGrassProgram.h"
+#include "postprocessprograms/VolumetricCloudProgram.h"
+#include "postprocessprograms/HDRToneMappingProgram.h"
+#include "postprocessprograms/SSGodRayProgram.h"
 
-//Declaración de CB
-void renderFunc();
-void resizeFunc(int width, int height);
-void idleFunc();
-void keyboardFunc(unsigned char key, int x, int y);
-void mouseFunc(int button, int state, int x, int y);
-void motionFunc(int x, int y);
+#include "inputhandlers/keyboardhandlers/CameraMovementHandler.h"
+#include "inputhandlers/keyboardhandlers/ToggleUIHandler.h"
+#include "inputhandlers/mousehandlers/CameraRotationHandler.h"
 
-//Funciones de inicialización y destrucción
-void initContext(int argc, char** argv);
-void initOGL();
+#include "animations/CameraBezier.h"
 
+#include "datatables/VegetationTable.h"
+
+#include "CascadeShadowMaps.h"
+
+#include "WorldConfig.h"
+
+void initOpenGL();
 void initScene();
-void initShaderTable();
-void initMeshesAssets();
+void initTables();
 void initSceneObj();
 void initHandlers();
 void initRenderEngine();
-
 void destroy();
+
+Engine::PostProcessChainNode * createBloomNode();
+Engine::PostProcessChainNode * createSSAANode();
+Engine::PostProcessChainNode * createSSReflectionNode();
+Engine::PostProcessChainNode * createSSGrassNode();
+Engine::PostProcessChainNode * createHDRNode();
+Engine::PostProcessChainNode * createSSGodRayNode();
+
 
 /**
 * @author Nadir Román Guerrero
@@ -63,21 +78,20 @@ void destroy();
 
 int main(int argc, char** argv)
 {
-	std::locale::global(std::locale("spanish"));// acentos ;)
+	std::locale::global(std::locale("spanish")); // acentos ;)
 
-	initContext(argc, argv);
-	initOGL();
-
+	initOpenGL();
+	initTables();
 	initScene();
-	initShaderTable();
-	initMeshesAssets();
-	initSceneObj();
 	initRenderEngine();
+	initSceneObj();
 	initHandlers();
 	
-	glutMainLoop();
+	Engine::Window::WindowManager::getInstance().getWindowToolkit()->mainLoop();
 
 	destroy();
+
+	system("Pause");
 
 	return 0;
 }
@@ -85,343 +99,251 @@ int main(int argc, char** argv)
 // ======================================================================
 // ======================================================================
 
-void initContext(int argc, char** argv)
+void initOpenGL()
 {
-	glutInit(&argc, argv);
-	glutInitContextVersion(3, 3);
-	glutInitContextProfile(GLUT_CORE_PROFILE);
-	
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-	glutInitWindowSize(500, 500);
-	glutInitWindowPosition(0, 0);
-	glutCreateWindow("Prácticas GLSL");
+	std::unique_ptr<Engine::Window::GLFWWindow> win = std::make_unique<Engine::Window::GLFWWindow>("Procedural World", 0, 30, 1024, 1024);
+	win->setOGLVersion(4, 1);
+	win->setContextProfile(GLFW_OPENGL_CORE_PROFILE);
 
-	glewExperimental = GL_TRUE;
-	GLenum err = glewInit();
-	if (GLEW_OK != err)
-	{
-		std::cout << "Error: " << glewGetErrorString(err) << std::endl;
-		exit(-1);
-	}
-	
-	const GLubyte *oglVersion = glGetString(GL_VERSION);
-	std::cout << "This system supports OpenGL Version: " << oglVersion << std::endl;
-
-	glutReshapeFunc(resizeFunc);
-	glutDisplayFunc(renderFunc);
-	glutIdleFunc(idleFunc);
-	glutKeyboardFunc(keyboardFunc);
-	glutMouseFunc(mouseFunc);
-	glutMotionFunc(motionFunc);
-}
-
-void initOGL()
-{
-	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glFrontFace(GL_CCW);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glEnable(GL_CULL_FACE);
-}
-
-void destroy()
-{
-	Engine::MeshLoader::getInstance().destroy();
-	Engine::MeshInstanceTable::getInstance().destroy();
-	Engine::ProgramTable::getInstance().destroyAllPrograms();
-	Engine::TextureTable::getInstance().destroy();
+	Engine::Window::WindowManager::getInstance().setToolkit(std::move(win));
 }
 
 void initScene()
 {
-	Engine::Camera * camera = new Engine::Camera(0.1f, 50.0f, 45.0f, 45.0f);
-	camera->translateView(glm::vec3(5.0f, -5.0f, -6.0f));
-	camera->rotateView(glm::vec3(glm::radians(30.0f), glm::radians(60.0f), 0.0f));
-
-	// Parameters: name, position, attenuation
-	Engine::PointLight * pl = new Engine::PointLight("point_light_1", glm::vec3(0, 0, 6), glm::vec3(1.0f,0.5f,0.0f));
-	pl->setAmbientIntensity(0.0f, 0.0f, 0.0f);
-	pl->setDiffuseIntensity(1.0f, 1.0f, 1.0f);
-	pl->setSpecularIntensity(1.0f, 1.0f, 1.0f);
-
-	// Parameters: name, direction
-	Engine::DirectionalLight * dl = new Engine::DirectionalLight("directional_light", glm::vec3(1,0.2,0));
-	dl->setAmbientIntensity(0.1f, 0.1f, 0.1f);
-	dl->setDiffuseIntensity(1.0f, 1.0f, 1.0f);
-	dl->setSpecularIntensity(0.0f, 0.0f, 0.0f);
-
-	// Parameters: name, position, direction, apperture, m, attenuation
-	Engine::SpotLight * sl = new Engine::SpotLight("spot_light", glm::vec3(-3, 3, 0), glm::vec3(1, 0, 0), 20.0f, 10.0f, glm::vec3(1.0f,0.0f,0.0f));
-	sl->setAmbientIntensity(0.0f, 0.0f, 0.0f);
-	sl->setDiffuseIntensity(1.0f, 0.0f, 0.0f);
-	sl->setSpecularIntensity(0.0f, 0.0f,0.0f);
+	Engine::Camera * camera = new Engine::Camera(0.5f, 1000.0f, 45.0f, 45.0f);
+	camera->translateView(glm::vec3(30.0f, -5.0f, -50.0f));
 
 	Engine::Scene * scene = new Engine::Scene();
 	scene->setCamera(camera);
-	scene->addPointLight(pl);
-	scene->addSpotLight(sl);
-	scene->addDirectionalLight(dl);
 
 	Engine::SceneManager::getInstance().registerScene("scene_0", scene);
 	Engine::SceneManager::getInstance().activateScene("scene_0");
 }
 
-void initShaderTable()
+void initTables()
 {
-	Engine::ProgramTable::getInstance().createProgram(new Engine::StandarProgram("full_color_material"),
-		"shaders/shader.full_color.vert", "shaders/shader.full_color.frag");
+	Engine::TableManager::getInstance().registerTable(&Engine::MeshTable::getInstance());
+	Engine::TableManager::getInstance().registerTable(&Engine::TextureTable::getInstance());
+	Engine::TableManager::getInstance().registerTable(&Engine::ProgramTable::getInstance());
+	Engine::TableManager::getInstance().registerTable(&Engine::GPU::LightBufferManager::getInstance());
+	Engine::TableManager::getInstance().registerTable(&Engine::DeferredObjectsTable::getInstance());
 
-	Engine::ProgramTable::getInstance().createProgram(new Engine::TextureProgram("full_texture_material"),
-		"shaders/shader.full_texture.vert", "shaders/shader.full_texture.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::PostProcessProgram("post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.v0.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::GaussianBlurProgram("gaussian_blur_post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.GaussianBlur.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::DepthOfFieldProgram("depth_of_field_post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.DepthOfFieldZbuffer.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::DepthRenderProgram("depth_render_post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.DepthZBuffer.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::PostProcessProgram("color_render_post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.ColorRender.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::PostProcessProgram("normal_render_post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.NormalRender.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::PostProcessProgram("specular_render_post_processing_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.SpecularRender.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::DeferredShadingProgram("deferred_shading"),
-		"shaders/postProcessing.v0.vert", "shaders/DeferredShading.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::EdgeBasedProgram("toon_shading_program"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.ToonShading.frag");
-
-	Engine::ProgramTable::getInstance().createProgram(new Engine::EdgeBasedProgram("screen_space_anti_aliasing"),
-		"shaders/postProcessing.v0.vert", "shaders/postProcessing.SSAA.frag");
-
+	// Texture table
 	Engine::TextureTable::getInstance().checkForAnisotropicFilterSupport();
-	Engine::TextureTable::getInstance().cacheTexture("img/color2.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/emissive.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/normal.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/specMap.png");
 
-	Engine::TextureTable::getInstance().cacheTexture("img/batman_d.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/batman_s.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/batman_n.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/batman_e.png");
-
-	Engine::TextureTable::getInstance().cacheTexture("img/Rock_10_d.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/Rock_10_e.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/Rock_10_s.png");
-	Engine::TextureTable::getInstance().cacheTexture("img/Rock_10_n.png");
-}
-
-void initMeshesAssets()
-{
-	Engine::Mesh cubeMesh = Engine::Mesh((unsigned int)cubeNTriangleIndex, (unsigned int)cubeNVertex,
-		cubeTriangleIndex, cubeVertexPos, cubeVertexColor, cubeVertexNormal, cubeVertexTexCoord, cubeVertexTangent);
-	Engine::MeshLoader::getInstance().addMeshToCache("cube", cubeMesh);
-
-	Engine::Mesh plane = Engine::Mesh(0, (unsigned int)planeNVertex, 0, planeVertexPos, 0, 0, planeUVs, 0);
-	Engine::MeshLoader::getInstance().addMeshToCache("plane", plane);
-
-	Engine::Mesh leftPlane = Engine::Mesh(0, (unsigned int)planeNVertex, 0, leftSmallPlaneVertex, 0, 0, planeUVs, 0);
-	Engine::MeshLoader::getInstance().addMeshToCache("left_plane", leftPlane);
-
-	Engine::Mesh rightPlane = Engine::Mesh(0, (unsigned int)planeNVertex, 0, rightSmallPlaneVertex, 0, 0, planeUVs, 0);
-	Engine::MeshLoader::getInstance().addMeshToCache("right_plane", rightPlane);
-
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("cube", "full_color_material");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("cube", "full_texture_material");
-
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("models/batman.obj", "full_texture_material");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("models/Rock_10.obj", "full_texture_material");
-
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "gaussian_blur_post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "depth_of_field_post_processing_program");
-
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "depth_render_post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "color_render_post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "normal_render_post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "specular_render_post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "deferred_shading");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "toon_shading_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("plane", "screen_space_anti_aliasing");
+	// Shader table
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::PostProcessProgram::PROGRAM_NAME, new Engine::PostProcessProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::DeferredShadingProgram::PROGRAM_NAME, new Engine::DeferredShadingProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SSAAProgram::PROGRAM_NAME, new Engine::SSAAProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::ProceduralTerrainProgram::PROGRAM_NAME, new Engine::ProceduralTerrainProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::ProceduralWaterProgram::PROGRAM_NAME, new Engine::ProceduralWaterProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SkyProgram::PROGRAM_NAME, new Engine::SkyProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::BloomProgram::PROGRAM_NAME, new Engine::BloomProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::TreeProgram::PROGRAM_NAME, new Engine::TreeProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SSReflectionProgram::PROGRAM_NAME, new Engine::SSReflectionProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SSGrassProgram::PROGRAM_NAME, new Engine::SSGrassProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::VolumetricCloudProgram::PROGRAM_NAME, new Engine::VolumetricCloudProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::HDRToneMappingProgram::PROGRAM_NAME, new Engine::HDRToneMappingProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SSGodRayProgram::PROGRAM_NAME, new Engine::SSGodRayProgramFactory());
 	
-	// Side by side render
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("left_plane", "post_processing_program");
-	Engine::MeshInstanceTable::getInstance().instantiateMesh("right_plane", "post_processing_program");
+	// Mesh table
+	Engine::MeshTable::getInstance().addMeshToCache("cube", Engine::CreateCube());
+	Engine::MeshTable::getInstance().addMeshToCache("plane", Engine::CreatePlane());
+	Engine::MeshTable::getInstance().addMeshToCache("trunk", Engine::CreateTrunk());
+	Engine::MeshTable::getInstance().addMeshToCache("leaf", Engine::createLeaf());
+
+	// Cascade shadow maps
+	Engine::CascadeShadowMaps::getInstance().init();
 }
 
 void initSceneObj()
 {
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
-	Engine::MeshInstance * mi = Engine::MeshInstanceTable::getInstance().getMeshInstance("cube", "full_color_material");
-	if (mi != nullptr)
-	{
-		// its on 0,0,0
-		Engine::Object * obj1 = new Engine::Object(mi);
-		scene->addObject(obj1);
 
-		scene->getAnimationHandler()->registerAnimation(new Engine::TestImplementation::DefaultCubeSpin("cube1_anim", obj1));
+	// Add directional light
+	Engine::DirectionalLight * dl = new Engine::DirectionalLight();
+	dl->setColor(Engine::Settings::lightColor);
+	dl->setDirection(Engine::Settings::lightDirection);
+	scene->setDirectionalLight(dl);
 
-		Engine::Object * obj2 = new Engine::Object(mi);
-		obj2->translate(glm::vec3(-5, 0, 0));
+	// Set a terrain
+	scene->setTerrain(new Engine::Terrain(5.0f, 15));
+	// Set a skybox
+	scene->setSkybox(new Engine::SkyBox());
+	
+	// Configure clear color (used for far objects fog)
+	scene->setClearColor(glm::vec3(0.8, 0.85, 1));
+	
+	scene->initialize();
 
-		scene->getAnimationHandler()->registerAnimation(new Engine::TestImplementation::OrbitingCube("cube2_anim", obj2));
-
-		scene->addObject(obj2);
-
-		Engine::Object * camGizmo = new Engine::Object(mi);
-		camGizmo->translate(glm::vec3(0.0f, 0.0f, 8.0f));
-		scene->addObject(camGizmo);
-	}
-
-	Engine::MeshInstance * textInst = Engine::MeshInstanceTable::getInstance().getMeshInstance("cube", "full_texture_material");
-	if (textInst != nullptr)
-	{
-		Engine::Object * textureObject = new Engine::Object(textInst);
-		textureObject->translate(glm::vec3(0, 3, 0));
-
-		textureObject->setAlbedoTexture(Engine::TextureTable::getInstance().instantiateTexture("img/color2.png"));
-		textureObject->setEmissiveTexture(Engine::TextureTable::getInstance().instantiateTexture("img/emissive.png"));
-		textureObject->setNormalMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/normal.png"));
-		textureObject->setSpecularMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/specMap.png"));
-
-		scene->getAnimationHandler()->registerAnimation(new Engine::TestImplementation::DefaultCubeSpin("textured_cube_anim", textureObject));
-
-		scene->addObject(textureObject);
-
-		Engine::Object * textureObject2 = new Engine::Object(textInst);
-		
-		textureObject2->setAlbedoTexture(Engine::TextureTable::getInstance().instantiateTexture("img/color2.png"));
-		textureObject2->setEmissiveTexture(Engine::TextureTable::getInstance().instantiateTexture("img/emissive.png"));
-		textureObject2->setNormalMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/normal.png"));
-		textureObject2->setSpecularMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/specMap.png"));
-
-		scene->getAnimationHandler()->registerAnimation(new Engine::TestImplementation::BezierOrbitingCube("bezier_curve_anim", textureObject2));
-
-		scene->addObject(textureObject2);
-	}
-
-	Engine::MeshInstance * batmanInst = Engine::MeshInstanceTable::getInstance().getMeshInstance("models/batman.obj", "full_texture_material");
-	if (batmanInst != 0)
-	{
-		Engine::Object * batmanObj = new Engine::Object(batmanInst);
-		batmanObj->scale(glm::vec3(0.02f, 0.02f, 0.02f));
-		batmanObj->translate(glm::vec3(0, 0, 3));
-		batmanObj->rotate(glm::radians(-90.0f), glm::vec3(1, 0, 0));
-		batmanObj->setAlbedoTexture(Engine::TextureTable::getInstance().instantiateTexture("img/batman_d.png"));
-		batmanObj->setNormalMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/batman_n.png"));
-		batmanObj->setSpecularMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/batman_s.png"));
-		batmanObj->setEmissiveTexture(Engine::TextureTable::getInstance().instantiateTexture("img/batman_e.png"));
-		scene->addObject(batmanObj);
-	}
-
-	Engine::MeshInstance * RockInst = Engine::MeshInstanceTable::getInstance().getMeshInstance("models/Rock_10.obj", "full_texture_material");
-	if (RockInst != 0)
-	{
-		Engine::Object * rockObj = new Engine::Object(RockInst);
-		rockObj->scale(glm::vec3(0.5f, 0.5f, 0.5f));
-		rockObj->translate(glm::vec3(-3, 0, 3));
-		rockObj->setAlbedoTexture(Engine::TextureTable::getInstance().instantiateTexture("img/Rock_10_d.png"));
-		rockObj->setNormalMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/Rock_10_n.png"));
-		rockObj->setSpecularMapTexture(Engine::TextureTable::getInstance().instantiateTexture("img/Rock_10_s.png"));
-		rockObj->setEmissiveTexture(Engine::TextureTable::getInstance().instantiateTexture("img/Rock_10_e.png"));
-
-		scene->addObject(rockObj);
-	}
-
-	scene->setClearColor(glm::vec3(0, 0, 0));
+	// Trigger FBO resize according to screen size
+	Engine::RenderManager::getInstance().doResize(1024, 1024);
 }
 
 void initHandlers()
 {
-	Engine::PointLight * pl = Engine::SceneManager::getInstance().getActiveScene()->getLightByName("point_light_1");
-	Engine::TestImplementation::LightMovement * lm = new Engine::TestImplementation::LightMovement(pl);
-	Engine::TestImplementation::LightIntensityMod * lim = new Engine::TestImplementation::LightIntensityMod(pl);
-	Engine::TestImplementation::CameraMovement * cm = new Engine::TestImplementation::CameraMovement(Engine::SceneManager::getInstance().getActiveScene()->getCamera());
+	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
 
-	Engine::KeyboardHandlersTable * handlers = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
-	handlers->registerHandler(lm);
-	handlers->registerHandler(lim);
+	// W A S D movement
+	Engine::CameraMovement * cm = new Engine::CameraMovement(scene->getCamera());
+	// UI visibility toggle
+	Engine::ToggleUIHandler * uiHandler = new Engine::ToggleUIHandler();
+	Engine::KeyboardHandlersTable * handlers = scene->getKeyboardHandler();
 	handlers->registerHandler(cm);
-	handlers->registerHandler(new Engine::TestImplementation::RendererSwitcher());
-
-	Engine::TestImplementation::CameraMotion * camMotion = new Engine::TestImplementation::CameraMotion("camera_motion", Engine::SceneManager::getInstance().getActiveScene()->getCamera());
+	handlers->registerHandler(uiHandler);
 	
-	Engine::MouseEventManager * mouseHandler = Engine::SceneManager::getInstance().getActiveScene()->getMouseHandler();
+	Engine::CameraBezier * camBezier = new Engine::CameraBezier(scene->getCamera(), glm::vec3(100,6,100), 50.0f, 3.0f);
+	scene->getAnimationHandler()->registerAnimation(camBezier);
+
+	// Mouse pitch & yaw
+	Engine::CameraRotationHandler * camMotion = new Engine::CameraRotationHandler("camera_motion", Engine::SceneManager::getInstance().getActiveScene()->getCamera());
+	Engine::MouseEventManager * mouseHandler = scene->getMouseHandler();
 	mouseHandler->registerMouseMotionHandler(camMotion);
 }
 
 void initRenderEngine()
 {
-	Engine::DeferredRenderer * dr = Engine::TestImplementation::createDeferredRendererWithDoF();
+	Engine::DeferredRenderer * dr = new Engine::DeferredRenderer();
+	dr->addPostProcess(createSSGodRayNode());		// SS God Rays
+	dr->addPostProcess(createBloomNode());			// Bloom
+	dr->addPostProcess(createSSReflectionNode());	// SS Reflections
+	dr->addPostProcess(createSSGrassNode());		// SS Grass
+	dr->addPostProcess(createHDRNode());			// Tone mapping
 
-	Engine::RenderManager::getInstance().setForwardRenderer(new Engine::ForwardRenderer());
-	Engine::RenderManager::getInstance().setDeferredRenderer(dr);
-
-	Engine::RenderManager::getInstance().deferredRender();
-
-	Engine::RenderManager::getInstance().doResize(500, 500);
+	Engine::RenderManager::getInstance().setRenderer(dr);
+	Engine::RenderManager::getInstance().doResize(1024, 1024);
 }
 
-void renderFunc()
+void destroy()
 {
-	Engine::RenderManager::getInstance().doRender();
-	// Intercambiamos buffer front and back
-	glutSwapBuffers();
+	Engine::TableManager::getInstance().cleanUp();
 }
 
-void resizeFunc(int width, int height)
-{
-	Engine::SceneManager::getInstance().getActiveScene()->onViewportResize(width, height);
-	Engine::RenderManager::getInstance().doResize(width, height);
-	glViewport(0, 0, width, height);
-	// No necesario porque glViewport ya genera los eventos de pintar
-	//glutPostRedisplay();
-}
+// ==========================================================================
 
-void idleFunc()
+Engine::PostProcessChainNode * createSSAANode()
 {
-	Engine::SceneManager::getInstance().getActiveScene()->getAnimationHandler()->tick();
-	glutPostRedisplay();
-}
+	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSAAProgram::PROGRAM_NAME);
 
-void keyboardFunc(unsigned char key, int x, int y)
-{
-	Engine::KeyboardHandlersTable * table = Engine::SceneManager::getInstance().getActiveScene()->getKeyboardHandler();
-	if (table != NULL)
+	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
+	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addDepthBuffer24(500, 500);
+	node->callBack = 0;
+
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
+	if (mi != 0)
 	{
-		table->handleKeyPress(key, x, y);
+		node->postProcessProgram->configureMeshBuffers(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
+
+	return node;
 }
 
-void mouseFunc(int button, int state, int x, int y)
+Engine::PostProcessChainNode * createBloomNode()
 {
-	// Left button = 0
-	// Pressed = 0
-	// Released = 0
-	Engine::MouseEventManager * manager = Engine::SceneManager::getInstance().getActiveScene()->getMouseHandler();
-	if (manager != NULL)
+	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
+	
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::BloomProgram::PROGRAM_NAME);
+
+	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
+	node->renderBuffer->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addColorBuffer(1, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addDepthBuffer24(500, 500);
+	node->callBack = 0;
+
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
+	if (mi != 0)
 	{
-		manager->handleMouseClick(button, state, x, y);
+		node->postProcessProgram->configureMeshBuffers(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
+
+	return node;
 }
 
-void motionFunc(int x, int y)
+Engine::PostProcessChainNode * createSSReflectionNode()
 {
-	// xMin, yMin = 0,0 (top-left corner)
-	// xMax, yMax = width,height (bottom-right corner)
-	Engine::MouseEventManager * manager = Engine::SceneManager::getInstance().getActiveScene()->getMouseHandler();
-	if (manager != NULL)
+	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
+
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSReflectionProgram::PROGRAM_NAME);
+
+	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
+	node->renderBuffer->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addDepthBuffer24(500, 500);
+	node->callBack = 0;
+
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
+	if (mi != 0)
 	{
-		manager->handleMouseMotion(x, y);
+		node->postProcessProgram->configureMeshBuffers(mi);
+		node->obj = new Engine::PostProcessObject(mi);
 	}
+
+	return node;
+}
+
+Engine::PostProcessChainNode * createSSGrassNode()
+{
+	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
+
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSGrassProgram::PROGRAM_NAME);
+
+	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
+	node->renderBuffer->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addColorBuffer(1, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addDepthBuffer24(500, 500);
+	node->callBack = 0;
+
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
+	if (mi != 0)
+	{
+		node->postProcessProgram->configureMeshBuffers(mi);
+		node->obj = new Engine::PostProcessObject(mi);
+	}
+
+	return node;
+}
+
+Engine::PostProcessChainNode * createHDRNode()
+{
+	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
+
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::HDRToneMappingProgram::PROGRAM_NAME);
+
+	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
+	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addDepthBuffer24(500, 500);
+	node->callBack = 0;
+
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
+	if (mi != 0)
+	{
+		node->postProcessProgram->configureMeshBuffers(mi);
+		node->obj = new Engine::PostProcessObject(mi);
+	}
+
+	return node;
+}
+
+Engine::PostProcessChainNode * createSSGodRayNode()
+{
+	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
+
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSGodRayProgram::PROGRAM_NAME);
+
+	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
+	node->renderBuffer->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addDepthBuffer24(500, 500);
+	node->callBack = 0;
+
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
+	if (mi != 0)
+	{
+		node->postProcessProgram->configureMeshBuffers(mi);
+		node->obj = new Engine::PostProcessObject(mi);
+	}
+
+	return node;
 }

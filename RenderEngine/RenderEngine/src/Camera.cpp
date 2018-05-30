@@ -11,6 +11,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include <math.h>
+#include <iostream>
 
 Engine::Camera::Camera(float n, float f, float fy, float fx) :nearPlane(n), farPlane(f), fovy(fy), fovx(fx)
 {
@@ -50,6 +51,13 @@ void Engine::Camera::initViewMatrix()
 	updateViewMatrix();
 }
 
+void Engine::Camera::setPosition(glm::vec3 pos)
+{
+	translation = glm::vec3(0, 0, 0);
+	rotation = glm::vec3(0, 0, 0);
+	translateView(pos);
+}
+
 void Engine::Camera::translateView(glm::vec3 t)
 {
 	float forwardDelta = t.z;
@@ -64,6 +72,13 @@ void Engine::Camera::translateView(glm::vec3 t)
 
 	translation += traslatedPosition;
 	updateViewMatrix();
+}
+
+void Engine::Camera::setLookAt(glm::vec3 eye, glm::vec3 target)
+{
+	viewMatrix = glm::lookAt(eye, target, glm::vec3(0, 1, 0));
+	translation = -eye;
+	forward = glm::normalize(glm::vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]));
 }
 
 void Engine::Camera::rotateView(glm::vec3 rot)
@@ -85,6 +100,11 @@ void Engine::Camera::updateViewMatrix()
 	glm::mat4 pitchMat = glm::mat4_cast(pitch);
 
 	viewMatrix = pitchMat * yawMat * glm::translate(identity, translation);
+
+	//invViewMatrix = glm::inverse(viewMatrix);
+	//transposeInvViewMatrix = glm::transpose(invViewMatrix);
+
+	forward = glm::normalize(glm::vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]));
 }
 
 void Engine::Camera::onWindowResize(int width, int height)
@@ -120,4 +140,14 @@ glm::mat4 & Engine::Camera::getProjectionMatrix()
 glm::mat4 & Engine::Camera::getViewMatrix()
 {
 	return viewMatrix;
+}
+
+glm::mat4 & Engine::Camera::getInvViewMatrix()
+{
+	return invViewMatrix;
+}
+
+glm::mat4 & Engine::Camera::getTransposeInvViewMatrix()
+{
+	return transposeInvViewMatrix;
 }

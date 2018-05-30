@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include <list>
+#include <map>
 #include <gl/glew.h>
 
-#include "Texture.h"
 #include "Object.h"
+#include "instances/TextureInstance.h"
 
 namespace Engine
 {
@@ -23,14 +23,21 @@ namespace Engine
 	{
 	private:
 		static GLenum COLOR_ATTACHMENTS[8];
-
+	public:
+		static const std::string G_BUFFER_COLOR;
+		static const std::string G_BUFFER_POS;
+		static const std::string G_BUFFER_NORMAL;
+		static const std::string G_BUFFER_SPECULAR;
+		static const std::string G_BUFFER_DEPTH;
+		static const std::string G_BUFFER_EMISSIVE;
+	private:
 		unsigned int fbo;
 		
 		int usedColorBuffers;
 		unsigned int colorBuffersSize;
 		BufferInfo * colorBuffers;
-
 		BufferInfo depthBuffer;
+		std::map<std::string, TextureInstance *> gBufferMap;
 
 		bool renderDepth;
 
@@ -40,13 +47,14 @@ namespace Engine
 
 		unsigned int getFrameBufferId();
 
-		void addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, float filterMethod = GL_NEAREST);
-		void addDepthBuffer24(unsigned int w, unsigned int h);
-		void addDepthBuffer32(unsigned int w, unsigned int h);
+		TextureInstance * addColorBuffer(unsigned int index, GLenum gpuTextureFormat, GLenum inputTextureFormat, GLenum pixelFormat, unsigned int w, unsigned int h, std::string name = "", int filterMethod = GL_NEAREST);
+		TextureInstance * addDepthBuffer24(unsigned int w, unsigned int h);
+		TextureInstance * addDepthBuffer32(unsigned int w, unsigned int h);
+		TextureInstance * getBufferByName(std::string name);
 
 		void initialize();
 		void resizeFBO(unsigned int w, unsigned int h);
 
-		void populateDeferredObject(Object * obj);
+		void populateDeferredObject(PostProcessObject * obj);
 	};
 }

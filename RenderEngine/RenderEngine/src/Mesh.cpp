@@ -9,25 +9,30 @@
 
 #include <glm/glm.hpp>
 #include <vector>
+#include <iostream>
+
+#include <gl\glew.h>
 
 Engine::Mesh::Mesh()
 {
 	faces = 0;
-	vertices = colors = normals = tangents = uvs = 0;
+	vertices = colors = normals = tangents = uvs = emission = 0;
 }
 
 Engine::Mesh::Mesh(aiMesh * mesh)
 {
 	faces = 0;
-	vertices = colors = normals = tangents = uvs = 0;
+	vertices = colors = normals = tangents = uvs = emission = 0;
 
 	loadFromMesh(mesh);
+
+	syncGPU();
 }
 
 Engine::Mesh::Mesh(const Engine::Mesh &other)
 {
 	faces = 0;
-	vertices = colors = normals = tangents = uvs = 0;
+	vertices = colors = normals = tangents = uvs = emission = 0;
 
 	numFaces = other.numFaces;
 	numVertices = other.numVertices;
@@ -70,18 +75,29 @@ Engine::Mesh::Mesh(const Engine::Mesh &other)
 		uvs = new float[numVertices * 2];
 		memcpy(uvs, other.uvs, numVertices * 2 * sizeof(float));
 	}
+
+	verticesPerFace = other.verticesPerFace;
+
+	vao = other.vao;
+	vboColors = other.vboColors;
+	vboFaces = other.vboFaces;
+	vboNormals = other.vboNormals;
+	vboTangents = other.vboTangents;
+	vboUVs = other.vboUVs;
+	vboVertices = other.vboVertices;
 }
 
-Engine::Mesh::Mesh(const unsigned int numF, const unsigned int numV, const unsigned int *f, const float *v, const float *c, const float *n, const float *uv, const float *t)
+Engine::Mesh::Mesh(const unsigned int numF, const unsigned int numV, const unsigned int *f, const float *v, const float *c, const float *n, const float *uv, const float *t, const float *e)
 	:numFaces(numF), numVertices(numV)
 {
 	faces = 0;
-	vertices = colors = normals = tangents = uvs = 0;
+	vertices = colors = normals = tangents = uvs = emission = 0;
 
 	if (numFaces > 0)
 	{
 		if (f != 0)
 		{
+			verticesPerFace = 3;
 			faces = new unsigned int[numFaces * 3];
 			memcpy(faces, f, numFaces * 3 * sizeof(unsigned int));
 		}
@@ -107,6 +123,10 @@ Engine::Mesh::Mesh(const unsigned int numF, const unsigned int numV, const unsig
 			normals = new float[totalV];
 			memcpy(normals, n, totalV * sizeof(float));
 		}
+		else
+		{
+			computeNormals();
+		}
 
 		if (uv != 0)
 		{
@@ -119,7 +139,15 @@ Engine::Mesh::Mesh(const unsigned int numF, const unsigned int numV, const unsig
 			tangents = new float[totalV];
 			memcpy(tangents, t, totalV * sizeof(float));
 		}
+
+		if (e != 0)
+		{
+			emission = new float[totalV];
+			memcpy(emission, e, totalV * sizeof(float));
+		}
 	}
+
+	syncGPU();
 }
 
 void Engine::Mesh::loadFromMesh(aiMesh * mesh)
@@ -132,34 +160,25 @@ void Engine::Mesh::loadFromMesh(aiMesh * mesh)
 
 Engine::Mesh::~Mesh()
 {
-	if(faces != nullptr)
-		delete[] faces;
-
-	if(vertices != 0)
-		delete[] vertices;
-
-	if(colors != 0)
-		delete[] colors;
-
-	if(normals != 0)
-		delete[] normals;
-
-	if(uvs != 0)
-		delete[] uvs;
-
-	if(tangents != 0)
-		delete[] tangents;
+	releaseCPU();
 }
 
 void Engine::Mesh::extractTopology(aiMesh * mesh)
 {
 	numFaces = mesh->mNumFaces;
 
-	faces = new unsigned int[numFaces * 3];
+	if (numFaces == 0)
+	{
+		return;
+	}
+	
+	verticesPerFace = mesh->mFaces[0].mNumIndices;
+	
+	faces = new unsigned int[numFaces * verticesPerFace];
 
 	for (unsigned int i = 0; i < numFaces; i++)
 	{
-		const int start = i * 3;
+		const int start = i * verticesPerFace;
 		memcpy(faces + start, mesh->mFaces[i].mIndices, sizeof(unsigned int) * 3);
 	}
 }
@@ -309,42 +328,195 @@ void Engine::Mesh::computeTangents()
 	}
 }
 
-unsigned int Engine::Mesh::getNumFaces()
+const unsigned int Engine::Mesh::getNumFaces() const
 {
 	return numFaces;
 }
 
-unsigned int Engine::Mesh::getNumVertices()
+const unsigned int Engine::Mesh::getNumVerticesPerFace() const
+{
+	return verticesPerFace;
+}
+
+const unsigned int Engine::Mesh::getNumVertices() const
 {
 	return numVertices;
 }
 
-unsigned int * Engine::Mesh::getFaces()
+const unsigned int * Engine::Mesh::getFaces() const
 {
 	return faces;
 }
 
-float * Engine::Mesh::getVertices()
+const float * Engine::Mesh::getVertices() const
 {
 	return vertices;
 }
 
-float * Engine::Mesh::getColor()
+const float * Engine::Mesh::getColor() const
 {
 	return colors;
 }
 
-float * Engine::Mesh::getNormals()
+const float * Engine::Mesh::getNormals() const
 {
 	return normals;
 }
 
-float * Engine::Mesh::getUVs()
+const float * Engine::Mesh::getUVs() const
 {
 	return uvs;
 }
 
-float * Engine::Mesh::getTangetns()
+const float * Engine::Mesh::getTangetns() const
 {
 	return tangents;
+}
+
+const float * Engine::Mesh::getEmissive() const
+{
+	return emission;
+}
+
+void Engine::Mesh::syncGPU()
+{
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	
+	unsigned int numFaces = getNumFaces();
+	unsigned int numVertex = getNumVertices();
+
+	glGenBuffers(1, &vboVertices);
+	glBindBuffer(GL_ARRAY_BUFFER, vboVertices);
+	glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, getVertices(), GL_STATIC_DRAW);
+
+	if (colors != 0)
+	{
+		glGenBuffers(1, &vboColors);
+		glBindBuffer(GL_ARRAY_BUFFER, vboColors);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, colors, GL_STATIC_DRAW);
+	}
+
+	if (normals != 0)
+	{
+		glGenBuffers(1, &vboNormals);
+		glBindBuffer(GL_ARRAY_BUFFER, vboNormals);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, normals, GL_STATIC_DRAW);
+	}
+
+	if (uvs != 0)
+	{
+		glGenBuffers(1, &vboUVs);
+		glBindBuffer(GL_ARRAY_BUFFER, vboUVs);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 2, uvs, GL_STATIC_DRAW);
+	}
+
+	if (tangents != 0)
+	{
+		glGenBuffers(1, &vboTangents);
+		glBindBuffer(GL_ARRAY_BUFFER, vboTangents);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, tangents, GL_STATIC_DRAW);
+	}
+
+	if (emission != 0)
+	{
+		glGenBuffers(1, &vboEmission);
+		glBindBuffer(GL_ARRAY_BUFFER, vboEmission);
+		glBufferData(GL_ARRAY_BUFFER, numVertex * sizeof(float) * 3, emission, GL_STATIC_DRAW);
+	}
+
+	if (faces != 0)
+	{
+		glGenBuffers(1, &vboFaces);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboFaces);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, numFaces * sizeof(unsigned int) * 3, faces, GL_STATIC_DRAW);
+	}
+}
+
+void Engine::Mesh::releaseCPU()
+{
+	if (faces != 0)
+	{
+		delete[] faces;
+	}
+	faces = 0;
+
+	if (vertices != 0)
+	{
+		delete[] vertices;
+	}
+	vertices = 0;
+
+	if (normals != 0)
+	{
+		delete[] normals;
+	}
+	normals = 0;
+
+	if (uvs != 0)
+	{
+		delete[] uvs;
+	}
+	uvs = 0;
+
+	if (tangents != 0)
+	{
+		delete[] tangents;
+	}
+	tangents = 0;
+
+	if (colors != 0)
+	{
+		delete[] colors;
+	}
+	colors = 0;
+
+	if(emission != 0)
+	{
+		delete[] emission;
+	}
+	emission = 0;
+}
+
+void Engine::Mesh::releaseGPU()
+{
+	if (vboVertices != -1)
+	{
+		glDeleteBuffers(1, &vboVertices);
+	}
+
+	if (vboNormals != -1)
+	{
+		glDeleteBuffers(1, &vboNormals);
+	}
+
+	if (vboColors != -1)
+	{
+		glDeleteBuffers(1, &vboColors);
+	}
+
+	if (vboUVs != -1)
+	{
+		glDeleteBuffers(1, &vboUVs);
+	}
+
+	if (vboTangents != -1)
+	{
+		glDeleteBuffers(1, &vboTangents);
+	}
+
+	if (vboFaces != -1)
+	{
+		glDeleteBuffers(1, &vboFaces);
+	}
+
+	if (vboEmission != -1)
+	{
+		glDeleteBuffers(1, &vboEmission);
+	}
+
+	if (vao != -1)
+	{
+		glDeleteVertexArrays(1, &vao);
+	}
 }

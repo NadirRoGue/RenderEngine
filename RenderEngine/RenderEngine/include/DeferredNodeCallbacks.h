@@ -22,31 +22,4 @@ namespace Engine
 	};
 
 	// ========================================================
-
-	class MotionBlurImpl : public DeferredCallback
-	{
-	private:
-		bool enabled;
-		float r, g, b, alpha;
-	public:
-		MotionBlurImpl();
-		~MotionBlurImpl();
-
-		glm::vec4 getMotionBlurStats();
-		void switchEnabled();
-		void setColorMask(float r, float g, float b);
-		void setAlpha(float alpha);
-		void execute(Object * obj, Program * prog, DeferredRenderObject * buffer, Camera * cam);
-	};
-
-	// =========================================================
-
-	class DeferredShadingLightPopulation : public DeferredCallback
-	{
-	public:
-		DeferredShadingLightPopulation();
-		~DeferredShadingLightPopulation();
-		void initialize(Object *obj, Program * prog, DeferredRenderObject * buffer);
-		void execute(Object * obj, Program * prog, DeferredRenderObject * buffer, Camera * cam);
-	};
 }

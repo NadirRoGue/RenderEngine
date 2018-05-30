@@ -7,6 +7,10 @@
 
 #include <iostream>
 
+const int Engine::KeyboardHandler::MODE_RELEASE = 0;
+const int Engine::KeyboardHandler::MODE_PRESS = 1;
+const int Engine::KeyboardHandler::MODE_REPEAT = 2;
+
 Engine::KeyboardHandlersTable::KeyboardHandlersTable()
 {
 	for (int i = 0; i < 256; i++)
@@ -32,7 +36,7 @@ void Engine::KeyboardHandlersTable::registerHandler(Engine::KeyboardHandler *han
 	}
 }
 
-void Engine::KeyboardHandlersTable::handleKeyPress(unsigned char key, int x, int y)
+void Engine::KeyboardHandlersTable::handleKeyPress(unsigned char key, int x, int y, int mode)
 {
 	key = tolower(key);
 
@@ -40,7 +44,7 @@ void Engine::KeyboardHandlersTable::handleKeyPress(unsigned char key, int x, int
 	
 	if (handler != 0)
 	{
-		handler->onKeyPressed(key, x, y);
+		handler->onKeyPressed(key, x, y, mode);
 	}
 }
 
@@ -63,6 +67,6 @@ const std::list<unsigned char> & Engine::KeyboardHandler::getUsedKeys() const
 	return usedKeys;
 }
 
-void Engine::KeyboardHandler::onKeyPressed(unsigned char key, int x, int y)
+void Engine::KeyboardHandler::onKeyPressed(unsigned char key, int x, int y, int mode)
 {
 }

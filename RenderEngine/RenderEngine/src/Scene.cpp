@@ -8,7 +8,9 @@
 
 #include <iostream>
 
-#include "ProgramTable.h"
+#include "datatables/ProgramTable.h"
+#include "LightBufferManager.h"
+#include "skybox/DummySkybox.h"
 
 Engine::Scene::Scene()
 {
@@ -17,6 +19,9 @@ Engine::Scene::Scene()
 	keyboardHandlers = new Engine::KeyboardHandlersTable();
 	mouseHandlers = new Engine::MouseEventManager();
 	animations = new Engine::AnimationTable();
+	directionalLight = NULL;
+	terrain = NULL;
+	skybox = new Engine::DummySkyBox();
 }
 
 Engine::Scene::~Scene()
@@ -35,16 +40,21 @@ Engine::Scene::~Scene()
 	{
 		delete animations;
 	}
+
+	if (terrain != NULL)
+	{
+		delete terrain;
+	}
+
+	if (skybox != NULL)
+	{
+		delete skybox;
+	}
 }
 
 void Engine::Scene::setClearColor(glm::vec3 cc)
 {
 	clearColor = cc;
-	std::map<std::string, Engine::ProgramRenderables *>::const_iterator renderableIt;
-	for (renderableIt = renders.cbegin(); renderableIt != renders.cend(); renderableIt++)
-	{
-		renderableIt->second->program->configureClearColor(clearColor);
-	}
 }
 
 const glm::vec3 & Engine::Scene::getClearColor() const
@@ -52,10 +62,30 @@ const glm::vec3 & Engine::Scene::getClearColor() const
 	return clearColor;
 }
 
+void Engine::Scene::setTerrain(Terrain * terrain)
+{
+	this->terrain = terrain;
+}
+
+Engine::Terrain * Engine::Scene::getTerrain()
+{
+	return this->terrain;
+}
+
+void Engine::Scene::setSkybox(Engine::AbstractSkyBox * sb)
+{
+	skybox = sb;
+}
+
+Engine::AbstractSkyBox * Engine::Scene::getSkyBox()
+{
+	return skybox;
+}
+
 void Engine::Scene::addObject(Engine::Object *obj)
 {
-	std::string material = obj->getMeshInstance()->getMaterial();
-	unsigned int vaoIndex = obj->getMeshInstance()->vao;
+	std::string material = obj->getShaderName();
+	unsigned int vaoIndex = obj->getMesh()->vao;
 
 	std::map<std::string, Engine::ProgramRenderables *>::iterator renderIt = renders.find(material);
 
@@ -65,10 +95,11 @@ void Engine::Scene::addObject(Engine::Object *obj)
 
 		if(prog == nullptr)
 		{
+			std::cerr << "Scene: Tried to add object with non-existent shader: " << material << std::endl;
 			return;
 		}
 
-		configureNewProgramLights(prog);
+		prog->configureMeshBuffers(obj->getManipMesh());
 
 		Engine::ProgramRenderables * renderable = new Engine::ProgramRenderables(prog);
 		renderable->objects[vaoIndex].push_back(obj);
@@ -80,81 +111,26 @@ void Engine::Scene::addObject(Engine::Object *obj)
 	}
 }
 
-void Engine::Scene::addLightDependentProgram(Engine::Program * prog)
-{
-	lightDependentPrograms.push_back(prog);
-}
-
-void Engine::Scene::configureNewProgramLights(Engine::Program * p)
-{
-	std::map<std::string, Engine::PointLight *>::iterator it = pointLights.begin();
-	while (it != pointLights.end())
-	{
-		p->configurePointLightBuffer(it->second);
-		it++;
-	}
-
-	std::map<std::string, Engine::SpotLight *>::iterator sIt = spotLights.begin();
-	while (sIt != spotLights.end())
-	{
-		p->configureSpotLightBuffer(sIt->second);
-		sIt++;
-	}
-
-	std::map<std::string, Engine::DirectionalLight *>::iterator dIt = directionalLights.begin();
-	while (dIt != directionalLights.end())
-	{
-		p->configureDirectionalLightBuffer(dIt->second);
-		dIt++;
-	}
-}
-
 void Engine::Scene::addPointLight(Engine::PointLight * pl)
 {
+	pl->setBufferIndex(unsigned int(pointLights.size()));
 	pointLights[pl->getName()] = pl;
-
-	triggerLightUpdate(pl);
 }
 
 void Engine::Scene::addSpotLight(Engine::SpotLight * sl)
 {
+	sl->setBufferIndex(unsigned int(spotLights.size()));
 	spotLights[sl->getName()] = sl;
-
-	std::map<std::string, Engine::ProgramRenderables *>::iterator it = renders.begin();
-	while (it != renders.end())
-	{
-		it->second->program->configureSpotLightBuffer(sl);
-		it++;
-	}
 }
 
-void Engine::Scene::addDirectionalLight(Engine::DirectionalLight * dl)
+void Engine::Scene::setDirectionalLight(Engine::DirectionalLight * dl)
 {
-	directionalLights[dl->getName()] = dl;
-
-	std::map<std::string, Engine::ProgramRenderables *>::iterator it = renders.begin();
-	while (it != renders.end())
+	if (directionalLight != NULL)
 	{
-		it->second->program->configureDirectionalLightBuffer(dl);
-		it++;
-	}
-}
-
-void Engine::Scene::triggerLightUpdate(PointLight *pl)
-{
-	std::map<std::string, Engine::ProgramRenderables *>::iterator it = renders.begin();
-	while (it != renders.end())
-	{
-		it->second->program->configurePointLightBuffer(pl);
-		it++;
+		delete directionalLight;
 	}
 
-	std::list<Engine::Program *>::iterator it2 = lightDependentPrograms.begin();
-	while (it2 != lightDependentPrograms.end())
-	{
-		(*it2)->configurePointLightBuffer(pl);
-		it2++;
-	}
+	directionalLight = dl;
 }
 
 Engine::PointLight * Engine::Scene::getLightByName(std::string name)
@@ -179,15 +155,9 @@ Engine::SpotLight * Engine::Scene::getSpotLightByName(std::string name)
 	return NULL;
 }
 
-Engine::DirectionalLight * Engine::Scene::getDirectionalLightByName(std::string name)
+Engine::DirectionalLight * Engine::Scene::getDirectionalLight()
 {
-	std::map<std::string, Engine::DirectionalLight *>::iterator it = directionalLights.find(name);
-	if (it != directionalLights.end())
-	{
-		return it->second;
-	}
-
-	return NULL;
+	return directionalLight;
 }
 
 void Engine::Scene::setCamera(Engine::Camera * cam)
@@ -215,11 +185,6 @@ const std::map<std::string, Engine::SpotLight *> & Engine::Scene::getSpotLights(
 	return spotLights;
 }
 
-const std::map<std::string, Engine::DirectionalLight *> Engine::Scene::getDirectionalLight() const
-{
-	return directionalLights;
-}
-
 void Engine::Scene::onViewportResize(int width, int height)
 {
 	camera->onWindowResize(width, height);
@@ -238,6 +203,11 @@ Engine::MouseEventManager * Engine::Scene::getMouseHandler() const
 Engine::AnimationTable * Engine::Scene::getAnimationHandler() const
 {
 	return animations;
+}
+
+void Engine::Scene::initialize()
+{
+	Engine::GPU::LightBufferManager::getInstance().onSceneStart();
 }
 
 // ===========================================================================================

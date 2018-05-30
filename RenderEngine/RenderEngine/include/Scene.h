@@ -13,6 +13,8 @@
 #include "KeyboardHandler.h"
 #include "MouseHandler.h"
 #include "Animation.h"
+#include "Terrain.h"
+#include "skybox/AbstractSkyBox.h"
 
 #include <map>
 #include <list>
@@ -38,11 +40,13 @@ namespace Engine
 		Camera * camera;
 
 		std::map<std::string, ProgramRenderables *> renders;
+
+		DirectionalLight * directionalLight;
 		std::map<std::string, PointLight *> pointLights;
 		std::map<std::string, SpotLight *> spotLights;
-		std::map<std::string, DirectionalLight *> directionalLights;
 
-		std::list<Program *> lightDependentPrograms;
+		Terrain * terrain;
+		AbstractSkyBox * skybox;
 
 		glm::vec3 clearColor;
 
@@ -51,24 +55,25 @@ namespace Engine
 		~Scene();
 
 		const std::map<std::string, ProgramRenderables *> & getObjects() const;
-		const std::map<std::string, PointLight *> & getPointLights() const;
-		const std::map<std::string, SpotLight *> & getSpotLights() const;
-		const std::map<std::string, DirectionalLight *> getDirectionalLight() const;
-		
-		void setCamera(Camera * cam);
-		Camera * getCamera();
-		void addObject(Object * obj);
-		void addLightDependentProgram(Program * prog);
 
 		void addPointLight(PointLight * pl);
 		void addSpotLight(SpotLight * sl);
-		void addDirectionalLight(DirectionalLight * dl);
-
+		void setDirectionalLight(DirectionalLight * dl);
+		const std::map<std::string, PointLight *> & getPointLights() const;
+		const std::map<std::string, SpotLight *> & getSpotLights() const;
 		PointLight * getLightByName(std::string name);
 		SpotLight * getSpotLightByName(std::string name);
-		DirectionalLight * getDirectionalLightByName(std::string name);
+		DirectionalLight * getDirectionalLight();
+		
+		void setTerrain(Terrain * terrain);
+		Terrain * getTerrain();
+		void setSkybox(AbstractSkyBox * skybox);
+		AbstractSkyBox * getSkyBox();
+		void setCamera(Camera * cam);
+		Camera * getCamera();
+		void addObject(Object * obj);
 
-		void triggerLightUpdate(PointLight *pl);
+		void initialize();
 
 		void setClearColor(glm::vec3 cc);
 		const glm::vec3 & getClearColor() const;
@@ -78,8 +83,6 @@ namespace Engine
 		KeyboardHandlersTable * getKeyboardHandler() const;
 		MouseEventManager * getMouseHandler() const;
 		AnimationTable * getAnimationHandler() const;
-	private:
-		void configureNewProgramLights(Program * p);
 	};
 
 	// =====================================================================
