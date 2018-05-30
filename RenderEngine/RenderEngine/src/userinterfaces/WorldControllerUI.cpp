@@ -77,6 +77,7 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::SliderFloat("Cloud Type##app", &Engine::Settings::cloudType, 0.0f, 1.0f);
 		ImGui::SliderFloat("Cloud Coverage##app", &Engine::Settings::coverageMultiplier, 0.0f, 1.0f);
 		ImGui::SliderFloat("Cloud Speed##app", &Engine::Settings::cloudSpeed, 0.0f, 50.0f);
+		ImGui::ColorEdit3("Cloud Color multiplier##app", &Engine::Settings::cloudColor[0]);
 
 		ImGui::Spacing(); ImGui::Spacing();
 		ImGui::Separator();

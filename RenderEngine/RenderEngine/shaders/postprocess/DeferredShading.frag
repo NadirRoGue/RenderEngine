@@ -124,11 +124,12 @@ vec3 processAtmosphericFog(in vec3 shadedColor)
 
 void main()
 {
-	vec4 gbuffercolor =		texture(postProcessing_0,  texCoord);
+	vec4 gbuffercolor =		texture(postProcessing_0, texCoord);
 	vec4 gbuffernormal =	texture(postProcessing_1, texCoord);
 	vec4 gbufferspec =		texture(postProcessing_2, texCoord);
 	vec4 gbufferemissive =	texture(postProcessing_3, texCoord);
 	vec4 gbufferpos =		texture(postProcessing_4, texCoord);
+	vec4 gbufferinfo =		texture(postProcessing_5, texCoord);
 	depth =					texture(postProcessing_6, texCoord).x;
 
 	N = gbuffernormal.xyz;
@@ -138,7 +139,7 @@ void main()
 	Ks = gbufferspec.rgb;
 	Ke = gbufferemissive.rgb;
 
-	vec3 shaded = processDirectionalLight(gbuffercolor.w);
+	vec3 shaded = processDirectionalLight(gbufferinfo.y);
 	shaded = processAtmosphericFog(shaded);
 
 	outColor = vec4(shaded, 1.0);

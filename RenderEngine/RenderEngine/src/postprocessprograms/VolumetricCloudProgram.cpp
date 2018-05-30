@@ -28,6 +28,7 @@ Engine::VolumetricCloudProgram::VolumetricCloudProgram(const Engine::VolumetricC
 	uCamPos = other.uCamPos;
 	uLightDir = other.uLightDir;
 	uLightColor = other.uLightColor;
+	uCloudColor = other.uCloudColor;
 	uTime = other.uTime;
 
 	uCloudSpeed = other.uCloudSpeed;
@@ -52,6 +53,7 @@ void Engine::VolumetricCloudProgram::configureProgram()
 	uCamPos = glGetUniformLocation(glProgram, "camPos");
 	uLightDir = glGetUniformLocation(glProgram, "lightDir");
 	uLightColor = glGetUniformLocation(glProgram, "lightColor");
+	uCloudColor = glGetUniformLocation(glProgram, "cloudColor");
 	uTime = glGetUniformLocation(glProgram, "time");
 
 	uCloudSpeed = glGetUniformLocation(glProgram, "cloudSpeed");
@@ -78,6 +80,7 @@ void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const 
 	glUniform3fv(uLightDir, 1, &Engine::Settings::lightDirection[0]);
 	glUniform3fv(uLightColor, 1, &Engine::Settings::lightColor[0]);
 
+	glUniform3fv(uCloudColor, 1, &Engine::Settings::cloudColor[0]);
 	glUniform1f(uTime, Engine::Time::timeSinceBegining);
 	glUniform1f(uCloudSpeed, Engine::Settings::cloudSpeed);
 	glUniform1f(uCloudType, Engine::Settings::cloudType);

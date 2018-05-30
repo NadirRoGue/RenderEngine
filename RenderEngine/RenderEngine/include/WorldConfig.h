@@ -44,6 +44,7 @@ namespace Engine
 		static float cloudType;
 		static float cloudSpeed;
 		static float coverageMultiplier;
+		static glm::vec3 cloudColor;
 
 		static float hdrExposure;
 		static float hdrGamma;

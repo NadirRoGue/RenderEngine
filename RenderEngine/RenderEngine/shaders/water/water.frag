@@ -6,6 +6,7 @@ layout (location=1) out vec4 outNormal;
 layout (location=2) out vec4 outSpecular;
 layout (location=3) out vec4 outEmissive;
 layout (location=4) out vec4 outPos;
+layout (location=5) out vec4 outInfo;
 
 layout (location=0) in vec2 inUV;
 layout (location=1) in vec3 inPos;
@@ -16,6 +17,9 @@ uniform mat4 normal;
 
 uniform sampler2D depthTexture;
 uniform sampler2D depthTexture1;
+
+uniform sampler2D inInfo;
+uniform vec2 screenSize;
 
 uniform vec3 lightDir;
 vec2 poissonDisk[4] = vec2[](
@@ -163,10 +167,12 @@ void main()
 	vec3 n = normalize((normal * vec4(rawNormal, 0.0)).xyz);	
 	// COMPUTE COLOR
 	// ------------------------------------------------------------------------------
+	float alpha = 1.0;
 #ifdef WIRE_MODE
 	vec3 color = vec3(0);
 #else
 	vec3 color = watercolor;
+	alpha = 1.0 - texture(inInfo, gl_FragCoord.xy / screenSize).z;
 #endif
 
 	// APPLY SHADOW MAP
@@ -175,9 +181,10 @@ void main()
 
 	// OUTPUT TO G-BUFFERS
 	// ------------------------------------------------------------------------------
-	outColor = vec4(color, visibility);
+	outColor = vec4(color, alpha);
 	outNormal = vec4(n, 1.0);
 	outPos = vec4(inPos, 1.0);
+	outInfo = vec4(0, visibility, 0, alpha);
 #ifdef WIRE_MODE
 	outSpecular = vec4(0);
 	outEmissive = vec4(0);

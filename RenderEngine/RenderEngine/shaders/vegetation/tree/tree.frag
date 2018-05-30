@@ -84,12 +84,12 @@ void main()
 	}
 	*/
 
-	outColor = vec4(inColor, visibility);
+	outColor = vec4(inColor, 1.0);
 	outNormal = vec4(rawNormal, 0);
 	outSpecular = vec4(0,0,0,0);
 	outEmissive = vec4(inEmission,0);
 	outPos = vec4(inPos, 1);
-	outInfo = vec4(0);
+	outInfo = vec4(0, visibility,0,0);
 #endif
 #else
 	lightdepth = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, 0);

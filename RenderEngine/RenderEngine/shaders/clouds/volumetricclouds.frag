@@ -26,6 +26,8 @@ uniform sampler2D weather;
 uniform vec3 lightDir;
 uniform vec3 lightColor;
 
+uniform vec3 cloudColor;
+
 // Cloud evolution
 uniform float time;
 uniform float cloudType;
@@ -288,7 +290,7 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 	// Light color attenuation based on sun's position
 	float lightFactor = (clamp(dot(vec3(0,1,0), normalize(lightDir)), 0.0, 1.0) + 0.01);
 	float ambientFactor =  max(min(lightFactor * 2.0, 1.0), 0.1);
-	vec3 lc = lightColor * lightFactor;
+	vec3 lc = lightColor * lightFactor * cloudColor;
 
 	vec3 pos = startPos;
 	vec3 st = dir / float(sampleCount - 1);
@@ -309,7 +311,7 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 			float lightEnergy = raymarchToLight(pos, viewDir, stepSize); // SAMPLE LIGHT
 
 			float height = getHeightFraction(pos);
-			vec4 src = vec4(lightColor * 0.7 * lightEnergy + ambientLight(height, lightFactor) * ambientFactor, cloudDensity); // ACCUMULATE 
+			vec4 src = vec4(lc * 0.7 * lightEnergy + ambientLight(height, lightFactor) * ambientFactor * cloudColor, cloudDensity); // ACCUMULATE 
 			src.rgb *= src.a;
 			result = (1.0 - result.a) * src + result;
 

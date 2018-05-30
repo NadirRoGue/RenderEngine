@@ -23,6 +23,9 @@ namespace Engine
 		unsigned int uModelViewProj;
 		unsigned int uNormal;
 
+		unsigned int uInInfo;
+		unsigned int uScreenSize;
+
 		unsigned int uLightDepthMatrix;
 		unsigned int uLightDepthMatrix1;
 		unsigned int uDepthTexture;
@@ -45,6 +48,7 @@ namespace Engine
 
 		void destroy();
 		
+		void setUniformGBufferInfo();
 		void setTimeUniform(float sinTime);
 		void setUniformGridPosition(unsigned int i, unsigned int j);
 		void setUniformLightDepthMatrix(const glm::mat4 & ldm);

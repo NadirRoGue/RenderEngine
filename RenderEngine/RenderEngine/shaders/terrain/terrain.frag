@@ -231,6 +231,7 @@ void main()
 	vec3 heightColor = vec3(0);
 	float visibility = 1.0;
 	float grassData = 0.0;
+	float alpha = 1.0;
 #ifndef WIRE_MODE
 
 	// Compute color gradient based on height / slope
@@ -240,15 +241,20 @@ void main()
 	// APPLY SHADOW MAP
 	// ------------------------------------------------------------------------------
 	visibility = getShadowVisibility(rawNormal);
+
+	// Depth for below-water level areas
+	alpha = height <= waterHeight? (height / waterHeight) - 0.6 : 1.0;
+	alpha = clamp(alpha, 0, 1);
 #endif
+
 
 	// OUTPUT G BUFFERS
 	// ------------------------------------------------------------------------------
-	outColor = vec4(heightColor, visibility);
+	outColor = vec4(heightColor, 1.0);
 	outNormal = vec4(normalize(n), 1.0);
 	outPos = vec4(inPos, 1.0);
 	outSpecular = vec4(0,0,0,0);
 	outEmissive = vec4(0,0,0,0);
-	outInfo = vec4(grassData, 0, 0, 0);
+	outInfo = vec4(grassData, visibility, alpha, 0);
 #endif
 }

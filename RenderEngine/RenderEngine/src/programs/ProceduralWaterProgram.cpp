@@ -1,6 +1,7 @@
 #include "programs/ProceduralWaterProgram.h"
 
 #include "WorldConfig.h"
+#include "renderers/DeferredRenderer.h"
 
 #include <iostream>
 
@@ -31,6 +32,9 @@ Engine::ProceduralWaterProgram::ProceduralWaterProgram(const Engine::ProceduralW
 	uDepthTexture = other.uDepthTexture;
 	uDepthTexture1 = other.uDepthTexture1;
 	uLightDirection = other.uLightDirection;
+
+	uInInfo = other.uInInfo;
+	uScreenSize = other.uScreenSize;
 
 	uTime = other.uTime;
 	uWaterColor = other.uWaterColor;
@@ -105,6 +109,9 @@ void Engine::ProceduralWaterProgram::configureProgram()
 	uDepthTexture = glGetUniformLocation(glProgram, "depthTexture");
 	uDepthTexture1 = glGetUniformLocation(glProgram, "depthTexture1");
 	uLightDirection = glGetUniformLocation(glProgram, "lightDir");
+
+	uInInfo = glGetUniformLocation(glProgram, "inInfo");
+	uScreenSize = glGetUniformLocation(glProgram, "screenSize");
 	
 	uWaterColor = glGetUniformLocation(glProgram, "watercolor");
 	uWaterSpeed = glGetUniformLocation(glProgram, "waterspeed");
@@ -151,6 +158,15 @@ void Engine::ProceduralWaterProgram::setUniformDepthTexture1(const Engine::Textu
 void Engine::ProceduralWaterProgram::setUniformLightDirection(const glm::vec3 & lightDir)
 {
 	glUniform3fv(uLightDirection, 1, &lightDir[0]);
+}
+
+void Engine::ProceduralWaterProgram::setUniformGBufferInfo()
+{
+	Engine::DeferredRenderer * dr = static_cast<Engine::DeferredRenderer*>(Engine::RenderManager::getInstance().getRenderer());
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, dr->getGBufferInfo()->getTexture()->getTextureId());
+	glUniform1i(uInInfo, 2);
+	glUniform2f(uScreenSize, Engine::ScreenManager::SCREEN_WIDTH, Engine::ScreenManager::SCREEN_HEIGHT);
 }
 
 void Engine::ProceduralWaterProgram::onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj)

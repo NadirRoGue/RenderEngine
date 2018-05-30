@@ -64,11 +64,10 @@ void Engine::Terrain::render(Engine::Camera * camera)
 
 	// RENDER WATER
 	// enable blending to produce water transparency
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
-	//glBlendColor(1.0f, 1.0f, 1.0f, 0.6f);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	tiledRendering(camera, waterActiveShader, &Terrain::waterRender);
-	//glDisable(GL_BLEND);
+	glDisable(GL_BLEND);
 
 	// RENDER TREES
 	renderRadius = renderRadius < 5? renderRadius : 5;
@@ -167,6 +166,7 @@ void Engine::Terrain::waterRender(Engine::Camera * camera, int i, int j)
 	float posZ = j * tileWidth;
 	tileObject->setTranslation(glm::vec3(poxX, Engine::Settings::waterHeight * tileWidth * 1.5f, posZ));
 
+	waterActiveShader->setUniformGBufferInfo();
 	waterActiveShader->setUniformGridPosition(i, j);
 	waterActiveShader->setTimeUniform(Engine::Time::timeSinceBegining);
 	waterActiveShader->setUniformLightDepthMatrix(Engine::CascadeShadowMaps::getInstance().getDepthMatrix0() * tileObject->getModelMatrix());
