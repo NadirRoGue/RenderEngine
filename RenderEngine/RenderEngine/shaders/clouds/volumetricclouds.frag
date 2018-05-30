@@ -11,6 +11,8 @@ uniform mat4 invView;
 
 uniform vec3 camPos;
 
+uniform sampler2D currentPixelDepth;
+
 // used to adjust u coordinate based on aspect ratio
 uniform vec2 screenResolution;
 
@@ -406,6 +408,10 @@ bool intersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 
 void main()
 {
+	// Do not compute clouds if they are not going to be visible
+	if(texture(currentPixelDepth, texCoord).x < 1.0)
+		discard;
+
 #ifdef SPHERE_PROJECTION
 	sphereCenter = vec3(camPos.x, -1950.0, camPos.z);
 #endif

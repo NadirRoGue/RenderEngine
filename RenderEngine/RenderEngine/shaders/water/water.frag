@@ -33,47 +33,14 @@ uniform float waterspeed;
 
 // ================================================================================
 
-uniform float scale = 200.0;
-
 float Random2D(in vec2 st)
 {
 	return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
-float cellularNoise(vec2 uv)
-{	
-	//obtenemos su coordenada en el grid y su coordenada real
-    vec2 currentPos = uv * scale; 
-    vec2 gridCoord  = floor( currentPos );
-    
-	float dist0 = 1000.0;
-    vec2 offset = vec2( -1.0, -1.0 );
-    
-    //recorremos los vecinos buscando la distancia mas cortas
-    for( offset.y = -1.0f; offset.y <= 1.0f; offset.y += 1.0f )
-    {
-        for( offset.x = -1.0f; offset.x <= 1.0f; offset.x += 1.0f )
-        {
-            vec2 cellCenter = gridCoord + offset;
-            cellCenter      = cellCenter + Random2D( cellCenter );
-            
-            float dist = length( cellCenter - currentPos );
-            
-            if( dist < dist0 )
-            {
-                dist0 = dist;
-            }
-        }
-    }
-    
-    //dist0 = 1.0 - dist0;
-    dist0 = dist0 * 0.5 + 0.5;
-	//dist0 = clamp(dist0, 0.3, 1.0);
-    return dist0;
-}
-
 // ================================================================================
 
+uniform float scale = 200.0;
 uniform float amplitude = 0.5;
 uniform float frecuency = 1.0;
 uniform int octaves = 4;
@@ -135,18 +102,24 @@ float getShadowVisibility(vec3 rawNormal)
 	if(whithinRange(inShadowMapPos.xy))
 	{
 		float curDepth = inShadowMapPos.z - bias;
+		//visibility = texture(depthTexture, inShadowMapPos.xy).x  <  curDepth? 0.0 : 1.0;
+		
 		for (int i = 0; i < 4; i++)
 		{
 			visibility -= 0.25 * ( texture(depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0).x  <  curDepth? 1.0 : 0.0 );
 		}
+		
 	}
 	else if(whithinRange(inShadowMapPos1.xy))
 	{
 		float curDepth = inShadowMapPos1.z - bias;
+		//visibility = texture(depthTexture1, inShadowMapPos1.xy).x  <  curDepth? 0.0 : 1.0;
+	
 		for (int i = 0; i < 4; i++)
 		{
 			visibility -= 0.25 * ( texture( depthTexture1, inShadowMapPos1.xy + poissonDisk[i] / 700.0 ).x  <  curDepth? 1.0 : 0.0 );
 		}
+		
 	}
 
 	return visibility;

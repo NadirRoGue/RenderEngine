@@ -76,7 +76,8 @@ float cellularNoise(vec2 uv, float cellularScale)
         }
     }
     
-    return dist0 * 0.5 + 0.5;
+	dist0 = clamp(dist0, 0, 1);
+    return 1.0 - dist0;
 }
 
 float NoiseInterpolation(in vec2 i_coord, in float i_size)
@@ -100,7 +101,7 @@ float NoiseInterpolation(in vec2 i_coord, in float i_size)
 		(p3 - p1) * (weights.y * weights.x);
 }
 
-float noiseHeight(in vec2 pos, float localScale)
+float noiseHeight(in vec2 pos, float localScale, int octaveCount)
 {
 
 	float noiseValue = 0.0;
@@ -108,7 +109,7 @@ float noiseHeight(in vec2 pos, float localScale)
 	float localAplitude = amplitude;
 	float localFrecuency = frecuency;
 
-	for (int index = 0; index < octaves; index++)
+	for (int index = 0; index < octaveCount; index++)
 	{
 
 		noiseValue += NoiseInterpolation(pos, localScale * localFrecuency) * localAplitude;
@@ -118,6 +119,13 @@ float noiseHeight(in vec2 pos, float localScale)
 	}
 
 	return noiseValue * noiseValue * noiseValue * 0.01;
+}
+
+vec2 Curl(float nx1, float nx2, float ny1, float ny2)
+{
+	float dx = nx1 - nx2;
+	float dy = ny1 - ny2;
+	return vec2(dy, -dx) * 10.0;
 }
 
 // =====================================================================
@@ -135,18 +143,24 @@ float getShadowVisibility(vec3 rawNormal)
 	if(whithinRange(inShadowMapPos.xy))
 	{
 		float curDepth = inShadowMapPos.z - bias;
+		//visibility = texture(depthTexture, inShadowMapPos.xy).x < curDepth? 0.0 : 1.0;
+		
 		for (int i = 0; i < 4; i++)
 		{
 			visibility -= 0.25 * ( texture(depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0).x  <  curDepth? 1.0 : 0.0 );
 		}
+		
 	}
 	else if(whithinRange(inShadowMapPos1.xy))
 	{
 		float curDepth = inShadowMapPos1.z - bias;
+		//visibility = texture( depthTexture1, inShadowMapPos1.xy).x  <  curDepth? 0.0 : 1.0;
+		
 		for (int i = 0; i < 4; i++)
 		{
 			visibility -= 0.25 * ( texture( depthTexture1, inShadowMapPos1.xy + poissonDisk[i] / 700.0 ).x  <  curDepth? 1.0 : 0.0 );
 		}
+		
 	}
 
 	return visibility;
@@ -168,27 +182,39 @@ void main()
 	float u = inUV.x;
 	float v = inUV.y;
 	float step = 0.01;
-	float tH = noiseHeight(vec2(u, v + step), scale); 
-	float bH = noiseHeight(vec2(u, v - step), scale);
-	float rH = noiseHeight(vec2(u + step, v), scale);
-	float lH = noiseHeight(vec2(u - step, v), scale); 
+	float tH = noiseHeight(vec2(u, v + step), scale, octaves); 
+	float bH = noiseHeight(vec2(u, v - step), scale, octaves);
+	float rH = noiseHeight(vec2(u + step, v), scale, octaves);
+	float lH = noiseHeight(vec2(u - step, v), scale, octaves); 
 
 	vec3 rawNormal = normalize(vec3(lH - rH, step * step, bH - tH));
 
 	vec3 up = vec3(0, 1, 0);
 	float cosV = abs(dot(rawNormal, up));
 
-	bool check = height < waterHeight + 0.01;
-	if(check)
+	bool sandP = height < waterHeight + 0.01;
+	bool rockP = cosV <= grassCoverage;
+	if(sandP)
 	{
-		float bumptH = cellularNoise(vec2(u, v + step),  1500.0);
-		float bumpbH = cellularNoise(vec2(u, v - step),  1500.0);
-		float bumprH = cellularNoise(vec2(u + step, v),  1500.0);
-		float bumplH = cellularNoise(vec2(u - step, v),  1500.0);
-			
+		float bumptH = noiseHeight(vec2(u, v + step), 500.0, 2);
+		float bumpbH = noiseHeight(vec2(u, v - step), 500.0, 2);
+		float bumprH = noiseHeight(vec2(2 * u + step, v), 500.0, 2);
+		float bumplH = noiseHeight(vec2(2 * u - step, v), 500.0, 2);
+		vec3 correct = vec3(0, 3.0, 0);
 		vec3 bumpNormal = normalize(vec3(bumplH - bumprH, step * step, bumpbH - bumptH));
-
-		rawNormal += bumpNormal * 0.1;
+		rawNormal = correct + bumpNormal;
+		rawNormal = normalize(rawNormal);
+	}
+	else if(rockP)
+	{
+		float nx1 = noiseHeight(vec2(u - step, v),  200.0, octaves);
+		float nx2 = noiseHeight(vec2(u + step, v),  200.0, octaves);
+		float ny1 = noiseHeight(vec2(u, v - step),  200.0, octaves);
+		float ny2 = noiseHeight(vec2(u, v + step),  200.0, octaves);
+		
+		vec2 curlV = Curl(nx1, nx2, ny1, ny2) * 10.0;
+		vec3 apply = cross(vec3(0,1,0), rawNormal) * (curlV.x - curlV.y); 
+		rawNormal += apply;
 		rawNormal = normalize(rawNormal);
 	}
 	

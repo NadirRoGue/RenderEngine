@@ -24,6 +24,8 @@ namespace Engine
 		unsigned int uCloudType;
 		unsigned int uCloudSpeed;
 		unsigned int uCoverageMultiplier;
+
+		unsigned int uCurrentDepth;
 	public:
 		VolumetricCloudProgram(std::string name, unsigned long long params);
 		VolumetricCloudProgram(const VolumetricCloudProgram & other);

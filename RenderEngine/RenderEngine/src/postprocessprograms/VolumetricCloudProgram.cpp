@@ -4,7 +4,7 @@
 #include "Scene.h"
 #include "WorldConfig.h"
 #include "Time.h"
-#include "Renderer.h"
+#include "renderers/DeferredRenderer.h"
 
 const std::string Engine::VolumetricCloudProgram::PROGRAM_NAME = "VolumetricCloudProgram";
 
@@ -33,6 +33,8 @@ Engine::VolumetricCloudProgram::VolumetricCloudProgram(const Engine::VolumetricC
 	uCloudSpeed = other.uCloudSpeed;
 	uCloudType = other.uCloudType;
 	uCoverageMultiplier = other.uCoverageMultiplier;
+
+	uCurrentDepth = other.uCurrentDepth;
 }
 
 void Engine::VolumetricCloudProgram::configureProgram()
@@ -55,6 +57,8 @@ void Engine::VolumetricCloudProgram::configureProgram()
 	uCloudSpeed = glGetUniformLocation(glProgram, "cloudSpeed");
 	uCloudType = glGetUniformLocation(glProgram, "cloudType");
 	uCoverageMultiplier = glGetUniformLocation(glProgram, "coverageMultiplier");
+
+	uCurrentDepth = glGetUniformLocation(glProgram, "currentPixelDepth");
 }
 
 void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
@@ -97,6 +101,11 @@ void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const 
 	glUniform1i(uWeather, 2);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, wth->getTexture()->getTextureId());
+
+	Engine::DeferredRenderer * dr = static_cast<Engine::DeferredRenderer*>(Engine::RenderManager::getInstance().getRenderer());
+	glUniform1i(uCurrentDepth, 3);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, dr->getGBufferDepth()->getTexture()->getTextureId());
 }
 
 // ===============================================================================================

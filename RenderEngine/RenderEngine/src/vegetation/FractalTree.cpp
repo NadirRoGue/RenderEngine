@@ -90,10 +90,11 @@ Engine::Mesh * Engine::FractalTree::generate()
 
 void Engine::FractalTree::processChunk(glm::mat4 & origin, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotation, size_t vOffset, unsigned int depth)
 {
-	if (depth >= treeData.maxDepth)
+	if (depth >= treeData.maxDepth - 1)
 	{
 		addLeaf(origin, scale / treeData.scalingFactor, vOffset, depth);
-		return;
+		if(depth >= treeData.maxDepth)
+			return;
 	}
 
 	// Generate local branch model matrix
@@ -121,7 +122,7 @@ void Engine::FractalTree::processChunk(glm::mat4 & origin, glm::vec3 scale, glm:
 
 	size_t currentOffset = vertices.size();
 
-	float xRotation = randInInterval(treeData.minBranchRotation.x, treeData.maxBranchRotation.x) * (depth + 1);
+	float xRotation = randInInterval(treeData.minBranchRotation.x, treeData.maxBranchRotation.x);;// *(depth + 1);
 
 	float deltaAngle = (2.f * 3.1415f) / intBranches;
 	float sign = randSign();
@@ -131,6 +132,7 @@ void Engine::FractalTree::processChunk(glm::mat4 & origin, glm::vec3 scale, glm:
 		// Copy and adjust next branch random data
 		glm::vec3 scaleCopy = scale;
 		scaleCopy *= treeData.scalingFactor;
+		//scaleCopy.y *= 1.1f;
 
 		glm::vec3 rotationCopy = rotation;
 		rotationCopy.x = xRotation * sign;
@@ -149,7 +151,7 @@ void Engine::FractalTree::addLeaf(glm::mat4 & origin, glm::vec3 lastScaling, siz
 	glm::vec3 translation(0, maxScale, 0);
 	glm::mat4 model = origin * glm::translate(glm::mat4(1.0f), translation);
 
-	appendVerticesAndFaces(base, model, glm::vec3(maxScale) * glm::vec3(0.25, 0.7, 0.25), 0, offset, true, true);
+	appendVerticesAndFaces(base, model, glm::vec3(maxScale) * glm::vec3(0.15, 0.6, 0.15), 0, offset, true, true);
 }
 
 void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat4 & model, glm::vec3 scale, unsigned int depth, size_t vOffset, bool keepBase, bool isLeaf)
