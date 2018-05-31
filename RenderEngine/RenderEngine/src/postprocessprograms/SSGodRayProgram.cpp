@@ -49,11 +49,9 @@ void Engine::SSGodRayProgram::onRenderObject(const Engine::Object * obj, const g
 	lightDir = lightDir * 0.5f + 0.5f;
 
 	// Its a screen space effect based on sun position on screen. When its offscreen, it produces artifacts
-	// make sure we only apply when its ok
-	bool onlyPass = lightDir.x < 0.f || lightDir.x > 1.f || lightDir.y < 0.f || lightDir.y > 1.f || lightDir.z > 1.f;
+	// make sure we only apply when its ok (with a little margin)
+	bool onlyPass = lightDir.z > 1.f || lightDir.x < -0.2f || lightDir.x > 1.2f || lightDir.y < -0.2f || lightDir.y > 12.f;
 	glUniform1i(uOnlyPass, onlyPass);
-
-	//lightDir.y = -glm::abs(lightDir.y);
 	glUniform2fv(uLightScreenPos, 1, &lightDir[0]);
 
 	// Send tweakable data

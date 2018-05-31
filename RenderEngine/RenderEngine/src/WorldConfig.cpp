@@ -26,10 +26,10 @@ float Engine::Settings::cloudType = 0.5f;
 float Engine::Settings::coverageMultiplier = 0.7f;
 glm::vec3 Engine::Settings::cloudColor = glm::vec3(1, 1, 1);
 
-float Engine::Settings::hdrExposure = 5.0f;
-float Engine::Settings::hdrGamma = 0.3f;
+float Engine::Settings::hdrExposure = 3.0f;
+float Engine::Settings::hdrGamma = 0.5f;
 
-float Engine::Settings::godRaysDecay = 0.85f;
+float Engine::Settings::godRaysDecay = 0.94f;
 float Engine::Settings::godRaysDensity = 1.192f;
 float Engine::Settings::godRaysExposure = 1.0f;
 float Engine::Settings::godRaysWeight = 0.2f;
