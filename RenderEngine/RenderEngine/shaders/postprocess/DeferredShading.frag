@@ -15,8 +15,9 @@ uniform sampler2D postProcessing_5; // info
 uniform sampler2D postProcessing_6; // depth
 
 // ===============================================
-// back ground color, used for fog effect
-uniform vec3 backgroundColor;
+// back ground color, used for fog effect and ambient lighting
+uniform vec3 zenitColor;
+uniform vec3 horizonColor;
 
 uniform vec3 worldUp;
 
@@ -62,6 +63,7 @@ vec3 N;
 float depth;
 float alpha = 50.0;
 float colorFactor;
+vec3 ambientColor;
 
 // ================================================================================
 // SHADING FUNCTIONALITY
@@ -89,7 +91,6 @@ vec3 diffuseLambert(vec3 dl, vec3 albedo)
 
 vec3 processDirectionalLight(in float visibility)
 {
-	colorFactor = clamp(dot(worldUp, DLdirection[0].xyz), 0.0, 1.0);
 	vec3 c = vec3(0,0,0);
 
 	vec3 L = DLdirection[0].xyz;
@@ -97,7 +98,7 @@ vec3 processDirectionalLight(in float visibility)
 	vec3 Kfactors = DLkFactors[0].xyz;
 
 	// Ambient
-	c += lightColor * Kfactors.x * Ka;
+	c += ambientColor * Kfactors.x * Ka;
 
 	// Diffuse
 	c += diffuseLambert(L, lightColor * Kfactors.y * Kd) * visibility;
@@ -117,7 +118,7 @@ vec3 processAtmosphericFog(in vec3 shadedColor)
 	float d = length(pos);
 	float lerpVal = 1.0 / exp(0.001 * d * d);
 	
-	return mix(backgroundColor * colorFactor * 0.95, shadedColor, lerpVal);
+	return mix(ambientColor * colorFactor * 0.95, shadedColor, lerpVal);
 }
 
 // ================================================================================
@@ -138,6 +139,9 @@ void main()
 	Kd = Ka;
 	Ks = gbufferspec.rgb;
 	Ke = gbufferemissive.rgb;
+
+	colorFactor = clamp(dot(worldUp, DLdirection[0].xyz), 0.0, 1.0);
+	ambientColor = mix(horizonColor, zenitColor, 0.2);
 
 	vec3 shaded = processDirectionalLight(gbufferinfo.y);
 	shaded = processAtmosphericFog(shaded);

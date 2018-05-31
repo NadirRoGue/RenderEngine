@@ -1,5 +1,6 @@
 #include "programs/SkyProgram.h"
 
+#include "WorldConfig.h"
 #include "Scene.h"
 
 std::string Engine::SkyProgram::PROGRAM_NAME = "SkyProgram";
@@ -17,6 +18,8 @@ Engine::SkyProgram::SkyProgram(const Engine::SkyProgram & other)
 	uProjMatrix = other.uProjMatrix;
 	uLightDir = other.uLightDir;
 	uLightColor = other.uLightColor;
+	uSkyHorizonColor = other.uSkyHorizonColor;
+	uSkyZenitColor = other.uSkyZenitColor;
 	inPos = other.inPos;
 }
 
@@ -25,6 +28,9 @@ void Engine::SkyProgram::configureProgram()
 	uProjMatrix = glGetUniformLocation(glProgram, "proj");
 	uLightDir = glGetUniformLocation(glProgram, "lightDir");
 	uLightColor = glGetUniformLocation(glProgram, "lightColor");
+
+	uSkyZenitColor = glGetUniformLocation(glProgram, "zenitColor");
+	uSkyHorizonColor = glGetUniformLocation(glProgram, "horizonColor");
 
 	inPos = glGetAttribLocation(glProgram, "inPos");
 }
@@ -54,6 +60,9 @@ void Engine::SkyProgram::onRenderObject(const Engine::Object * obj, const glm::m
 	glUniform3fv(uLightDir, 1, &direction[0]);
 
 	glUniform3fv(uLightColor, 1, dl->getData().color);
+
+	glUniform3fv(uSkyZenitColor, 1, &Engine::Settings::skyZenitColor[0]);
+	glUniform3fv(uSkyHorizonColor, 1, &Engine::Settings::skyHorizonColor[0]);
 }
 
 // =====================================================================

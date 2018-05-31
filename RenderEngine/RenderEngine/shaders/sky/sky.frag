@@ -10,6 +10,8 @@ uniform vec3 lightDir;
 uniform float radius = 0.9;
 uniform vec3 lightColor;
 
+uniform vec3 zenitColor;
+uniform vec3 horizonColor;
 
 void main()
 {
@@ -27,9 +29,7 @@ void main()
 	centerColor.z *= (colorFactor);
 
 	float alphaSky = -camToSphere.y * 0.6;
-	vec3 horizon = vec3(0.8,0.85,1);
-	vec3 zenit = vec3(0.4, 0.7, 1);
-	vec3 cubeMapColor = mix(horizon, zenit, alphaSky);
+	vec3 cubeMapColor = mix(horizonColor, zenitColor, alphaSky);
 	
 	color = realY < 0 && dotValue > 0.999? vec4(centerColor, 1.0) : vec4(cubeMapColor * colorFactor, 1.0);
 	emission = realY < 0 && dotValue > 0.999? vec4(centerColor, 1) : vec4(0,0,0,1);

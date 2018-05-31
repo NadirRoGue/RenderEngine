@@ -198,7 +198,7 @@
     <ClInclude Include="include\textures\Texture3D.h" />
     <ClInclude Include="include\textures\TextureCubemap.h" />
     <ClInclude Include="include\Threadpool.h" />
-    <ClInclude Include="include\Time.h" />
+    <ClInclude Include="include\TimeAccesor.h" />
     <ClInclude Include="include\UserInterface.h" />
     <ClInclude Include="include\userinterfaces\WorldControllerUI.h" />
     <ClInclude Include="include\util\IOUtils.h" />
@@ -281,7 +281,7 @@
     <ClCompile Include="src\textures\Texture3D.cpp" />
     <ClCompile Include="src\textures\TextureCubemap.cpp" />
     <ClCompile Include="src\Threadpool.cpp" />
-    <ClCompile Include="src\Time.cpp" />
+    <ClCompile Include="src\TimeAccesor.cpp" />
     <ClCompile Include="src\UserInterface.cpp" />
     <ClCompile Include="src\userinterfaces\WorldControllerUI.cpp" />
     <ClCompile Include="src\util\IOUtils.cpp" />

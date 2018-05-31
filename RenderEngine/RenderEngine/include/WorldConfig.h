@@ -37,6 +37,9 @@ namespace Engine
 		static glm::vec3 sandColor;
 		static glm::vec3 rockColor;
 
+		static glm::vec3 skyZenitColor;
+		static glm::vec3 skyHorizonColor;
+
 		static glm::vec3 waterColor;
 		static float waterSpeed;
 		static float waterHeight;

@@ -2,6 +2,7 @@
 
 #include "Scene.h"
 #include "LightBufferManager.h"
+#include "WorldConfig.h"
 
 std::string Engine::DeferredShadingProgram::PROGRAM_NAME = "DeferredShadingProgram";
 
@@ -23,7 +24,8 @@ Engine::DeferredShadingProgram::DeferredShadingProgram(const Engine::DeferredSha
 	uPLBuffer = other.uPLBuffer;
 	uSLBuffer = other.uSLBuffer;
 
-	uBackground = other.uBackground;
+	uSkyHorizonColor = other.uSkyHorizonColor;
+	uSkyZenitColor = other.uSkyZenitColor;
 
 	uWorldUp = other.uWorldUp;
 }
@@ -53,18 +55,19 @@ void Engine::DeferredShadingProgram::onRenderObject(const Engine::Object * obj, 
 		processDirectionalLights(dl, view);
 	}
 
-	glUniform3fv(uBackground, 1, &scene->getClearColor()[0]);
+	glUniform3fv(uSkyZenitColor, 1, &Engine::Settings::skyZenitColor[0]);
+	glUniform3fv(uSkyHorizonColor, 1, &Engine::Settings::skyHorizonColor[0]);
 
 	glm::vec4 worldUp = view * glm::vec4(0, 1, 0, 0);
 	glUniform3fv(uWorldUp, 1, &worldUp[0]);
-
 }
 
 void Engine::DeferredShadingProgram::configureProgram()
 {
 	Engine::PostProcessProgram::configureProgram();
 
-	uBackground = glGetUniformLocation(glProgram, "backgroundColor");
+	uSkyHorizonColor = glGetUniformLocation(glProgram, "horizonColor");
+	uSkyZenitColor = glGetUniformLocation(glProgram, "zenitColor");
 
 	uDLBuffer = glGetUniformBlockIndex(glProgram, "DLBuffer");
 	uPLBuffer = glGetUniformBlockIndex(glProgram, "PLBuffer");
@@ -77,7 +80,6 @@ void Engine::DeferredShadingProgram::configureProgram()
 
 	uWorldUp = glGetUniformLocation(glProgram, "worldUp");
 }
-
 
 // =====================================================
 

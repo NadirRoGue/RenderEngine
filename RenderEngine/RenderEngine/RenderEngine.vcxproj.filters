@@ -330,9 +330,6 @@
     <ClInclude Include="include\datatables\DeferredObjectsTable.h">
       <Filter>Archivos de encabezado\datatables</Filter>
     </ClInclude>
-    <ClInclude Include="include\Time.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="include\animations\CameraBezier.h">
       <Filter>Archivos de encabezado\animations</Filter>
     </ClInclude>
@@ -406,6 +403,9 @@
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>
     <ClInclude Include="include\CascadeShadowMaps.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TimeAccesor.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
@@ -566,9 +566,6 @@
     <ClCompile Include="src\datatables\DeferredObjectsTable.cpp">
       <Filter>Archivos de origen\datatables</Filter>
     </ClCompile>
-    <ClCompile Include="src\Time.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
     <ClCompile Include="src\animations\CameraBezier.cpp">
       <Filter>Archivos de origen\animatios</Filter>
     </ClCompile>
@@ -630,6 +627,9 @@
       <Filter>Archivos de origen\postprocessprograms</Filter>
     </ClCompile>
     <ClCompile Include="src\CascadeShadowMaps.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TimeAccesor.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>

@@ -23,7 +23,8 @@ namespace Engine
 
 		unsigned int uWorldUp;
 
-		unsigned int uBackground;
+		unsigned int uSkyZenitColor;
+		unsigned int uSkyHorizonColor;
 	public:
 		DeferredShadingProgram(std::string name, unsigned long long params);
 		DeferredShadingProgram(const DeferredShadingProgram & other);

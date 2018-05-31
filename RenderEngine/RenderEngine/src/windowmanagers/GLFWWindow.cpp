@@ -9,7 +9,7 @@
 
 #include "userinterfaces/WorldControllerUI.h"
 #include "WorldConfig.h"
-#include "Time.h"
+#include "TimeAccesor.h"
 
 double lastMouseXPos = 0.0, lastMouseYPos = 0.0;
 

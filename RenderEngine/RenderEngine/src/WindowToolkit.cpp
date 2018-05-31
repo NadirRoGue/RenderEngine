@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "WorldConfig.h"
-#include "Time.h"
+#include "TimeAccesor.h"
 
 // ===================================================================
 

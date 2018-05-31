@@ -17,6 +17,9 @@ glm::vec3 Engine::Settings::grassColor = glm::vec3(0.1f, 0.3f, 0.0f);
 glm::vec3 Engine::Settings::sandColor = glm::vec3(0.93, 0.9, 0.66);
 glm::vec3 Engine::Settings::rockColor = glm::vec3(0.40f);
 
+glm::vec3 Engine::Settings::skyZenitColor = glm::vec3(0.0f, 0.5f, 1.0f);
+glm::vec3 Engine::Settings::skyHorizonColor = glm::vec3(0.8f, 0.85f, 1.0f);
+
 glm::vec3 Engine::Settings::waterColor = glm::vec3(0.f, 0.171f, 0.101f);
 float Engine::Settings::waterSpeed = 0.0025f;
 float Engine::Settings::waterHeight = 0.09f;

@@ -166,7 +166,7 @@ void Engine::ProceduralWaterProgram::setUniformGBufferInfo()
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, dr->getGBufferInfo()->getTexture()->getTextureId());
 	glUniform1i(uInInfo, 2);
-	glUniform2f(uScreenSize, Engine::ScreenManager::SCREEN_WIDTH, Engine::ScreenManager::SCREEN_HEIGHT);
+	glUniform2f(uScreenSize, float(Engine::ScreenManager::SCREEN_WIDTH), float(Engine::ScreenManager::SCREEN_HEIGHT));
 }
 
 void Engine::ProceduralWaterProgram::onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj)

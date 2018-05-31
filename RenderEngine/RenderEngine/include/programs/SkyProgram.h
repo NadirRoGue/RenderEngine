@@ -13,6 +13,9 @@ namespace Engine
 		unsigned int uLightDir;
 		unsigned int uLightColor;
 
+		unsigned int uSkyZenitColor;
+		unsigned int uSkyHorizonColor;
+
 		unsigned int inPos;
 
 	public:

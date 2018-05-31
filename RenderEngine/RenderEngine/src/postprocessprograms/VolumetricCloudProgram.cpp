@@ -3,7 +3,7 @@
 #include "volumetricclouds/NoiseInitializer.h"
 #include "Scene.h"
 #include "WorldConfig.h"
-#include "Time.h"
+#include "TimeAccesor.h"
 #include "renderers/DeferredRenderer.h"
 
 const std::string Engine::VolumetricCloudProgram::PROGRAM_NAME = "VolumetricCloudProgram";

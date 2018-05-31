@@ -1,7 +1,7 @@
 #include "inputhandlers/mousehandlers/CameraRotationHandler.h"
 
 #include "WorldConfig.h"
-#include "Time.h"
+#include "TimeAccesor.h"
 
 const float Engine::CameraRotationHandler::ROTATION_SPEED = 50.0f;
 
