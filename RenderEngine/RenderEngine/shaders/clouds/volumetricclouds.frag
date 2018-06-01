@@ -178,7 +178,7 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 	vec4 baseCloudNoise = textureLod(perlinworley, tex3dsample, lod);
 	
 	// Build the low frequency fbm modifier
-	float lowFreqFBM = ( baseCloudNoise.g * 0.625) + ( baseCloudNoise.b * 0.25 ) + ( baseCloudNoise.a * 0.125 );
+	float lowFreqFBM = ( baseCloudNoise.g * 0.625) + ( baseCloudNoise.b * 0.25 ) + ( baseCloudNoise.a * 0.125 ) * 2.0;
 	float baseCloudShape = remapValue(baseCloudNoise.r * 2.0, -(1.0 - lowFreqFBM), 1.0, 0.0, 1.0);
 
 	// Apply density gradient based on cloud type
@@ -196,7 +196,7 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 
 	float finalCloud = coveragedCloud;
 
-	if(expensive)
+	if(expensive && finalCloud > 0.0)
 	{
 		// Build−high frequency Worley noise FBM.
 		vec3 erodeCloudNoise = textureLod(worley, vec3(uv, heightFraction) * 0.1, lod).rgb;
@@ -285,7 +285,7 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 	float delta = planeMax.y - planeMin.y;
 #endif
 
-	int sampleCount = int(ceil(mix(64.0, 128.0, clamp(thick / delta, 0.0, 1.0))));
+	int sampleCount = int(ceil(mix(48.0, 96.0, clamp(thick / delta, 0.0, 1.0))));
 
 	// Light color attenuation based on sun's position
 	float lightFactor = (clamp(dot(vec3(0,1,0), normalize(lightDir)), 0.0, 1.0) + 0.01);
@@ -315,7 +315,7 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 			src.rgb *= src.a;
 			result = (1.0 - result.a) * src + result;
 
-			if(result.a >= 1.0) // EARLY EXIT ON FULL OPACITY
+			if(result.a >= 0.95) // EARLY EXIT ON FULL OPACITY
 				break;
 		}
 
