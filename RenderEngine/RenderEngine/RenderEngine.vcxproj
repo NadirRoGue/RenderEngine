@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClInclude Include="include\Animation.h" />
     <ClInclude Include="include\animations\CameraBezier.h" />
+    <ClInclude Include="include\animations\CameraStraight.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\CascadeShadowMaps.h" />
     <ClInclude Include="include\ComputeProgram.h" />
@@ -224,6 +225,7 @@
     <ClCompile Include="lib\include\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\Animation.cpp" />
     <ClCompile Include="src\animations\CameraBezier.cpp" />
+    <ClCompile Include="src\animations\CameraStraight.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\CascadeShadowMaps.cpp" />
     <ClCompile Include="src\ComputeProgram.cpp" />

@@ -22,7 +22,6 @@ namespace Engine
 		float splineRadius;
 		std::vector<glm::vec3> splinePoints;
 		glm::vec3 previousPoint;
-		bool paused;
 	public:
 		CameraBezier(Camera * cam, glm::vec3 & centerOfSpline, float splineRadius, float moveSpeed);
 		void update();

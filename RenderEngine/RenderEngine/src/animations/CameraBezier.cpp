@@ -10,7 +10,6 @@ Engine::CameraBezier::CameraBezier(Engine::Camera * camera, glm::vec3 & centerOf
 	this->splineCenter = -centerOfSpline;
 	computeSpline();
 	previousPoint = splinePoints[0];
-	paused = true;
 
 	//cam->rotateView(glm::vec3(0, 3.1415f, 0));
 }

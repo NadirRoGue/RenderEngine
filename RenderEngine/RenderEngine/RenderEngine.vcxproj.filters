@@ -408,6 +408,9 @@
     <ClInclude Include="include\TimeAccesor.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="include\animations\CameraStraight.h">
+      <Filter>Archivos de encabezado\animations</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -631,6 +634,9 @@
     </ClCompile>
     <ClCompile Include="src\TimeAccesor.cpp">
       <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\animations\CameraStraight.cpp">
+      <Filter>Archivos de origen\animatios</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

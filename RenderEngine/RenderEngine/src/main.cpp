@@ -48,6 +48,7 @@
 #include "inputhandlers/mousehandlers/CameraRotationHandler.h"
 
 #include "animations/CameraBezier.h"
+#include "animations/CameraStraight.h"
 
 #include "datatables/VegetationTable.h"
 
@@ -194,6 +195,9 @@ void initHandlers()
 	
 	Engine::CameraBezier * camBezier = new Engine::CameraBezier(scene->getCamera(), glm::vec3(100,6,100), 50.0f, 3.0f);
 	scene->getAnimationHandler()->registerAnimation(camBezier);
+
+	Engine::CameraStraight * camStraight = new Engine::CameraStraight(scene->getCamera(), glm::vec3(1, 0, 1));
+	scene->getAnimationHandler()->registerAnimation(camStraight);
 
 	// Mouse pitch & yaw
 	Engine::CameraRotationHandler * camMotion = new Engine::CameraRotationHandler("camera_motion", Engine::SceneManager::getInstance().getActiveScene()->getCamera());

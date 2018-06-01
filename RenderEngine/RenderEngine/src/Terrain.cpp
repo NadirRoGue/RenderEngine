@@ -70,7 +70,7 @@ void Engine::Terrain::render(Engine::Camera * camera)
 	glDisable(GL_BLEND);
 
 	// RENDER TREES
-	renderRadius = renderRadius < 5? renderRadius : 5;
+	renderRadius = renderRadius < 6? renderRadius : 6;
 	tiledRendering(camera, treeActiveShader, &Terrain::treesRender);
 	renderRadius = previousRadius;
 }
