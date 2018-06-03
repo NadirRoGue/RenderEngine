@@ -25,6 +25,7 @@ uniform sampler2D weather;
 // Light data
 uniform vec3 lightDir;
 uniform vec3 lightColor;
+vec3 realLightColor;
 
 uniform vec3 cloudColor;
 
@@ -92,7 +93,7 @@ float lightEnergy(vec3 l, vec3 v, float ca, float coneDensity, float realDensity
 
 vec3 ambientLight(float heightFrac, float lightFactor)
 {
-	return mix(lightColor * 0.5, lightColor * 0.9, heightFrac);// * (lightFactor * 0.5 + 0.5);
+	return mix(realLightColor * 0.7, realLightColor * 1.0, heightFrac);
 }
 
 // ==========================================================================
@@ -203,7 +204,7 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 		float highFreqFBM = (erodeCloudNoise.r * 0.625) + (erodeCloudNoise.g * 0.25) + (erodeCloudNoise.b * 0.125);
 
 		heightFraction = getHeightFraction(p);
-		float highFreqNoiseModifier = mix(highFreqFBM, 1.0 - highFreqFBM, clamp(heightFraction * 10.0, 0.0, 1.0)) * 1.0;
+		float highFreqNoiseModifier = mix(highFreqFBM, 1.0 - highFreqFBM, clamp(heightFraction * 1.0, 0.0, 1.0));
 
 		coveragedCloud = coveragedCloud - highFreqNoiseModifier * (1.0 - coveragedCloud);
 
@@ -288,7 +289,11 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 	int sampleCount = int(ceil(mix(48.0, 96.0, clamp(thick / delta, 0.0, 1.0))));
 
 	// Light color attenuation based on sun's position
-	float lightFactor = (clamp(dot(vec3(0,1,0), normalize(lightDir)), 0.0, 1.0) + 0.01);
+	float lightFactor = (clamp(dot(vec3(0,1,0), normalize(lightDir)), 0.0, 1.0));
+	realLightColor = lightColor;
+	realLightColor.y = lightFactor > 0.4? mix(lightColor.y * 0.8, lightColor.y, (lightFactor - 0.4) / 0.6) : mix(0.5, lightColor.y, lightFactor / 0.4);
+	realLightColor.z = lightFactor > 0.4? mix(lightColor.z * 0.8, lightColor.z, (lightFactor - 0.4) / 0.6) : mix(0.15, lightColor.z, lightFactor / 0.4);
+
 	float ambientFactor =  max(min(lightFactor * 2.0, 1.0), 0.1);
 	vec3 lc = lightColor * lightFactor * cloudColor;
 

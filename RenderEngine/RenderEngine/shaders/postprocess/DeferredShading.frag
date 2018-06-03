@@ -95,6 +95,10 @@ vec3 processDirectionalLight(in float visibility)
 
 	vec3 L = DLdirection[0].xyz;
 	vec3 lightColor = DLcolor[0].rgb;
+
+	lightColor.y = colorFactor > 0.4? mix(lightColor.y * 0.8, lightColor.y, (colorFactor - 0.4) / 0.6) : mix(0.5, lightColor.y, colorFactor / 0.4);
+	lightColor.z = colorFactor > 0.4? mix(lightColor.z * 0.8, lightColor.z, (colorFactor - 0.4) / 0.6) : mix(0.15, lightColor.z, colorFactor / 0.4);
+
 	vec3 Kfactors = DLkFactors[0].xyz;
 
 	// Ambient
