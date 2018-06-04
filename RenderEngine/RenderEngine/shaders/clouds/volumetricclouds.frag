@@ -1,8 +1,8 @@
 ﻿#version 430 core
 
 layout (location=0) out vec4 color;
-layout (location=1) out vec4 emission;
-layout (location=2) out vec4 godRayInfo;
+//layout (location=1) out vec4 emission;
+//layout (location=2) out vec4 godRayInfo;
 
 in vec2 texCoord;
 
@@ -88,12 +88,12 @@ float powder(float density, float ca)
 
 float lightEnergy(vec3 l, vec3 v, float ca, float coneDensity, float realDensity)
 {
-	return 2.0 * beer(coneDensity) * powder(realDensity, ca) * (1.0/3.1415) * mix(henyeyGreenstein(l, v, 0.8, ca), henyeyGreenstein(l, v, -0.5, ca), 0.5);
+	return 2.0 * beer(coneDensity) * powder(coneDensity, ca) * mix(henyeyGreenstein(l, v, 0.8, ca), henyeyGreenstein(l, v, -0.5, ca), 0.5);
 }
 
 vec3 ambientLight(float heightFrac, float lightFactor)
 {
-	return mix(realLightColor * 0.7, realLightColor * 1.0, heightFrac);
+	return mix(realLightColor * 0.7, realLightColor * 0.9, heightFrac);
 }
 
 // ==========================================================================
@@ -179,7 +179,7 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 	vec4 baseCloudNoise = textureLod(perlinworley, tex3dsample, lod);
 	
 	// Build the low frequency fbm modifier
-	float lowFreqFBM = ( baseCloudNoise.g * 0.625) + ( baseCloudNoise.b * 0.25 ) + ( baseCloudNoise.a * 0.125 ) * 2.0;
+	float lowFreqFBM = ( baseCloudNoise.g * 0.625) + ( baseCloudNoise.b * 0.25 ) + ( baseCloudNoise.a * 0.125 ) * 1.0;
 	float baseCloudShape = remapValue(baseCloudNoise.r * 2.0, -(1.0 - lowFreqFBM), 1.0, 0.0, 1.0);
 
 	// Apply density gradient based on cloud type
@@ -197,7 +197,7 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 
 	float finalCloud = coveragedCloud;
 
-	if(expensive && finalCloud > 0.0)
+	if(expensive)
 	{
 		// Build−high frequency Worley noise FBM.
 		vec3 erodeCloudNoise = textureLod(worley, vec3(uv, heightFraction) * 0.1, lod).rgb;
@@ -221,7 +221,7 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 {
 	vec3 normLightDir = normalize(lightDir);
 	vec3 startPos = pos;
-	vec3 rayStep = normLightDir * stepSize;
+	vec3 rayStep = normLightDir * (stepSize);
 	float coneRadius = 1.0;
 	float coneStep = 1.0/6.0;
 	float density = 0.0;
@@ -305,6 +305,9 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 	vec4 result = vec4(0.0);
 
 	float samplingLod = mix(0.0, 2.0, (length(startPos) - sphereInnerRadius) / (sphereOuterRadius - sphereInnerRadius));
+
+	vec3 wd = getWeatherData(pos);
+	pos += st * wd.g;
 
 	for(int i = 0; i < sampleCount; i++)
 	{
@@ -425,7 +428,7 @@ void main()
 	// Ray direction
 	float ar = screenResolution.x / screenResolution.y;
 	vec2 fulluv = texCoord * vec2(ar, 1.0) * 2.0 - 1.0;
-	float z = ar / tan(radians(45.0));
+	float z =  1.0 / tan(radians(45.0));
 	vec3 viewDir = normalize(vec3(fulluv, -z));
 	vec3 worldDir = normalize( (invView * vec4(viewDir, 0)).xyz);
 	// Volume intersection points
@@ -444,11 +447,6 @@ void main()
 		density = clamp(density, 0.0, 1.0);
 		
 		color = vec4(outColor, density);
-		emission = vec4(0,0,0,density);
-		vec3 godRay = outColor * (1.0 - density);
-		godRayInfo = vec4(godRay, density);
-
-		gl_FragDepth = 0.999; // behind everything, but in front of the cubemap
 	}
 	else
 	{

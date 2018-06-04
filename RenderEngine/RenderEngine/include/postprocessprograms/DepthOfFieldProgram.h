@@ -1,10 +1,10 @@
 #pragma once
 
-#include "postprocessprograms/GaussianBlurProgram.h"
+#include "PostProcessProgram.h"
 
 namespace Engine
 {
-	class DepthOfFieldProgram : public GaussianBlurProgram
+	class DepthOfFieldProgram : public PostProcessProgram
 	{
 	public:
 		static std::string PROGRAM_NAME;
@@ -12,6 +12,7 @@ namespace Engine
 		unsigned int uFocalDistance;
 		unsigned int uMaxDistanceFactor;
 		unsigned int uInverseProj;
+		unsigned int uTexelSize;
 
 		float focalDistance;
 		float maxDistanceFactor;

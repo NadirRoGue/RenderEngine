@@ -86,7 +86,7 @@ void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const 
 	glUniform1f(uCloudType, Engine::Settings::cloudType);
 	glUniform1f(uCoverageMultiplier, Engine::Settings::coverageMultiplier);
 
-	float res[2] = { float(Engine::ScreenManager::SCREEN_WIDTH), float(Engine::ScreenManager::SCREEN_HEIGHT) };
+	float res[2] = { (float)Engine::ScreenManager::SCREEN_WIDTH, (float)Engine::ScreenManager::SCREEN_HEIGHT };
 	glUniform2fv(uResolution, 1, res);
 
 	const Engine::TextureInstance * pw = Engine::CloudSystem::NoiseInitializer::getInstance().getPerlinWorleyFBM();

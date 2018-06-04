@@ -117,18 +117,18 @@ void Engine::Camera::onWindowResize(int width, int height)
 
 	if (width > height)
 	{
-		vAngle *= (1.0f / (fWidth / fHeight));
+		//hAngle /= (1.0f / (fWidth / fHeight));
 	}
 	else if (height > width)
 	{
-		hAngle *= (1.0f / (fHeight / fWidth));
+		//vAngle /= (1.0f / (fHeight / fWidth));
 	}
 
 	projMatrix = glm::mat4(0.0f);
-	projMatrix[0].x = 1.0f / tan(hAngle*3.14159f / 180.0f);
+	projMatrix[0].x = 1.0f / (tan(hAngle*3.14159f / 180.0f) * (fWidth / fHeight));
 	projMatrix[1].y = 1.0f / tan(vAngle*3.14159f / 180.0f);
-	projMatrix[2].z = -(farPlane + nearPlane) / (farPlane - nearPlane);
-	projMatrix[3].z = -2.0f * nearPlane*farPlane / (farPlane - nearPlane);
+	projMatrix[2].z = (farPlane + nearPlane) / (nearPlane - farPlane);
+	projMatrix[3].z = 2.0f * nearPlane*farPlane / (nearPlane - farPlane);
 	projMatrix[2].w = -1.0f;
 }
 

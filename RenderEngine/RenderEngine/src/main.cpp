@@ -40,6 +40,7 @@
 #include "postprocessprograms/SSReflectionProgram.h"
 #include "postprocessprograms/SSGrassProgram.h"
 #include "postprocessprograms/VolumetricCloudProgram.h"
+#include "postprocessprograms/CloudFilterProgram.h"
 #include "postprocessprograms/HDRToneMappingProgram.h"
 #include "postprocessprograms/SSGodRayProgram.h"
 
@@ -111,7 +112,7 @@ void initOpenGL()
 
 void initScene()
 {
-	Engine::Camera * camera = new Engine::Camera(0.5f, 1000.0f, 45.0f, 45.0f);
+	Engine::Camera * camera = new Engine::Camera(0.1f, 1000.0f, 45.0f, 45.0f);
 	camera->translateView(glm::vec3(30.0f, -5.0f, -50.0f));
 
 	Engine::Scene * scene = new Engine::Scene();
@@ -144,6 +145,7 @@ void initTables()
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SSReflectionProgram::PROGRAM_NAME, new Engine::SSReflectionProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SSGrassProgram::PROGRAM_NAME, new Engine::SSGrassProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::VolumetricCloudProgram::PROGRAM_NAME, new Engine::VolumetricCloudProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::CloudFilterProgram::PROGRAM_NAME, new Engine::CloudFilterProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::HDRToneMappingProgram::PROGRAM_NAME, new Engine::HDRToneMappingProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SSGodRayProgram::PROGRAM_NAME, new Engine::SSGodRayProgramFactory());
 	

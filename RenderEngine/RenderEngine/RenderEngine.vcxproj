@@ -171,7 +171,7 @@
     <ClInclude Include="include\postprocessprograms\BloomProgram.h" />
     <ClInclude Include="include\postprocessprograms\DeferredShadingProgram.h" />
     <ClInclude Include="include\postprocessprograms\DepthOfFieldProgram.h" />
-    <ClInclude Include="include\postprocessprograms\GaussianBlurProgram.h" />
+    <ClInclude Include="include\postprocessprograms\CloudFilterProgram.h" />
     <ClInclude Include="include\postprocessprograms\HDRToneMappingProgram.h" />
     <ClInclude Include="include\postprocessprograms\SSAAProgram.h" />
     <ClInclude Include="include\postprocessprograms\SSGodRayProgram.h" />
@@ -257,7 +257,7 @@
     <ClCompile Include="src\postprocessprograms\BloomProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\DeferredShadingProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\DepthOfFieldProgram.cpp" />
-    <ClCompile Include="src\postprocessprograms\GaussianBlurProgram.cpp" />
+    <ClCompile Include="src\postprocessprograms\CloudFilterProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\HDRToneMappingProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\SSAAProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\SSGodRayProgram.cpp" />
@@ -297,6 +297,7 @@
     <ClCompile Include="src\WorldConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\clouds\cloudfilter.frag" />
     <None Include="shaders\clouds\generation\perlinworley.comp" />
     <None Include="shaders\clouds\generation\weather.comp" />
     <None Include="shaders\clouds\generation\worley.comp" />
@@ -304,7 +305,6 @@
     <None Include="shaders\postprocess\Bloom.frag" />
     <None Include="shaders\postprocess\DeferredShading.frag" />
     <None Include="shaders\postprocess\DepthOfField.frag" />
-    <None Include="shaders\postprocess\GaussianBlur.frag" />
     <None Include="shaders\postprocess\HDRToneMapping.frag" />
     <None Include="shaders\postprocess\PostProcessRender.frag" />
     <None Include="shaders\postprocess\PostProcessRender.vert" />

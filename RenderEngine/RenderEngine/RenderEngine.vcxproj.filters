@@ -270,9 +270,6 @@
     <ClInclude Include="include\postprocessprograms\DepthOfFieldProgram.h">
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>
-    <ClInclude Include="include\postprocessprograms\GaussianBlurProgram.h">
-      <Filter>Archivos de encabezado\postprocessprograms</Filter>
-    </ClInclude>
     <ClInclude Include="include\StorageTable.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
@@ -411,6 +408,9 @@
     <ClInclude Include="include\animations\CameraStraight.h">
       <Filter>Archivos de encabezado\animations</Filter>
     </ClInclude>
+    <ClInclude Include="include\postprocessprograms\CloudFilterProgram.h">
+      <Filter>Archivos de encabezado\postprocessprograms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -519,9 +519,6 @@
       <Filter>Archivos de origen\instances</Filter>
     </ClCompile>
     <ClCompile Include="src\postprocessprograms\DepthOfFieldProgram.cpp">
-      <Filter>Archivos de origen\postprocessprograms</Filter>
-    </ClCompile>
-    <ClCompile Include="src\postprocessprograms\GaussianBlurProgram.cpp">
       <Filter>Archivos de origen\postprocessprograms</Filter>
     </ClCompile>
     <ClCompile Include="src\StorageTable.cpp">
@@ -638,6 +635,9 @@
     <ClCompile Include="src\animations\CameraStraight.cpp">
       <Filter>Archivos de origen\animatios</Filter>
     </ClCompile>
+    <ClCompile Include="src\postprocessprograms\CloudFilterProgram.cpp">
+      <Filter>Archivos de origen\postprocessprograms</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\sky\sky.frag">
@@ -721,9 +721,6 @@
     <None Include="shaders\postprocess\DepthOfField.frag">
       <Filter>shaders\postprocess</Filter>
     </None>
-    <None Include="shaders\postprocess\GaussianBlur.frag">
-      <Filter>shaders\postprocess</Filter>
-    </None>
     <None Include="shaders\postprocess\PostProcessRender.frag">
       <Filter>shaders\postprocess</Filter>
     </None>
@@ -741,6 +738,9 @@
     </None>
     <None Include="shaders\postprocess\SSGodRays.frag">
       <Filter>shaders\postprocess</Filter>
+    </None>
+    <None Include="shaders\clouds\cloudfilter.frag">
+      <Filter>shaders\clouds</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -41,7 +41,7 @@ float noiseInterpolation(in vec2 i_coord, in float i_size)
            ( p3 - p1 ) * ( weights.y * weights.x );    
 }
 
-float perlinNoise(vec2 uv)
+float perlinNoise(vec2 uv, float sc)
 {
     float noiseValue = 0.0;
     
@@ -51,7 +51,7 @@ float perlinNoise(vec2 uv)
     for( int index = 0; index < perlinOctaves; index++ )
     {
      	       
-        noiseValue += noiseInterpolation( uv, perlinScale * localFrecuency ) * localAplitude;
+        noiseValue += noiseInterpolation( uv, sc * localFrecuency ) * localAplitude;
     
         localAplitude   *= 0.25;
         localFrecuency  *= 3.0;
@@ -70,7 +70,7 @@ void main()
 	vec2 uv = vec2(float(pixel.x) / 1024.0, float(pixel.y) / 1024.0);
 	vec2 suv = vec2(uv.x + 5.5, uv.y + 5.5);
 
-	vec4 weather = vec4(perlinNoise(uv) * 1.0, perlinNoise(suv) * 1.0, 0, 1);
+	vec4 weather = vec4(perlinNoise(uv, perlinScale) * 1.0, perlinNoise(suv, 2000.0) * 1.0, 0, 1);
 
 	imageStore (outWeatherTex, pixel, weather);
 }
