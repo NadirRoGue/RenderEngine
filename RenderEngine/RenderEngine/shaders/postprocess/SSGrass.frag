@@ -43,7 +43,7 @@ void main()
 		y += x * 1000.0;
 
 		float yOffset = fract(y * d) / d;
-		vec2 uvOffset = texCoord - vec2(0, yOffset * 2.0 * 1.0/(dist * 0.2) * ar);
+		vec2 uvOffset = texCoord - vec2(0, yOffset * 2.0 * 1.0/(dist * 0.2));
 
 		vec3 offsetColor = texture(postProcessing_0, uvOffset).rgb;
 		vec3 offsetPos = texture(posBuffer, uvOffset).xyz;

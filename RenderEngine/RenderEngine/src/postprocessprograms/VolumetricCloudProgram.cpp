@@ -66,17 +66,13 @@ void Engine::VolumetricCloudProgram::configureProgram()
 void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
 {
 	glm::mat4 invView = glm::inverse(view);
-
-	glm::mat4 viewProj = proj * view;
-
 	glUniformMatrix4fv(uInvView, 1, GL_FALSE, &(invView[0][0]));
 
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
 	Engine::Camera * cam = scene->getCamera();
-
 	glm::vec3 camPos = -cam->getPosition();
-	
 	glUniform3fv(uCamPos, 1, &camPos[0]);
+
 	glUniform3fv(uLightDir, 1, &Engine::Settings::lightDirection[0]);
 	glUniform3fv(uLightColor, 1, &Engine::Settings::lightColor[0]);
 

@@ -427,9 +427,9 @@ void main()
 #endif
 	// Ray direction
 	float ar = screenResolution.x / screenResolution.y;
-	vec2 fulluv = texCoord * vec2(ar, 1.0) * 2.0 - 1.0;
-	float z =  1.0 / tan(radians(45.0));
-	vec3 viewDir = normalize(vec3(fulluv, -z));
+	vec2 fulluv = gl_FragCoord.xy - screenResolution / 2.0;//texCoord * vec2(ar, 1.0) * 2.0 - 1.0;
+	float z =  screenResolution.y / tan(radians(45.0));
+	vec3 viewDir = normalize(vec3(fulluv, -z / 2.0));
 	vec3 worldDir = normalize( (invView * vec4(viewDir, 0)).xyz);
 	// Volume intersection points
 	vec3 startPos, endPos;
