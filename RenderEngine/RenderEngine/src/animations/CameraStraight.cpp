@@ -6,7 +6,7 @@
 Engine::CameraStraight::CameraStraight(Engine::Camera * cam, glm::vec3 & moveDir)
 	:Engine::Animation("CameraStraight", NULL),cam(cam), moveDirection(moveDir)
 {
-	moveSpeed = 4.0f;
+	moveSpeed = 2.5f;
 }
 
 void Engine::CameraStraight::update()

@@ -352,8 +352,8 @@ bool intersectSphere(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 	float maxSInner;
 	if(sqrtOpInner < 0.0)
 	{
-		//return false;
-		maxSInner = 0.0;
+		return false;
+		//maxSInner = 0.0;
 	}
 	else
 	{

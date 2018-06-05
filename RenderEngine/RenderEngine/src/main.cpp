@@ -122,7 +122,7 @@ void initOpenGL()
 // Creates a new scene and activates it
 void initScene()
 {
-	Engine::Camera * camera = new Engine::Camera(0.1f, 1000.0f, 35.0f);
+	Engine::Camera * camera = new Engine::Camera(0.5f, 1000.0f, 35.0f);
 	camera->translateView(glm::vec3(30.0f, -5.0f, -50.0f));
 
 	Engine::Scene * scene = new Engine::Scene();

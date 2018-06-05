@@ -103,7 +103,7 @@ void Engine::Terrain::tiledRendering(Engine::Camera * camera, Program * prog, vo
 		{
 			// Culling (skips almost half)
 			glm::vec3 test(i - x, 0, j - y);
-			if (abs(px) > 2 && abs(py) > 2 && glm::dot(glm::normalize(test), -fwd) <= 0)
+			if (abs(px) > 2 && abs(py) > 2 && glm::dot(glm::normalize(test), -fwd) < 0.01f)
 				continue;
 
 			(this->*func)(camera, i, j);
