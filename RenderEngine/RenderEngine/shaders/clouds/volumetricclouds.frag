@@ -46,6 +46,17 @@ uniform vec3 noiseKernel[6u] = vec3[]
 	vec3(-0.16852403,  0.14748697,  0.97460106)
 );
 
+#define BAYER_FACTOR 1.0/16.0
+
+uniform float bayerFilter[16u] = float[]
+(
+	0.0*BAYER_FACTOR, 8.0*BAYER_FACTOR, 2.0*BAYER_FACTOR, 10.0*BAYER_FACTOR,
+	12.0*BAYER_FACTOR, 4.0*BAYER_FACTOR, 14.0*BAYER_FACTOR, 6.0*BAYER_FACTOR,
+	3.0*BAYER_FACTOR, 11.0*BAYER_FACTOR, 1.0*BAYER_FACTOR, 9.0*BAYER_FACTOR,
+	15.0*BAYER_FACTOR, 7.0*BAYER_FACTOR, 13.0*BAYER_FACTOR, 5.0*BAYER_FACTOR
+);
+
+
 #define SPHERE_PROJECTION
 
 // Cloud layer data
@@ -121,10 +132,12 @@ float getHeightFraction(vec3 p)
 vec2 getPlanarUV(vec3 p)
 {
 #ifdef SPHERE_PROJECTION
-	return (p.xz - vec2(-sphereOuterRadius)) / (sphereOuterRadius * 2.0);
+	vec2 uv = (p.xz - vec2(-sphereOuterRadius)) / (sphereOuterRadius * 2.0);
 #else
-	return (p.xz - planeMin.xz) / planeDim;
+	vec2 uv = (p.xz - planeMin.xz) / planeDim;
 #endif
+	uv = max(vec2(0.05,0.05),min(vec2(0.95,0.95), uv));
+	return uv;
 }
 
 // Retrieves the weather data stored in the weather texture
@@ -307,7 +320,10 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 	float samplingLod = mix(0.0, 2.0, (length(startPos) - sphereInnerRadius) / (sphereOuterRadius - sphereInnerRadius));
 
 	vec3 wd = getWeatherData(pos);
-	pos += st * wd.g;
+	// Dithering on the starting ray position to reduce banding artifacts
+	int a = int(gl_FragCoord.x) % 4;
+	int b = int(gl_FragCoord.y) % 4;
+	pos += st * bayerFilter[a * 4 + b] * 10.0;
 
 	for(int i = 0; i < sampleCount; i++)
 	{
