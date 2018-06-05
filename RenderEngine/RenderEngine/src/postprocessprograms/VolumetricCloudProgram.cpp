@@ -20,6 +20,7 @@ Engine::VolumetricCloudProgram::VolumetricCloudProgram(const Engine::VolumetricC
 	uInvView = other.uInvView;
 
 	uResolution = other.uResolution;
+	uFov = other.uFov;
 
 	uPerlinWorley = other.uPerlinWorley;
 	uWorley = other.uWorley;
@@ -45,6 +46,7 @@ void Engine::VolumetricCloudProgram::configureProgram()
 	uInvView = glGetUniformLocation(glProgram, "invView");
 
 	uResolution = glGetUniformLocation(glProgram, "screenResolution");
+	uFov = glGetUniformLocation(glProgram, "FOV");
 
 	uPerlinWorley = glGetUniformLocation(glProgram, "perlinworley");
 	uWorley = glGetUniformLocation(glProgram, "worley");
@@ -84,6 +86,7 @@ void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const 
 
 	float res[2] = { (float)Engine::ScreenManager::SCREEN_WIDTH, (float)Engine::ScreenManager::SCREEN_HEIGHT };
 	glUniform2fv(uResolution, 1, res);
+	glUniform1f(uFov, cam->getFOV());
 
 	const Engine::TextureInstance * pw = Engine::CloudSystem::NoiseInitializer::getInstance().getPerlinWorleyFBM();
 	const Engine::TextureInstance * w = Engine::CloudSystem::NoiseInitializer::getInstance().getWorleyFBM();

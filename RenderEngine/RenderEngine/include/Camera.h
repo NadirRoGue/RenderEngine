@@ -17,7 +17,6 @@ namespace Engine
 		float farPlane;
 
 		float fovy;
-		float fovx;
 		glm::mat4 projMatrix;
 
 		glm::vec3 translation;
@@ -30,11 +29,13 @@ namespace Engine
 		glm::vec3 forward;
 
 	public:
-		Camera(float n, float f, float fy, float fx);
+		Camera(float n, float f, float fov);
 		Camera(const Camera & other);
 		~Camera();
 
 		void onWindowResize(int width, int height);
+
+		float getFOV();
 
 		glm::mat4 & getProjectionMatrix();
 		glm::mat4 & getViewMatrix();

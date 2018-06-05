@@ -16,6 +16,7 @@ namespace Engine
 		unsigned int uWeather;
 
 		unsigned int uResolution;
+		unsigned int uFov;
 
 		unsigned int uCamPos;
 		unsigned int uLightDir;

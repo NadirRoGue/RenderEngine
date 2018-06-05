@@ -1,8 +1,6 @@
 ﻿#version 430 core
 
 layout (location=0) out vec4 color;
-//layout (location=1) out vec4 emission;
-//layout (location=2) out vec4 godRayInfo;
 
 in vec2 texCoord;
 
@@ -15,6 +13,7 @@ uniform sampler2D currentPixelDepth;
 
 // used to adjust u coordinate based on aspect ratio
 uniform vec2 screenResolution;
+uniform float FOV;
 
 // Noise textures for cloud shapes and erosion
 uniform sampler3D perlinworley;
@@ -97,14 +96,14 @@ float powder(float density, float ca)
 	return f;
 }
 
-float lightEnergy(vec3 l, vec3 v, float ca, float coneDensity, float realDensity)
+float lightEnergy(vec3 l, vec3 v, float ca, float coneDensity)
 {
 	return 2.0 * beer(coneDensity) * powder(coneDensity, ca) * mix(henyeyGreenstein(l, v, 0.8, ca), henyeyGreenstein(l, v, -0.5, ca), 0.5);
 }
 
 vec3 ambientLight(float heightFrac, float lightFactor)
 {
-	return mix(realLightColor * 0.7, realLightColor * 0.9, heightFrac);
+	return mix(realLightColor * 0.5, realLightColor * 0.75, heightFrac);
 }
 
 // ==========================================================================
@@ -114,11 +113,7 @@ vec3 ambientLight(float heightFrac, float lightFactor)
 float getHeightFraction(vec3 p)
 {
 #ifdef SPHERE_PROJECTION
-	//float y = p.y < 0.0? 1.0 - p.y : p.y;
-	//float div = (0.5 * sphereOuterRadius) / (sphereOuterRadius - sphereOuterRadius);
-	//float fraction = fract(p.y / (0.5 * (sphereOuterRadius - sphereInnerRadius)) * 0.5 + 0.5);
-	float fraction = fract(p.y / (sphereOuterRadius - sphereInnerRadius));
-	//float fraction = (y / div) / (sphereOuterRadius - sphereInnerRadius);
+	float fraction = fract((p.y) / (sphereOuterRadius - sphereInnerRadius));
 #else
 	float fraction = (p.y - planeMin.y) / (planeMax.y - planeMin.y);
 #endif
@@ -136,7 +131,6 @@ vec2 getPlanarUV(vec3 p)
 #else
 	vec2 uv = (p.xz - planeMin.xz) / planeDim;
 #endif
-	uv = max(vec2(0.05,0.05),min(vec2(0.95,0.95), uv));
 	return uv;
 }
 
@@ -192,18 +186,15 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 	vec4 baseCloudNoise = textureLod(perlinworley, tex3dsample, lod);
 	
 	// Build the low frequency fbm modifier
-	float lowFreqFBM = ( baseCloudNoise.g * 0.625) + ( baseCloudNoise.b * 0.25 ) + ( baseCloudNoise.a * 0.125 ) * 1.0;
+	float lowFreqFBM = ( baseCloudNoise.g * 0.625) + ( baseCloudNoise.b * 0.25 ) + ( baseCloudNoise.a * 0.125 );
 	float baseCloudShape = remapValue(baseCloudNoise.r * 2.0, -(1.0 - lowFreqFBM), 1.0, 0.0, 1.0);
 
 	// Apply density gradient based on cloud type
 	float densityGradient = getDensityForCloud(heightFraction, cloudType);
-	baseCloudShape *= densityGradient;// / heightFraction;
+	baseCloudShape *= densityGradient / heightFraction;
 
 	// Apply coverage
-	float coverageStart = weatherData.r;
-	float coverageEnd = weatherData.g;
-	float coverageV = coverageStart;//mix(coverageStart, 0.0, heightFraction);
-	float coverage = coverageV * coverageMultiplier;
+	float coverage = weatherData.r * coverageMultiplier;
 	//coverage = pow(coverage, remapValue(heightFraction, 0.7, 0.8, 1.0, mix(1.0, 0.5, 1.0)));
 	float coveragedCloud = remapValue(baseCloudShape, coverage, 1.0, 0.0, 1.0);
 	coveragedCloud *= coverage;
@@ -256,9 +247,6 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 				density += cloudDensity;
 				float transmittance = 1.0 - (density * rcpThickness);
 				coneDensity += (cloudDensity * transmittance);
-
-				//if(coneDensity >= 1.0)
-				//	break;
 			}
 		}
 
@@ -269,21 +257,18 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 	// 1 far sample for shadowing
 	pos += (rayStep * 8.0);
 	float heightFraction = getHeightFraction(pos);
-	if(heightFraction <= 1.0)
+	float cloudDensity = sampleCloudDensity(pos, getWeatherData(pos), 6.0, false);
+	if(cloudDensity > 0.0)
 	{
-		float cloudDensity = sampleCloudDensity(pos, getWeatherData(pos), 6.0, true);
-		if(cloudDensity > 0.0)
-		{
-			density += cloudDensity;
-			float transmittance = 1.0 - clamp(density * rcpThickness, 0.0, 1.0);
-			coneDensity += (cloudDensity * transmittance);
-		}
+		density += cloudDensity;
+		float transmittance = 1.0 - (density * rcpThickness);
+		coneDensity += (cloudDensity * transmittance);
 	}
 
-	float ca = (dot(normLightDir, -d), 0, 1);
+	float ca = 1.0;
 
 	// Compute light energy arriving at point
-	return lightEnergy(normLightDir, d, ca, coneDensity, density);
+	return lightEnergy(normLightDir, d, ca, coneDensity);
 }
 
 float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
@@ -291,7 +276,6 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 	vec3 dir = endPos - startPos;
 	float density = 0.0;
 	float thick = length(dir);
-	float rcpThick = 1.0 / thick;
 
 #ifdef SPHERE_PROJECTION
 	float delta = sphereOuterRadius - sphereInnerRadius;
@@ -442,9 +426,8 @@ void main()
 	sphereCenter = vec3(camPos.x, -1950.0, camPos.z);
 #endif
 	// Ray direction
-	float ar = screenResolution.x / screenResolution.y;
-	vec2 fulluv = gl_FragCoord.xy - screenResolution / 2.0;//texCoord * vec2(ar, 1.0) * 2.0 - 1.0;
-	float z =  screenResolution.y / tan(radians(45.0));
+	vec2 fulluv = gl_FragCoord.xy - screenResolution / 2.0;
+	float z =  screenResolution.y / tan(radians(FOV));
 	vec3 viewDir = normalize(vec3(fulluv, -z / 2.0));
 	vec3 worldDir = normalize( (invView * vec4(viewDir, 0)).xyz);
 	// Volume intersection points

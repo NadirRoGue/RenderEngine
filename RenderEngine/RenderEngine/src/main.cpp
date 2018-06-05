@@ -1,3 +1,8 @@
+/**
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
+
 #include <windows.h>
 
 #include "windowmanagers/GLUTWindow.h"
@@ -11,7 +16,6 @@
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <iostream>
-
 
 #include "Scene.h"
 #include "Renderer.h"
@@ -65,6 +69,7 @@ void initHandlers();
 void initRenderEngine();
 void destroy();
 
+// Initialize various post process nodes to be added to the scene renderer (see end of file)
 Engine::PostProcessChainNode * createBloomNode();
 Engine::PostProcessChainNode * createSSAANode();
 Engine::PostProcessChainNode * createSSReflectionNode();
@@ -73,24 +78,27 @@ Engine::PostProcessChainNode * createHDRNode();
 Engine::PostProcessChainNode * createSSGodRayNode();
 
 
-/**
-* @author Nadir Román Guerrero
-* @email nadir.ro.gue@gmail.com
-*/
-
 int main(int argc, char** argv)
 {
 	std::locale::global(std::locale("spanish")); // acentos ;)
 
+	// Initialize OpenGL and window system
 	initOpenGL();
+	// Initialize caches
 	initTables();
+	// Create new scene
 	initScene();
+	// Build the renderer
 	initRenderEngine();
+	// Add scene elements
 	initSceneObj();
+	// Create input handlers
 	initHandlers();
 	
+	// Render loop
 	Engine::Window::WindowManager::getInstance().getWindowToolkit()->mainLoop();
 
+	// Clean up
 	destroy();
 
 	system("Pause");
@@ -101,18 +109,20 @@ int main(int argc, char** argv)
 // ======================================================================
 // ======================================================================
 
+// Initializes OpenGL and the window system
 void initOpenGL()
 {
-	std::unique_ptr<Engine::Window::GLFWWindow> win = std::make_unique<Engine::Window::GLFWWindow>("Procedural World", 0, 30, 1024, 1024);
+	std::unique_ptr<Engine::Window::GLFWWindow> win = std::make_unique<Engine::Window::GLFWWindow>("No Man's Planet", 0, 30, 1024, 1024);
 	win->setOGLVersion(4, 1);
 	win->setContextProfile(GLFW_OPENGL_CORE_PROFILE);
 
 	Engine::Window::WindowManager::getInstance().setToolkit(std::move(win));
 }
 
+// Creates a new scene and activates it
 void initScene()
 {
-	Engine::Camera * camera = new Engine::Camera(0.1f, 1000.0f, 45.0f, 45.0f);
+	Engine::Camera * camera = new Engine::Camera(0.1f, 1000.0f, 35.0f);
 	camera->translateView(glm::vec3(30.0f, -5.0f, -50.0f));
 
 	Engine::Scene * scene = new Engine::Scene();
@@ -122,6 +132,7 @@ void initScene()
 	Engine::SceneManager::getInstance().activateScene("scene_0");
 }
 
+// Initialize storage classes and fill them with needed data
 void initTables()
 {
 	Engine::TableManager::getInstance().registerTable(&Engine::MeshTable::getInstance());
@@ -159,6 +170,7 @@ void initTables()
 	Engine::CascadeShadowMaps::getInstance().init();
 }
 
+// Adds scene elements (light, terrain, skybox, etc.)
 void initSceneObj()
 {
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
@@ -183,6 +195,7 @@ void initSceneObj()
 	Engine::RenderManager::getInstance().doResize(1024, 1024);
 }
 
+// Initialize user input and animation handlers (updated once per frame)
 void initHandlers()
 {
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
@@ -207,6 +220,7 @@ void initHandlers()
 	mouseHandler->registerMouseMotionHandler(camMotion);
 }
 
+// Creates the deferred renderer and attachs various post processing nodes to it
 void initRenderEngine()
 {
 	Engine::DeferredRenderer * dr = new Engine::DeferredRenderer();
@@ -220,6 +234,7 @@ void initRenderEngine()
 	Engine::RenderManager::getInstance().doResize(1024, 1024);
 }
 
+// Clean up cache (both CPU and GPU)
 void destroy()
 {
 	Engine::TableManager::getInstance().cleanUp();
@@ -227,16 +242,21 @@ void destroy()
 
 // ==========================================================================
 
+// Creates a screen-space anti aliasing post process
 Engine::PostProcessChainNode * createSSAANode()
 {
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
+
+	// Shader
 	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSAAProgram::PROGRAM_NAME);
 
+	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
 	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addDepthBuffer24(500, 500);
 	node->callBack = 0;
 
+	// Render plane
 	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
 	if (mi != 0)
 	{
@@ -247,18 +267,22 @@ Engine::PostProcessChainNode * createSSAANode()
 	return node;
 }
 
+// Creates a bloom post process
 Engine::PostProcessChainNode * createBloomNode()
 {
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 	
+	// Shader
 	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::BloomProgram::PROGRAM_NAME);
 
+	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
 	node->renderBuffer->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addColorBuffer(1, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addDepthBuffer24(500, 500);
 	node->callBack = 0;
 
+	// Render plane
 	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
 	if (mi != 0)
 	{
@@ -269,17 +293,21 @@ Engine::PostProcessChainNode * createBloomNode()
 	return node;
 }
 
+// Creates a screen-space reflection post process
 Engine::PostProcessChainNode * createSSReflectionNode()
 {
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 
+	// Shader
 	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSReflectionProgram::PROGRAM_NAME);
 
+	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
 	node->renderBuffer->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addDepthBuffer24(500, 500);
 	node->callBack = 0;
 
+	// Render plane
 	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
 	if (mi != 0)
 	{
@@ -290,18 +318,22 @@ Engine::PostProcessChainNode * createSSReflectionNode()
 	return node;
 }
 
+// Creates a screen-space grass post process
 Engine::PostProcessChainNode * createSSGrassNode()
 {
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 
+	// Shader
 	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSGrassProgram::PROGRAM_NAME);
 
+	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
 	node->renderBuffer->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addColorBuffer(1, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addDepthBuffer24(500, 500);
 	node->callBack = 0;
 
+	// Render plane
 	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
 	if (mi != 0)
 	{
@@ -312,17 +344,21 @@ Engine::PostProcessChainNode * createSSGrassNode()
 	return node;
 }
 
+// Creates a hdr tone mapping post process
 Engine::PostProcessChainNode * createHDRNode()
 {
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 
+	// Shader
 	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::HDRToneMappingProgram::PROGRAM_NAME);
 
+	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
 	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addDepthBuffer24(500, 500);
 	node->callBack = 0;
 
+	// Render plane
 	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
 	if (mi != 0)
 	{
@@ -333,17 +369,21 @@ Engine::PostProcessChainNode * createHDRNode()
 	return node;
 }
 
+// Creates a screen-space light scatting post process
 Engine::PostProcessChainNode * createSSGodRayNode()
 {
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 
+	// Shader
 	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSGodRayProgram::PROGRAM_NAME);
 
+	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
 	node->renderBuffer->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addDepthBuffer24(500, 500);
 	node->callBack = 0;
 
+	// Render plane
 	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
 	if (mi != 0)
 	{
