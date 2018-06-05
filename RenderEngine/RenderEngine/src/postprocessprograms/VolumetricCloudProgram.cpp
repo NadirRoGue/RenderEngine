@@ -30,6 +30,8 @@ Engine::VolumetricCloudProgram::VolumetricCloudProgram(const Engine::VolumetricC
 	uLightDir = other.uLightDir;
 	uLightColor = other.uLightColor;
 	uCloudColor = other.uCloudColor;
+	uZenitColor = other.uZenitColor;
+	uHorizonColor = other.uHorizonColor;
 	uTime = other.uTime;
 
 	uCloudSpeed = other.uCloudSpeed;
@@ -56,6 +58,8 @@ void Engine::VolumetricCloudProgram::configureProgram()
 	uLightDir = glGetUniformLocation(glProgram, "lightDir");
 	uLightColor = glGetUniformLocation(glProgram, "lightColor");
 	uCloudColor = glGetUniformLocation(glProgram, "cloudColor");
+	uZenitColor = glGetUniformLocation(glProgram, "zenitColor");
+	uHorizonColor = glGetUniformLocation(glProgram, "horizonColor");
 	uTime = glGetUniformLocation(glProgram, "time");
 
 	uCloudSpeed = glGetUniformLocation(glProgram, "cloudSpeed");
@@ -75,8 +79,12 @@ void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const 
 	glm::vec3 camPos = -cam->getPosition();
 	glUniform3fv(uCamPos, 1, &camPos[0]);
 
-	glUniform3fv(uLightDir, 1, &Engine::Settings::lightDirection[0]);
+	glm::vec3 normLightDir = glm::normalize(Engine::Settings::lightDirection);
+	glUniform3fv(uLightDir, 1, &normLightDir[0]);
 	glUniform3fv(uLightColor, 1, &Engine::Settings::lightColor[0]);
+
+	glUniform3fv(uZenitColor, 1, &Engine::Settings::skyZenitColor[0]);
+	glUniform3fv(uHorizonColor, 1, &Engine::Settings::skyHorizonColor[0]);
 
 	glUniform3fv(uCloudColor, 1, &Engine::Settings::cloudColor[0]);
 	glUniform1f(uTime, Engine::Time::timeSinceBegining);

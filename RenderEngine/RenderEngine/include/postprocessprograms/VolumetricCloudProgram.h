@@ -21,6 +21,8 @@ namespace Engine
 		unsigned int uCamPos;
 		unsigned int uLightDir;
 		unsigned int uLightColor;
+		unsigned int uZenitColor;
+		unsigned int uHorizonColor;
 		unsigned int uCloudColor;
 		unsigned int uTime;
 		unsigned int uCloudType;

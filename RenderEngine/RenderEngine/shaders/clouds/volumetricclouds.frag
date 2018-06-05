@@ -26,6 +26,9 @@ uniform vec3 lightDir;
 uniform vec3 lightColor;
 vec3 realLightColor;
 
+uniform vec3 zenitColor;
+uniform vec3 horizonColor;
+
 uniform vec3 cloudColor;
 
 // Cloud evolution
@@ -73,7 +76,7 @@ vec2 planeDim = vec2(planeMax.xz - planeMin.xz);
 // Cloud types height density gradients
 #define STRATUS_GRADIENT vec4(0.0, 0.1, 0.2, 0.3)
 #define STRATOCUMULUS_GRADIENT vec4(0.02, 0.2, 0.48, 0.625)
-#define CUMULUS_GRADIENT vec4(0.01, 0.0625, 0.78, 1.0)
+#define CUMULUS_GRADIENT vec4(0.01, 0.0625, 0.78, 0.88)
 
 // ==========================================================================
 // Lighting functions
@@ -195,7 +198,7 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 
 	// Apply coverage
 	float coverage = weatherData.r * coverageMultiplier;
-	//coverage = pow(coverage, remapValue(heightFraction, 0.7, 0.8, 1.0, mix(1.0, 0.5, 1.0)));
+	//coverage = pow(coverage, remapValue(heightFraction, 0.7, 0.8, 1.0, mix(1.0, 0.5, 0.2)));
 	float coveragedCloud = remapValue(baseCloudShape, coverage, 1.0, 0.0, 1.0);
 	coveragedCloud *= coverage;
 
@@ -215,7 +218,7 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 		finalCloud = remapValue(coveragedCloud, highFreqNoiseModifier * 0.2, 1.0, 0.0, 1.0);
 	}
 
-	return clamp(finalCloud, 0.0, 1.0);
+	return clamp(finalCloud, 0.0, 1.0);// * (1.0 - heightFraction);
 }
 
 // ==========================================================================
@@ -223,9 +226,8 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 
 float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 {
-	vec3 normLightDir = normalize(lightDir);
 	vec3 startPos = pos;
-	vec3 rayStep = normLightDir * (stepSize);
+	vec3 rayStep = lightDir * (stepSize);
 	float coneRadius = 1.0;
 	float coneStep = 1.0/6.0;
 	float density = 0.0;
@@ -268,7 +270,7 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 	float ca = 1.0;
 
 	// Compute light energy arriving at point
-	return lightEnergy(normLightDir, d, ca, coneDensity);
+	return lightEnergy(lightDir, d, ca, coneDensity);
 }
 
 float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
@@ -286,7 +288,7 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 	int sampleCount = int(ceil(mix(48.0, 96.0, clamp(thick / delta, 0.0, 1.0))));
 
 	// Light color attenuation based on sun's position
-	float lightFactor = (clamp(dot(vec3(0,1,0), normalize(lightDir)), 0.0, 1.0));
+	float lightFactor = (clamp(dot(vec3(0,1,0), lightDir), 0.0, 1.0));
 	realLightColor = lightColor;
 	realLightColor.y = lightFactor > 0.4? mix(lightColor.y * 0.8, lightColor.y, (lightFactor - 0.4) / 0.6) : mix(0.5, lightColor.y, lightFactor / 0.4);
 	realLightColor.z = lightFactor > 0.4? mix(lightColor.z * 0.8, lightColor.z, (lightFactor - 0.4) / 0.6) : mix(0.15, lightColor.z, lightFactor / 0.4);
@@ -347,18 +349,21 @@ bool intersectSphere(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 	float sqrtOpInner = b*b - (c - sphereInnerRadius*sphereInnerRadius);
 
 	// No solution (we are outside the sphere, looking away from it)
+	float maxSInner;
 	if(sqrtOpInner < 0.0)
 	{
-		return false;
+		//return false;
+		maxSInner = 0.0;
 	}
+	else
+	{
+		float deInner = sqrt(sqrtOpInner);
+		float solAInner = -b - deInner;
+		float solBInner = -b + deInner;
 
-	float deInner = sqrt(sqrtOpInner);
-	float solAInner = -b - deInner;
-	float solBInner = -b + deInner;
-
-	float maxSInner = max(solAInner, solBInner);
-	maxSInner = maxSInner < 0.0? 0.0 : maxSInner;
-
+		maxSInner = max(solAInner, solBInner);
+		maxSInner = maxSInner < 0.0? 0.0 : maxSInner;
+	}
 	// Intersect outer sphere
 	float sqrtOpOuter = b*b - (c - sphereOuterRadius*sphereOuterRadius);
 
@@ -423,7 +428,7 @@ void main()
 		discard;
 
 #ifdef SPHERE_PROJECTION
-	sphereCenter = vec3(camPos.x, -1950.0, camPos.z);
+	sphereCenter = vec3(camPos.x, -1900.0, camPos.z);
 #endif
 	// Ray direction
 	vec2 fulluv = gl_FragCoord.xy - screenResolution / 2.0;
@@ -444,8 +449,20 @@ void main()
 		vec3 outColor;
 		float density = frontToBackRaymarch(startPos, endPos, outColor);
 		density = clamp(density, 0.0, 1.0);
-		
-		color = vec4(outColor, density);
+
+		vec4 finalColor = vec4(outColor, density);
+
+#ifdef SPHERE_PROJECTION
+		float colorFactor = clamp(dot(vec3(0,1,0), lightDir), 0.0, 1.0);
+		vec4 ambientColor = vec4(mix(horizonColor, zenitColor, 0.2), 1.0);
+
+		float dist = length(startPos - camPos);
+		float radius = (camPos.y - sphereCenter.y) * 0.35;
+		float alpha = clamp(dist / radius, 0.0, 1.0);
+		finalColor = mix(finalColor, ambientColor * colorFactor, alpha);
+#endif
+
+		color = finalColor;
 	}
 	else
 	{
