@@ -13,12 +13,15 @@
 
 namespace Engine
 {
+	/**
+	 * Class in charge of managing GPU programs (creation, access, clean up, etc.)
+	 */
 	class ProgramTable : public StorageTable
 	{
 	private:
 		static ProgramTable * INSTANCE;
 
-		//std::map<std::string, Program *> table;
+		// List of program factories
 		std::map<std::string, ProgramFactory *> table;
 	private:
 		ProgramTable();
@@ -27,10 +30,14 @@ namespace Engine
 		static ProgramTable & getInstance();
 
 		~ProgramTable();
+		// Register a new program factory to allow the creation of the given shader type)
 		void registerProgramFactory(std::string name, ProgramFactory * pf);
 
+		// Attempts to return a program from the cache. If the combination name-parameters does not exist,
+		// will create a new one
 		Program * getProgramByName(std::string name, unsigned long long parameters = 0);
 
+		// Releases the programs
 		void clean();
 	};
 }

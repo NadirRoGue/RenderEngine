@@ -12,6 +12,7 @@ Engine::VolumetricCloudProgram::VolumetricCloudProgram(std::string name, unsigne
 	:Engine::PostProcessProgram(name, params)
 {
 	fShaderFile = "shaders/clouds/volumetricclouds.frag";
+	f = 0;
 }
 
 Engine::VolumetricCloudProgram::VolumetricCloudProgram(const Engine::VolumetricCloudProgram & other)
@@ -67,6 +68,8 @@ void Engine::VolumetricCloudProgram::configureProgram()
 	uCoverageMultiplier = glGetUniformLocation(glProgram, "coverageMultiplier");
 
 	uCurrentDepth = glGetUniformLocation(glProgram, "currentPixelDepth");
+
+	uFrame = glGetUniformLocation(glProgram, "frame");
 }
 
 void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
@@ -116,6 +119,10 @@ void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const 
 	glUniform1i(uCurrentDepth, 3);
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, dr->getGBufferDepth()->getTexture()->getTextureId());
+
+	glUniform1i(uFrame, f);
+	f++;
+	f = f % 1024;
 }
 
 // ===============================================================================================

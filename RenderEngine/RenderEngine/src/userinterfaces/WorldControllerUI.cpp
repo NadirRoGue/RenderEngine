@@ -67,9 +67,9 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::Spacing(); ImGui::Spacing();
 
 		ImGui::Text("Terrain settings");
-		ImGui::SliderFloat("Amplitude##app", &Engine::Settings::terrainAmplitude, 0.0f, 10.0f);
-		ImGui::SliderFloat("Frecuency##app",&Engine::Settings::terrainFrecuency, 0.0f, 10.0f);
-		ImGui::SliderFloat("Scale##app", &Engine::Settings::terrainScale, 0.0f, 50.0f);
+		ImGui::SliderFloat("Amplitude##app", &Engine::Settings::terrainAmplitude, 0.0f, 2.0f);
+		ImGui::SliderFloat("Frecuency##app",&Engine::Settings::terrainFrecuency, 0.0f, 2.0f);
+		ImGui::SliderFloat("Scale##app", &Engine::Settings::terrainScale, 0.0f, 10.0f);
 		ImGui::InputInt("Octaves##app", reinterpret_cast< int32_t*>(&Engine::Settings::terrainOctaves));
 		ImGui::SliderFloat("Grass coverage##app", &Engine::Settings::grassCoverage, 0.0f, 1.0f);
 		ImGui::ColorEdit3("Grass color##app", &Engine::Settings::grassColor[0]);

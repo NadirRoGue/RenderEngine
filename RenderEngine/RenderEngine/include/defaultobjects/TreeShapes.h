@@ -1,9 +1,18 @@
+/**
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
+
 #pragma once
 
 #include "Mesh.h"
 
 namespace Engine
 {
+	/**
+	 * Holds the data needed to create a indexed, open at the bottom, cube
+	 * used as base shape to build the procedural vegetation
+	 */
 	namespace TrunkData
 	{
 		const unsigned int triangleIndex[] = 
@@ -36,6 +45,7 @@ namespace Engine
 		};
 	}
 
+	// Creates a trunk piece mesh
 	Mesh CreateTrunk()
 	{
 		return Mesh
@@ -52,6 +62,10 @@ namespace Engine
 		);
 	}
 
+	/**
+	 * UNUSED - Holds the data to create triangular leafs for
+	 * the procedural vegetation
+	 */
 	namespace LeafData
 	{
 		const unsigned int triangleIndex[] =

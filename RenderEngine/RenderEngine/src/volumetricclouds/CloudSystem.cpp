@@ -37,7 +37,7 @@ void Engine::CloudSystem::VolumetricClouds::render(Engine::Camera * cam)
 
 	// Render clouds
 	glBindFramebuffer(GL_FRAMEBUFFER, filterBuffer->getFrameBufferId());
-	glClear(GL_COLOR_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(shader->getProgramId());
 	shader->onRenderObject(NULL, cam->getViewMatrix(), cam->getProjectionMatrix());
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

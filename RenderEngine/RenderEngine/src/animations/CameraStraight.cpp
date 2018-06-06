@@ -3,8 +3,8 @@
 #include "WorldConfig.h"
 #include "TimeAccesor.h"
 
-Engine::CameraStraight::CameraStraight(Engine::Camera * cam, glm::vec3 & moveDir)
-	:Engine::Animation("CameraStraight", NULL),cam(cam), moveDirection(moveDir)
+Engine::CameraStraight::CameraStraight(Engine::Camera * cam)
+	:Engine::Animation("CameraStraight", NULL),cam(cam)
 {
 	moveSpeed = 2.5f;
 }

@@ -31,6 +31,8 @@ uniform vec3 horizonColor;
 
 uniform vec3 cloudColor;
 
+uniform int frame;
+
 // Cloud evolution
 uniform float time;
 uniform float cloudType;
@@ -194,11 +196,10 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 
 	// Apply density gradient based on cloud type
 	float densityGradient = getDensityForCloud(heightFraction, cloudType);
-	baseCloudShape *= densityGradient / heightFraction;
+	baseCloudShape *= (densityGradient / heightFraction) * (1.0 - heightFraction);
 
 	// Apply coverage
 	float coverage = weatherData.r * coverageMultiplier;
-	//coverage = pow(coverage, remapValue(heightFraction, 0.7, 0.8, 1.0, mix(1.0, 0.5, 0.2)));
 	float coveragedCloud = remapValue(baseCloudShape, coverage, 1.0, 0.0, 1.0);
 	coveragedCloud *= coverage;
 
@@ -218,7 +219,7 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 		finalCloud = remapValue(coveragedCloud, highFreqNoiseModifier * 0.2, 1.0, 0.0, 1.0);
 	}
 
-	return clamp(finalCloud, 0.0, 1.0);// * (1.0 - heightFraction);
+	return clamp(finalCloud, 0.0, 1.0);
 }
 
 // ==========================================================================
@@ -229,7 +230,7 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 	vec3 startPos = pos;
 	vec3 rayStep = lightDir * (stepSize);
 	float coneRadius = 1.0;
-	float coneStep = 1.0/6.0;
+	float coneStep = 0.1666666; // (1 / 6)
 	float density = 0.0;
 	float coneDensity = 0.0;
 	float rcpThickness = 1.0 / (stepSize * 6);
@@ -267,10 +268,10 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 		coneDensity += (cloudDensity * transmittance);
 	}
 
-	float ca = 1.0;
+	//float ca = 1.0;
 
 	// Compute light energy arriving at point
-	return lightEnergy(lightDir, d, ca, coneDensity);
+	return lightEnergy(lightDir, d, 1.0/*ca*/, coneDensity);
 }
 
 float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
@@ -423,9 +424,17 @@ bool intersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 
 void main()
 {
+	// Simple temporal reprojection
+	if(int(gl_FragCoord.x) % 2 != frame % 2)
+		discard;
+
 	// Do not compute clouds if they are not going to be visible
 	if(texture(currentPixelDepth, texCoord).x < 1.0)
-		discard;
+	{
+		color = vec4(0);
+		return;
+		//discard;
+	}
 
 #ifdef SPHERE_PROJECTION
 	sphereCenter = vec3(camPos.x, -1900.0, camPos.z);
