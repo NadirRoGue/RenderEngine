@@ -26,7 +26,9 @@ namespace Engine
 		glm::vec3 endTrunkColor;
 
 		bool emissiveLeaf;
-		glm::vec3 leafColor;
+		glm::vec3 leafStartColor;
+		glm::vec3 leafEndColor;
+		unsigned int depthStartingLeaf;
 	} TreeGenerationData;
 
 	class ProceduralVegetation

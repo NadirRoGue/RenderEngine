@@ -25,6 +25,7 @@ uniform mat4 modelViewProj;
 #endif
 
 uniform float waterHeight;
+uniform float maxHeight;
 
 uniform mat4 lightDepthMat;
 uniform mat4 lightDepthMat1;
@@ -91,7 +92,7 @@ void main()
 	
 	float height = noiseHeight(tileUV);
 
-	if(height > waterHeight && height < waterHeight + 0.1)
+	if(height > waterHeight && height < maxHeight)
 	{
 		vec4 displacement = vec4(0, height * 1.5 * 5.0, 0, 0);
 

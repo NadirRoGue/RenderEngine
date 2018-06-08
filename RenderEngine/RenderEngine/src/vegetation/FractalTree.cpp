@@ -90,7 +90,7 @@ Engine::Mesh * Engine::FractalTree::generate()
 
 void Engine::FractalTree::processChunk(glm::mat4 & origin, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotation, size_t vOffset, unsigned int depth)
 {
-	if (depth >= treeData.maxDepth - 1)
+	if (depth >= treeData.depthStartingLeaf)
 	{
 		addLeaf(origin, scale / treeData.scalingFactor, vOffset, depth);
 		if(depth >= treeData.maxDepth)
@@ -187,6 +187,18 @@ void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat
 	// Add new vertices applying the transformations
 	const float * verts = source->getVertices();
 	unsigned int start = keepBase ? 0 : source->getNumVertices() / 2;
+	float highestY = -99999.9f, lowestY = 99999.9f;
+	for (unsigned int i = start; i < source->getNumVertices(); i++)
+	{
+		unsigned int index = (i * 3) + 1;
+
+		if (verts[index] > highestY)
+			highestY = verts[index];
+		if (verts[index] < lowestY)
+			lowestY = verts[index];
+	}
+	float delta = highestY - lowestY;
+
 	for (unsigned int i = start; i < source->getNumVertices(); i++)
 	{
 		unsigned int index = i * 3;
@@ -207,16 +219,17 @@ void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat
 		}
 		else
 		{
+			glm::vec3 color = glm::mix(treeData.leafStartColor, treeData.leafEndColor, verts[index + 1] / delta);
 			// Add leaf color and possible emission
 			if (treeData.emissiveLeaf)
 			{
-				emission.push_back(treeData.leafColor);
+				emission.push_back(color);
 			}
 			else
 			{
 				emission.push_back(glm::vec3(0, 0, 0));
 			}
-			colors.push_back(treeData.leafColor);
+			colors.push_back(color);
 		}
 	}
 }

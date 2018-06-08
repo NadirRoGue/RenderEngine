@@ -243,7 +243,7 @@ void main()
 	visibility = getShadowVisibility(rawNormal);
 
 	// Depth for below-water level areas
-	alpha = height <= waterHeight? (height / waterHeight) - 0.6 : 1.0;
+	alpha = height <= waterHeight? (height / waterHeight) - 0.5 : 1.0;
 	alpha = clamp(alpha, 0, 1);
 #endif
 

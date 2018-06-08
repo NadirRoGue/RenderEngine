@@ -43,10 +43,15 @@ void main()
 		float yOffset = fract(y * d) / d;
 		vec2 uvOffset = texCoord - vec2(0, yOffset * 2.0 * 1.0/(dist * 0.2));
 
-		vec3 offsetColor = texture(postProcessing_0, uvOffset).rgb;
-		vec3 offsetPos = texture(posBuffer, uvOffset).xyz;
-
-		outColor = offsetPos.z < pos.z? backColor : vec4(mix(backColor.rgb, offsetColor, clamp(1 - yOffset * d / 3.8, 0, 1)), 1.0);
+		if(texture(grassBuffer, uvOffset).x > 0.9)
+		{
+			vec3 offsetPos = texture(posBuffer, uvOffset).xyz;
+			outColor = offsetPos.z < pos.z? backColor : vec4(mix(backColor.rgb, texture(postProcessing_0, uvOffset).rgb, clamp(1 - yOffset * d / 3.8, 0, 1)), 1.0);
+		}
+		else
+		{
+			outColor = backColor;
+		}
 	}
 	else
 	{

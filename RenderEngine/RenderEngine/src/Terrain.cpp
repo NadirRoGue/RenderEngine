@@ -201,6 +201,8 @@ void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j
 
 	Engine::CascadeShadowMaps & csm = Engine::CascadeShadowMaps::getInstance();
 
+	treeActiveShader->setUniformMaxHeight(Engine::Settings::waterHeight + 0.1f);
+
 	size_t treeToSpawn = 0;
 	unsigned int z = 0;
 	while(z < spawnTrees)
@@ -251,6 +253,8 @@ void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
 
 	Engine::CascadeShadowMaps & csm = Engine::CascadeShadowMaps::getInstance();
 
+	treeActiveShader->setUniformMaxHeight(Engine::Settings::waterHeight + 0.1f);
+
 	size_t treeToSpawn = 0;
 	unsigned int z = 0;
 	while(z < spawnTrees)
@@ -297,17 +301,15 @@ void Engine::Terrain::flowerRender(Engine::Camera * cam, int i, int j)
 	std::uniform_real_distribution<float> dTerrain(0.0f, 1.0f);
 	std::default_random_engine eTerrain(seed);
 
-	// 16 trees per tile
-	size_t spawnTrees = 30;
-	//size_t numTypeOfTrees = treeTypes.size();
-	//size_t equalAmount = spawnTrees / numTypeOfTrees;
-	//equalAmount = equalAmount < 1 ? 1 : equalAmount;
+	// 60 flowers per tile
+	const size_t spawnTrees = 80;
 
 	Engine::CascadeShadowMaps & csm = Engine::CascadeShadowMaps::getInstance();
 
-	//glBindVertexArray(flower->getMesh()->vao);
+	treeActiveShader->setUniformMaxHeight(Engine::Settings::waterHeight + 0.2f);
 
-	//size_t treeToSpawn = 0;
+	const unsigned int numElements = flower->getMesh()->getNumFaces() * 3;
+
 	unsigned int z = 0;
 	while (z < spawnTrees)
 	{
@@ -331,7 +333,7 @@ void Engine::Terrain::flowerRender(Engine::Camera * cam, int i, int j)
 		treeActiveShader->setUniformDepthMap1(csm.getDepthTexture1());
 		treeActiveShader->onRenderObject(flower, cam->getViewMatrix(), cam->getProjectionMatrix());
 
-		glDrawElements(GL_TRIANGLES, flower->getMesh()->getNumFaces() * 3, GL_UNSIGNED_INT, (void*)0);
+		glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_INT, (void*)0);
 	}
 
 }
@@ -464,12 +466,14 @@ void Engine::Terrain::addTrees()
 		treeData.emissiveLeaf = leafColor(eLeaf) > 0.8f;
 		treeData.startTrunkColor = glm::vec3(0.2f, 0.1f, 0.0f);
 		treeData.endTrunkColor = treeData.startTrunkColor;
-		treeData.leafColor = glm::vec3(leafColor(eLeaf), 1.0 - leafColor(eLeaf), 1.0 - leafColor(eLeaf));
+		treeData.leafStartColor = glm::vec3(leafColor(eLeaf), 1.0 - leafColor(eLeaf), 1.0 - leafColor(eLeaf));
+		treeData.leafEndColor = treeData.leafStartColor;
 		treeData.maxBranchesSplit = 4;
 		float rotFactor = leafColor(eLeaf) * 0.5f + 0.5f;
 		treeData.maxBranchRotation = glm::vec3(45.0f, 10.0f, 10.0f) * rotFactor;
 		treeData.minBranchRotation = glm::vec3(-45.0f, -10.0f, -10.0f) * rotFactor;
 		treeData.maxDepth = 7;
+		treeData.depthStartingLeaf = 6;
 		treeData.rotateMainTrunk = false;
 		treeData.scalingFactor = glm::vec3(0.75, 1.0, 0.75) + glm::vec3(0.0f, (1.0f - rotFactor) * 0.25f, 0.0f);
 		treeData.seed = d(e);
@@ -490,16 +494,18 @@ void Engine::Terrain::addTrees()
 	
 	Engine::TreeGenerationData treeData;
 	treeData.treeName = std::string("Flower");
-	treeData.emissiveLeaf = false;// leafColor(eLeaf) > 0.8f;
+	treeData.emissiveLeaf = false;
 	treeData.startTrunkColor = glm::vec3(0.2f, 0.4f, 0.0f);
 	treeData.endTrunkColor = treeData.startTrunkColor;
-	treeData.leafColor = glm::vec3(1.0, 0.1, 0.1);
+	treeData.leafStartColor = glm::vec3(0.1f, 0.1f, 1.0f);
+	treeData.leafEndColor = glm::vec3(1.0f, 0.1f, 0.1f);
 	treeData.maxBranchesSplit = 1;
 	treeData.maxBranchRotation = glm::vec3(45.0f, 10.0f, 10.0f);
 	treeData.minBranchRotation = glm::vec3(-45.0f, -10.0f, -10.0f);
 	treeData.maxDepth = 2;
+	treeData.depthStartingLeaf = 2;
 	treeData.rotateMainTrunk = false;
-	treeData.scalingFactor = glm::vec3(0.05f, 0.25f, 0.05f);
+	treeData.scalingFactor = glm::vec3(0.06f, 0.3f, 0.06f);
 	treeData.seed = d(e);
 	treeData.startBranchingDepth = 2;
 
