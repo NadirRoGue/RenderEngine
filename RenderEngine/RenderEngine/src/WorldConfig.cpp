@@ -14,7 +14,7 @@ float Engine::Settings::terrainScale = 0.9f;
 unsigned int Engine::Settings::terrainOctaves = 10;
 float Engine::Settings::grassCoverage = 0.5;
 glm::vec3 Engine::Settings::grassColor = glm::vec3(0.1f, 0.3f, 0.0f);
-glm::vec3 Engine::Settings::sandColor = glm::vec3(0.93, 0.9, 0.66);
+glm::vec3 Engine::Settings::sandColor = glm::vec3(0.94f, 0.89f, 0.5f);
 glm::vec3 Engine::Settings::rockColor = glm::vec3(0.40f);
 
 glm::vec3 Engine::Settings::skyZenitColor = glm::vec3(0.0f, 0.5f, 1.0f);
@@ -26,15 +26,15 @@ float Engine::Settings::waterHeight = 0.09f;
 
 float Engine::Settings::cloudSpeed = 1.0f;
 float Engine::Settings::cloudType = 0.5f;
-float Engine::Settings::coverageMultiplier = 0.7f;
+float Engine::Settings::coverageMultiplier = 0.228f;
 glm::vec3 Engine::Settings::cloudColor = glm::vec3(1, 1, 1);
 
-float Engine::Settings::hdrExposure = 3.0f;
+float Engine::Settings::hdrExposure = 3.3f;
 float Engine::Settings::hdrGamma = 0.5f;
 
 float Engine::Settings::godRaysDecay = 0.91f;
 float Engine::Settings::godRaysDensity = 1.192f;
-float Engine::Settings::godRaysExposure = 1.0f;
+float Engine::Settings::godRaysExposure = 0.662f;
 float Engine::Settings::godRaysWeight = 0.2f;
 
 bool Engine::Settings::showUI = false;

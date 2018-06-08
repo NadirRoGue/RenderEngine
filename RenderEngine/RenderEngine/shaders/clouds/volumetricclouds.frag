@@ -78,7 +78,8 @@ vec2 planeDim = vec2(planeMax.xz - planeMin.xz);
 // Cloud types height density gradients
 #define STRATUS_GRADIENT vec4(0.0, 0.1, 0.2, 0.3)
 #define STRATOCUMULUS_GRADIENT vec4(0.02, 0.2, 0.48, 0.625)
-#define CUMULUS_GRADIENT vec4(0.01, 0.0625, 0.78, 0.88)
+//vec4(0.02, 0.2, 0.48, 0.625)
+#define CUMULUS_GRADIENT vec4(0.01, 0.1625, 0.88, 0.98)
 
 // ==========================================================================
 // Lighting functions
@@ -108,7 +109,7 @@ float lightEnergy(vec3 l, vec3 v, float ca, float coneDensity)
 
 vec3 ambientLight(float heightFrac, float lightFactor)
 {
-	return mix(realLightColor * 0.5, realLightColor * 0.75, heightFrac);
+	return mix(realLightColor * 0.7, realLightColor * 0.9, heightFrac);
 }
 
 // ==========================================================================
@@ -424,8 +425,8 @@ bool intersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 
 void main()
 {
-	// Simple temporal reprojection
-	if(int(gl_FragCoord.x) % 2 != frame % 2)
+	// Simple temporal reprojection. Render half a frame per iteration. Discard consecutive threads for efficiency purposes
+	if( (frame % 2 == 0 && int(gl_FragCoord.x) < int(screenResolution.x / 2.0)) || (frame % 2 != 0 && int(gl_FragCoord.x) >= int(screenResolution.x / 2.0)))
 		discard;
 
 	// Do not compute clouds if they are not going to be visible
@@ -463,7 +464,7 @@ void main()
 
 #ifdef SPHERE_PROJECTION
 		float colorFactor = clamp(dot(vec3(0,1,0), lightDir), 0.0, 1.0);
-		vec4 ambientColor = vec4(mix(horizonColor, zenitColor, 0.2), 1.0);
+		vec4 ambientColor = vec4(mix(horizonColor, zenitColor, 0.2), 0.6);
 
 		float dist = length(startPos - camPos);
 		float radius = (camPos.y - sphereCenter.y) * 0.35;

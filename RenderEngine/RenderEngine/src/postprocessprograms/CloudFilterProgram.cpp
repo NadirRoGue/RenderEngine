@@ -1,7 +1,7 @@
 #include "postprocessprograms/CloudFilterProgram.h"
 
 #include "Renderer.h"
-#include <iostream>
+#include "WorldConfig.h"
 
 std::string Engine::CloudFilterProgram::PROGRAM_NAME = "CloudFilterProgram";
 

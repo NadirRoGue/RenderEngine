@@ -74,20 +74,10 @@ void main()
 	// ------------------------------------------------------------------------------
 	float visibility = getShadowVisibility(rawNormal);
 
-	/*
-	if(inShadowMapPos.x >= 0 && inShadowMapPos.x <= 1 && inShadowMapPos.y >= 0 && inShadowMapPos.y <= 1)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			visibility -= 0.25 * (( texture( depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0 ).x  <  curDepth )? 1.0 : 0.0);
-		}
-	}
-	*/
-
 	outColor = vec4(inColor, 1.0);
-	outNormal = vec4(rawNormal, 0);
+	outNormal = vec4(rawNormal, 1);
 	outSpecular = vec4(0,0,0,0);
-	outEmissive = vec4(inEmission,0);
+	outEmissive = vec4(inEmission,1);
 	outPos = vec4(inPos, 1);
 	outInfo = vec4(0, visibility,0,0);
 #endif

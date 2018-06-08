@@ -212,7 +212,7 @@ void main()
 		float ny1 = noiseHeight(vec2(u, v - step),  200.0, octaves);
 		float ny2 = noiseHeight(vec2(u, v + step),  200.0, octaves);
 		
-		vec2 curlV = Curl(nx1, nx2, ny1, ny2) * 10.0;
+		vec2 curlV = Curl(nx1, nx2, ny1, ny2) * 5.0;
 		vec3 apply = cross(vec3(0,1,0), rawNormal) * (curlV.x - curlV.y); 
 		rawNormal += apply;
 		rawNormal = normalize(rawNormal);

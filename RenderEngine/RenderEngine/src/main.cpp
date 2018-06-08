@@ -211,7 +211,7 @@ void initHandlers()
 	Engine::CameraBezier * camBezier = new Engine::CameraBezier(scene->getCamera(), glm::vec3(100,6,100), 50.0f, 3.0f);
 	scene->getAnimationHandler()->registerAnimation(camBezier);
 
-	Engine::CameraStraight * camStraight = new Engine::CameraStraight(scene->getCamera(), glm::vec3(1, 0, 1));
+	Engine::CameraStraight * camStraight = new Engine::CameraStraight(scene->getCamera());
 	scene->getAnimationHandler()->registerAnimation(camStraight);
 
 	// Mouse pitch & yaw

@@ -25,7 +25,7 @@ void main()
 		// compute screen-space displacement based on num of samples and shafts density
 		vec2 deltaTextCoord = vec2(texCoord - lightScreenPos);
 		vec2 uv = texCoord;
-		deltaTextCoord *= 1.0 /  float(NUM_SAMPLES) * density;// * densityMultiplier * 0.5);
+		deltaTextCoord *= 1.0 /  (float(NUM_SAMPLES) * density);// * densityMultiplier * 0.5);
 		float illuminationDecay = 1.0;
 
 		// Start with current's god ray buffer value
@@ -39,7 +39,6 @@ void main()
 			
 			sampl *= illuminationDecay * weight;
 
-			//result += sampl;
 			result += sampl;
 
 			illuminationDecay *= decay;

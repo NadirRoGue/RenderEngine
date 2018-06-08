@@ -11,22 +11,20 @@ in vec2 texCoord;
 
 //Textura
 uniform sampler2D gColor;
-uniform sampler2D gEmission;
-uniform sampler2D gGodRays;
 
-uniform uint maskSize = 25u;
 uniform vec2 texelSize;
 
+#define maskSize 25u
 #define maskFactor 1.0/65.0
 
-uniform vec2 bigaffectedTexels[25u] = vec2[](
+uniform vec2 bigaffectedTexels[maskSize] = vec2[](
 	vec2(-2.0,2.0), vec2(-1.0,2.0), vec2(0.0,2.0), vec2(1.0,2.0), vec2(2.0,2.0),
 	vec2(-2.0,1.0), vec2(-1.0,1.0), vec2(0.0,1.0), vec2(1.0,1.0), vec2(2.0,1.0),
 	vec2(-2.0,0.0), vec2(-1.0,0.0), vec2(0.0,0.0), vec2(1.0,0.0), vec2(2.0,0.0),
 	vec2(-2.0,-1.0), vec2(-1.0,-1.0), vec2(0.0,-1.0), vec2(1.0,-1.0), vec2(2.0,-1.0),
 	vec2(-2.0,-2.0), vec2(-1.0,-2.0), vec2(0.0,-2.0), vec2(1.0,-2.0), vec2(2.0,-2.0));
 
-uniform float bigkernel[25u] = float[](
+uniform float bigkernel[maskSize] = float[](
 	1.0*maskFactor, 2.0*maskFactor, 3.0*maskFactor,2.0*maskFactor, 1.0*maskFactor,
 	2.0*maskFactor, 3.0*maskFactor, 4.0*maskFactor,3.0*maskFactor, 2.0*maskFactor,
 	3.0*maskFactor, 4.0*maskFactor, 5.0*maskFactor,4.0*maskFactor, 3.0*maskFactor,

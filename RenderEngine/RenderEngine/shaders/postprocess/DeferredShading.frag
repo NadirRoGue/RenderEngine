@@ -152,6 +152,6 @@ void main()
 
 	outColor = vec4(shaded, 1.0);
 	outEmission = gbufferemissive;
-	outGodRaysInfo = depth < 1.0? vec4(0,0,0,1) : vec4(0);
+	outGodRaysInfo = vec4(0);
 	gl_FragDepth = depth;
 }

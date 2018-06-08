@@ -68,6 +68,7 @@ namespace Engine
 		Object * tileObject;
 
 		std::vector<Object *> treeTypes;
+		Object * flower;
 	public:
 		Terrain();
 		Terrain(float tileWidth, unsigned int renderRadius);
@@ -89,5 +90,6 @@ namespace Engine
 		void terrainRender(Camera * cam, int i, int j);
 		void waterRender(Camera * cam, int i, int j);
 		void treesRender(Camera * cam, int i, int j);
+		void flowerRender(Camera * cam, int i, int j);
 	};
 }

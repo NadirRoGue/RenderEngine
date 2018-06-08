@@ -72,6 +72,10 @@ void Engine::Terrain::render(Engine::Camera * camera)
 	// RENDER TREES
 	renderRadius = renderRadius < 6? renderRadius : 6;
 	tiledRendering(camera, treeActiveShader, &Terrain::treesRender);
+
+	glBindVertexArray(flower->getMesh()->vao);
+	tiledRendering(camera, treeActiveShader, &Terrain::flowerRender);
+
 	renderRadius = previousRadius;
 }
 
@@ -281,6 +285,57 @@ void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
 
 }
 
+void Engine::Terrain::flowerRender(Engine::Camera * cam, int i, int j)
+{
+	Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
+
+	// We have to travel way to much to make this seed system not to work...
+	unsigned int seed = (j << 16) | i;
+	float posX = i * tileWidth;
+	float posZ = j * tileWidth;
+
+	std::uniform_real_distribution<float> dTerrain(0.0f, 1.0f);
+	std::default_random_engine eTerrain(seed);
+
+	// 16 trees per tile
+	size_t spawnTrees = 30;
+	//size_t numTypeOfTrees = treeTypes.size();
+	//size_t equalAmount = spawnTrees / numTypeOfTrees;
+	//equalAmount = equalAmount < 1 ? 1 : equalAmount;
+
+	Engine::CascadeShadowMaps & csm = Engine::CascadeShadowMaps::getInstance();
+
+	//glBindVertexArray(flower->getMesh()->vao);
+
+	//size_t treeToSpawn = 0;
+	unsigned int z = 0;
+	while (z < spawnTrees)
+	{
+		z++;
+		float uOffset = dTerrain(eTerrain);
+		float vOffset = dTerrain(eTerrain);
+
+		float treePosX = posX + uOffset * tileWidth;
+		float treePosZ = posZ + vOffset * tileWidth;
+
+		flower->setTranslation(glm::vec3(treePosX, 0.0f, treePosZ));
+
+		float u = abs(i + uOffset);
+		float v = abs(j + vOffset);
+
+		treeActiveShader->setUniformTileUV(u, v);
+		treeActiveShader->setUniformLightDir(dl->getDirection());
+		treeActiveShader->setUniformLightDepthMat(csm.getDepthMatrix0() * flower->getModelMatrix());
+		treeActiveShader->setUniformLightDepthMat1(csm.getDepthMatrix1() * flower->getModelMatrix());
+		treeActiveShader->setUniformDepthMap(csm.getDepthTexture0());
+		treeActiveShader->setUniformDepthMap1(csm.getDepthTexture1());
+		treeActiveShader->onRenderObject(flower, cam->getViewMatrix(), cam->getProjectionMatrix());
+
+		glDrawElements(GL_TRIANGLES, flower->getMesh()->getNumFaces() * 3, GL_UNSIGNED_INT, (void*)0);
+	}
+
+}
+
 // ====================================================================================================================
 
 void Engine::Terrain::initialize()
@@ -405,17 +460,18 @@ void Engine::Terrain::addTrees()
 	for (int i = 0; i < 8; i++)
 	{
 		Engine::TreeGenerationData treeData;
-		treeData.treeName = std::string("Tree") + std::to_string(i);
+		treeData.treeName = std::string("Tree_") + std::to_string(i);
 		treeData.emissiveLeaf = leafColor(eLeaf) > 0.8f;
 		treeData.startTrunkColor = glm::vec3(0.2f, 0.1f, 0.0f);
 		treeData.endTrunkColor = treeData.startTrunkColor;
 		treeData.leafColor = glm::vec3(leafColor(eLeaf), 1.0 - leafColor(eLeaf), 1.0 - leafColor(eLeaf));
 		treeData.maxBranchesSplit = 4;
-		treeData.maxBranchRotation = glm::vec3(45.0f, 10.0f, 10.0f);
-		treeData.minBranchRotation = glm::vec3(-45.0f, -10.0f, -10.0f);
+		float rotFactor = leafColor(eLeaf) * 0.5f + 0.5f;
+		treeData.maxBranchRotation = glm::vec3(45.0f, 10.0f, 10.0f) * rotFactor;
+		treeData.minBranchRotation = glm::vec3(-45.0f, -10.0f, -10.0f) * rotFactor;
 		treeData.maxDepth = 7;
 		treeData.rotateMainTrunk = false;
-		treeData.scalingFactor = glm::vec3(0.75, 1.0, 0.75);
+		treeData.scalingFactor = glm::vec3(0.75, 1.0, 0.75) + glm::vec3(0.0f, (1.0f - rotFactor) * 0.25f, 0.0f);
 		treeData.seed = d(e);
 		treeData.startBranchingDepth = 2;
 
@@ -431,6 +487,31 @@ void Engine::Terrain::addTrees()
 		
 		treeTypes.push_back(tree);
 	}
+	
+	Engine::TreeGenerationData treeData;
+	treeData.treeName = std::string("Flower");
+	treeData.emissiveLeaf = false;// leafColor(eLeaf) > 0.8f;
+	treeData.startTrunkColor = glm::vec3(0.2f, 0.4f, 0.0f);
+	treeData.endTrunkColor = treeData.startTrunkColor;
+	treeData.leafColor = glm::vec3(1.0, 0.1, 0.1);
+	treeData.maxBranchesSplit = 1;
+	treeData.maxBranchRotation = glm::vec3(45.0f, 10.0f, 10.0f);
+	treeData.minBranchRotation = glm::vec3(-45.0f, -10.0f, -10.0f);
+	treeData.maxDepth = 2;
+	treeData.rotateMainTrunk = false;
+	treeData.scalingFactor = glm::vec3(0.05f, 0.25f, 0.05f);
+	treeData.seed = d(e);
+	treeData.startBranchingDepth = 2;
+
+	Engine::Mesh * m = Engine::VegetationTable::getInstance().generateFractalTree(treeData, true);
+
+	std::cout << "Flower: " << m->getNumFaces() << " faces, " << m->getNumVertices() << " vertices" << std::endl;
+
+	treeShader->configureMeshBuffers(m);
+	treeWireShader->configureMeshBuffers(m);
+	treeShadowMapShader->configureMeshBuffers(m);
+
+	flower = new Engine::Object(m);
 }
 
 // ====================================================================================================================

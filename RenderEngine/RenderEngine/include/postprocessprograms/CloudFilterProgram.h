@@ -16,9 +16,6 @@ namespace Engine
 		unsigned int uTexelSize;
 
 		unsigned int uGColor;
-		unsigned int uGEmi;
-		unsigned int uGGodRB;
-
 	public:
 		CloudFilterProgram(std::string name, unsigned long long params);
 		CloudFilterProgram(const CloudFilterProgram & other);
