@@ -72,6 +72,7 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::SliderFloat("Scale##app", &Engine::Settings::terrainScale, 0.0f, 10.0f);
 		ImGui::InputInt("Octaves##app", reinterpret_cast< int32_t*>(&Engine::Settings::terrainOctaves));
 		ImGui::SliderFloat("Grass coverage##app", &Engine::Settings::grassCoverage, 0.0f, 1.0f);
+		ImGui::SliderFloat("Vegetation max height##app", &Engine::Settings::vegetationMaxHeight, 0.0f, 1.0f);
 		ImGui::ColorEdit3("Grass color##app", &Engine::Settings::grassColor[0]);
 		ImGui::ColorEdit3("Sand color##app", &Engine::Settings::sandColor[0]);
 		ImGui::ColorEdit3("Rock color##app", &Engine::Settings::rockColor[0]);

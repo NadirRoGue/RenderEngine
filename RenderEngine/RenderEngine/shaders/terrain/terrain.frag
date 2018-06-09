@@ -33,6 +33,8 @@ uniform vec3 rock;
 uniform vec3 grass;
 uniform vec3 sand;
 
+uniform float time;
+
 uniform float waterHeight;
 
 uniform ivec2 gridPos;
@@ -79,7 +81,7 @@ float cellularNoise(vec2 uv, float cellularScale)
     }
     
 	dist0 = clamp(dist0, 0, 1);
-    return 1.0 - dist0;
+    return dist0 * dist0;
 }
 
 float NoiseInterpolation(in vec2 i_coord, in float i_size)
@@ -197,13 +199,19 @@ vec3 computeBumpNormal()
 {
 	float u = inUV.x;
 	float v = inUV.y;
-	float step = 0.0015;
-	float tH = bumpNoiseHeight(vec2(u, v + step), scale, octaves); 
-	float bH = bumpNoiseHeight(vec2(u, v - step), scale, octaves);
-	float rH = bumpNoiseHeight(vec2(u + step, v), scale, octaves);
-	float lH = bumpNoiseHeight(vec2(u - step, v), scale, octaves); 
+	float step = 0.001;
+	float slope = 2.0;
+	float tH = bumpNoiseHeight(vec2(u, v + step), scale * slope, octaves); 
+	float bH = bumpNoiseHeight(vec2(u, v - step), scale * slope, octaves);
+	float rH = bumpNoiseHeight(vec2(u + step, v), scale * slope, octaves);
+	float lH = bumpNoiseHeight(vec2(u - step, v), scale * slope, octaves); 
 
 	return normalize(vec3(lH - rH, step * step, bH - tH));
+}
+
+vec3 computeCaustics(vec2 uv)
+{
+	return vec3(cellularNoise(uv, 150.0));
 }
 
 #else
@@ -252,8 +260,9 @@ void main()
 	visibility = getShadowVisibility(rawNormal);
 
 	// Depth for below-water level areas
-	alpha = height <= waterHeight? (height / waterHeight) - 0.5 : 1.0;
+	alpha = height <= waterHeight? (height / waterHeight) - 0.4 : 1.0;
 	alpha = clamp(alpha, 0, 1);
+	heightColor = alpha < 1.0? heightColor + (computeCaustics(inUV + time * 0.007) + computeCaustics(inUV.yx - time * 0.007)) * (1.0 - alpha) * 0.8 : heightColor;
 #endif
 
 	// OUTPUT G BUFFERS
@@ -261,7 +270,7 @@ void main()
 	outColor = vec4(heightColor, 1.0);
 	outNormal = vec4(normalize(n), 1.0);
 	outPos = vec4(inPos, 1.0);
-	outSpecular = vec4(0,0,0,0);
+	outSpecular = vec4(0);
 	outEmissive = vec4(0,0,0,0);
 	outInfo = vec4(grassData, visibility, alpha, 0);
 #endif

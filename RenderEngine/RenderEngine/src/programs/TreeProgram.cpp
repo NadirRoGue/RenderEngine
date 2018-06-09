@@ -158,9 +158,9 @@ void Engine::TreeProgram::onRenderObject(const Engine::Object * obj, const glm::
 	glUniform1f(uWaterLevel, Engine::Settings::waterHeight);
 }
 
-void Engine::TreeProgram::setUniformMaxHeight(float mh)
+void Engine::TreeProgram::setUniformMaxHeight()
 {
-	glUniform1f(uMaxHeight, mh);
+	glUniform1f(uMaxHeight, Engine::Settings::waterHeight + Engine::Settings::vegetationMaxHeight);
 }
 
 void Engine::TreeProgram::setUniformTileUV(float u, float v)

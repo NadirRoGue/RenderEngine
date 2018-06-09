@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "WorldConfig.h"
+#include "TimeAccesor.h"
 
 const std::string Engine::ProceduralTerrainProgram::PROGRAM_NAME = "ProceduralTerrainProgram";
 
@@ -49,6 +50,8 @@ Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerra
 	uInUV = other.uInUV;
 
 	uGridPos = other.uGridPos;
+
+	uTime = other.uTime;
 
 	uGrassCoverage = other.uGrassCoverage;
 	uGrassColor = other.uGrassColor;
@@ -136,6 +139,7 @@ void Engine::ProceduralTerrainProgram::configureProgram()
 	uGrassColor = glGetUniformLocation(glProgram, "grass");
 	uRockColor = glGetUniformLocation(glProgram, "rock");
 	uSandColor = glGetUniformLocation(glProgram, "sand");
+	uTime = glGetUniformLocation(glProgram, "time");
 
 	uInPos = glGetAttribLocation(glProgram, "inPos");
 	uInUV = glGetAttribLocation(glProgram, "inUV");
@@ -183,6 +187,8 @@ void Engine::ProceduralTerrainProgram::onRenderObject(const Engine::Object * obj
 	glUniform3fv(uGrassColor, 1, &Engine::Settings::grassColor[0]);
 	glUniform3fv(uRockColor, 1, &Engine::Settings::rockColor[0]);
 	glUniform3fv(uSandColor, 1, &Engine::Settings::sandColor[0]);
+
+	glUniform1f(uTime, Engine::Time::timeSinceBegining);
 }
 
 void Engine::ProceduralTerrainProgram::setUniformGridPosition(unsigned int i, unsigned int j)

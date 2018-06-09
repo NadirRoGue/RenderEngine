@@ -201,7 +201,7 @@ void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j
 
 	Engine::CascadeShadowMaps & csm = Engine::CascadeShadowMaps::getInstance();
 
-	treeShadowMapShader->setUniformMaxHeight(Engine::Settings::waterHeight + 0.1f);
+	treeShadowMapShader->setUniformMaxHeight();
 
 	size_t treeToSpawn = 0;
 	unsigned int z = 0;
@@ -253,7 +253,7 @@ void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
 
 	Engine::CascadeShadowMaps & csm = Engine::CascadeShadowMaps::getInstance();
 
-	treeActiveShader->setUniformMaxHeight(Engine::Settings::waterHeight + 0.1f);
+	treeActiveShader->setUniformMaxHeight();
 
 	size_t treeToSpawn = 0;
 	unsigned int z = 0;
@@ -306,7 +306,7 @@ void Engine::Terrain::flowerRender(Engine::Camera * cam, int i, int j)
 
 	Engine::CascadeShadowMaps & csm = Engine::CascadeShadowMaps::getInstance();
 
-	treeActiveShader->setUniformMaxHeight(Engine::Settings::waterHeight + 0.1f);
+	treeActiveShader->setUniformMaxHeight();
 
 	const unsigned int numElements = flower->getMesh()->getNumFaces() * 3;
 

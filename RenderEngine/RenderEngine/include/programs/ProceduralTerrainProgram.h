@@ -33,6 +33,8 @@ namespace Engine
 
 		unsigned int uWaterLevel;
 
+		unsigned int uTime;
+
 		unsigned int uGridPos;
 
 		unsigned int uAmplitude;

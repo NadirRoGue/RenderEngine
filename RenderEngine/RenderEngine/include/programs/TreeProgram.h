@@ -46,7 +46,7 @@ namespace Engine
 		void configureMeshBuffers(Mesh * mesh);
 		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
 
-		void setUniformMaxHeight(float maxHeight);
+		void setUniformMaxHeight();
 		void setUniformTileUV(float u, float v);
 		void setUniformLightDepthMat(const glm::mat4 & ldp);
 		void setUniformLightDepthMat1(const glm::mat4 & ldp);

@@ -50,8 +50,8 @@ uniform vec3 noiseKernel[6u] = vec3[]
 	vec3(-0.16852403,  0.14748697,  0.97460106)
 );
 
+// Random offset added to starting ray depth to prevent banding artifacts 
 #define BAYER_FACTOR 1.0/16.0
-
 uniform float bayerFilter[16u] = float[]
 (
 	0.0*BAYER_FACTOR, 8.0*BAYER_FACTOR, 2.0*BAYER_FACTOR, 10.0*BAYER_FACTOR,
@@ -60,12 +60,11 @@ uniform float bayerFilter[16u] = float[]
 	15.0*BAYER_FACTOR, 7.0*BAYER_FACTOR, 13.0*BAYER_FACTOR, 5.0*BAYER_FACTOR
 );
 
-
 #define SPHERE_PROJECTION
 
 // Cloud layer data
 #ifdef SPHERE_PROJECTION
-vec3 sphereCenter;// = vec3(0,-1950,0);
+vec3 sphereCenter;
 float chunkLen;
 uniform float sphereInnerRadius = 2000.0;
 uniform float sphereOuterRadius = 2150.0;
@@ -78,7 +77,6 @@ vec2 planeDim = vec2(planeMax.xz - planeMin.xz);
 // Cloud types height density gradients
 #define STRATUS_GRADIENT vec4(0.0, 0.1, 0.2, 0.3)
 #define STRATOCUMULUS_GRADIENT vec4(0.02, 0.2, 0.48, 0.625)
-//vec4(0.02, 0.2, 0.48, 0.625)
 #define CUMULUS_GRADIENT vec4(0.01, 0.1625, 0.88, 0.98)
 
 // ==========================================================================
@@ -391,7 +389,7 @@ bool intersectSphere(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 
 	chunkLen = length(maxT - minT);
 
-	return minT.y > -100.0; // only above the horizon
+	return minT.y > -15.0; // only above the horizon
 }
 #else 
 bool intersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
@@ -426,7 +424,9 @@ bool intersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 void main()
 {
 	// Simple temporal reprojection. Render half a frame per iteration. Discard consecutive threads for efficiency purposes
-	if( (frame % 2 == 0 && int(gl_FragCoord.x) < int(screenResolution.x / 2.0)) || (frame % 2 != 0 && int(gl_FragCoord.x) >= int(screenResolution.x / 2.0)))
+	int fx = int(gl_FragCoord.x);
+	int screenStart = (frame % 2) * int(ceil(screenResolution.x / 2.0));
+	if(fx < screenStart || fx > screenStart + cuarter)
 		discard;
 
 	// Do not compute clouds if they are not going to be visible

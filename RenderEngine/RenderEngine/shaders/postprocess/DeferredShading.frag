@@ -106,7 +106,7 @@ vec3 processDirectionalLight(in float visibility)
 
 	// Diffuse
 	c += diffuseLambert(L, lightColor * Kfactors.y * Kd) * visibility;
-	//c += diffuseOrenNayar(L, 1.0, Kd * Kfactors.y * lightColor) * visibility;
+	//c += diffuseOrenNayar(L, 1.0, Kd * Kfactors.y * lightColor) * visibility; // too dark
 
 	// Specular
 	vec3 R = normalize(reflect(-L, N));
