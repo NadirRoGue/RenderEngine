@@ -15,6 +15,7 @@ layout (location=1) out vec3 outPos;
 layout (location=2) out float outHeight;
 layout (location=3) out vec4 outShadowMapPos;
 layout (location=4) out vec4 outShadowMapPos1;
+layout (location=5) out vec3 tangentVector;
 
 uniform mat4 modelView;
 uniform mat4 modelViewProj;
@@ -23,6 +24,25 @@ uniform float waterHeight;
 
 uniform mat4 lightDepthMat;
 uniform mat4 lightDepthMat1;
+
+vec3 computeTangent(int m, int a, int b)
+{
+	vec2 st1 = inUV[a] - inUV[m];
+	vec2 st2 = inUV[b] - inUV[m];
+	vec3 dBA = gl_in[a].gl_Position.xyz - gl_in[m].gl_Position.xyz;
+	vec3 dCA = gl_in[b].gl_Position.xyz - gl_in[m].gl_Position.xyz;
+
+	float div = 1.0 / (st1.x * st2.y - st1.y * st2.x);
+	vec2 row = vec2(st2.y, -st1.y);
+
+	vec2 column1 = vec2(dBA.x, dCA.x);
+	vec2 column2 = vec2(dBA.y, dCA.y);
+	vec2 column3 = vec2(dBA.z, dCA.z);
+
+	vec3 tangent = div * vec3(dot(row, column1), dot(row, column2), dot(row, column3));
+
+	return normalize(tangent);
+}
 
 void main()
 {
@@ -34,6 +54,7 @@ void main()
 	outHeight = height[0];
 	outShadowMapPos = lightDepthMat * a;
 	outShadowMapPos1 = lightDepthMat1 * a;
+	tangentVector = (modelView * vec4(computeTangent(0, 1, 2),1)).xyz;
 	gl_Position = modelViewProj * a;
 	outPos = (modelView * a).xyz;
 	EmitVertex();
@@ -42,6 +63,7 @@ void main()
 	outHeight = height[1];
 	outShadowMapPos = lightDepthMat * b;
 	outShadowMapPos1 = lightDepthMat1 * b;
+	tangentVector = (modelView * vec4(computeTangent(1, 0, 2),1)).xyz;
 	gl_Position = modelViewProj * b;
 	outPos = (modelView * b).xyz;
 	EmitVertex();
@@ -50,6 +72,7 @@ void main()
 	outHeight = height[2];
 	outShadowMapPos = lightDepthMat * c;
 	outShadowMapPos1 = lightDepthMat1 * c;
+	tangentVector = (modelView * vec4(computeTangent(2, 0, 1),1)).xyz;
 	gl_Position = modelViewProj * c;
 	outPos = (modelView * c).xyz;
 	EmitVertex();

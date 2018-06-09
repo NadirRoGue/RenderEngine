@@ -13,8 +13,10 @@ layout (location=1) in vec3 inPos;
 layout (location=2) in float height;
 layout (location=3) in vec4 inShadowMapPos;
 layout (location=4) in vec4 inShadowMapPos1;
+layout (location=5) in vec3 tangentVector;
 
 uniform mat4 normal;
+uniform mat4 modelView;
 
 uniform sampler2D depthTexture;
 uniform sampler2D depthTexture1;
@@ -111,7 +113,6 @@ float noiseHeight(in vec2 pos, float localScale, int octaveCount)
 
 	for (int index = 0; index < octaveCount; index++)
 	{
-
 		noiseValue += NoiseInterpolation(pos, localScale * localFrecuency) * localAplitude;
 
 		localAplitude /= 2.0;
@@ -121,11 +122,24 @@ float noiseHeight(in vec2 pos, float localScale, int octaveCount)
 	return noiseValue * noiseValue * noiseValue * 0.01;
 }
 
-vec2 Curl(float nx1, float nx2, float ny1, float ny2)
+float bumpNoiseHeight(in vec2 pos, float localScale, int octaveCount)
 {
-	float dx = nx1 - nx2;
-	float dy = ny1 - ny2;
-	return vec2(dy, -dx) * 10.0;
+	float noiseValue = 0.0;
+
+	float localAplitude = amplitude;
+	float localFrecuency = frecuency;
+
+	for (int index = 0; index < octaveCount; index++)
+	{
+
+		noiseValue += NoiseInterpolation(pos, localScale * localFrecuency) * localAplitude;
+		noiseValue += NoiseInterpolation(pos.yx, localScale * localFrecuency) * localAplitude;
+
+		localAplitude /= 2.0;
+		localFrecuency *= 2.0;
+	}
+
+	return noiseValue * 0.001;
 }
 
 // =====================================================================
@@ -166,6 +180,32 @@ float getShadowVisibility(vec3 rawNormal)
 	return visibility;
 }
 
+vec3 computeNormal()
+{
+	float u = inUV.x;
+	float v = inUV.y;
+	float step = 0.01;
+	float tH = noiseHeight(vec2(u, v + step), scale, octaves); 
+	float bH = noiseHeight(vec2(u, v - step), scale, octaves);
+	float rH = noiseHeight(vec2(u + step, v), scale, octaves);
+	float lH = noiseHeight(vec2(u - step, v), scale, octaves); 
+
+	return normalize(vec3(lH - rH, step * step, bH - tH));
+}
+
+vec3 computeBumpNormal()
+{
+	float u = inUV.x;
+	float v = inUV.y;
+	float step = 0.0015;
+	float tH = bumpNoiseHeight(vec2(u, v + step), scale, octaves); 
+	float bH = bumpNoiseHeight(vec2(u, v - step), scale, octaves);
+	float rH = bumpNoiseHeight(vec2(u + step, v), scale, octaves);
+	float lH = bumpNoiseHeight(vec2(u - step, v), scale, octaves); 
+
+	return normalize(vec3(lH - rH, step * step, bH - tH));
+}
+
 #else
 layout (location=0) out vec4 lightdepth;
 #endif
@@ -179,45 +219,13 @@ void main()
 #else
 	// COMPUTE NORMAL FROM HEIGHTMAP
 	// ------------------------------------------------------------------------------
-	float u = inUV.x;
-	float v = inUV.y;
-	float step = 0.01;
-	float tH = noiseHeight(vec2(u, v + step), scale, octaves); 
-	float bH = noiseHeight(vec2(u, v - step), scale, octaves);
-	float rH = noiseHeight(vec2(u + step, v), scale, octaves);
-	float lH = noiseHeight(vec2(u - step, v), scale, octaves); 
-
-	vec3 rawNormal = normalize(vec3(lH - rH, step * step, bH - tH));
-
+	// Compute vertex normal
+	vec3 rawNormal = computeNormal();
 	vec3 up = vec3(0, 1, 0);
 	float cosV = abs(dot(rawNormal, up));
 
-	bool sandP = height < waterHeight + 0.01;
-	bool rockP = cosV <= grassCoverage;
-	if(sandP)
-	{
-		float bumptH = noiseHeight(vec2(u, v + step), 500.0, 2);
-		float bumpbH = noiseHeight(vec2(u, v - step), 500.0, 2);
-		float bumprH = noiseHeight(vec2(2 * u + step, v), 500.0, 2);
-		float bumplH = noiseHeight(vec2(2 * u - step, v), 500.0, 2);
-		vec3 correct = vec3(0, 3.0, 0);
-		vec3 bumpNormal = normalize(vec3(bumplH - bumprH, step * step, bumpbH - bumptH));
-		rawNormal = correct + bumpNormal;
-		rawNormal = normalize(rawNormal);
-	}
-	else if(rockP)
-	{
-		float nx1 = noiseHeight(vec2(u - step, v),  200.0, octaves);
-		float nx2 = noiseHeight(vec2(u + step, v),  200.0, octaves);
-		float ny1 = noiseHeight(vec2(u, v - step),  200.0, octaves);
-		float ny2 = noiseHeight(vec2(u, v + step),  200.0, octaves);
-		
-		vec2 curlV = Curl(nx1, nx2, ny1, ny2) * 5.0;
-		vec3 apply = cross(vec3(0,1,0), rawNormal) * (curlV.x - curlV.y); 
-		rawNormal += apply;
-		rawNormal = normalize(rawNormal);
-	}
-	
+	// Compute bump normal
+	rawNormal = computeBumpNormal();
 
 	// Correct normal if we have pass from +X to -X, from +Z to -Z, viceversa, or both
 	int xSign = sign(gridPos.x);
@@ -235,7 +243,8 @@ void main()
 #ifndef WIRE_MODE
 
 	// Compute color gradient based on height / slope
-	heightColor = height <= waterHeight + 0.01? sand : cosV > grassCoverage? grass : rock;
+	float tenPerCentGrass = grassCoverage - grassCoverage * 0.1;
+	heightColor = height <= waterHeight + 0.01? sand : height <= waterHeight + 0.015? mix(sand, grass, (height - waterHeight - 0.01) / 0.005) : cosV > grassCoverage? grass : cosV > tenPerCentGrass? mix(rock, vec3(0.15,0.1,0.05), (cosV - tenPerCentGrass) / (grassCoverage * 0.1)) : rock;
 	
 	grassData = heightColor == grass? 1.0 : 0.0;
 	// APPLY SHADOW MAP
@@ -246,7 +255,6 @@ void main()
 	alpha = height <= waterHeight? (height / waterHeight) - 0.5 : 1.0;
 	alpha = clamp(alpha, 0, 1);
 #endif
-
 
 	// OUTPUT G BUFFERS
 	// ------------------------------------------------------------------------------
