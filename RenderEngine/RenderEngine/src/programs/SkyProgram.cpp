@@ -37,7 +37,7 @@ void Engine::SkyProgram::configureProgram()
 
 void Engine::SkyProgram::configureMeshBuffers(Engine::Mesh * m)
 {
-	glBindVertexArray(m->vao);
+	m->use();
 
 	if (inPos != -1)
 	{

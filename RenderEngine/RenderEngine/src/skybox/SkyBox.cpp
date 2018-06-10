@@ -26,9 +26,9 @@ void Engine::SkyBox::render(Engine::Camera * camera)
 	glDepthFunc(GL_LEQUAL);
 
 	const Engine::Mesh * data = cubeMesh->getMesh();
+	data->use();
 
-	glUseProgram(shader->getProgramId());
-	glBindVertexArray(data->vao);
+	shader->use();
 
 	const glm::vec3 pos = camera->getPosition();
 	glm::vec3 cubePos(pos);

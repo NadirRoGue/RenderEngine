@@ -46,8 +46,9 @@ void Engine::Terrain::render(Engine::Camera * camera)
 	{
 		Engine::CascadeShadowMaps::getInstance().saveCurrentFBO();
 		Engine::CascadeShadowMaps::getInstance().beginShadowRender(i);
-
-		glBindVertexArray(tileObject->getMesh()->vao);
+		
+		// Re-bind tile, as we are rendering the trees in last place, thus changing the active vao
+		tileObject->getMesh()->use();
 		tiledRendering(camera, terrainShadowMapShader, &Terrain::terrainShadowMapRender);
 		tiledRendering(camera, waterShadowMapShader, &Terrain::waterShadowMapRender);
 		renderRadius = 4;
@@ -57,7 +58,8 @@ void Engine::Terrain::render(Engine::Camera * camera)
 		Engine::CascadeShadowMaps::getInstance().endShadowRender();
 	}
 
-	glBindVertexArray(tileObject->getMesh()->vao);
+	// Bind tile to render terrain and water
+	tileObject->getMesh()->use();
 
 	// RENDER TERRAIN
 	tiledRendering(camera, terrainActiveShader, &Terrain::terrainRender);
@@ -73,7 +75,7 @@ void Engine::Terrain::render(Engine::Camera * camera)
 	renderRadius = renderRadius < 6? renderRadius : 6;
 	tiledRendering(camera, treeActiveShader, &Terrain::treesRender);
 
-	glBindVertexArray(flower->getMesh()->vao);
+	flower->getMesh()->use();
 	tiledRendering(camera, treeActiveShader, &Terrain::flowerRender);
 
 	renderRadius = previousRadius;
@@ -93,7 +95,7 @@ void Engine::Terrain::tiledRendering(Engine::Camera * camera, Program * prog, vo
 	int yStart = y - renderRadius;
 	int yEnd = y + renderRadius;
 
-	glUseProgram(prog->getProgramId());
+	prog->use();
 
 	// Culling parameters
 	glm::vec3 fwd = camera->getForwardVector();
@@ -209,7 +211,7 @@ void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j
 	{
 		Engine::Object * randomTree = treeTypes[treeToSpawn % numTypeOfTrees];
 		treeToSpawn++;
-		glBindVertexArray(randomTree->getMesh()->vao);
+		randomTree->getMesh()->use();
 		for (unsigned int k = 0; k < equalAmount; k++)
 		{
 			z++;
@@ -261,7 +263,7 @@ void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
 	{
 		Engine::Object * randomTree = treeTypes[treeToSpawn % numTypeOfTrees];
 		treeToSpawn++;
-		glBindVertexArray(randomTree->getMesh()->vao);
+		randomTree->getMesh()->use();
 		for (unsigned int k = 0; k < equalAmount; k++, z++)
 		{
 			float uOffset = dTerrain(eTerrain);

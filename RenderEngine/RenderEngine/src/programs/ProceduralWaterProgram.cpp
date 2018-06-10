@@ -185,7 +185,7 @@ void Engine::ProceduralWaterProgram::onRenderObject(const Object * obj, const gl
 
 void Engine::ProceduralWaterProgram::configureMeshBuffers(Engine::Mesh * data)
 {
-	glBindVertexArray(data->vao);
+	data->use();
 
 	if (uInPos != -1)
 	{

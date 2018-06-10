@@ -132,6 +132,11 @@ void Engine::Program::destroy()
 	glDeleteProgram(glProgram);
 }
 
+void Engine::Program::use()
+{
+	glUseProgram(glProgram);
+}
+
 // ===========================================================
 
 Engine::Program * Engine::ProgramFactory::instantiateProgram(unsigned long long parameters)

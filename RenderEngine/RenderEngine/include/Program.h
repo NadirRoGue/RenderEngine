@@ -44,6 +44,7 @@ namespace Engine
 		virtual void configureProgram() = 0;
 		virtual void configureMeshBuffers(Mesh * mesh) = 0;
 
+		void use();
 		virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj) = 0;
 
 		virtual void destroy();

@@ -520,3 +520,8 @@ void Engine::Mesh::releaseGPU()
 		glDeleteVertexArrays(1, &vao);
 	}
 }
+
+void Engine::Mesh::use() const
+{
+	glBindVertexArray(vao);
+}

@@ -110,7 +110,7 @@ void Engine::TreeProgram::configureProgram()
 
 void Engine::TreeProgram::configureMeshBuffers(Mesh * mesh)
 {
-	glBindVertexArray(mesh->vao);
+	mesh->use();
 
 	if (uInPos != -1)
 	{

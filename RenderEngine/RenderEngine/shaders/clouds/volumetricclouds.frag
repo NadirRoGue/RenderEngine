@@ -425,7 +425,8 @@ void main()
 {
 	// Simple temporal reprojection. Render half a frame per iteration. Discard consecutive threads for efficiency purposes
 	int fx = int(gl_FragCoord.x);
-	int screenStart = (frame % 2) * int(ceil(screenResolution.x / 2.0));
+	int cuarter = int(ceil(screenResolution.x / 2.0));
+	int screenStart = (frame % 2) * cuarter;
 	if(fx < screenStart || fx > screenStart + cuarter)
 		discard;
 

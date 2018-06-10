@@ -30,15 +30,14 @@ void Engine::CloudSystem::VolumetricClouds::render(Engine::Camera * cam)
 {
 	int prevFBO;
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFBO);
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_DEPTH_TEST);
-	glBindVertexArray(renderPlane->vao);
+
+	renderPlane->use();
 
 	// Render clouds
 	glBindFramebuffer(GL_FRAMEBUFFER, filterBuffer->getFrameBufferId());
 	//glClear(GL_COLOR_BUFFER_BIT);
-	glUseProgram(shader->getProgramId());
+	shader->use();
 	shader->onRenderObject(NULL, cam->getViewMatrix(), cam->getProjectionMatrix());
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -48,7 +47,7 @@ void Engine::CloudSystem::VolumetricClouds::render(Engine::Camera * cam)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glUseProgram(filterShader->getProgramId());
+	filterShader->use();
 	filterShader->onRenderObject(NULL, cam->getViewMatrix(), cam->getProjectionMatrix());
 	filterShader->setBufferInput(colorB);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

@@ -51,7 +51,7 @@ void Engine::PostProcessProgram::configureProgram()
 
 void Engine::PostProcessProgram::configureMeshBuffers(Engine::Mesh * data)
 {
-	glBindVertexArray(data->vao);
+	data->use();
 	
 	glBindBuffer(GL_ARRAY_BUFFER, data->vboVertices);
 	glVertexAttribPointer(inPos, 3, GL_FLOAT, GL_FALSE, 0, 0);

@@ -61,6 +61,8 @@ namespace Engine
 
 		void releaseGPU();
 		void releaseCPU();
+
+		void use() const;
 	private:
 		void extractTopology(aiMesh * mesh);
 		void extractGeometry(aiMesh * mesh);

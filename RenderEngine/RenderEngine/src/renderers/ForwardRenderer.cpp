@@ -33,7 +33,7 @@ void Engine::ForwardRenderer::doRender()
 		// Stablish program to use
 		// changing program is expensive -> 
 		// https://www.opengl.org/discussion_boards/showthread.php/185615-cheep-expensive-calls
-		glUseProgram(renderableIt->second->program->getProgramId());
+		renderableIt->second->program->use();
 
 		renderProgram(activeCam, renderableIt->second);
 	}

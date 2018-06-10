@@ -261,8 +261,8 @@ void main()
 
 	// Depth for below-water level areas
 	alpha = height <= waterHeight? (height / waterHeight) - 0.4 : 1.0;
-	alpha = clamp(alpha, 0, 1);
-	heightColor = alpha < 1.0? heightColor + (computeCaustics(inUV + time * 0.007) + computeCaustics(inUV.yx - time * 0.007)) * (1.0 - alpha) * 0.8 : heightColor;
+	alpha = clamp(alpha, 0.0, 1.0);
+	heightColor = alpha < 0.95? heightColor + (computeCaustics(inUV + time * 0.007) + computeCaustics(inUV.yx - time * 0.007)) * (0.95 - alpha) * 1.0 : heightColor;
 #endif
 
 	// OUTPUT G BUFFERS

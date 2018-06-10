@@ -157,8 +157,8 @@ void Engine::DeferredRenderer::renderLoop()
 	glDisable(GL_CULL_FACE);
 	glBindFramebuffer(GL_FRAMEBUFFER, deferredPassBuffer->getFrameBufferId());
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glUseProgram(deferredShading->getProgramId());
-	glBindVertexArray(deferredDrawSurface->getMesh()->vao);
+	deferredShading->use();
+	deferredDrawSurface->getMesh()->use();
 	deferredShading->onRenderObject(deferredDrawSurface, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -173,8 +173,8 @@ void Engine::DeferredRenderer::renderLoop()
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	// Output the final result to screen
-	glUseProgram(screenOutput->getProgramId());
-	glBindVertexArray(chainEnd->getMesh()->vao);
+	screenOutput->use();
+	chainEnd->getMesh()->use();
 	screenOutput->onRenderObject(chainEnd, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -192,14 +192,14 @@ void Engine::DeferredRenderer::runPostProcesses()
 		glBindFramebuffer(GL_FRAMEBUFFER, buffer->getFrameBufferId());
 
 		Engine::Program * prog = node->postProcessProgram;
-		glUseProgram(prog->getProgramId());
+		prog->use();
 
 		//if (node->callBack != 0)
 		//{
 		//	node->callBack->execute(node->obj, node->postProcessProgram, node->renderBuffer, activeCam);
 		//}
 
-		glBindVertexArray(node->obj->getMesh()->vao);
+		node->obj->getMesh()->use();
 
 		prog->onRenderObject(node->obj, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
 

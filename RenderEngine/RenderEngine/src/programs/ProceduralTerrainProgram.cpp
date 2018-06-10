@@ -147,7 +147,7 @@ void Engine::ProceduralTerrainProgram::configureProgram()
 
 void Engine::ProceduralTerrainProgram::configureMeshBuffers(Engine::Mesh * data)
 {
-	glBindVertexArray(data->vao);
+	data->use();
 
 	if (uInPos != -1)
 	{
