@@ -33,11 +33,11 @@ void Engine::DepthOfFieldProgram::configureProgram()
 	uTexelSize = glGetUniformLocation(glProgram, "texelSize");
 }
 
-void Engine::DepthOfFieldProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::DepthOfFieldProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
-	Engine::PostProcessProgram::onRenderObject(obj, view, proj);
+	Engine::PostProcessProgram::onRenderObject(obj, camera);
 
-	glm::mat4 invProj = glm::inverse(proj);
+	glm::mat4 invProj = glm::inverse(camera->getProjectionMatrix());
 
 	glUniform1f(uFocalDistance, focalDistance);
 	glUniform1f(uMaxDistanceFactor, maxDistanceFactor);

@@ -38,7 +38,7 @@ namespace Engine
 		virtual void configureProgram();
 		void configureMeshBuffers(Mesh * mesh);
 
-		virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
+		virtual void onRenderObject(const Object * obj, Camera * camera);
 	};
 
 	// =======================================================

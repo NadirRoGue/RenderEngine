@@ -116,6 +116,10 @@ unsigned int Engine::Program::loadShader(std::string fileName, GLenum type, std:
 	return shader;
 }
 
+void Engine::Program::applyGlobalUniforms()
+{
+}
+
 std::string Engine::Program::getName() const
 {
 	return name;

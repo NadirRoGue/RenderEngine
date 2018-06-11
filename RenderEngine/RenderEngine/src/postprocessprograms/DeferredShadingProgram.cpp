@@ -44,21 +44,21 @@ void Engine::DeferredShadingProgram::processDirectionalLights(Engine::Directiona
 	dl->clearUpdateFlag();
 }
 
-void Engine::DeferredShadingProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::DeferredShadingProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
-	Engine::PostProcessProgram::onRenderObject(obj, view, proj);
+	Engine::PostProcessProgram::onRenderObject(obj, camera);
 
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
 	if (scene != 0)
 	{
 		Engine::DirectionalLight * dl = scene->getDirectionalLight();
-		processDirectionalLights(dl, view);
+		processDirectionalLights(dl, camera->getViewMatrix());
 	}
 
 	glUniform3fv(uSkyZenitColor, 1, &Engine::Settings::skyZenitColor[0]);
 	glUniform3fv(uSkyHorizonColor, 1, &Engine::Settings::skyHorizonColor[0]);
 
-	glm::vec4 worldUp = view * glm::vec4(0, 1, 0, 0);
+	glm::vec4 worldUp = camera->getViewMatrix() * glm::vec4(0, 1, 0, 0);
 	glUniform3fv(uWorldUp, 1, &worldUp[0]);
 }
 

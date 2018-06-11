@@ -38,7 +38,7 @@ namespace Engine
 		VolumetricCloudProgram(const VolumetricCloudProgram & other);
 
 		void configureProgram();
-		void onRenderObject(Object * obj, const glm::mat4 & view, const glm::mat4 & proj);
+		void onRenderObject(Object * obj, Camera * camera);
 	};
 
 	class VolumetricCloudProgramFactory : public ProgramFactory

@@ -72,9 +72,9 @@ void Engine::VolumetricCloudProgram::configureProgram()
 	uFrame = glGetUniformLocation(glProgram, "frame");
 }
 
-void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
+void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, Engine::Camera * camera)
 {
-	glm::mat4 invView = glm::inverse(view);
+	glm::mat4 invView = glm::inverse(camera->getViewMatrix());
 	glUniformMatrix4fv(uInvView, 1, GL_FALSE, &(invView[0][0]));
 
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();

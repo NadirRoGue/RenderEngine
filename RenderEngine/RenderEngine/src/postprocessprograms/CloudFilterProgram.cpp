@@ -31,7 +31,7 @@ void Engine::CloudFilterProgram::configureProgram()
 	uGColor = glGetUniformLocation(glProgram, "gColor");
 }
 
-void Engine::CloudFilterProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::CloudFilterProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
 	glUniform2f(uTexelSize, 1.0f / ((float)ScreenManager::SCREEN_WIDTH), 1.0f / ((float)ScreenManager::SCREEN_HEIGHT));
 }

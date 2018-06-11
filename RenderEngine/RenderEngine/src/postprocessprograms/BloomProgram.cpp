@@ -37,9 +37,9 @@ void Engine::BloomProgram::configureProgram()
 	uBlend = glGetUniformLocation(glProgram, "blend");
 }
 
-void Engine::BloomProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::BloomProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
-	Engine::SSAAProgram::onRenderObject(obj, view, proj);
+	Engine::SSAAProgram::onRenderObject(obj, camera);
 
 	int prevFBO;
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFBO);

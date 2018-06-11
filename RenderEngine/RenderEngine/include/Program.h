@@ -10,6 +10,7 @@
 #include <GL/glew.h>
 #include <memory>
 
+#include "Camera.h"
 #include "lights/PointLight.h"
 #include "lights/SpotLight.h"
 #include "lights/DirectionalLight.h"
@@ -45,7 +46,8 @@ namespace Engine
 		virtual void configureMeshBuffers(Mesh * mesh) = 0;
 
 		void use();
-		virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj) = 0;
+		virtual void applyGlobalUniforms();
+		virtual void onRenderObject(const Object * obj, Camera * camera) = 0;
 
 		virtual void destroy();
 	protected:

@@ -36,15 +36,15 @@ void Engine::SSGodRayProgram::configureProgram()
 	uOnlyPass = glGetUniformLocation(glProgram, "onlyPass");
 }
 
-void Engine::SSGodRayProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
+void Engine::SSGodRayProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
-	Engine::PostProcessProgram::onRenderObject(obj, view, proj);
+	Engine::PostProcessProgram::onRenderObject(obj, camera);
 
 	// Project light position on screen
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
 	Engine::Camera * cam = scene->getCamera();
 	glm::vec4 lightDir = glm::vec4(-cam->getPosition() + Engine::Settings::lightDirection * 20.0f, 1.0);
-	lightDir = proj * view * lightDir;
+	lightDir = camera->getProjectionMatrix() * camera->getViewMatrix() * lightDir;
 	lightDir /= lightDir.w;
 	lightDir = lightDir * 0.5f + 0.5f;
 

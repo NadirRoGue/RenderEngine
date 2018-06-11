@@ -50,7 +50,7 @@ void Engine::Terrain::render(Engine::Camera * camera)
 		// Re-bind tile, as we are rendering the trees in last place, thus changing the active vao
 		tileObject->getMesh()->use();
 		tiledRendering(camera, terrainShadowMapShader, &Terrain::terrainShadowMapRender);
-		tiledRendering(camera, waterShadowMapShader, &Terrain::waterShadowMapRender);
+		//tiledRendering(camera, waterShadowMapShader, &Terrain::waterShadowMapRender); // we dont really need to cast shadows from water...
 		renderRadius = 4;
 		tiledRendering(camera, treeShadowMapShader, &Terrain::treesShadowMapRender);
 		renderRadius = previousRadius;
@@ -96,11 +96,12 @@ void Engine::Terrain::tiledRendering(Engine::Camera * camera, Program * prog, vo
 	int yEnd = y + renderRadius;
 
 	prog->use();
+	prog->applyGlobalUniforms();
 
 	// Culling parameters
 	glm::vec3 fwd = camera->getForwardVector();
 	fwd.y = 0;
-	fwd = glm::normalize(fwd);
+	fwd = -glm::normalize(fwd);
 	int px = -int(renderRadius), py = px;
 
 	for (int i = xStart; i < xEnd; i++, px++)
@@ -109,7 +110,7 @@ void Engine::Terrain::tiledRendering(Engine::Camera * camera, Program * prog, vo
 		{
 			// Culling (skips almost half)
 			glm::vec3 test(i - x, 0, j - y);
-			if (abs(px) > 2 && abs(py) > 2 && glm::dot(glm::normalize(test), -fwd) < 0.01f)
+			if (abs(px) > 2 && abs(py) > 2 && glm::dot(glm::normalize(test), fwd) < 0.01f)
 				continue;
 
 			(this->*func)(camera, i, j);
@@ -128,59 +129,50 @@ void Engine::Terrain::terrainShadowMapRender(Engine::Camera * camera, int i, int
 	terrainShadowMapShader->setUniformGridPosition(i, j);
 	terrainShadowMapShader->setUniformLightDepthMatrix(Engine::CascadeShadowMaps::getInstance().getShadowProjectionMat() * tileObject->getModelMatrix());
 
-	terrainShadowMapShader->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
+	terrainShadowMapShader->onRenderObject(tileObject, camera);
 
 	glDrawElements(GL_PATCHES, 6, GL_UNSIGNED_INT, (void*)0);
 }
 
+/*
 void Engine::Terrain::waterShadowMapRender(Engine::Camera * camera, int i, int j)
 {
 	float poxX = i * tileWidth;
 	float posZ = j * tileWidth;
 	tileObject->setTranslation(glm::vec3(poxX, 0.0f, posZ));
+
 	waterShadowMapShader->setUniformLightDepthMatrix(Engine::CascadeShadowMaps::getInstance().getShadowProjectionMat() * tileObject->getModelMatrix());
-	waterShadowMapShader->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
+
+	waterShadowMapShader->onRenderObject(tileObject, camera);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 }
-
+*/
 void Engine::Terrain::terrainRender(Engine::Camera * camera, int i, int j)
 {
-	Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
-
 	float poxX = i * tileWidth;
 	float posZ = j * tileWidth;
 	tileObject->setTranslation(glm::vec3(poxX, 0.0f, posZ));
 
 	terrainActiveShader->setUniformGridPosition(i, j);
-	terrainActiveShader->setUniformDepthTexture(Engine::CascadeShadowMaps::getInstance().getDepthTexture0());
-	terrainActiveShader->setUniformDepthTexture1(Engine::CascadeShadowMaps::getInstance().getDepthTexture1());
 	terrainActiveShader->setUniformLightDepthMatrix(Engine::CascadeShadowMaps::getInstance().getDepthMatrix0() * tileObject->getModelMatrix());
 	terrainActiveShader->setUniformLightDepthMatrix1(Engine::CascadeShadowMaps::getInstance().getDepthMatrix1() * tileObject->getModelMatrix());
-	terrainActiveShader->setUniformLightDirection(dl->getDirection());
 
-	terrainActiveShader->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
+	terrainActiveShader->onRenderObject(tileObject, camera);
 
 	glDrawElements(GL_PATCHES, 6, GL_UNSIGNED_INT, (void*)0);
 }
 
 void Engine::Terrain::waterRender(Engine::Camera * camera, int i, int j)
 {
-	Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
-
 	float poxX = i * tileWidth;
 	float posZ = j * tileWidth;
 	tileObject->setTranslation(glm::vec3(poxX, Engine::Settings::waterHeight * tileWidth * 1.5f, posZ));
 
-	waterActiveShader->setUniformGBufferInfo();
 	waterActiveShader->setUniformGridPosition(i, j);
-	waterActiveShader->setTimeUniform(Engine::Time::timeSinceBegining);
 	waterActiveShader->setUniformLightDepthMatrix(Engine::CascadeShadowMaps::getInstance().getDepthMatrix0() * tileObject->getModelMatrix());
 	waterActiveShader->setUniformLightDepthMatrix1(Engine::CascadeShadowMaps::getInstance().getDepthMatrix1() * tileObject->getModelMatrix());
-	waterActiveShader->setUniformDepthTexture(Engine::CascadeShadowMaps::getInstance().getDepthTexture0());
-	waterActiveShader->setUniformDepthTexture1(Engine::CascadeShadowMaps::getInstance().getDepthTexture1());
-	waterActiveShader->setUniformLightDirection(dl->getDirection());
-	waterActiveShader->onRenderObject(tileObject, camera->getViewMatrix(), camera->getProjectionMatrix());
+	waterActiveShader->onRenderObject(tileObject, camera);
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 }
@@ -196,24 +188,23 @@ void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j
 	std::default_random_engine eTerrain(seed);
 
 	// 16 trees per tile
-	size_t spawnTrees = 16;
 	size_t numTypeOfTrees = treeTypes.size();
-	size_t equalAmount = spawnTrees / numTypeOfTrees;
+	size_t equalAmount = treesToSpawn / numTypeOfTrees;
 	equalAmount = equalAmount < 1 ? 1 : equalAmount;
 
 	Engine::CascadeShadowMaps & csm = Engine::CascadeShadowMaps::getInstance();
 
-	treeShadowMapShader->setUniformMaxHeight();
-
 	size_t treeToSpawn = 0;
 	unsigned int z = 0;
-	while(z < spawnTrees)
+	while(z < treesToSpawn)
 	{
 		Engine::Object * randomTree = treeTypes[treeToSpawn % numTypeOfTrees];
 		treeToSpawn++;
 		randomTree->getMesh()->use();
-		for (unsigned int k = 0; k < equalAmount; k++)
+		unsigned int k = 0;
+		while(k < equalAmount)
 		{
+			k++;
 			z++;
 			float uOffset = dTerrain(eTerrain);
 			float vOffset = dTerrain(eTerrain);
@@ -228,7 +219,7 @@ void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j
 
 			treeShadowMapShader->setUniformTileUV(u, v);
 			treeShadowMapShader->setUniformLightDepthMat(csm.getShadowProjectionMat() *  randomTree->getModelMatrix());
-			treeShadowMapShader->onRenderObject(randomTree, camera->getViewMatrix(), camera->getProjectionMatrix());
+			treeShadowMapShader->onRenderObject(randomTree, camera);
 
 			glDrawElements(GL_TRIANGLES, randomTree->getMesh()->getNumFaces() * 3, GL_UNSIGNED_INT, (void*)0);
 		}
@@ -237,8 +228,6 @@ void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j
 
 void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
 {
-	Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
-
 	// We have to travel way to much to make this seed system not to work...
 	unsigned int seed = (i << 16) | j;
 	float posX = i * tileWidth;
@@ -248,24 +237,25 @@ void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
 	std::default_random_engine eTerrain(seed);
 
 	// 16 trees per tile
-	size_t spawnTrees = 16;
 	size_t numTypeOfTrees = treeTypes.size();
-	size_t equalAmount = spawnTrees / numTypeOfTrees;
+	size_t equalAmount = treesToSpawn / numTypeOfTrees;
 	equalAmount = equalAmount < 1 ? 1 : equalAmount;
 
 	Engine::CascadeShadowMaps & csm = Engine::CascadeShadowMaps::getInstance();
 
-	treeActiveShader->setUniformMaxHeight();
-
 	size_t treeToSpawn = 0;
 	unsigned int z = 0;
-	while(z < spawnTrees)
+	while(z < treesToSpawn)
 	{
 		Engine::Object * randomTree = treeTypes[treeToSpawn % numTypeOfTrees];
 		treeToSpawn++;
 		randomTree->getMesh()->use();
-		for (unsigned int k = 0; k < equalAmount; k++, z++)
+		unsigned int k = 0;
+		while(k < equalAmount)
 		{
+			k++;
+			z++;
+
 			float uOffset = dTerrain(eTerrain);
 			float vOffset = dTerrain(eTerrain);
 
@@ -278,12 +268,9 @@ void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
 			float v = abs(j + vOffset);
 
 			treeActiveShader->setUniformTileUV(u, v);
-			treeActiveShader->setUniformLightDir(dl->getDirection());
 			treeActiveShader->setUniformLightDepthMat(csm.getDepthMatrix0() * randomTree->getModelMatrix());
 			treeActiveShader->setUniformLightDepthMat1(csm.getDepthMatrix1() * randomTree->getModelMatrix());
-			treeActiveShader->setUniformDepthMap(csm.getDepthTexture0());
-			treeActiveShader->setUniformDepthMap1(csm.getDepthTexture1());
-			treeActiveShader->onRenderObject(randomTree, camera->getViewMatrix(), camera->getProjectionMatrix());
+			treeActiveShader->onRenderObject(randomTree, camera);
 
 			glDrawElements(GL_TRIANGLES, randomTree->getMesh()->getNumFaces() * 3, GL_UNSIGNED_INT, (void*)0);
 		}
@@ -293,8 +280,6 @@ void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
 
 void Engine::Terrain::flowerRender(Engine::Camera * cam, int i, int j)
 {
-	Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
-
 	// We have to travel way to much to make this seed system not to work...
 	unsigned int seed = (j << 16) | i;
 	float posX = i * tileWidth;
@@ -303,17 +288,12 @@ void Engine::Terrain::flowerRender(Engine::Camera * cam, int i, int j)
 	std::uniform_real_distribution<float> dTerrain(0.0f, 1.0f);
 	std::default_random_engine eTerrain(seed);
 
-	// 60 flowers per tile
-	const size_t spawnTrees = 60;
-
 	Engine::CascadeShadowMaps & csm = Engine::CascadeShadowMaps::getInstance();
-
-	treeActiveShader->setUniformMaxHeight();
 
 	const unsigned int numElements = flower->getMesh()->getNumFaces() * 3;
 
 	unsigned int z = 0;
-	while (z < spawnTrees)
+	while (z < flowersToSpawn)
 	{
 		z++;
 		float uOffset = dTerrain(eTerrain);
@@ -328,12 +308,9 @@ void Engine::Terrain::flowerRender(Engine::Camera * cam, int i, int j)
 		float v = abs(j + vOffset);
 
 		treeActiveShader->setUniformTileUV(u, v);
-		treeActiveShader->setUniformLightDir(dl->getDirection());
 		treeActiveShader->setUniformLightDepthMat(csm.getDepthMatrix0() * flower->getModelMatrix());
 		treeActiveShader->setUniformLightDepthMat1(csm.getDepthMatrix1() * flower->getModelMatrix());
-		treeActiveShader->setUniformDepthMap(csm.getDepthTexture0());
-		treeActiveShader->setUniformDepthMap1(csm.getDepthTexture1());
-		treeActiveShader->onRenderObject(flower, cam->getViewMatrix(), cam->getProjectionMatrix());
+		treeActiveShader->onRenderObject(flower, cam);
 
 		glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_INT, (void*)0);
 	}
@@ -346,6 +323,19 @@ void Engine::Terrain::initialize()
 {
 	Engine::RenderableNotifier::getInstance().registerRenderable(this);
 
+	treesToSpawn = 16;
+	flowersToSpawn = 50;
+
+	/*unsigned int jitterSize = treesToSpawn % 2 != 0 ? treesToSpawn + 1 : treesToSpawn;
+	jitterPattern = new glm::vec2[jitterSize];
+
+	int rows = (int)glm::ceil(sqrtf((float)jitterSize));
+	int columns = jitterSize / rows;
+	for (unsigned int i = 0; i < jitterSize; i++)
+	{
+		
+	}
+	*/
 	// TERRAIN SHADERS INSTANCING
 	const std::string & terrainProgName = Engine::ProceduralTerrainProgram::PROGRAM_NAME;
 	// shadow map
@@ -371,11 +361,11 @@ void Engine::Terrain::initialize()
 	// WATER SHADERS INSTANCING
 	const std::string & waterProgName = Engine::ProceduralWaterProgram::PROGRAM_NAME;
 	// shadow map
-	waterShadowMapShader = dynamic_cast<Engine::ProceduralWaterProgram*>
-	(
-		Engine::ProgramTable::getInstance().getProgramByName(waterProgName,
-		Engine::ProceduralWaterProgram::SHADOW_MAP)
-	);
+	//waterShadowMapShader = dynamic_cast<Engine::ProceduralWaterProgram*>
+	//(
+	//	Engine::ProgramTable::getInstance().getProgramByName(waterProgName,
+	//	Engine::ProceduralWaterProgram::SHADOW_MAP)
+	//);
 	// g-buffers
 	waterShadingShader = dynamic_cast<Engine::ProceduralWaterProgram*>
 	(

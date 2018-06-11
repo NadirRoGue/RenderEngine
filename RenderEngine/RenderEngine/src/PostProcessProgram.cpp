@@ -62,9 +62,8 @@ void Engine::PostProcessProgram::configureMeshBuffers(Engine::Mesh * data)
 	glEnableVertexAttribArray(inTexCoord);
 }
 
-void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
-	
 	std::map<std::string, TextureInstance *> all = ((PostProcessObject*)obj)->getAllCustomTextures();
 	std::map<std::string, TextureInstance *>::const_iterator it = all.cbegin();
 	

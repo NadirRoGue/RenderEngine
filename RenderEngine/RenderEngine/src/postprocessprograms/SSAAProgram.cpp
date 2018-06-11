@@ -30,9 +30,9 @@ void Engine::SSAAProgram::configureProgram()
 	uTexelSize = glGetUniformLocation(glProgram, "texelSize");
 }
 
-void Engine::SSAAProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::SSAAProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
-	Engine::PostProcessProgram::onRenderObject(obj, view, proj);
+	Engine::PostProcessProgram::onRenderObject(obj, camera);
 
 	float texelSize[2];
 	texelSize[0] = 1.0f / ScreenManager::SCREEN_WIDTH;

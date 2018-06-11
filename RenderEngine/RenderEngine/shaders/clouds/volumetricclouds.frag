@@ -66,8 +66,9 @@ uniform float bayerFilter[16u] = float[]
 #ifdef SPHERE_PROJECTION
 vec3 sphereCenter;
 float chunkLen;
-uniform float sphereInnerRadius = 2000.0;
-uniform float sphereOuterRadius = 2150.0;
+#define sphereInnerRadius 2000.0
+#define sphereOuterRadius 2150.0
+#define deltaSphere sphereOuterRadius - sphereInnerRadius
 #else
 uniform vec3 planeMin = vec3(-2000, 30.0, -2000);
 uniform vec3 planeMax = vec3(2000, 230.0, 2000);
@@ -78,6 +79,9 @@ vec2 planeDim = vec2(planeMax.xz - planeMin.xz);
 #define STRATUS_GRADIENT vec4(0.0, 0.1, 0.2, 0.3)
 #define STRATOCUMULUS_GRADIENT vec4(0.02, 0.2, 0.48, 0.625)
 #define CUMULUS_GRADIENT vec4(0.01, 0.1625, 0.88, 0.98)
+
+// Light sampling constants
+#define coneStep 0.1666666
 
 // ==========================================================================
 // Lighting functions
@@ -117,12 +121,12 @@ vec3 ambientLight(float heightFrac, float lightFactor)
 float getHeightFraction(vec3 p)
 {
 #ifdef SPHERE_PROJECTION
-	float fraction = fract((p.y) / (sphereOuterRadius - sphereInnerRadius));
+	float fraction = fract(((p.y) / (sphereOuterRadius - sphereInnerRadius)));
 #else
 	float fraction = (p.y - planeMin.y) / (planeMax.y - planeMin.y);
 #endif
 
-	fraction = clamp(fraction, 0.0, 1.0);
+	//fraction = clamp(fraction, 0.0, 1.0);
 
 	return fraction;
 }
@@ -173,6 +177,8 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 
 	p += heightFraction * wind * cloudTopOffset;
 	p += wind * time * cloudSpeed;
+
+	heightFraction = getHeightFraction(p);
 
 	// Apply uv (xz) scale to keep clouds un-stretched based on cloud layer thickness
 #ifdef SPHERE_PROJECTION
@@ -227,16 +233,16 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive)
 float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 {
 	vec3 startPos = pos;
-	vec3 rayStep = lightDir * (stepSize);
+	vec3 rayStep = lightDir * (stepSize * 4.0);
 	float coneRadius = 1.0;
-	float coneStep = 0.1666666; // (1 / 6)
 	float density = 0.0;
 	float coneDensity = 0.0;
-	float rcpThickness = 1.0 / (stepSize * 6);
+	float invDepth = 1.0 / (stepSize * 6);
 
 	// Light raymarchToLight
 	// 6 close samples
-	for(int i = 0; i < 6; i++)
+	int i = 0;
+	while(i < 6)
 	{
 		vec3 posInCone = startPos + coneRadius * noiseKernel[i] * float(i);
 		float heightFraction = getHeightFraction(posInCone);
@@ -247,13 +253,14 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 			if(cloudDensity > 0.0)
 			{
 				density += cloudDensity;
-				float transmittance = 1.0 - (density * rcpThickness);
+				float transmittance = 1.0 - (density * invDepth);
 				coneDensity += (cloudDensity * transmittance);
 			}
 		}
 
 		startPos += rayStep;
 		coneRadius += coneStep;
+		i++;
 	}
 
 	// 1 far sample for shadowing
@@ -263,29 +270,27 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 	if(cloudDensity > 0.0)
 	{
 		density += cloudDensity;
-		float transmittance = 1.0 - (density * rcpThickness);
+		float transmittance = 1.0 - (density * invDepth);
 		coneDensity += (cloudDensity * transmittance);
 	}
 
-	//float ca = 1.0;
+	//float ca = -clamp(dot(lightDir, d), 0.0, 1.0);
 
 	// Compute light energy arriving at point
-	return lightEnergy(lightDir, d, 1.0/*ca*/, coneDensity);
+	return lightEnergy(lightDir, d, 1.0, coneDensity);
 }
 
 float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 {
-	vec3 dir = endPos - startPos;
-	float density = 0.0;
-	float thick = length(dir);
+	// Sampling parameters calculation
+	vec3 path = endPos - startPos;
 
 #ifdef SPHERE_PROJECTION
-	float delta = sphereOuterRadius - sphereInnerRadius;
+	int sampleCount = int(ceil(mix(48.0, 96.0, clamp(length(path) / deltaSphere, 0.0, 1.0))));
 #else
 	float delta = planeMax.y - planeMin.y;
+	int sampleCount = int(ceil(mix(48.0, 96.0, clamp(length(path) / delta, 0.0, 1.0))));
 #endif
-
-	int sampleCount = int(ceil(mix(48.0, 96.0, clamp(thick / delta, 0.0, 1.0))));
 
 	// Light color attenuation based on sun's position
 	float lightFactor = (clamp(dot(vec3(0,1,0), lightDir), 0.0, 1.0));
@@ -296,22 +301,22 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 	float ambientFactor =  max(min(lightFactor * 2.0, 1.0), 0.1);
 	vec3 lc = lightColor * lightFactor * cloudColor;
 
+	// Ray march data
 	vec3 pos = startPos;
-	vec3 st = dir / float(sampleCount - 1);
+	vec3 st = path / float(sampleCount - 1);
 	float stepSize = length(st);
-	vec3 viewDir = normalize(dir);
-
+	vec3 viewDir = normalize(path);
+	float density = 0.0;
 	vec4 result = vec4(0.0);
+	float samplingLod = 0.0;//mix(0.0, 2.0, (length(startPos) - sphereInnerRadius) / (sphereOuterRadius - sphereInnerRadius));
 
-	float samplingLod = mix(0.0, 2.0, (length(startPos) - sphereInnerRadius) / (sphereOuterRadius - sphereInnerRadius));
-
-	vec3 wd = getWeatherData(pos);
 	// Dithering on the starting ray position to reduce banding artifacts
 	int a = int(gl_FragCoord.x) % 4;
 	int b = int(gl_FragCoord.y) % 4;
 	pos += st * bayerFilter[a * 4 + b] * 10.0;
 
-	for(int i = 0; i < sampleCount; i++)
+	int i = 0;
+	while(i < sampleCount)
 	{
 		float cloudDensity = sampleCloudDensity(pos, getWeatherData(pos), samplingLod, true); // SAMPLE CLOUD textureSamples
 
@@ -330,6 +335,7 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 		}
 
 		pos += st;
+		i++;
 	}
 
 	// Return alpha (density) and store final color
@@ -423,12 +429,14 @@ bool intersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 
 void main()
 {
-	// Simple temporal reprojection. Render half a frame per iteration. Discard consecutive threads for efficiency purposes
+	// Simple temporal reprojection. Render half a frame per iteration.
 	int fx = int(gl_FragCoord.x);
-	int cuarter = int(ceil(screenResolution.x / 2.0));
-	int screenStart = (frame % 2) * cuarter;
-	if(fx < screenStart || fx > screenStart + cuarter)
+	if(fx % 4 != frame % 4)
 		discard;
+	//int cuarter = int(ceil(screenResolution.x / 2.0));
+	//int screenStart = (frame % 2) * cuarter;
+	//if(fx < screenStart || fx > screenStart + cuarter)
+	//	discard;
 
 	// Do not compute clouds if they are not going to be visible
 	if(texture(currentPixelDepth, texCoord).x < 1.0)

@@ -44,18 +44,14 @@ namespace Engine
 		void configureProgram();
 		void configureMeshBuffers(Mesh * mesh);
 
-		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
+		void applyGlobalUniforms();
+		void onRenderObject(const Object * obj, Camera * camera);
 
 		void destroy();
 		
-		void setUniformGBufferInfo();
-		void setTimeUniform(float sinTime);
 		void setUniformGridPosition(unsigned int i, unsigned int j);
 		void setUniformLightDepthMatrix(const glm::mat4 & ldm);
 		void setUniformLightDepthMatrix1(const glm::mat4 & ldm);
-		void setUniformDepthTexture(const TextureInstance * depthTexture);
-		void setUniformDepthTexture1(const TextureInstance * depthTexture);
-		void setUniformLightDirection(const glm::vec3 & lightDir);
 	};
 
 	// =========================================================

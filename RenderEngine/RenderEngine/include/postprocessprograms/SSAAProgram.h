@@ -16,7 +16,7 @@ namespace Engine
 		~SSAAProgram();
 
 		virtual void configureProgram();
-		virtual void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
+		virtual void onRenderObject(const Object * obj, Camera * camera);
 	};
 
 	class SSAAProgramFactory : public ProgramFactory

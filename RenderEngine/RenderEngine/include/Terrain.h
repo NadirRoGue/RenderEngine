@@ -53,7 +53,7 @@ namespace Engine
 
 		ProceduralTerrainProgram * terrainActiveShader;
 
-		ProceduralWaterProgram * waterShadowMapShader;
+		//ProceduralWaterProgram * waterShadowMapShader;
 		ProceduralWaterProgram * waterShadingShader;
 		ProceduralWaterProgram * waterWireShader;
 
@@ -69,6 +69,9 @@ namespace Engine
 
 		std::vector<Object *> treeTypes;
 		Object * flower;
+		unsigned int treesToSpawn;
+		unsigned int flowersToSpawn;
+		glm::vec2 * jitterPattern;
 	public:
 		Terrain();
 		Terrain(float tileWidth, unsigned int renderRadius);
@@ -85,7 +88,7 @@ namespace Engine
 		void tiledRendering(Camera * cam, Program * prog, void (Terrain::*func)(Camera * cam, int i, int j));
 
 		void terrainShadowMapRender(Camera * cam, int i, int j);
-		void waterShadowMapRender(Camera * cam, int i, int j);
+		//void waterShadowMapRender(Camera * cam, int i, int j);
 		void treesShadowMapRender(Camera * cam, int i, int j);
 		void terrainRender(Camera * cam, int i, int j);
 		void waterRender(Camera * cam, int i, int j);

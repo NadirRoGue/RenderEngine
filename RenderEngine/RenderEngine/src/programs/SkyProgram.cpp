@@ -47,19 +47,15 @@ void Engine::SkyProgram::configureMeshBuffers(Engine::Mesh * m)
 	}
 }
 
-void Engine::SkyProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::SkyProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
-	glm::mat4 modelViewProj = proj * view * obj->getModelMatrix();
+	glm::mat4 modelViewProj = camera->getProjectionMatrix() * camera->getViewMatrix() * obj->getModelMatrix();
 	glUniformMatrix4fv(uProjMatrix, 1, GL_FALSE, &(modelViewProj[0][0]));
 
-	Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
-
-	const glm::mat4 & modelCopy = dl->getModelMatrix();
-	glm::vec3 direction(modelCopy[3][0], modelCopy[3][1], modelCopy[3][2]);
-	direction = -glm::normalize(direction);
+	glm::vec3 direction = -glm::normalize(Engine::Settings::lightDirection);
 	glUniform3fv(uLightDir, 1, &direction[0]);
 
-	glUniform3fv(uLightColor, 1, dl->getData().color);
+	glUniform3fv(uLightColor, 1, &Engine::Settings::lightColor[0]);
 
 	glUniform3fv(uSkyZenitColor, 1, &Engine::Settings::skyZenitColor[0]);
 	glUniform3fv(uSkyHorizonColor, 1, &Engine::Settings::skyHorizonColor[0]);

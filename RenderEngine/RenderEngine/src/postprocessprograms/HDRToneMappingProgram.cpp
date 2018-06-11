@@ -25,9 +25,9 @@ void Engine::HDRToneMappingProgram::configureProgram()
 	uGamma = glGetUniformLocation(glProgram, "gamma");
 }
 
-void Engine::HDRToneMappingProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
+void Engine::HDRToneMappingProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
-	Engine::PostProcessProgram::onRenderObject(obj, view, proj);
+	Engine::PostProcessProgram::onRenderObject(obj, camera);
 
 	glUniform1f(uExposure, Engine::Settings::hdrExposure);
 	glUniform1f(uGamma, Engine::Settings::hdrGamma);

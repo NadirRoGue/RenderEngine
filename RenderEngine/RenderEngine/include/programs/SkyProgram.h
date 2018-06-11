@@ -24,7 +24,7 @@ namespace Engine
 
 		void configureProgram();
 		void configureMeshBuffers(Mesh * mesh);
-		void onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj);
+		void onRenderObject(const Object * obj, Camera * camera);
 	};
 
 	class SkyProgramFactory : public ProgramFactory

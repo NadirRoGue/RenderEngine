@@ -33,7 +33,7 @@ void Engine::SkyBox::render(Engine::Camera * camera)
 	const glm::vec3 pos = camera->getPosition();
 	glm::vec3 cubePos(pos);
 	cubeMesh->setTranslation(cubePos * -1.0f);
-	shader->onRenderObject(cubeMesh, camera->getViewMatrix(), camera->getProjectionMatrix());
+	shader->onRenderObject(cubeMesh, camera);
 
 	glDrawElements(renderMode, data->getNumFaces() * data->getNumVerticesPerFace(), GL_UNSIGNED_INT, (void*)0);
 

@@ -159,7 +159,7 @@ void Engine::DeferredRenderer::renderLoop()
 	glClear(GL_DEPTH_BUFFER_BIT);
 	deferredShading->use();
 	deferredDrawSurface->getMesh()->use();
-	deferredShading->onRenderObject(deferredDrawSurface, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
+	deferredShading->onRenderObject(deferredDrawSurface, activeCam);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	// Render the skybox after shading is performed (SKY, SUN, & CLOUDS)
@@ -175,7 +175,7 @@ void Engine::DeferredRenderer::renderLoop()
 	// Output the final result to screen
 	screenOutput->use();
 	chainEnd->getMesh()->use();
-	screenOutput->onRenderObject(chainEnd, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
+	screenOutput->onRenderObject(chainEnd, activeCam);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
@@ -201,7 +201,7 @@ void Engine::DeferredRenderer::runPostProcesses()
 
 		node->obj->getMesh()->use();
 
-		prog->onRenderObject(node->obj, activeCam->getViewMatrix(), activeCam->getProjectionMatrix());
+		prog->onRenderObject(node->obj, activeCam);
 
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		it++;
