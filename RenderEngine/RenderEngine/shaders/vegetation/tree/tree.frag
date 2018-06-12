@@ -18,6 +18,8 @@ layout (location=5) in vec3 inShadowMapPos1;
 uniform sampler2D depthTexture;
 uniform sampler2D depthTexture1;
 
+uniform mat4 normal;
+
 uniform vec3 lightDir;
 
 uniform vec2 poissonDisk[4] = vec2[](
@@ -77,9 +79,9 @@ void main()
 	outColor = vec4(inColor, 1.0);
 	outNormal = vec4(rawNormal, 1);
 	outSpecular = vec4(0,0,0,0);
-	outEmissive = vec4(inEmission,1);
+	outEmissive = vec4(inEmission.rgb,1);
 	outPos = vec4(inPos, 1);
-	outInfo = vec4(0, visibility,0,1);
+	outInfo = vec4(0.0, visibility,0,1);
 #endif
 #else
 	lightdepth = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, 0);

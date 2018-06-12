@@ -70,6 +70,7 @@ namespace Engine
 		std::vector<Object *> treeTypes;
 		Object * flower;
 		unsigned int treesToSpawn;
+		unsigned int equalAmountOfTrees;
 		unsigned int flowersToSpawn;
 		glm::vec2 * jitterPattern;
 	public:

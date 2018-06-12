@@ -3,7 +3,7 @@
 #include "WorldConfig.h"
 #include "TimeAccesor.h"
 
-const float Engine::CameraRotationHandler::ROTATION_SPEED = 50.0f;
+const float Engine::CameraRotationHandler::ROTATION_SPEED = 25.0f;
 
 Engine::CameraRotationHandler::CameraRotationHandler(std::string nam, Engine::Camera * cam)
 	:MouseMotionHandler(nam)

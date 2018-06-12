@@ -30,6 +30,7 @@ namespace Engine
 		PointLight(std::string name);
 		~PointLight();
 
+		// Setters
 		void setPosition(const glm::vec3 & pos);
 		void setAttenuation(const glm::vec3 & att);
 		void setColor(const glm::vec3 & color);

@@ -15,11 +15,6 @@ Engine::DeferredShadingProgram::DeferredShadingProgram(std::string name, unsigne
 Engine::DeferredShadingProgram::DeferredShadingProgram(const Engine::DeferredShadingProgram & other)
 	: Engine::PostProcessProgram(other)
 {
-	uDirectionalLightDir = other.uDirectionalLightDir;
-	uDLIa = other.uDLIa;
-	uDLId = other.uDLId;
-	uDLIs = other.uDLIs;
-
 	uDLBuffer = other.uDLBuffer;
 	uPLBuffer = other.uPLBuffer;
 	uSLBuffer = other.uSLBuffer;
@@ -72,11 +67,6 @@ void Engine::DeferredShadingProgram::configureProgram()
 	uDLBuffer = glGetUniformBlockIndex(glProgram, "DLBuffer");
 	uPLBuffer = glGetUniformBlockIndex(glProgram, "PLBuffer");
 	uSLBuffer = glGetUniformBlockIndex(glProgram, "SLBuffer");
-
-	uDLIa = glGetUniformLocation(glProgram, "DLIa");
-	uDLId = glGetUniformLocation(glProgram, "DLId");
-	uDLIs = glGetUniformLocation(glProgram, "DLIs");
-	uDirectionalLightDir = glGetUniformLocation(glProgram, "DLdir");
 
 	uWorldUp = glGetUniformLocation(glProgram, "worldUp");
 }

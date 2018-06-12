@@ -31,13 +31,13 @@ namespace Engine
 
 		const float vertexPos[] = 
 		{
-			//Face y = -1
+			//Face y = 0
 			-1.0f,	0.0f,	 -1.0f, //0
 			1.0f,	0.0f,	 -1.0f, //1
 			-1.0f,	0.0f,	 1.0f, //2
 			1.0f,	0.0f,	 1.0f, //3
 
-			//Face z = -1		   
+			//Face y = 1		   
 			-1.0f,	1.0f,	-1.0f, //4
 			1.0f,	1.0f,	-1.0f, //5
 			-1.0f,	1.0f,	1.0f, //6

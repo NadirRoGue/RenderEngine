@@ -17,6 +17,7 @@ namespace Engine
 		std::vector<glm::ivec3> faces;
 		std::vector<glm::vec3> colors;
 		std::vector<glm::vec3> emission;
+		//std::vector<glm::vec2> uvs;
 		Mesh * base;
 		Mesh * leaf;
 

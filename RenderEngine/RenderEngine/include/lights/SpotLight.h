@@ -37,6 +37,7 @@ namespace Engine
 		// Returns the model matrix for the light direction
 		const glm::mat4 & getDirModelMatrix() const;
 
+		// Setters
 		void setAttenuation(const glm::vec3 & att);
 		void setPosition(const glm::vec3 & pos);
 		void setDirection(const glm::vec3 & dir);

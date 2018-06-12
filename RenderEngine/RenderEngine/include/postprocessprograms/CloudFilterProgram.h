@@ -8,13 +8,18 @@
 
 namespace Engine
 {
+	/**
+	 * Class in charge to manipulate the image space filter applied to volumetric clouds
+	 */
 	class CloudFilterProgram : public PostProcessProgram
 	{
 	public:
 		static std::string PROGRAM_NAME;
 	private:
+		// texel size (1/bufferwidth, 1/bufferheight)
 		unsigned int uTexelSize;
 
+		// G-Buffer color data
 		unsigned int uGColor;
 	public:
 		CloudFilterProgram(std::string name, unsigned long long params);
@@ -27,6 +32,8 @@ namespace Engine
 		void setBufferInput(const TextureInstance * color);
 	};
 
+	// ========================================================================
+	// Cloud filter factory : creates new cloud filter programs
 	class CloudFilterProgramFactory : public ProgramFactory
 	{
 	protected:

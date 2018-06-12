@@ -36,6 +36,7 @@ namespace Engine
 		// Will change light direction (directional lights have no position)
 		void translate(const glm::vec3 & translation);
 
+		// Setters
 		void setDirection(const glm::vec3 & dir);
 		void setColor(const glm::vec3 & color);
 		void setKa(float a);

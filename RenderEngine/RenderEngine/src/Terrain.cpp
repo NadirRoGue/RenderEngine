@@ -75,6 +75,7 @@ void Engine::Terrain::render(Engine::Camera * camera)
 	renderRadius = renderRadius < 6? renderRadius : 6;
 	tiledRendering(camera, treeActiveShader, &Terrain::treesRender);
 
+	renderRadius = 3;
 	flower->getMesh()->use();
 	tiledRendering(camera, treeActiveShader, &Terrain::flowerRender);
 
@@ -179,19 +180,10 @@ void Engine::Terrain::waterRender(Engine::Camera * camera, int i, int j)
 
 void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j)
 {
-	// We have to travel way to much to make this seed system not to work...
-	unsigned int seed = (i << 16) | j;
 	float posX = i * tileWidth;
 	float posZ = j * tileWidth;
 
-	std::uniform_real_distribution<float> dTerrain(0.0f, 1.0f);
-	std::default_random_engine eTerrain(seed);
-
-	// 16 trees per tile
 	size_t numTypeOfTrees = treeTypes.size();
-	size_t equalAmount = treesToSpawn / numTypeOfTrees;
-	equalAmount = equalAmount < 1 ? 1 : equalAmount;
-
 	Engine::CascadeShadowMaps & csm = Engine::CascadeShadowMaps::getInstance();
 
 	size_t treeToSpawn = 0;
@@ -202,12 +194,13 @@ void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j
 		treeToSpawn++;
 		randomTree->getMesh()->use();
 		unsigned int k = 0;
-		while(k < equalAmount)
+		while(k < equalAmountOfTrees)
 		{
 			k++;
 			z++;
-			float uOffset = dTerrain(eTerrain);
-			float vOffset = dTerrain(eTerrain);
+			glm::vec2 & jitter = jitterPattern[z];
+			float & uOffset = jitter.x;
+			float & vOffset = jitter.y;
 
 			float treePosX = posX + uOffset * tileWidth;
 			float treePosZ = posZ + vOffset * tileWidth;
@@ -228,19 +221,10 @@ void Engine::Terrain::treesShadowMapRender(Engine::Camera * camera, int i, int j
 
 void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
 {
-	// We have to travel way to much to make this seed system not to work...
-	unsigned int seed = (i << 16) | j;
 	float posX = i * tileWidth;
 	float posZ = j * tileWidth;
 
-	std::uniform_real_distribution<float> dTerrain(0.0f, 1.0f);
-	std::default_random_engine eTerrain(seed);
-
-	// 16 trees per tile
 	size_t numTypeOfTrees = treeTypes.size();
-	size_t equalAmount = treesToSpawn / numTypeOfTrees;
-	equalAmount = equalAmount < 1 ? 1 : equalAmount;
-
 	Engine::CascadeShadowMaps & csm = Engine::CascadeShadowMaps::getInstance();
 
 	size_t treeToSpawn = 0;
@@ -251,13 +235,14 @@ void Engine::Terrain::treesRender(Engine::Camera * camera, int i, int j)
 		treeToSpawn++;
 		randomTree->getMesh()->use();
 		unsigned int k = 0;
-		while(k < equalAmount)
+		while(k < equalAmountOfTrees)
 		{
 			k++;
 			z++;
 
-			float uOffset = dTerrain(eTerrain);
-			float vOffset = dTerrain(eTerrain);
+			glm::vec2 & jitter = jitterPattern[z];
+			float & uOffset = jitter.x;
+			float & vOffset = jitter.y;
 
 			float treePosX = posX + uOffset * tileWidth;
 			float treePosZ = posZ + vOffset * tileWidth;
@@ -324,18 +309,31 @@ void Engine::Terrain::initialize()
 	Engine::RenderableNotifier::getInstance().registerRenderable(this);
 
 	treesToSpawn = 16;
-	flowersToSpawn = 50;
+	flowersToSpawn = 40;
 
-	/*unsigned int jitterSize = treesToSpawn % 2 != 0 ? treesToSpawn + 1 : treesToSpawn;
-	jitterPattern = new glm::vec2[jitterSize];
-
+	unsigned int jitterSize = treesToSpawn % 2 != 0 ? treesToSpawn + 1 : treesToSpawn;
 	int rows = (int)glm::ceil(sqrtf((float)jitterSize));
-	int columns = jitterSize / rows;
-	for (unsigned int i = 0; i < jitterSize; i++)
+	int columns = rows;
+	jitterPattern = new glm::vec2[rows * columns];
+
+	std::uniform_real_distribution<float> d(0.0f, 1.0f);
+	std::default_random_engine e(0);
+
+	float jitterCellX = 1.0f / columns;
+	float jitterCellY = 1.0f / rows;
+
+	int c = 0;
+	for (int i = 0; i < rows; i++)
 	{
-		
+		for (int j = 0; j < columns; j++)
+		{
+			float x = d(e) * jitterCellX + jitterCellX * float(j);
+			float y = d(e) * jitterCellY + jitterCellY * float(i);
+			jitterPattern[c] = glm::vec2(x, y);
+			c++;
+		}
 	}
-	*/
+	
 	// TERRAIN SHADERS INSTANCING
 	const std::string & terrainProgName = Engine::ProceduralTerrainProgram::PROGRAM_NAME;
 	// shadow map
@@ -445,20 +443,24 @@ void Engine::Terrain::createTileMesh()
 
 void Engine::Terrain::addTrees()
 {
+	// Procedural tree generation
 	std::uniform_int_distribution<unsigned int> d(0, 50000);
 	std::default_random_engine e(0);
 
 	std::uniform_real_distribution<float> leafColor(0.0f, 1.0f);
-	std::default_random_engine eLeaf(0);
+	std::default_random_engine eLeaf(d(e) * d(e));
+
+	std::uniform_real_distribution<float> trunkColor(0.0f, 1.0f);
+	std::default_random_engine eTrunk(d(e) * d(e));
 
 	for (int i = 0; i < 8; i++)
 	{
 		Engine::TreeGenerationData treeData;
 		treeData.treeName = std::string("Tree_") + std::to_string(i);
 		treeData.emissiveLeaf = leafColor(eLeaf) > 0.8f;
-		treeData.startTrunkColor = glm::vec3(0.2f, 0.1f, 0.0f);
+		treeData.startTrunkColor = trunkColor(eTrunk) >= 0.5f? glm::vec3(0.2f, 0.1f, 0.0f) : glm::vec3(0.65f, 0.65f, 0.65f);
 		treeData.endTrunkColor = treeData.startTrunkColor;
-		treeData.leafStartColor = glm::vec3(leafColor(eLeaf), 1.0 - leafColor(eLeaf), 1.0 - leafColor(eLeaf));
+		treeData.leafStartColor = glm::vec3(1.0 - leafColor(eLeaf), 1.0 - leafColor(eLeaf), 1.0 - leafColor(eLeaf));
 		treeData.leafEndColor = treeData.leafStartColor;
 		treeData.maxBranchesSplit = 4;
 		float rotFactor = leafColor(eLeaf) * 0.5f + 0.5f;
@@ -483,7 +485,13 @@ void Engine::Terrain::addTrees()
 		
 		treeTypes.push_back(tree);
 	}
+
+	// Amount of each tree type to evenly spawn trees up to treesToSpawn
+	size_t numTypeOfTrees = treeTypes.size();
+	equalAmountOfTrees = treesToSpawn / numTypeOfTrees;
+	equalAmountOfTrees = equalAmountOfTrees < 1 ? 1 : equalAmountOfTrees;
 	
+	// Procedural flower generation
 	Engine::TreeGenerationData treeData;
 	treeData.treeName = std::string("Flower");
 	treeData.emissiveLeaf = false;
