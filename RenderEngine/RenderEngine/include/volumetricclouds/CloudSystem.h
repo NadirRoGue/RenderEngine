@@ -17,10 +17,8 @@ namespace Engine
 			CloudFilterProgram * filterShader;
 			Mesh * renderPlane;
 
-			DeferredRenderObject * reprojectionBuffer[2];
-			TextureInstance * reproBuffer[2];
-			DeferredRenderObject * filterBuffer;
-			TextureInstance * colorB;
+			DeferredRenderObject * reprojectionBuffer[4];
+			TextureInstance * reproBuffer[4];
 		public:
 			VolumetricClouds();
 			void render(Camera * cam);

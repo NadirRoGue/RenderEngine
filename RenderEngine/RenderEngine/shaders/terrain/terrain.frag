@@ -202,7 +202,7 @@ vec3 computeBumpNormal()
 {
 	float u = inUV.x;
 	float v = inUV.y;
-	float step = 0.001;
+	float step = 0.0025;
 	float slope = 2.0;
 	float tH = bumpNoiseHeight(vec2(u, v + step), scale * slope, octaves); 
 	float bH = bumpNoiseHeight(vec2(u, v - step), scale * slope, octaves);
@@ -214,7 +214,8 @@ vec3 computeBumpNormal()
 
 vec3 computeCaustics(vec2 uv)
 {
-	return vec3(cellularNoise(uv, 150.0));
+	float val = cellularNoise(uv, 150.0);
+	return vec3(val * val * 2.0);
 }
 
 #else
@@ -265,7 +266,7 @@ void main()
 	// Depth for below-water level areas
 	alpha = height <= waterHeight? (height / waterHeight) - 0.4 : 1.0;
 	alpha = clamp(alpha, 0.0, 1.0);
-	heightColor = alpha < 0.95? heightColor + (computeCaustics(inUV + time * 0.007) + computeCaustics(inUV.yx - time * 0.007)) * (0.95 - alpha) * 1.0 : heightColor;
+	heightColor = alpha < 0.95? heightColor + (computeCaustics(inUV + time * 0.007) + computeCaustics(inUV.yx - time * 0.007)) * (0.95 - alpha) : heightColor;
 #endif
 
 	// OUTPUT G BUFFERS

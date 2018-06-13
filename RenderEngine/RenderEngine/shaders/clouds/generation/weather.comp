@@ -16,8 +16,8 @@ float random2D( in vec2 st )
 // PERLIN NOISE SPECIFIC
 
 uniform float perlinAmplitude = 0.5;
-uniform float perlinFrecuency = 0.5;
-uniform float perlinScale = 128.0;
+uniform float perlinFrecuency = 0.8;
+uniform float perlinScale = 100.0;
 uniform int perlinOctaves = 3;
 
 float noiseInterpolation(in vec2 i_coord, in float i_size)

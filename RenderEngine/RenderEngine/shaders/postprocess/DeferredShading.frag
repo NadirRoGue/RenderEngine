@@ -121,7 +121,7 @@ vec3 processAtmosphericFog(in vec3 shadedColor)
 {
 	float d = length(pos);
 	d -= 15.0;
-	float lerpVal = d > 0.0? 1.0 / exp(0.001 * d * d) : 1.0;
+	float lerpVal = d > 0.0? 1.0 / exp(0.002 * d * d) : 1.0;
 	
 	return mix(ambientColor * colorFactor, shadedColor, lerpVal);
 }

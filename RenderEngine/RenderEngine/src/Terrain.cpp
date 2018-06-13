@@ -308,8 +308,8 @@ void Engine::Terrain::initialize()
 {
 	Engine::RenderableNotifier::getInstance().registerRenderable(this);
 
-	treesToSpawn = 16;
-	flowersToSpawn = 40;
+	treesToSpawn = 12;
+	flowersToSpawn = 35;
 
 	unsigned int jitterSize = treesToSpawn % 2 != 0 ? treesToSpawn + 1 : treesToSpawn;
 	int rows = (int)glm::ceil(sqrtf((float)jitterSize));

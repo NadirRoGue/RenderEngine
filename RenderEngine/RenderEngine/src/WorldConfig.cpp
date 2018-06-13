@@ -8,11 +8,11 @@ unsigned int Engine::Settings::travelMethod = 0;
 glm::vec3 Engine::Settings::lightColor = glm::vec3(1, 1, 1);
 glm::vec3 Engine::Settings::lightDirection = glm::vec3(1, 0.515, 0);
 
-float Engine::Settings::worldTileScale = 8.0f;
-unsigned int Engine::Settings::worldRenderRadius = 10;
+float Engine::Settings::worldTileScale = 7.0f;
+unsigned int Engine::Settings::worldRenderRadius = 12;
 
 float Engine::Settings::terrainAmplitude = 0.65f;
-float Engine::Settings::terrainFrecuency = 0.4f;
+float Engine::Settings::terrainFrecuency = 0.5f;
 float Engine::Settings::terrainScale = 0.9f;
 unsigned int Engine::Settings::terrainOctaves = 10;
 float Engine::Settings::vegetationMaxHeight = 0.1f;
@@ -24,7 +24,7 @@ glm::vec3 Engine::Settings::rockColor = glm::vec3(0.40f);
 glm::vec3 Engine::Settings::skyZenitColor = glm::vec3(0.0f, 0.5f, 1.0f);
 glm::vec3 Engine::Settings::skyHorizonColor = glm::vec3(0.8f, 0.85f, 1.0f);
 
-glm::vec3 Engine::Settings::waterColor = glm::vec3(0.f, 0.171f, 0.101f);
+glm::vec3 Engine::Settings::waterColor = glm::vec3(0.06f, 0.52f, 0.337f);
 float Engine::Settings::waterSpeed = 0.0025f;
 float Engine::Settings::waterHeight = 0.09f;
 
@@ -33,8 +33,8 @@ float Engine::Settings::cloudType = 0.5f;
 float Engine::Settings::coverageMultiplier = 0.228f;
 glm::vec3 Engine::Settings::cloudColor = glm::vec3(1, 1, 1);
 
-float Engine::Settings::hdrExposure = 3.3f;
-float Engine::Settings::hdrGamma = 0.5f;
+float Engine::Settings::hdrExposure = 6.0f;
+float Engine::Settings::hdrGamma = 0.368f;
 
 float Engine::Settings::godRaysDecay = 0.91f;
 float Engine::Settings::godRaysDensity = 1.192f;

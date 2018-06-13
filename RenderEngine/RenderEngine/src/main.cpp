@@ -123,7 +123,7 @@ void initOpenGL()
 void initScene()
 {
 	Engine::Camera * camera = new Engine::Camera(0.5f, 75.0f, 35.0f);
-	camera->translateView(glm::vec3(23.0f, -8.0f, -44.0f));
+	camera->translateView(glm::vec3(-197.0f, -10.0f, -130.0f));
 
 	Engine::Scene * scene = new Engine::Scene();
 	scene->setCamera(camera);

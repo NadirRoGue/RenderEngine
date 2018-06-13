@@ -115,7 +115,7 @@ void Engine::Window::GLFWWindow::initializeContext()
 
 	glfwSetWindowPos(window, windowPosX, windowPosY);
 
-	glfwSwapInterval(0);
+	glfwSwapInterval(2);
 
 	initGlew();
 

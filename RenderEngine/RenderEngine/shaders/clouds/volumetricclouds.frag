@@ -60,8 +60,8 @@ uniform float bayerFilter[16u] = float[]
 	15.0*BAYER_FACTOR, 7.0*BAYER_FACTOR, 13.0*BAYER_FACTOR, 5.0*BAYER_FACTOR
 );
 
-#define CLOUD_TOP_OFFSET 10.0
-#define WIND_DIRECTION vec3(1,0,0)
+#define CLOUD_TOP_OFFSET 25.0
+#define WIND_DIRECTION vec3(1,-0.2,0)
 
 #define SPHERE_PROJECTION
 
@@ -71,10 +71,10 @@ vec3 sphereCenter;
 float chunkLen;
 #define SPHERE_Y -1900.0
 #define SPHERE_INNER_RADIUS 2000.0
-#define SPHERE_OUTER_RADIUS 2150.0
-//#define SPHERE_Y -2500.0
-//#define SPHERE_INNER_RADIUS 2565.0
-//#define SPHERE_OUTER_RADIUS 2757.3
+#define SPHERE_OUTER_RADIUS 2125.0
+//#define SPHERE_Y -8500.0
+//#define SPHERE_INNER_RADIUS 8600.0
+//#define SPHERE_OUTER_RADIUS 8750.0
 #define SPHERE_DELTA float(SPHERE_OUTER_RADIUS - SPHERE_INNER_RADIUS)
 #else
 uniform vec3 planeMin = vec3(-2000, 30.0, -2000);
@@ -398,7 +398,7 @@ bool intersectSphere(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 
 	chunkLen = length(maxT - minT);
 
-	return minT.y > -100.0; // only above the horizon
+	return minT.y > -500.0; // only above the horizon
 }
 #else 
 bool intersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
@@ -475,7 +475,7 @@ void main()
 			vec4 ambientColor = vec4(mix(horizonColor, zenitColor, 0.15), 0.6);
 
 			float dist = length(startPos - camPos);
-			float radius = (camPos.y - sphereCenter.y) * 0.2;
+			float radius = (camPos.y - sphereCenter.y) * 0.3;
 			float alpha = clamp(dist / radius, 0.0, 1.0);
 			finalColor = mix(finalColor, ambientColor * colorFactor, alpha);
 	#endif

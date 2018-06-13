@@ -46,11 +46,11 @@ float getShadowVisibility(vec3 rawNormal)
 			visibility -= 0.25 * ( texture(depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0).x  <  curDepth? 1.0 : 0.0 );
 		}
 	}
-	else if(whithinRange(inShadowMapPos1.xy))
+	/*else if(whithinRange(inShadowMapPos1.xy))
 	{
 		float curDepth = inShadowMapPos1.z - bias;
 		visibility = texture(depthTexture1, inShadowMapPos1.xy).x < curDepth? 0.0 : 1.0;
-	}
+	}*/
 
 	return visibility;
 }

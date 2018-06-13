@@ -22,16 +22,11 @@ Engine::CloudSystem::VolumetricClouds::VolumetricClouds()
 	shader->configureMeshBuffers(renderPlane);
 	filterShader->configureMeshBuffers(renderPlane);
 
-	filterBuffer = new Engine::DeferredRenderObject(1, false);
-	colorB = filterBuffer->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 1024, 1024, "", GL_NEAREST);
-	filterBuffer->addDepthBuffer24(1024, 1024);
-	filterBuffer->initialize();
-
 	for (int i = 0; i < 2; i++)
 	{
 		reprojectionBuffer[i] = new Engine::DeferredRenderObject(1, false);
 		reprojectionBuffer[i]->setResizeMod(0.5f);
-		reproBuffer[i] = reprojectionBuffer[i]->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 1024, 1024, "", GL_NEAREST);
+		reproBuffer[i] = reprojectionBuffer[i]->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 512, 1024, "", GL_NEAREST);
 		reprojectionBuffer[i]->addDepthBuffer24(1024, 1024);
 		reprojectionBuffer[i]->initialize();
 	}
@@ -47,11 +42,9 @@ void Engine::CloudSystem::VolumetricClouds::render(Engine::Camera * cam)
 
 	int frameMod = Engine::Time::frame % 2;
 
-
 	// Render clouds
-	//glBindFramebuffer(GL_FRAMEBUFFER, filterBuffer->getFrameBufferId());
 	glBindFramebuffer(GL_FRAMEBUFFER, reprojectionBuffer[frameMod]->getFrameBufferId());
-	glClear(GL_COLOR_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT);
 	shader->use();
 	shader->onRenderObject(NULL, cam);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -64,7 +57,7 @@ void Engine::CloudSystem::VolumetricClouds::render(Engine::Camera * cam)
 
 	filterShader->use();
 	filterShader->onRenderObject(NULL, cam);
-	filterShader->setBufferInput(reproBuffer[0], reproBuffer[1]);
+	filterShader->setBufferInput(&reproBuffer[0]);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	glDisable(GL_BLEND);
