@@ -18,6 +18,9 @@ layout (location=5) in vec3 tangentVector;
 uniform mat4 normal;
 uniform mat4 modelView;
 
+uniform float worldScale;
+uniform float renderRadius;
+
 uniform sampler2D depthTexture;
 uniform sampler2D depthTexture1;
 
@@ -233,7 +236,7 @@ void main()
 	float cosV = abs(dot(rawNormal, up));
 
 	// Compute bump normal
-	rawNormal = computeBumpNormal();
+	rawNormal = length(inPos) < float(renderRadius * worldScale) / 1.5? computeBumpNormal() : rawNormal;
 
 	// Correct normal if we have pass from +X to -X, from +Z to -Z, viceversa, or both
 	int xSign = sign(gridPos.x);

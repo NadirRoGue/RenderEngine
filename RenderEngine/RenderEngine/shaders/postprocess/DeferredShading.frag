@@ -28,9 +28,9 @@ uniform int numPointLights;
 
 layout(std140, binding = 0) uniform DLBuffer
 {
-	vec4 DLdirection [];
-	vec4 DLcolor [];
-	vec4 DLkFactors [];
+	vec4 DLdirection [1];
+	vec4 DLcolor [1];
+	vec4 DLkFactors [1];
 };
 
 /*
@@ -120,7 +120,8 @@ vec3 processDirectionalLight(in float visibility)
 vec3 processAtmosphericFog(in vec3 shadedColor)
 {
 	float d = length(pos);
-	float lerpVal = 1.0 / exp(0.001 * d * d);
+	d -= 15.0;
+	float lerpVal = d > 0.0? 1.0 / exp(0.001 * d * d) : 1.0;
 	
 	return mix(ambientColor * colorFactor, shadedColor, lerpVal);
 }
@@ -144,7 +145,9 @@ void main()
 	Ks = gbufferspec.rgb;
 	Ke = gbufferemissive.rgb;
 
+	//float alpha = -(normalize(-abs(pos)).y) * 0.6;
 	colorFactor = clamp(dot(worldUp, DLdirection[0].xyz), 0.0, 1.0);
+	//float alpha = clamp(dot(worldUp, normalize(pos)), 0.0, 1.0);
 	ambientColor = mix(horizonColor, zenitColor, 0.2);
 
 	vec3 shaded = processDirectionalLight(gbufferinfo.y);

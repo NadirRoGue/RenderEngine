@@ -10,6 +10,8 @@ layout (location=0) out vec2 outUV[];
 
 uniform mat4 modelView;
 
+uniform float worldScale;
+
 void main()
 {
 	outUV[gl_InvocationID] = inUV[gl_InvocationID];
@@ -33,22 +35,22 @@ void main()
 		
 		closer = max(closer, 1.0);
 
-		float lod0Factor = (la * lc);
+		float lod0Factor = (la * lc) * (2.0 / worldScale);
 		lod0Factor = max(lod0Factor, 1.0);
 
-		float lod1Factor = (la * lb);
+		float lod1Factor = (la * lb) * (2.0 / worldScale);
 		lod1Factor = max(lod1Factor, 1.0);
 
-		float lod2Factor = (lb * lc);
+		float lod2Factor = (lb * lc) * (2.0 / worldScale);
 		lod2Factor = max(lod2Factor, 1.0);
 
-		float ilodFactor = (closer * closer);
+		float ilodFactor = (closer * closer) * (2.0 / worldScale);
 		ilodFactor = max(ilodFactor, 1.0);
 
-		float LOD0 = max(floor(400.0 / lod0Factor), 5.0);
-		float LOD1 = max(floor(400.0 / lod1Factor), 5.0);
-		float LOD2 = max(floor(400.0 / lod2Factor), 5.0);
-		float ILOD = max(floor(400.0 / ilodFactor), 5.0);
+		float LOD0 = max(floor(400.0 / lod0Factor), worldScale);
+		float LOD1 = max(floor(400.0 / lod1Factor), worldScale);
+		float LOD2 = max(floor(400.0 / lod2Factor), worldScale);
+		float ILOD = max(floor(400.0 / ilodFactor), worldScale);
 
 		// 0 : a - c
 		// 1 : a - b

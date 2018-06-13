@@ -32,6 +32,8 @@ uniform mat4 lightDepthMat1;
 
 uniform vec2 tileUV;
 
+uniform float worldScale;
+
 // ===============================================================================
 
 uniform float amplitude;
@@ -94,7 +96,7 @@ void main()
 
 	if(height > waterHeight && height < maxHeight)
 	{
-		vec4 displacement = vec4(0, height * 1.5 * 5.0, 0, 0);
+		vec4 displacement = vec4(0, height * 1.5 * worldScale, 0, 0);
 
 		vec4 a = gl_in[0].gl_Position + displacement;
 		vec4 b = gl_in[1].gl_Position + displacement;

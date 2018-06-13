@@ -122,8 +122,8 @@ void initOpenGL()
 // Creates a new scene and activates it
 void initScene()
 {
-	Engine::Camera * camera = new Engine::Camera(0.5f, 1000.0f, 35.0f);
-	camera->translateView(glm::vec3(30.0f, -5.0f, -50.0f));
+	Engine::Camera * camera = new Engine::Camera(0.5f, 75.0f, 35.0f);
+	camera->translateView(glm::vec3(23.0f, -8.0f, -44.0f));
 
 	Engine::Scene * scene = new Engine::Scene();
 	scene->setCamera(camera);
@@ -182,7 +182,7 @@ void initSceneObj()
 	scene->setDirectionalLight(dl);
 
 	// Set a terrain
-	scene->setTerrain(new Engine::Terrain(5.0f, 15));
+	scene->setTerrain(new Engine::Terrain(Engine::Settings::worldTileScale, Engine::Settings::worldRenderRadius));
 	// Set a skybox
 	scene->setSkybox(new Engine::SkyBox());
 	

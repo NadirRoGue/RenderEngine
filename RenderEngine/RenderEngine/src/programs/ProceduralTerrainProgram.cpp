@@ -35,6 +35,8 @@ Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerra
 	uNormal = other.uNormal;
 
 	uWaterLevel = other.uWaterLevel;
+	uWorldScale = other.uWorldScale;
+	uRenderRadius = other.uRenderRadius;
 
 	uLightDepthMatrix = other.uLightDepthMatrix;
 	uLightDepthMatrix1 = other.uLightDepthMatrix1;
@@ -130,6 +132,8 @@ void Engine::ProceduralTerrainProgram::configureProgram()
 	uDepthTexture1 = glGetUniformLocation(glProgram, "depthTexture1");
 
 	uWaterLevel = glGetUniformLocation(glProgram, "waterHeight");
+	uWorldScale = glGetUniformLocation(glProgram, "worldScale");
+	uRenderRadius = glGetUniformLocation(glProgram, "renderRadius");
 
 	uAmplitude = glGetUniformLocation(glProgram, "amplitude");
 	uFrecuency = glGetUniformLocation(glProgram, "frecuency");
@@ -186,8 +190,12 @@ void Engine::ProceduralTerrainProgram::applyGlobalUniforms()
 		glUniform3fv(uSandColor, 1, &Engine::Settings::sandColor[0]);
 
 		glUniform1f(uTime, Engine::Time::timeSinceBegining);
+
+		glUniform1f(uWorldScale, Engine::Settings::worldTileScale);
+		glUniform1f(uRenderRadius, (float)Engine::Settings::worldRenderRadius);
 	}
 
+	glUniform1f(uWorldScale, Engine::Settings::worldTileScale);
 	glUniform1f(uAmplitude, Engine::Settings::terrainAmplitude);
 	glUniform1f(uFrecuency, Engine::Settings::terrainFrecuency);
 	glUniform1f(uScale, Engine::Settings::terrainScale);

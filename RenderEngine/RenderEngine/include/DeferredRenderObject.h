@@ -41,6 +41,8 @@ namespace Engine
 
 		bool renderDepth;
 
+		float widthMod, heightMod;
+
 	public:
 		DeferredRenderObject(unsigned int numColorBuffers, bool renderDepth);
 		~DeferredRenderObject();
@@ -53,6 +55,7 @@ namespace Engine
 		TextureInstance * getBufferByName(std::string name);
 
 		void initialize();
+		void setResizeMod(float widthMod = 1.0f, float heightMod = 1.0f);
 		void resizeFBO(unsigned int w, unsigned int h);
 
 		void populateDeferredObject(PostProcessObject * obj);

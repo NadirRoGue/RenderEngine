@@ -64,6 +64,8 @@ namespace Engine
 		unsigned int uWaterLevel;
 		// Normalized max vegetation spawn height id
 		unsigned int uMaxHeight;
+		// World tile scale
+		unsigned int uWorldScale;
 
 		// Vetex position attribute id
 		unsigned int uInPos;

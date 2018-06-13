@@ -8,8 +8,11 @@ unsigned int Engine::Settings::travelMethod = 0;
 glm::vec3 Engine::Settings::lightColor = glm::vec3(1, 1, 1);
 glm::vec3 Engine::Settings::lightDirection = glm::vec3(1, 0.515, 0);
 
-float Engine::Settings::terrainAmplitude = 0.6f;
-float Engine::Settings::terrainFrecuency = 0.5f;
+float Engine::Settings::worldTileScale = 8.0f;
+unsigned int Engine::Settings::worldRenderRadius = 10;
+
+float Engine::Settings::terrainAmplitude = 0.65f;
+float Engine::Settings::terrainFrecuency = 0.4f;
 float Engine::Settings::terrainScale = 0.9f;
 unsigned int Engine::Settings::terrainOctaves = 10;
 float Engine::Settings::vegetationMaxHeight = 0.1f;

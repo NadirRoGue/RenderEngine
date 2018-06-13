@@ -17,6 +17,8 @@ namespace Engine
 			CloudFilterProgram * filterShader;
 			Mesh * renderPlane;
 
+			DeferredRenderObject * reprojectionBuffer[2];
+			TextureInstance * reproBuffer[2];
 			DeferredRenderObject * filterBuffer;
 			TextureInstance * colorB;
 		public:

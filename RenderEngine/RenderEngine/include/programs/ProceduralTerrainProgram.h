@@ -59,6 +59,10 @@ namespace Engine
 
 		// Normalized water height (0 - 1) id
 		unsigned int uWaterLevel;
+		// World tile scale
+		unsigned int uWorldScale;
+		// Terrain render radius
+		unsigned int uRenderRadius;
 
 		// Time passed id
 		unsigned int uTime;

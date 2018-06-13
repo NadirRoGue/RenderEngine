@@ -31,6 +31,7 @@ Engine::TreeProgram::TreeProgram(const TreeProgram & other)
 	uFrecuency = other.uFrecuency;
 	uScale = other.uScale;
 	uOctaves = other.uOctaves;
+	uWorldScale = other.uWorldScale;
 	uLightDir = other.uLightDir;
 	uWaterLevel = other.uWaterLevel;
 	uMaxHeight = other.uMaxHeight;
@@ -102,6 +103,7 @@ void Engine::TreeProgram::configureProgram()
 	uMaxHeight = glGetUniformLocation(glProgram, "maxHeight");
 	uDepthMap0 = glGetUniformLocation(glProgram, "depthTexture");
 	uDepthMap1 = glGetUniformLocation(glProgram, "depthTexture1");
+	uWorldScale = glGetUniformLocation(glProgram, "worldScale");
 
 	uInPos = glGetAttribLocation(glProgram, "inPos");
 	uInColor = glGetAttribLocation(glProgram, "inColor");
@@ -159,6 +161,7 @@ void Engine::TreeProgram::applyGlobalUniforms()
 	}
 
 	glUniform1f(uMaxHeight, Engine::Settings::waterHeight + Engine::Settings::vegetationMaxHeight);
+	glUniform1f(uWorldScale, Engine::Settings::worldTileScale);
 }
 
 void Engine::TreeProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)

@@ -2,6 +2,7 @@
 
 #include "Renderer.h"
 #include "WorldConfig.h"
+#include "TimeAccesor.h"
 
 std::string Engine::CloudFilterProgram::PROGRAM_NAME = "CloudFilterProgram";
 
@@ -15,8 +16,9 @@ Engine::CloudFilterProgram::CloudFilterProgram(const Engine::CloudFilterProgram 
 	: PostProcessProgram(other)
 {
 	uTexelSize = other.uTexelSize;
-
-	uGColor = other.uGColor;
+	uFrame = other.uFrame;
+	uEvenFrame = other.uEvenFrame;
+	uOddFrame = other.uOddFrame;
 }
 
 Engine::CloudFilterProgram::~CloudFilterProgram()
@@ -28,19 +30,26 @@ void Engine::CloudFilterProgram::configureProgram()
 	PostProcessProgram::configureProgram();
 
 	uTexelSize = glGetUniformLocation(glProgram, "texelSize");
-	uGColor = glGetUniformLocation(glProgram, "gColor");
+	uEvenFrame = glGetUniformLocation(glProgram, "evenFrame");
+	uOddFrame = glGetUniformLocation(glProgram, "oddFrame");
+	uFrame = glGetUniformLocation(glProgram, "frame");
 }
 
 void Engine::CloudFilterProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
 	glUniform2f(uTexelSize, 1.0f / ((float)ScreenManager::SCREEN_WIDTH), 1.0f / ((float)ScreenManager::SCREEN_HEIGHT));
+	glUniform1i(uFrame, (GLint)Engine::Time::frame);
 }
 
-void Engine::CloudFilterProgram::setBufferInput(const Engine::TextureInstance * color)
+void Engine::CloudFilterProgram::setBufferInput(const Engine::TextureInstance * color,  const Engine::TextureInstance * color2)
 {
-	glUniform1i(uGColor, 0);
+	glUniform1i(uEvenFrame, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, color->getTexture()->getTextureId());
+
+	glUniform1i(uOddFrame, 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, color2->getTexture()->getTextureId());
 }
 
 // ===============================================================================

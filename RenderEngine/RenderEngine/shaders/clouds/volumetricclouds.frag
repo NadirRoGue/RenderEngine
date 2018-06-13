@@ -69,12 +69,12 @@ uniform float bayerFilter[16u] = float[]
 #ifdef SPHERE_PROJECTION
 vec3 sphereCenter;
 float chunkLen;
-//#define sphereY -1900.0
-//#define sphereInnerRadius 2000.0
-//#define sphereOuterRadius 2150.0
-#define SPHERE_Y -2500.0
-#define SPHERE_INNER_RADIUS 2565.0
-#define SPHERE_OUTER_RADIUS 2757.3
+#define SPHERE_Y -1900.0
+#define SPHERE_INNER_RADIUS 2000.0
+#define SPHERE_OUTER_RADIUS 2150.0
+//#define SPHERE_Y -2500.0
+//#define SPHERE_INNER_RADIUS 2565.0
+//#define SPHERE_OUTER_RADIUS 2757.3
 #define SPHERE_DELTA float(SPHERE_OUTER_RADIUS - SPHERE_INNER_RADIUS)
 #else
 uniform vec3 planeMin = vec3(-2000, 30.0, -2000);
@@ -432,31 +432,24 @@ bool intersectBox(vec3 o, vec3 d, out vec3 minT, out vec3 maxT)
 
 void main()
 {
-	// Simple temporal reprojection. Render half a frame per iteration.
-	int fx = int(gl_FragCoord.x);
-	// Faster, but has more artifacts
-	//fx /= 32;
-	//if(fx % 4 != frame % 4)
-	//	discard;
-	int cuarter = int(ceil(screenResolution.x / 2.0));
-	int screenStart = (frame % 2) * cuarter;
-	if(fx < screenStart || fx > screenStart + cuarter)
+	// Frag coordinates must be adjusted to perform temporal reprojection
+	// We are rendering a half width frame, but the rays direction (based on the screen coordinates)
+	// should account for the final result (full hd screen size)
+	int frameIter = frame % 2;
+	vec2 fragCoord = vec2(gl_FragCoord.x * 2.0 + frameIter, gl_FragCoord.y);
+	
+	// Do now raymarch the clouds if the fragment is occluded
+	if(texture(currentPixelDepth, vec2(fragCoord / screenResolution)).x < 1.0)
 	{
-		discard;
-	}
-
-	// Do not compute clouds if they are not going to be visible
-	if(texture(currentPixelDepth, texCoord).x < 1.0)
-	{
-		color = vec4(0);
+		color = vec4(0,0,0,0);
 	}
 	else
 	{
 #ifdef SPHERE_PROJECTION
 		sphereCenter = vec3(camPos.x, SPHERE_Y, camPos.z);
 #endif
-		// Ray direction
-		vec2 fulluv = gl_FragCoord.xy - screenResolution / 2.0;
+		// computing ray direction based on screen coordinates adn camera fov
+		vec2 fulluv = fragCoord - screenResolution / 2.0;
 		float z =  screenResolution.y / tan(radians(FOV));
 		vec3 viewDir = normalize(vec3(fulluv, -z / 2.0));
 		vec3 worldDir = normalize( (invView * vec4(viewDir, 0)).xyz);
@@ -479,7 +472,7 @@ void main()
 
 	#ifdef SPHERE_PROJECTION
 			float colorFactor = clamp(dot(vec3(0,1,0), lightDir), 0.0, 1.0);
-			vec4 ambientColor = vec4(mix(horizonColor, zenitColor, 0.2), 0.6);
+			vec4 ambientColor = vec4(mix(horizonColor, zenitColor, 0.15), 0.6);
 
 			float dist = length(startPos - camPos);
 			float radius = (camPos.y - sphereCenter.y) * 0.2;
@@ -491,7 +484,8 @@ void main()
 		}
 		else
 		{
-			discard;
+			//discard;
+			color = vec4(0);
 		}
 	}
 }

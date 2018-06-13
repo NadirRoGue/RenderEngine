@@ -19,8 +19,13 @@ namespace Engine
 		// texel size (1/bufferwidth, 1/bufferheight)
 		unsigned int uTexelSize;
 
-		// G-Buffer color data
-		unsigned int uGColor;
+		// Alternate rendered frames for temporal reprojection
+		// even frame will contain all pixels with an even x coordinate
+		unsigned int uEvenFrame;
+		// odd frame will contain all pixels with an odd x coordinate
+		unsigned int uOddFrame;
+		// Current frame to process
+		unsigned int uFrame;
 	public:
 		CloudFilterProgram(std::string name, unsigned long long params);
 		CloudFilterProgram(const CloudFilterProgram & other);
@@ -29,7 +34,7 @@ namespace Engine
 		virtual void configureProgram();
 		virtual void onRenderObject(const Object * obj, Camera * camera);
 		
-		void setBufferInput(const TextureInstance * color);
+		void setBufferInput(const TextureInstance * evenFrame, const TextureInstance * oddFrame);
 	};
 
 	// ========================================================================

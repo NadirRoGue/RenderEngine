@@ -9,10 +9,13 @@ layout (location=2) out vec4 outGodRays;
 
 in vec2 texCoord;
 
-//Textura
-uniform sampler2D gColor;
+//Textures
+uniform sampler2D evenFrame;
+uniform sampler2D oddFrame;
 
 uniform vec2 texelSize;
+
+uniform int frame;
 
 #define maskSize 25u
 #define maskFactor 1.0/65.0
@@ -31,14 +34,33 @@ uniform float bigkernel[maskSize] = float[](
 	2.0*maskFactor, 3.0*maskFactor, 4.0*maskFactor,3.0*maskFactor, 2.0*maskFactor,
 	1.0*maskFactor, 2.0*maskFactor, 3.0*maskFactor,2.0*maskFactor, 1.0*maskFactor);
 
+vec4 getCloudInfo(vec2 modUV)
+{
+	int x = int(gl_FragCoord.x + modUV.x);
+	float y = gl_FragCoord.y + modUV.y;
+
+	float u = (float(x) * texelSize.x);
+	float v = y * texelSize.y;
+
+	int frameIter = frame % 2;
+	if(frameIter == x % 2)
+	{
+		return frameIter == 0? texture(evenFrame, vec2(u,v)) : texture(oddFrame, vec2(u,v));
+	}
+	else
+	{
+		return frameIter == 1? texture(evenFrame, vec2(u,v)) : texture(oddFrame, vec2(u,v));
+	}
+}
+
 void main()
 {
 	vec4 color = vec4 (0.0);
 
 	for (uint i = 0u; i < maskSize; i++)
 	{
-		vec2 iidx = texCoord + texelSize * bigaffectedTexels[i];
-		color += texture(gColor, iidx,0.0) * bigkernel[i];
+		//vec2 iidx = texCoord + texelSize * bigaffectedTexels[i];
+		color += getCloudInfo(bigaffectedTexels[i]) * bigkernel[i];//texture(gColor, iidx,0.0) * bigkernel[i];
 	}
 
 	outColor = color;

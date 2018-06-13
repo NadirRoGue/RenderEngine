@@ -28,6 +28,9 @@ namespace Engine
 		static glm::vec3 lightColor;
 		static glm::vec3 lightDirection;
 
+		static float worldTileScale;
+		static unsigned int worldRenderRadius;
+
 		static float terrainAmplitude;
 		static float terrainFrecuency;
 		static float terrainScale;

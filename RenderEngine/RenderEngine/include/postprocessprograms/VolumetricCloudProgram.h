@@ -59,8 +59,6 @@ namespace Engine
 
 		// Current frame id
 		unsigned int uFrame;
-		// Current frame
-		unsigned int f;
 	public:
 		VolumetricCloudProgram(std::string name, unsigned long long params);
 		VolumetricCloudProgram(const VolumetricCloudProgram & other);

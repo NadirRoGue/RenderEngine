@@ -27,7 +27,7 @@ void Engine::CascadeShadowMaps::init()
 
 	// Initialize shadow maps
 	initializeShadowMap(0, -5.0f, 5.0f, -5.0f, 5.0f, 0.1f, 50.0f);
-	initializeShadowMap(1, -20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 100.0f);
+	initializeShadowMap(1, -40.0f, 40.0f, -40.0f, 40.0f, 0.1f, 120.0f);
 }
 
 void Engine::CascadeShadowMaps::initializeShadowMap(int level, float minX, float maxX, float minY, float maxY, float minZ, float maxZ)
