@@ -14,6 +14,13 @@ layout (location=2) in vec3 inNormal;
 layout (location=3) in vec3 inEmission;
 layout (location=4) in vec3 inShadowMapPos;
 layout (location=5) in vec3 inShadowMapPos1;
+layout (location=6) in vec3 inWorldPos;
+layout (location=7) in vec2 inNDotAxis;
+
+uniform float Tamplitude = 0.5;
+uniform float Tfrecuency = 0.5;
+uniform float Tscale = 10.0;
+uniform int Toctaves = 5;
 
 uniform sampler2D depthTexture;
 uniform sampler2D depthTexture1;
@@ -28,6 +35,52 @@ uniform vec2 poissonDisk[4] = vec2[](
   vec2( -0.094184101, -0.92938870 ),
   vec2( 0.34495938, 0.29387760 )
 );
+
+// ================================================================================
+float Random2D(in vec2 st)
+{
+	return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+float NoiseInterpolation(in vec2 i_coord, in float i_size)
+{
+	vec2 grid = i_coord *i_size;
+
+	vec2 randomInput = floor(grid);
+	vec2 weights = fract(grid);
+
+
+	float p0 = Random2D(randomInput);
+	float p1 = Random2D(randomInput + vec2(1.0, 0.0));
+	float p2 = Random2D(randomInput + vec2(0.0, 1.0));
+	float p3 = Random2D(randomInput + vec2(1.0, 1.0));
+
+	weights = smoothstep(vec2(0.0, 0.0), vec2(1.0, 1.0), weights);
+
+	return p0 +
+		(p1 - p0) * (weights.x) +
+		(p2 - p0) * (weights.y) * (1.0 - weights.x) +
+		(p3 - p1) * (weights.y * weights.x);
+}
+
+float noise(in vec2 pos)
+{
+
+	float noiseValue = 0.0;
+
+	float localAplitude = Tamplitude;
+	float localFrecuency = Tfrecuency;
+
+	for (int index = 0; index < Toctaves; index++)
+	{
+		noiseValue += NoiseInterpolation(pos, Tscale * localFrecuency) * localAplitude;
+
+		localAplitude /= 2.0;
+		localFrecuency *= 2.0;
+	}
+
+	return noiseValue;// * noiseValue * noiseValue * 0.01;
+}
 
 bool whithinRange(vec2 texCoord)
 {
@@ -55,9 +108,34 @@ float getShadowVisibility(vec3 rawNormal)
 	return visibility;
 }
 
+bool discardLeaf()
+{
+	float upSign = sign(inNDotAxis.x);
+	float leftSign = sign(inNDotAxis.y);
+	float cosUp = abs(inNDotAxis.x);
+	float cosRight = abs(inNDotAxis.y);
+	vec2 coords;
+	if(cosUp < 0.5)
+	{
+		if(cosRight < 0.5)
+		{
+			coords = upSign < 0.0? inWorldPos.yz : inWorldPos.zy;
+		}
+		else
+		{
+			coords = upSign < 0.0? inWorldPos.yx : inWorldPos.xy;
+		}
+	}
+	else
+	{
+		coords = leftSign < 0.0? inWorldPos.zx : inWorldPos.xz;
+	}
+
+	return noise(coords) < 0.75;
+}
+
 #else
 layout (location=0) out vec4 lightdepth;
-
 #endif
 
 void main()
@@ -72,6 +150,8 @@ void main()
 	outPos = vec4(inPos, 1);
 	outInfo = vec4(0);
 #else
+	if(inEmission.x == 1.0 && discardLeaf())
+		discard;
 	// APPLY SHADOW MAP
 	// ------------------------------------------------------------------------------
 	float visibility = getShadowVisibility(rawNormal);
@@ -79,7 +159,7 @@ void main()
 	outColor = vec4(inColor, 1.0);
 	outNormal = vec4(rawNormal, 1);
 	outSpecular = vec4(0,0,0,0);
-	outEmissive = vec4(inEmission.rgb,1);
+	outEmissive = vec4(inEmission.y > 0.0? inColor * 0.2 : vec3(0),1);
 	outPos = vec4(inPos, 1);
 	outInfo = vec4(0.0, visibility,0,1);
 #endif

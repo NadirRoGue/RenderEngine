@@ -18,6 +18,8 @@ layout (location=2) out vec3 outNormal;
 layout (location=3) out vec3 outEmission;
 layout (location=4) out vec3 lightDepth;
 layout (location=5) out vec3 lightDepth1;
+layout (location=6) out vec3 outWorldPos;
+layout (location=7) out vec2 outNDotAxis;
 
 uniform mat4 normal;
 uniform mat4 modelView;
@@ -103,8 +105,11 @@ void main()
 		vec4 c = gl_in[2].gl_Position + displacement;
 
 #ifndef SHADOW_MAP
+		outWorldPos = a.xyz;
 		outColor = inColor[0];
 		outEmission = inEmission[0];
+		outNDotAxis.x = (dot(inNormal[0], vec3(0,1,0)));
+		outNDotAxis.y = (dot(inNormal[0], vec3(1,0,0)));
 		outNormal = (normal * vec4(inNormal[0], 0)).xyz;
 		outPos = (modelView * a).xyz;
 		lightDepth = (lightDepthMat * a).xyz;
@@ -112,8 +117,11 @@ void main()
 		gl_Position = modelViewProj * a;
 		EmitVertex();
 
+		outWorldPos = b.xyz;
 		outColor = inColor[1];
 		outEmission = inEmission[1];
+		outNDotAxis.x = (dot(inNormal[1], vec3(0,1,0)));
+		outNDotAxis.y = (dot(inNormal[1], vec3(1,0,0)));
 		outNormal = (normal * vec4(inNormal[1], 0)).xyz;
 		outPos = (modelView * b).xyz;
 		lightDepth = (lightDepthMat * b).xyz;
@@ -121,8 +129,11 @@ void main()
 		gl_Position = modelViewProj * b;
 		EmitVertex();
 
+		outWorldPos = c.xyz;
 		outColor = inColor[2];
 		outEmission = inEmission[2];
+		outNDotAxis.x = (dot(inNormal[2], vec3(0,1,0)));
+		outNDotAxis.y = (dot(inNormal[2], vec3(1,0,0)));
 		outNormal = (normal * vec4(inNormal[2], 0)).xyz;
 		outPos = (modelView * c).xyz;
 		lightDepth = (lightDepthMat * c).xyz;

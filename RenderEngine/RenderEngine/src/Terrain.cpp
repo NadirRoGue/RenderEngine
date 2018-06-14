@@ -458,7 +458,7 @@ void Engine::Terrain::addTrees()
 		Engine::TreeGenerationData treeData;
 		treeData.treeName = std::string("Tree_") + std::to_string(i);
 		treeData.emissiveLeaf = leafColor(eLeaf) > 0.8f;
-		treeData.startTrunkColor = trunkColor(eTrunk) >= 0.5f? glm::vec3(0.2f, 0.1f, 0.0f) : glm::vec3(0.65f, 0.65f, 0.65f);
+		treeData.startTrunkColor = trunkColor(eTrunk) >= 0.5f? glm::vec3(0.2f, 0.2f, 0.0f) : glm::vec3(0.65f, 0.65f, 0.65f);
 		treeData.endTrunkColor = treeData.startTrunkColor;
 		treeData.leafStartColor = glm::vec3(1.0 - leafColor(eLeaf), 1.0 - leafColor(eLeaf), 1.0 - leafColor(eLeaf));
 		treeData.leafEndColor = treeData.leafStartColor;

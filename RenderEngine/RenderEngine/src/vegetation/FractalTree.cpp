@@ -151,7 +151,7 @@ void Engine::FractalTree::addLeaf(glm::mat4 & origin, glm::vec3 lastScaling, siz
 	glm::vec3 translation(0, maxScale, 0);
 	glm::mat4 model = origin * glm::translate(glm::mat4(1.0f), translation);
 
-	appendVerticesAndFaces(base, model, glm::vec3(maxScale) * glm::vec3(0.15, 0.6, 0.15), 0, offset, true, true);
+	appendVerticesAndFaces(base, model, glm::vec3(maxScale) * glm::vec3(0.4, 0.3, 0.4), 0, offset, true, true);
 }
 
 void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat4 & model, glm::vec3 scale, unsigned int depth, size_t vOffset, bool keepBase, bool isLeaf)
@@ -221,14 +221,10 @@ void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat
 		{
 			glm::vec3 color = glm::mix(treeData.leafStartColor, treeData.leafEndColor, verts[index + 1] / delta);
 			// Add leaf color and possible emission
-			if (treeData.emissiveLeaf)
-			{
-				emission.push_back(color);
-			}
-			else
-			{
-				emission.push_back(glm::vec3(0, 0, 0));
-			}
+			glm::vec3 data;
+			data.x = 1.0f;
+			data.y = treeData.emissiveLeaf ? 1.0f : 0.0f;
+			emission.push_back(data);
 			colors.push_back(color);
 		}
 	}
