@@ -29,6 +29,7 @@ Engine::VolumetricCloudProgram::VolumetricCloudProgram(const Engine::VolumetricC
 	uCamPos = other.uCamPos;
 	uLightDir = other.uLightDir;
 	uLightColor = other.uLightColor;
+	uLightFactor = other.uLightFactor;
 	uCloudColor = other.uCloudColor;
 	uZenitColor = other.uZenitColor;
 	uHorizonColor = other.uHorizonColor;
@@ -56,7 +57,8 @@ void Engine::VolumetricCloudProgram::configureProgram()
 
 	uCamPos = glGetUniformLocation(glProgram, "camPos");
 	uLightDir = glGetUniformLocation(glProgram, "lightDir");
-	uLightColor = glGetUniformLocation(glProgram, "lightColor");
+	uLightColor = glGetUniformLocation(glProgram, "realLightColor");
+	uLightFactor = glGetUniformLocation(glProgram, "lightFactor");
 	uCloudColor = glGetUniformLocation(glProgram, "cloudColor");
 	uZenitColor = glGetUniformLocation(glProgram, "zenitColor");
 	uHorizonColor = glGetUniformLocation(glProgram, "horizonColor");
@@ -83,7 +85,8 @@ void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, Engine
 
 	glm::vec3 normLightDir = glm::normalize(Engine::Settings::lightDirection);
 	glUniform3fv(uLightDir, 1, &normLightDir[0]);
-	glUniform3fv(uLightColor, 1, &Engine::Settings::lightColor[0]);
+	glUniform3fv(uLightColor, 1, &Engine::Settings::realLightColor[0]);
+	glUniform1f(uLightFactor, Engine::Settings::lightFactor);
 
 	glUniform3fv(uZenitColor, 1, &Engine::Settings::skyZenitColor[0]);
 	glUniform3fv(uHorizonColor, 1, &Engine::Settings::skyHorizonColor[0]);

@@ -19,7 +19,7 @@ uniform sampler2D postProcessing_6; // depth
 uniform vec3 zenitColor;
 uniform vec3 horizonColor;
 
-uniform vec3 worldUp;
+uniform float colorFactor;
 
 // Different lights data
 
@@ -62,7 +62,6 @@ vec3 Ke;
 vec3 N;
 float depth;
 float alpha = 50.0;
-float colorFactor;
 vec3 ambientColor;
 
 // ================================================================================
@@ -95,9 +94,8 @@ vec3 processDirectionalLight(in float visibility)
 
 	vec3 L = DLdirection[0].xyz;
 	vec3 lightColor = DLcolor[0].rgb;
-
-	lightColor.y = colorFactor > 0.4? mix(lightColor.y * 0.8, lightColor.y, (colorFactor - 0.4) / 0.6) : mix(0.5, lightColor.y, colorFactor / 0.4);
-	lightColor.z = colorFactor > 0.4? mix(lightColor.z * 0.8, lightColor.z, (colorFactor - 0.4) / 0.6) : mix(0.15, lightColor.z, colorFactor / 0.4);
+	lightColor.y *= colorFactor * 1.5;
+	lightColor.z *= colorFactor;
 
 	vec3 Kfactors = DLkFactors[0].xyz;
 
@@ -145,9 +143,6 @@ void main()
 	Ks = gbufferspec.rgb;
 	Ke = gbufferemissive.rgb;
 
-	//float alpha = -(normalize(-abs(pos)).y) * 0.6;
-	colorFactor = clamp(dot(worldUp, DLdirection[0].xyz), 0.0, 1.0);
-	//float alpha = clamp(dot(worldUp, normalize(pos)), 0.0, 1.0);
 	ambientColor = mix(horizonColor, zenitColor, 0.2);
 
 	vec3 shaded = processDirectionalLight(gbufferinfo.y);

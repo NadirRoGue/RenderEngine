@@ -22,7 +22,7 @@ Engine::DeferredShadingProgram::DeferredShadingProgram(const Engine::DeferredSha
 	uSkyHorizonColor = other.uSkyHorizonColor;
 	uSkyZenitColor = other.uSkyZenitColor;
 
-	uWorldUp = other.uWorldUp;
+	uColorFactor = other.uColorFactor;
 }
 
 void Engine::DeferredShadingProgram::processDirectionalLights(Engine::DirectionalLight * dl, const glm::mat4 & view)
@@ -53,8 +53,7 @@ void Engine::DeferredShadingProgram::onRenderObject(const Engine::Object * obj, 
 	glUniform3fv(uSkyZenitColor, 1, &Engine::Settings::skyZenitColor[0]);
 	glUniform3fv(uSkyHorizonColor, 1, &Engine::Settings::skyHorizonColor[0]);
 
-	glm::vec4 worldUp = camera->getViewMatrix() * glm::vec4(0, 1, 0, 0);
-	glUniform3fv(uWorldUp, 1, &worldUp[0]);
+	glUniform1f(uColorFactor, Engine::Settings::lightFactor);
 }
 
 void Engine::DeferredShadingProgram::configureProgram()
@@ -68,7 +67,7 @@ void Engine::DeferredShadingProgram::configureProgram()
 	uPLBuffer = glGetUniformBlockIndex(glProgram, "PLBuffer");
 	uSLBuffer = glGetUniformBlockIndex(glProgram, "SLBuffer");
 
-	uWorldUp = glGetUniformLocation(glProgram, "worldUp");
+	uColorFactor = glGetUniformLocation(glProgram, "colorFactor");
 }
 
 // =====================================================

@@ -25,7 +25,9 @@ namespace Engine
 		static unsigned int drawingMethod;
 		static unsigned int travelMethod;
 
+		static float lightFactor;
 		static glm::vec3 lightColor;
+		static glm::vec3 realLightColor;
 		static glm::vec3 lightDirection;
 
 		static float worldTileScale;
@@ -62,6 +64,8 @@ namespace Engine
 		static float godRaysWeight;
 
 		static bool showUI;
+	public:
+		static void update();
 	};
 
 	class RenderableNotifier

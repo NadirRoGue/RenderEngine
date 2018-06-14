@@ -31,6 +31,8 @@ namespace Engine
 		unsigned int uExposure;
 		// "Dont do anything" flag id
 		unsigned int uOnlyPass;
+
+		unsigned int uAlpha;
 	public:
 		SSGodRayProgram(std::string name, unsigned long long params);
 		SSGodRayProgram(const SSGodRayProgram & other);

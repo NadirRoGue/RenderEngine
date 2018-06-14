@@ -6,6 +6,8 @@ unsigned int Engine::Settings::drawingMethod = 0;
 unsigned int Engine::Settings::travelMethod = 0;
 
 glm::vec3 Engine::Settings::lightColor = glm::vec3(1, 1, 1);
+float Engine::Settings::lightFactor = 1.0f;
+glm::vec3 Engine::Settings::realLightColor = glm::vec3(1, 1, 1);
 glm::vec3 Engine::Settings::lightDirection = glm::vec3(1, 0.515, 0);
 
 float Engine::Settings::worldTileScale = 7.0f;
@@ -36,12 +38,20 @@ glm::vec3 Engine::Settings::cloudColor = glm::vec3(1, 1, 1);
 float Engine::Settings::hdrExposure = 6.0f;
 float Engine::Settings::hdrGamma = 0.368f;
 
-float Engine::Settings::godRaysDecay = 0.91f;
-float Engine::Settings::godRaysDensity = 1.192f;
-float Engine::Settings::godRaysExposure = 0.662f;
+float Engine::Settings::godRaysDecay = 0.904f;
+float Engine::Settings::godRaysDensity = 0.318f;
+float Engine::Settings::godRaysExposure = 0.515f;
 float Engine::Settings::godRaysWeight = 0.2f;
 
 bool Engine::Settings::showUI = false;
+
+void Engine::Settings::update()
+{
+	lightFactor = glm::clamp(glm::dot(glm::vec3(0, 1, 0), glm::normalize(lightDirection)), 0.0f, 1.0f);
+	realLightColor = lightColor;
+	realLightColor.y *= lightFactor * 1.5f;
+	realLightColor.z *= lightFactor;
+}
 
 // =====================================================================
 

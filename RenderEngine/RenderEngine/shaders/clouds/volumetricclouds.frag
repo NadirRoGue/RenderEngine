@@ -23,8 +23,9 @@ uniform sampler2D weather;
 
 // Light data
 uniform vec3 lightDir;
-uniform vec3 lightColor;
-vec3 realLightColor;
+//uniform vec3 lightColor;
+uniform vec3 realLightColor;
+uniform float lightFactor;
 
 uniform vec3 zenitColor;
 uniform vec3 horizonColor;
@@ -296,13 +297,13 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 #endif
 
 	// Light color attenuation based on sun's position
-	float lightFactor = (clamp(dot(vec3(0,1,0), lightDir), 0.0, 1.0));
-	realLightColor = lightColor;
-	realLightColor.y = lightFactor > 0.4? mix(lightColor.y * 0.8, lightColor.y, (lightFactor - 0.4) / 0.6) : mix(0.5, lightColor.y, lightFactor / 0.4);
-	realLightColor.z = lightFactor > 0.4? mix(lightColor.z * 0.8, lightColor.z, (lightFactor - 0.4) / 0.6) : mix(0.15, lightColor.z, lightFactor / 0.4);
+	//float lightFactor = (clamp(dot(vec3(0,1,0), lightDir), 0.0, 1.0));
+	//realLightColor = lightColor;
+	//realLightColor.y *= lightFactor * 1.5;
+	//realLightColor.z *= lightFactor;
 
-	float ambientFactor =  max(min(lightFactor * 2.0, 1.0), 0.1);
-	vec3 lc = lightColor * lightFactor * cloudColor;
+	float ambientFactor =  max(min(lightFactor, 1.0), 0.1);
+	vec3 lc = realLightColor * lightFactor * cloudColor;
 
 	// Ray march data
 	vec3 pos = startPos;
@@ -471,13 +472,12 @@ void main()
 			vec4 finalColor = vec4(outColor, density);
 
 	#ifdef SPHERE_PROJECTION
-			float colorFactor = clamp(dot(vec3(0,1,0), lightDir), 0.0, 1.0);
 			vec4 ambientColor = vec4(mix(horizonColor, zenitColor, 0.15), 0.6);
 
 			float dist = length(startPos - camPos);
 			float radius = (camPos.y - sphereCenter.y) * 0.3;
 			float alpha = clamp(dist / radius, 0.0, 1.0);
-			finalColor = mix(finalColor, ambientColor * colorFactor, alpha);
+			finalColor = mix(finalColor, ambientColor * lightFactor, alpha);
 	#endif
 
 			color = finalColor;

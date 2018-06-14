@@ -16,6 +16,7 @@ Engine::CloudFilterProgram::CloudFilterProgram(const Engine::CloudFilterProgram 
 	: PostProcessProgram(other)
 {
 	uTexelSize = other.uTexelSize;
+	uLightColor = other.uLightColor;
 	uRepro1 = other.uRepro1;
 	uRepro2 = other.uRepro2;
 	uRepro3 = other.uRepro3;
@@ -31,6 +32,7 @@ void Engine::CloudFilterProgram::configureProgram()
 	PostProcessProgram::configureProgram();
 
 	uTexelSize = glGetUniformLocation(glProgram, "texelSize");
+	uLightColor = glGetUniformLocation(glProgram, "realLightColor");
 	uRepro1 = glGetUniformLocation(glProgram, "repro1");
 	uRepro2 = glGetUniformLocation(glProgram, "repro2");
 	uRepro3 = glGetUniformLocation(glProgram, "repro3");
@@ -40,6 +42,7 @@ void Engine::CloudFilterProgram::configureProgram()
 void Engine::CloudFilterProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
 	glUniform2f(uTexelSize, 1.0f / ((float)ScreenManager::SCREEN_WIDTH), 1.0f / ((float)ScreenManager::SCREEN_HEIGHT));
+	glUniform3fv(uLightColor, 1, &Engine::Settings::realLightColor[0]);
 }
 
 void Engine::CloudFilterProgram::setBufferInput(Engine::TextureInstance ** buffer)

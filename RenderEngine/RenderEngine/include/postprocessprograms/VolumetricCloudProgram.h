@@ -39,6 +39,8 @@ namespace Engine
 		unsigned int uLightDir;
 		// Light color id
 		unsigned int uLightColor;
+		// Light factor (Based on sun's position) id
+		unsigned int uLightFactor;
 		// Zenit color id (fog / ambient)
 		unsigned int uZenitColor;
 		// Horizon color id (fog / ambient)

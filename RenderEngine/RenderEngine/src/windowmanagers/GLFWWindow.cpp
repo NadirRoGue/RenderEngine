@@ -115,7 +115,7 @@ void Engine::Window::GLFWWindow::initializeContext()
 
 	glfwSetWindowPos(window, windowPosX, windowPosY);
 
-	glfwSwapInterval(2);
+	glfwSwapInterval(1);
 
 	initGlew();
 
@@ -126,6 +126,9 @@ void Engine::Window::GLFWWindow::mainLoop()
 {
 	while (!glfwWindowShouldClose(window))
 	{
+		// Update secondary settings based on main settings changes
+		Engine::Settings::update();
+
 		// Render scene
 		Engine::RenderManager::getInstance().doRender();
 

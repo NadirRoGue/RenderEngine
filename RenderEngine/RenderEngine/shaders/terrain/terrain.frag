@@ -198,16 +198,16 @@ vec3 computeNormal()
 	return normalize(vec3(lH - rH, step * step, bH - tH));
 }
 
-vec3 computeBumpNormal()
+vec3 computeBumpNormal(int octaveCount)
 {
 	float u = inUV.x;
 	float v = inUV.y;
 	float step = 0.0025;
 	float slope = 2.0;
-	float tH = bumpNoiseHeight(vec2(u, v + step), scale * slope, octaves); 
-	float bH = bumpNoiseHeight(vec2(u, v - step), scale * slope, octaves);
-	float rH = bumpNoiseHeight(vec2(u + step, v), scale * slope, octaves);
-	float lH = bumpNoiseHeight(vec2(u - step, v), scale * slope, octaves); 
+	float tH = bumpNoiseHeight(vec2(u, v + step), scale * slope, octaveCount); 
+	float bH = bumpNoiseHeight(vec2(u, v - step), scale * slope, octaveCount);
+	float rH = bumpNoiseHeight(vec2(u + step, v), scale * slope, octaveCount);
+	float lH = bumpNoiseHeight(vec2(u - step, v), scale * slope, octaveCount); 
 
 	return normalize(vec3(lH - rH, step * step, bH - tH));
 }
@@ -237,7 +237,7 @@ void main()
 	float cosV = abs(dot(rawNormal, up));
 
 	// Compute bump normal
-	rawNormal = length(inPos) < float(renderRadius * worldScale) / 1.5? computeBumpNormal() : rawNormal;
+	rawNormal = length(inPos) < float(renderRadius * worldScale) / 1.5? (height < waterHeight + 0.01? computeBumpNormal(8) : computeBumpNormal(octaves)) : rawNormal;
 
 	// Correct normal if we have pass from +X to -X, from +Z to -Z, viceversa, or both
 	int xSign = sign(gridPos.x);

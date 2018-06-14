@@ -20,6 +20,7 @@ Engine::SkyProgram::SkyProgram(const Engine::SkyProgram & other)
 	uLightColor = other.uLightColor;
 	uSkyHorizonColor = other.uSkyHorizonColor;
 	uSkyZenitColor = other.uSkyZenitColor;
+	uColorFactor = other.uColorFactor;
 	inPos = other.inPos;
 }
 
@@ -28,6 +29,7 @@ void Engine::SkyProgram::configureProgram()
 	uProjMatrix = glGetUniformLocation(glProgram, "proj");
 	uLightDir = glGetUniformLocation(glProgram, "lightDir");
 	uLightColor = glGetUniformLocation(glProgram, "lightColor");
+	uColorFactor = glGetUniformLocation(glProgram, "colorFactor");
 
 	uSkyZenitColor = glGetUniformLocation(glProgram, "zenitColor");
 	uSkyHorizonColor = glGetUniformLocation(glProgram, "horizonColor");
@@ -55,7 +57,8 @@ void Engine::SkyProgram::onRenderObject(const Engine::Object * obj, Engine::Came
 	glm::vec3 direction = -glm::normalize(Engine::Settings::lightDirection);
 	glUniform3fv(uLightDir, 1, &direction[0]);
 
-	glUniform3fv(uLightColor, 1, &Engine::Settings::lightColor[0]);
+	glUniform3fv(uLightColor, 1, &Engine::Settings::realLightColor[0]);
+	glUniform1f(uColorFactor, Engine::Settings::lightFactor);
 
 	glUniform3fv(uSkyZenitColor, 1, &Engine::Settings::skyZenitColor[0]);
 	glUniform3fv(uSkyHorizonColor, 1, &Engine::Settings::skyHorizonColor[0]);

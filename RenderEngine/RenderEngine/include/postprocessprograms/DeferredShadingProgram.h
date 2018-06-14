@@ -26,8 +26,8 @@ namespace Engine
 		unsigned int uPLBuffer;
 		// Spot lights data buffer
 		unsigned int uSLBuffer;
-		// Camera space world up vector
-		unsigned int uWorldUp;
+		// Light attenuation factor based on sun's position
+		unsigned int uColorFactor;
 
 		// Zenit and horizon color (used for atmospheric fog)
 		unsigned int uSkyZenitColor;

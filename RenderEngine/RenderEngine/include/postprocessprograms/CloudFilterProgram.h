@@ -19,6 +19,9 @@ namespace Engine
 		// texel size (1/bufferwidth, 1/bufferheight)
 		unsigned int uTexelSize;
 
+		// Light color id (will determine the ray's color)
+		unsigned int uLightColor;
+
 		// Alternate rendered frames for temporal reprojection
 		unsigned int uRepro1;
 		unsigned int uRepro2;

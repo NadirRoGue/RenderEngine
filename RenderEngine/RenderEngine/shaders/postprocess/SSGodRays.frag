@@ -11,6 +11,7 @@ uniform float decay;
 uniform float density;
 uniform float weight;
 uniform bool onlyPass;
+uniform float alpha;
 
 #define NUM_SAMPLES 100
 
@@ -44,7 +45,7 @@ void main()
 			illuminationDecay *= decay;
 		}
 		// Blend with color buffer
-		outColor = texture(postProcessing_0, texCoord) + result * exposure;
+		outColor = texture(postProcessing_0, texCoord) + result * exposure * clamp(1.0 / length(deltaTextCoord), 0.0, 1.0);
 		// Transfer emission for bloom post processing
 		outEmission = texture(postProcessing_1, texCoord);
 	}
