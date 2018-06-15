@@ -460,7 +460,7 @@ void Engine::Terrain::addTrees()
 		treeData.emissiveLeaf = leafColor(eLeaf) > 0.8f;
 		treeData.startTrunkColor = trunkColor(eTrunk) >= 0.5f? glm::vec3(0.2f, 0.2f, 0.0f) : glm::vec3(0.65f, 0.65f, 0.65f);
 		treeData.endTrunkColor = treeData.startTrunkColor;
-		treeData.leafStartColor = glm::vec3(1.0 - leafColor(eLeaf), 1.0 - leafColor(eLeaf), 1.0 - leafColor(eLeaf));
+		treeData.leafStartColor = glm::vec3(1.0 - leafColor(eLeaf), 1.0 - leafColor(eLeaf), 1.0 - leafColor(eLeaf)) * 0.5f;
 		treeData.leafEndColor = treeData.leafStartColor;
 		treeData.maxBranchesSplit = 4;
 		float rotFactor = leafColor(eLeaf) * 0.5f + 0.5f;

@@ -42,6 +42,7 @@ Engine::TreeProgram::TreeProgram(const TreeProgram & other)
 	uInColor = other.uInColor;
 	uInNormal = other.uInNormal;
 	uInEmissive = other.uInEmissive;
+	uInUV = other.uInUV;
 }
 
 void Engine::TreeProgram::initialize()
@@ -109,6 +110,7 @@ void Engine::TreeProgram::configureProgram()
 	uInColor = glGetAttribLocation(glProgram, "inColor");
 	uInNormal = glGetAttribLocation(glProgram, "inNormal");
 	uInEmissive = glGetAttribLocation(glProgram, "inEmission");
+	uInUV = glGetAttribLocation(glProgram, "inTexCoord");
 }
 
 void Engine::TreeProgram::configureMeshBuffers(Mesh * mesh)
@@ -141,6 +143,13 @@ void Engine::TreeProgram::configureMeshBuffers(Mesh * mesh)
 		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboEmission);
 		glVertexAttribPointer(uInEmissive, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(uInEmissive);
+	}
+
+	if (uInUV != -1)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboUVs);
+		glVertexAttribPointer(uInUV, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(uInUV);
 	}
 }
 

@@ -52,6 +52,7 @@ Engine::Mesh * Engine::FractalTree::generate()
 	float * newVertices = new float[vertices.size() * 3];
 	float * newColors = new float[vertices.size() * 3];
 	float * newEmission = new float[vertices.size() * 3];
+	float * newUVs = new float[vertices.size() * 2];
 	for (size_t i = 0; i < vertices.size(); i++)
 	{
 		size_t index = i * 3;
@@ -70,6 +71,11 @@ Engine::Mesh * Engine::FractalTree::generate()
 		newEmission[index] = e.x;
 		newEmission[index + 1] = e.y;
 		newEmission[index + 2] = e.z;
+
+		size_t uvIndex = i * 2;
+		glm::vec2 & uv = uvs[i];
+		newUVs[uvIndex] = uv.x;
+		newUVs[uvIndex + 1] = uv.y;
 	}
 
 	unsigned int * newFaces = new unsigned int[faces.size() * 3];
@@ -83,7 +89,7 @@ Engine::Mesh * Engine::FractalTree::generate()
 	}
 
 	// Generate new mesh. Normals are automatically computed if not present in the constructor
-	Engine::Mesh * tree = new Engine::Mesh(unsigned int(faces.size()), unsigned int(vertices.size()), newFaces, newVertices, newColors, 0, 0, 0, newEmission);
+	Engine::Mesh * tree = new Engine::Mesh(unsigned int(faces.size()), unsigned int(vertices.size()), newFaces, newVertices, newColors, 0, newUVs, 0, newEmission);
 
 	return tree;
 }
@@ -206,6 +212,12 @@ void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat
 		float y = verts[index + 1] * scale.y; 
 		float z = verts[index + 2] * scale.z;
 		glm::vec4 v(x, y, z, 1.0);
+
+		unsigned int uvIndex = i * 2;
+		float s = source->getUVs()[uvIndex];
+		float t = source->getUVs()[uvIndex + 1];
+		glm::vec2 uv(s, t);
+		uvs.push_back(uv);
 
 		glm::vec4 transformedV = model * v;
 

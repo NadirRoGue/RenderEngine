@@ -43,6 +43,21 @@ namespace Engine
 			-1.0f,	1.0f,	1.0f, //6
 			1.0f,	1.0f,	1.0f, //7
 		};
+
+		const float texCoord[] =
+		{
+			// Face y = 0
+			1.0f, 1.0f,
+			1.0f, 2.0f,
+			2.0f, 1.0f,
+			2.0f, 2.0f,
+
+			// Face y = 1
+			0.0f, 0.0f,
+			0.0f, 1.0f,
+			1.0f, 0.0f,
+			1.0f, 1.0f
+		};
 	}
 
 	// Creates a trunk piece mesh
@@ -56,7 +71,7 @@ namespace Engine
 			TrunkData::vertexPos,
 			0,
 			0,
-			0,
+			TrunkData::texCoord,
 			0,
 			0
 		);

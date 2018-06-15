@@ -14,13 +14,7 @@ layout (location=2) in vec3 inNormal;
 layout (location=3) in vec3 inEmission;
 layout (location=4) in vec3 inShadowMapPos;
 layout (location=5) in vec3 inShadowMapPos1;
-layout (location=6) in vec3 inWorldPos;
-layout (location=7) in vec2 inNDotAxis;
-
-uniform float Tamplitude = 0.5;
-uniform float Tfrecuency = 0.5;
-uniform float Tscale = 10.0;
-uniform int Toctaves = 5;
+layout (location=6) in vec2 inTexCoord;
 
 uniform sampler2D depthTexture;
 uniform sampler2D depthTexture1;
@@ -35,6 +29,38 @@ uniform vec2 poissonDisk[4] = vec2[](
   vec2( -0.094184101, -0.92938870 ),
   vec2( 0.34495938, 0.29387760 )
 );
+
+bool whithinRange(vec2 texCoord)
+{
+	return texCoord.x >= 0.0 && texCoord.x <= 1.0 && texCoord.y >= 0.0 && texCoord.y <= 1.0;
+}
+
+float getShadowVisibility(vec3 rawNormal)
+{
+	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
+	float visibility = 1.0;
+	if(whithinRange(inShadowMapPos.xy))
+	{
+		float curDepth = inShadowMapPos.z - bias;
+		for (int i = 0; i < 4; i++)
+		{
+			visibility -= 0.25 * ( texture(depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0).x  <  curDepth? 1.0 : 0.0 );
+		}
+	}
+	// Level 2 cascade shadow map is too low res for the high frequency details of the trees
+	/*else if(whithinRange(inShadowMapPos1.xy))
+	{
+		float curDepth = inShadowMapPos1.z - bias;
+		visibility = texture(depthTexture1, inShadowMapPos1.xy).x < curDepth? 0.0 : 1.0;
+	}*/
+
+	return visibility;
+}
+
+uniform float Tamplitude = 0.5;
+uniform float Tfrecuency = 0.5;
+uniform float Tscale = 40.0;
+uniform int Toctaves = 2;
 
 // ================================================================================
 float Random2D(in vec2 st)
@@ -82,58 +108,6 @@ float noise(in vec2 pos)
 	return noiseValue;// * noiseValue * noiseValue * 0.01;
 }
 
-bool whithinRange(vec2 texCoord)
-{
-	return texCoord.x >= 0.0 && texCoord.x <= 1.0 && texCoord.y >= 0.0 && texCoord.y <= 1.0;
-}
-
-float getShadowVisibility(vec3 rawNormal)
-{
-	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
-	float visibility = 1.0;
-	if(whithinRange(inShadowMapPos.xy))
-	{
-		float curDepth = inShadowMapPos.z - bias;
-		for (int i = 0; i < 4; i++)
-		{
-			visibility -= 0.25 * ( texture(depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0).x  <  curDepth? 1.0 : 0.0 );
-		}
-	}
-	/*else if(whithinRange(inShadowMapPos1.xy))
-	{
-		float curDepth = inShadowMapPos1.z - bias;
-		visibility = texture(depthTexture1, inShadowMapPos1.xy).x < curDepth? 0.0 : 1.0;
-	}*/
-
-	return visibility;
-}
-
-bool discardLeaf()
-{
-	float upSign = sign(inNDotAxis.x);
-	float leftSign = sign(inNDotAxis.y);
-	float cosUp = abs(inNDotAxis.x);
-	float cosRight = abs(inNDotAxis.y);
-	vec2 coords;
-	if(cosUp < 0.5)
-	{
-		if(cosRight < 0.5)
-		{
-			coords = upSign < 0.0? inWorldPos.yz : inWorldPos.zy;
-		}
-		else
-		{
-			coords = upSign < 0.0? inWorldPos.yx : inWorldPos.xy;
-		}
-	}
-	else
-	{
-		coords = leftSign < 0.0? inWorldPos.zx : inWorldPos.xz;
-	}
-
-	return noise(coords) < 0.75;
-}
-
 #else
 layout (location=0) out vec4 lightdepth;
 #endif
@@ -150,8 +124,9 @@ void main()
 	outPos = vec4(inPos, 1);
 	outInfo = vec4(0);
 #else
-	if(inEmission.x == 1.0 && discardLeaf())
+	if(inEmission.x > 0.0 && noise(inTexCoord) < 0.4)
 		discard;
+
 	// APPLY SHADOW MAP
 	// ------------------------------------------------------------------------------
 	float visibility = getShadowVisibility(rawNormal);

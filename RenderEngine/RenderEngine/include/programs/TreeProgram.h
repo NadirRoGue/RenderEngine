@@ -75,6 +75,8 @@ namespace Engine
 		unsigned int uInNormal;
 		// Vertex emission attribute id
 		unsigned int uInEmissive;
+		// Vertex texture coordinates attribute id
+		unsigned int uInUV;
 	public:
 		TreeProgram(std::string name, unsigned long long params);
 		TreeProgram(const TreeProgram & other);
