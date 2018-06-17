@@ -79,7 +79,7 @@ void main()
 
 	outColor = color;
 	outEmission = vec4(0,0,0, color.a);
-	vec3 gr = (realLightColor * 0.6) * (1.0 - color.a);
+	vec3 gr = (realLightColor) * (1.0 - color.a);
 	outGodRays = vec4(gr, color.a);
 	gl_FragDepth = 0.999;
 }

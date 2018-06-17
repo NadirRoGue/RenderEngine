@@ -49,8 +49,8 @@ void Engine::Settings::update()
 {
 	lightFactor = glm::clamp(glm::dot(glm::vec3(0, 1, 0), glm::normalize(lightDirection)), 0.0f, 1.0f);
 	realLightColor = lightColor;
-	realLightColor.y *= lightFactor * 1.5f;
-	realLightColor.z *= lightFactor;
+	realLightColor.y *= lightFactor * 0.85f;
+	realLightColor.z *= lightFactor * 0.55f;
 }
 
 // =====================================================================

@@ -25,8 +25,9 @@ void main()
 	{
 		// compute screen-space displacement based on num of samples and shafts density
 		vec2 deltaTextCoord = vec2(texCoord - lightScreenPos);
+		float distFactor = clamp(1.0 / length(deltaTextCoord), 0.0, 1.0);
 		vec2 uv = texCoord;
-		deltaTextCoord *= 1.0 /  (float(NUM_SAMPLES) * density);// * densityMultiplier * 0.5);
+		deltaTextCoord *= 1.0 /  (float(NUM_SAMPLES) * density);
 		float illuminationDecay = 1.0;
 
 		// Start with current's god ray buffer value
@@ -45,7 +46,7 @@ void main()
 			illuminationDecay *= decay;
 		}
 		// Blend with color buffer
-		outColor = texture(postProcessing_0, texCoord) + result * exposure * clamp(1.0 / length(deltaTextCoord), 0.0, 1.0);
+		outColor = texture(postProcessing_0, texCoord) + result * exposure * distFactor;
 		// Transfer emission for bloom post processing
 		outEmission = texture(postProcessing_1, texCoord);
 	}
