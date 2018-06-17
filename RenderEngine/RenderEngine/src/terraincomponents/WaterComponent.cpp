@@ -102,5 +102,5 @@ Engine::Program * Engine::WaterComponent::getActiveShader()
 
 Engine::Program * Engine::WaterComponent::getShadowMapShader()
 {
-	return shadowShader;
+	return NULL;// shadowShader;
 }

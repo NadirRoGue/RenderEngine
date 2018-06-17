@@ -227,7 +227,7 @@ void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat
 		if (!isLeaf)
 		{
 			// Add color gradient based on depth + vertex height
-			colors.push_back(lerpColor(treeData.startTrunkColor, treeData.endTrunkColor, depth * 2.0f + y));
+			colors.push_back(glm::mix(treeData.startTrunkColor, treeData.endTrunkColor, depth * 2.0f + y));
 			emission.push_back(glm::vec3(0, 0, 0));
 		}
 		else
@@ -255,13 +255,4 @@ float Engine::FractalTree::randSign()
 float Engine::FractalTree::randInInterval(float a, float b)
 {
 	return a + (b - a) * randGen(randEngine);
-}
-
-glm::vec3 Engine::FractalTree::lerpColor(const glm::vec3 & a, const glm::vec3 & b, float alpha)
-{
-	glm::vec3 result;
-	result.x = a.x + (b.x - a.x) * alpha;
-	result.y = a.y + (b.y - a.y) * alpha;
-	result.z = a.z + (b.z - a.z) * alpha;
-	return result;
 }

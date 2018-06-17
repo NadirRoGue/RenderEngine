@@ -1,3 +1,7 @@
+/**
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 #include "TerrainComponent.h"
@@ -6,15 +10,24 @@
 
 namespace Engine
 {
+	/**
+	 * Terrain component in charge of rendering the terrain mesh
+	 * Cast shadows
+	 */
 	class LandscapeComponent : public TerrainComponent
 	{
 	private:
+		// Shading program
 		ProceduralTerrainProgram * fillShader;
+		// Wireframe mode program
 		ProceduralTerrainProgram * wireShader;
+		// Shadow map render program
 		ProceduralTerrainProgram * shadowShader;
 
+		// Active program (shading or wire)
 		ProceduralTerrainProgram * activeShader;
 
+		// Tile instance
 		Object * landscapeTile;
 	public:
 		LandscapeComponent();

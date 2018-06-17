@@ -91,6 +91,8 @@ vec3 diffuseLambert(vec3 dl, vec3 albedo)
 vec3 processDirectionalLight(in float visibility)
 {
 	vec3 c = vec3(0,0,0);
+	// Minimun visibility is 0.1 in shadow places to avoid unlit shading look in shadowed zones
+	visibility = max(visibility, 0.1);
 
 	vec3 L = DLdirection[0].xyz;
 	vec3 lightColor = DLcolor[0].rgb;

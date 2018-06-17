@@ -1,3 +1,7 @@
+/**
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 #include "TerrainComponent.h"
@@ -6,15 +10,23 @@
 
 namespace Engine
 {
+	/**
+	 * Terrain component in charge of render procedural water
+	 * Wont cast shadows
+	 */
 	class WaterComponent : public TerrainComponent
 	{
 	private:
+		// Shading program
 		ProceduralWaterProgram * fillShader;
+		// Wireframe program
 		ProceduralWaterProgram * wireShader;
-		ProceduralWaterProgram * shadowShader;
+		//ProceduralWaterProgram * shadowShader;
 
+		// Active shader
 		ProceduralWaterProgram * activeShader;
 
+		// Tile instance to render
 		Object * waterTile;
 	public:
 		WaterComponent();

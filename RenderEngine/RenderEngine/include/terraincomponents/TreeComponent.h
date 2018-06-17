@@ -1,3 +1,7 @@
+/**
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 #include "TerrainComponent.h"
@@ -8,18 +12,30 @@
 
 namespace Engine
 {
+	/**
+	 * Terrain component in charge of rendering trees across the terrain
+	 * Cast shadows
+	 */
 	class TreeComponent : public TerrainComponent
 	{
 	private:
+		// Shading program
 		TreeProgram * fillShader;
+		// Wireframe mode program
 		TreeProgram * wireShader;
+		// Shadow map render program
 		TreeProgram * shadowShader;
 
+		// Active shader (shading or wireframe)
 		TreeProgram * activeShader;
 
+		// List of type of trees
 		std::vector<Object *> treeTypes;
+		// Number of trees to spawn per terrain tile
 		size_t treesToSpawn;
+		// Equal amount of each tree type to spawn
 		size_t equalAmountOfTrees;
+		// shuffled jitter pattern to ensure trees are spread
 		glm::vec2 * jitterPattern;
 	public:
 		TreeComponent();
@@ -34,6 +50,7 @@ namespace Engine
 		Program * getActiveShader();
 		Program * getShadowMapShader();
 	private:
+		// Run the fractal tree generator to build a fixed number of different procedural trees
 		void initTrees();
 	};
 }

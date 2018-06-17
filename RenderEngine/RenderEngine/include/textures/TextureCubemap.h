@@ -1,14 +1,24 @@
+/**
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 #include "Texture.h"
 
 namespace Engine
 {
+	/**
+	 * Class in charge of represent, give access, and manipulate Cube map texture types
+	 */
 	class TextureCubemap : public AbstractTexture
 	{
 	private:
+		// Per-face data
 		unsigned char * data[6];
+		// Common to all faces width
 		unsigned int tileWidth;
+		// Common to all faces height
 		unsigned int tileHeight;
 	public:
 		TextureCubemap(std::string name, unsigned int tileWidth, unsigned int tileHeight);
