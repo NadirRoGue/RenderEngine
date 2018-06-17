@@ -37,6 +37,16 @@ namespace Engine
 		// will create a new one
 		Program * getProgramByName(std::string name, unsigned long long parameters = 0);
 
+		// Returns a program of the given type already as an instance of such class
+		template<typename T>
+		T * getProgram(std::string name, unsigned long long parameters = 0)
+		{
+			Program * p = getProgramByName(name, parameters);
+			if (p == NULL) return NULL;
+
+			return static_cast<T*>(p);
+		}
+
 		// Releases the programs
 		void clean();
 	};

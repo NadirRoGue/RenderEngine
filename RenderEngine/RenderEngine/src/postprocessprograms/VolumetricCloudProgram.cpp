@@ -122,7 +122,7 @@ void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, Engine
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, dr->getGBufferDepth()->getTexture()->getTextureId());
 
-	glUniform1i(uFrame, Engine::Time::frame);
+	glUniform1i(uFrame, (GLint)Engine::Time::frame);
 }
 
 // ===============================================================================================

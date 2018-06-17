@@ -1,10 +1,12 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <vector>
 
 #include "Camera.h"
 #include "instances/TextureInstance.h"
 #include "DeferredRenderObject.h"
+#include "ShadowCaster.h"
 
 namespace Engine
 {
@@ -29,6 +31,9 @@ namespace Engine
 
 		// Previous frame buffer before starting to render shadows to custom rtt
 		int previousFrameBuffer;
+
+		// List of renderable objects which cast shadows
+		std::vector<ShadowCaster *> shadowCasters;
 	public:
 		static CascadeShadowMaps & getInstance();
 	private:
@@ -37,9 +42,11 @@ namespace Engine
 	public:
 		void init();
 		void initializeFrame(Camera * eye);
-		void saveCurrentFBO();
 		void beginShadowRender(int level);
 		void endShadowRender();
+		void registerShadowCaster(ShadowCaster * caster);
+
+		void renderShadows(Camera * cam);
 
 		const glm::mat4 & getShadowProjectionMat();
 		const glm::mat4 & getBiasMat();

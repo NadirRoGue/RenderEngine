@@ -157,6 +157,7 @@ void Engine::FractalTree::addLeaf(glm::mat4 & origin, glm::vec3 lastScaling, siz
 	glm::vec3 translation(0, maxScale, 0);
 	glm::mat4 model = origin * glm::translate(glm::mat4(1.0f), translation);
 
+	//0.4 0.3 0.4
 	appendVerticesAndFaces(base, model, glm::vec3(maxScale) * glm::vec3(0.4, 0.3, 0.4), 0, offset, true, true);
 }
 
@@ -214,8 +215,8 @@ void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat
 		glm::vec4 v(x, y, z, 1.0);
 
 		unsigned int uvIndex = i * 2;
-		float s = source->getUVs()[uvIndex];
-		float t = source->getUVs()[uvIndex + 1];
+		float s = source->getUVs()[uvIndex] +  - 4;
+		float t = source->getUVs()[uvIndex + 1] + vOffset - 4;
 		glm::vec2 uv(s, t);
 		uvs.push_back(uv);
 

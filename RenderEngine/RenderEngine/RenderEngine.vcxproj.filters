@@ -157,6 +157,12 @@
     <Filter Include="shaders\clouds\generation">
       <UniqueIdentifier>{88f7877e-7163-466a-b888-edcd5aa6ed49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de encabezado\terraincomponents">
+      <UniqueIdentifier>{a60fb81d-3372-420b-8d53-56da91140dec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\terraincomponents">
+      <UniqueIdentifier>{2e6fac4e-4f04-4d7c-b1f1-b07a09e87828}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Animation.h">
@@ -411,6 +417,24 @@
     <ClInclude Include="include\postprocessprograms\CloudFilterProgram.h">
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>
+    <ClInclude Include="include\terraincomponents\FlowerComponent.h">
+      <Filter>Archivos de encabezado\terraincomponents</Filter>
+    </ClInclude>
+    <ClInclude Include="include\terraincomponents\LandscapeComponent.h">
+      <Filter>Archivos de encabezado\terraincomponents</Filter>
+    </ClInclude>
+    <ClInclude Include="include\terraincomponents\TreeComponent.h">
+      <Filter>Archivos de encabezado\terraincomponents</Filter>
+    </ClInclude>
+    <ClInclude Include="include\terraincomponents\WaterComponent.h">
+      <Filter>Archivos de encabezado\terraincomponents</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TerrainComponent.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ShadowCaster.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -637,6 +661,18 @@
     </ClCompile>
     <ClCompile Include="src\postprocessprograms\CloudFilterProgram.cpp">
       <Filter>Archivos de origen\postprocessprograms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\terraincomponents\FlowerComponent.cpp">
+      <Filter>Archivos de origen\terraincomponents</Filter>
+    </ClCompile>
+    <ClCompile Include="src\terraincomponents\LandscapeComponent.cpp">
+      <Filter>Archivos de origen\terraincomponents</Filter>
+    </ClCompile>
+    <ClCompile Include="src\terraincomponents\TreeComponent.cpp">
+      <Filter>Archivos de origen\terraincomponents</Filter>
+    </ClCompile>
+    <ClCompile Include="src\terraincomponents\WaterComponent.cpp">
+      <Filter>Archivos de origen\terraincomponents</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

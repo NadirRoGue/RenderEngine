@@ -48,11 +48,11 @@ float getShadowVisibility(vec3 rawNormal)
 		}
 	}
 	// Level 2 cascade shadow map is too low res for the high frequency details of the trees
-	/*else if(whithinRange(inShadowMapPos1.xy))
+	else if(whithinRange(inShadowMapPos1.xy))
 	{
 		float curDepth = inShadowMapPos1.z - bias;
 		visibility = texture(depthTexture1, inShadowMapPos1.xy).x < curDepth? 0.0 : 1.0;
-	}*/
+	}
 
 	return visibility;
 }
@@ -89,17 +89,17 @@ float NoiseInterpolation(in vec2 i_coord, in float i_size)
 		(p3 - p1) * (weights.y * weights.x);
 }
 
-float noise(in vec2 pos)
+float noise(in vec2 pos, float f, float a, float s)
 {
 
 	float noiseValue = 0.0;
 
-	float localAplitude = Tamplitude;
-	float localFrecuency = Tfrecuency;
+	float localAplitude = a;
+	float localFrecuency = f;
 
 	for (int index = 0; index < Toctaves; index++)
 	{
-		noiseValue += NoiseInterpolation(pos, Tscale * localFrecuency) * localAplitude;
+		noiseValue += NoiseInterpolation(pos, s * localFrecuency) * localAplitude;
 
 		localAplitude /= 2.0;
 		localFrecuency *= 2.0;
@@ -124,7 +124,7 @@ void main()
 	outPos = vec4(inPos, 1);
 	outInfo = vec4(0);
 #else
-	if(inEmission.x > 0.0 && noise(inTexCoord) < 0.4)
+	if(inEmission.x > 0.0 && noise(inTexCoord, Tfrecuency, Tamplitude, Tscale) < 0.4)
 		discard;
 
 	// APPLY SHADOW MAP

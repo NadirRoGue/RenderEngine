@@ -49,11 +49,8 @@ void Engine::CascadeShadowMaps::initializeFrame(Engine::Camera * eye)
 	{
 		shadowMaps[i].depth = shadowMaps[i].proj * depthViewMatrix;
 	}
-}
 
-void Engine::CascadeShadowMaps::saveCurrentFBO()
-{
-	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFrameBuffer);
+	renderShadows(eye);
 }
 
 void Engine::CascadeShadowMaps::beginShadowRender(int level)
@@ -66,7 +63,6 @@ void Engine::CascadeShadowMaps::beginShadowRender(int level)
 void Engine::CascadeShadowMaps::endShadowRender()
 {
 	shadowMaps[currentLevel].depth = biasMatrix * shadowMaps[currentLevel].depth;
-	glBindFramebuffer(GL_FRAMEBUFFER, previousFrameBuffer);
 }
 
 const glm::mat4 & Engine::CascadeShadowMaps::getBiasMat()
@@ -102,4 +98,28 @@ const Engine::TextureInstance * Engine::CascadeShadowMaps::getDepthTexture0()
 const Engine::TextureInstance * Engine::CascadeShadowMaps::getDepthTexture1()
 {
 	return shadowMaps[1].shadowMap;
+}
+
+void Engine::CascadeShadowMaps::registerShadowCaster(Engine::ShadowCaster * caster)
+{
+	shadowCasters.push_back(caster);
+}
+
+void Engine::CascadeShadowMaps::renderShadows(Engine::Camera * cam)
+{
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFrameBuffer);
+
+	for (unsigned int i = 0; i < getCascadeLevels(); i++)
+	{
+		beginShadowRender(i);
+
+		for (auto & v : shadowCasters)
+		{
+			v->renderShadow(cam, getShadowProjectionMat());
+		}
+
+		endShadowRender();
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, previousFrameBuffer);
 }
