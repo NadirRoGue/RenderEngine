@@ -26,12 +26,8 @@ namespace Engine
 		unsigned int uInverseProj;
 		// Texel screen size id
 		unsigned int uTexelSize;
-
-		// Focal distance to send to shader
-		float focalDistance;
-		// Max distance to send to shader
-		float maxDistanceFactor;
-
+		// G-Buffer depth texture id
+		unsigned int uDepthBuffer;
 	public:
 		DepthOfFieldProgram(std::string name, unsigned long long params);
 		DepthOfFieldProgram(const DepthOfFieldProgram & other);
@@ -39,16 +35,6 @@ namespace Engine
 
 		void configureProgram();
 		void onRenderObject(const Object * obj, Camera * camera);
-
-		// Returns the focal distance this program is configured for
-		float getFocalDistance();
-		// Returns the max distance this program is configured for
-		float getMaxDistanceFactor();
-
-		// Sets the focal distance for this program
-		void setFocalDistance(float fd);
-		// Sets the max distance for this program
-		void setMaxDistanceFactor(float mdf);
 	};
 
 	// =========================================================================

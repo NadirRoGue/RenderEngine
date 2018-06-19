@@ -38,6 +38,7 @@
 #include "programs/ProceduralWaterProgram.h"
 #include "programs/TreeProgram.h"
 #include "programs/SkyProgram.h"
+#include "programs/CloudShadowProgram.h"
 #include "postprocessprograms/DeferredShadingProgram.h"
 #include "postprocessprograms/SSAAProgram.h"
 #include "postprocessprograms/BloomProgram.h"
@@ -47,6 +48,7 @@
 #include "postprocessprograms/CloudFilterProgram.h"
 #include "postprocessprograms/HDRToneMappingProgram.h"
 #include "postprocessprograms/SSGodRayProgram.h"
+#include "postprocessprograms/DepthOfFieldProgram.h"
 
 #include "inputhandlers/keyboardhandlers/CameraMovementHandler.h"
 #include "inputhandlers/keyboardhandlers/ToggleUIHandler.h"
@@ -76,6 +78,7 @@ Engine::PostProcessChainNode * createSSReflectionNode();
 Engine::PostProcessChainNode * createSSGrassNode();
 Engine::PostProcessChainNode * createHDRNode();
 Engine::PostProcessChainNode * createSSGodRayNode();
+Engine::PostProcessChainNode * createDOFNode();
 
 
 int main(int argc, char** argv)
@@ -159,6 +162,8 @@ void initTables()
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::CloudFilterProgram::PROGRAM_NAME, new Engine::CloudFilterProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::HDRToneMappingProgram::PROGRAM_NAME, new Engine::HDRToneMappingProgramFactory());
 	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::SSGodRayProgram::PROGRAM_NAME, new Engine::SSGodRayProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::DepthOfFieldProgram::PROGRAM_NAME, new Engine::DepthOfFieldProgramFactory());
+	Engine::ProgramTable::getInstance().registerProgramFactory(Engine::CloudShadowProgram::PROGRAM_NAME, new Engine::CloudShadowProgramFactory());
 	
 	// Mesh table
 	Engine::MeshTable::getInstance().addMeshToCache("cube", Engine::CreateCube());
@@ -208,7 +213,7 @@ void initHandlers()
 	handlers->registerHandler(cm);
 	handlers->registerHandler(uiHandler);
 	
-	Engine::CameraBezier * camBezier = new Engine::CameraBezier(scene->getCamera(), glm::vec3(100,6,100), 50.0f, 3.0f);
+	Engine::CameraBezier * camBezier = new Engine::CameraBezier(scene->getCamera(), glm::vec3(197.0f, 10.0f, 130.0f), 75.0f, 3.0f);
 	scene->getAnimationHandler()->registerAnimation(camBezier);
 
 	Engine::CameraStraight * camStraight = new Engine::CameraStraight(scene->getCamera());
@@ -229,6 +234,7 @@ void initRenderEngine()
 	dr->addPostProcess(createSSReflectionNode());	// SS Reflections
 	dr->addPostProcess(createSSGrassNode());		// SS Grass
 	dr->addPostProcess(createHDRNode());			// Tone mapping
+	dr->addPostProcess(createDOFNode());			// Depth of field
 
 	Engine::RenderManager::getInstance().setRenderer(dr);
 	Engine::RenderManager::getInstance().doResize(1024, 1024);
@@ -380,6 +386,31 @@ Engine::PostProcessChainNode * createSSGodRayNode()
 	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
 	node->renderBuffer->addColorBuffer(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
+	node->renderBuffer->addDepthBuffer24(500, 500);
+	node->callBack = 0;
+
+	// Render plane
+	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
+	if (mi != 0)
+	{
+		node->postProcessProgram->configureMeshBuffers(mi);
+		node->obj = new Engine::PostProcessObject(mi);
+	}
+
+	return node;
+}
+
+// Creates a Depth of Field post process node
+Engine::PostProcessChainNode * createDOFNode()
+{
+	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
+
+	// Shader
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::DepthOfFieldProgram::PROGRAM_NAME);
+
+	// RTT
+	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
+	node->renderBuffer->addColorBuffer(0, GL_RGBA8, GL_RGBA, GL_FLOAT, 500, 500, "", GL_LINEAR);
 	node->renderBuffer->addDepthBuffer24(500, 500);
 	node->callBack = 0;
 

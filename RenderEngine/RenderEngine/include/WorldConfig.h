@@ -58,6 +58,9 @@ namespace Engine
 		static float hdrExposure;
 		static float hdrGamma;
 
+		static float dofFocalDist;
+		static float dofMaxDist;
+
 		static float godRaysExposure;
 		static float godRaysDensity;
 		static float godRaysDecay;

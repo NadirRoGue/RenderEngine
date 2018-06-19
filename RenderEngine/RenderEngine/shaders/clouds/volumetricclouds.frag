@@ -93,6 +93,7 @@ vec2 planeDim = vec2(planeMax.xz - planeMin.xz);
 
 // ==========================================================================
 // Lighting functions
+// Scattering phase function
 float henyeyGreenstein(vec3 l, vec3 v, float g, float ca)
 {
 	float g2 = g * g;
@@ -100,11 +101,13 @@ float henyeyGreenstein(vec3 l, vec3 v, float g, float ca)
 	return ((1.0 - g2) / pow((1.0 + g2 - 2.0 * g * ca), 1.5 )) * (1.0 / (4.0 * 3.1415));
 }
 
+// Intensity decreases with density
 float beer(float density)
 {
 	return exp(-density);
 }
 
+// Beer's law inverted equation for edges
 float powder(float density, float ca)
 {
 	float f = 1.0 - exp(-density * 2.0);
@@ -112,11 +115,13 @@ float powder(float density, float ca)
 	return f;
 }
 
+// Full cloud light energy equation
 float lightEnergy(vec3 l, vec3 v, float ca, float coneDensity)
 {
 	return 2.0 * beer(coneDensity) * powder(coneDensity, ca) * mix(henyeyGreenstein(l, v, 0.8, ca), henyeyGreenstein(l, v, -0.5, ca), 0.5);
 }
 
+// Returns an ambient lighting depending on the height
 vec3 ambientLight(float heightFrac, float lightFactor)
 {
 	return mix(realLightColor * 0.7, realLightColor * 0.9, heightFrac);
@@ -176,11 +181,13 @@ float getDensityForCloud(float heightFraction, float cloudType)
 	return remapValue(heightFraction, baseGradient.x, baseGradient.y, 0.0, 1.0) * remapValue(heightFraction, baseGradient.z, baseGradient.w, 1.0, 0.0);
 }
 
+// Retrieves the density of clouds at a given point
 float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive, float hf)
 {
 	// Position modifications
 	//float heightFraction = getHeightFraction (p);
 
+	// Make clouds evolve with wind
 	p += hf * WIND_DIRECTION * CLOUD_TOP_OFFSET;
 	p += WIND_DIRECTION * time * cloudSpeed;
 
@@ -214,6 +221,7 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive, fl
 
 	float finalCloud = coveragedCloud;
 
+	// Only erode the cloud if visible
 	if(expensive)
 	{
 		// Build−high frequency Worley noise FBM.
@@ -296,13 +304,9 @@ float frontToBackRaymarch(vec3 startPos, vec3 endPos, out vec3 color)
 	int sampleCount = int(ceil(mix(48.0, 96.0, clamp(length(path) / delta, 0.0, 1.0))));
 #endif
 
-	// Light color attenuation based on sun's position
-	//float lightFactor = (clamp(dot(vec3(0,1,0), lightDir), 0.0, 1.0));
-	//realLightColor = lightColor;
-	//realLightColor.y *= lightFactor * 1.5;
-	//realLightColor.z *= lightFactor;
-
+	// ambient lighting attenuation factor
 	float ambientFactor =  max(min(lightFactor, 1.0), 0.1);
+	// full lighting
 	vec3 lc = realLightColor * lightFactor * cloudColor;
 
 	// Ray march data
@@ -466,14 +470,17 @@ void main()
 		if(intersect)
 		{
 			vec3 outColor;
+			// If intersected, raymarch cloud
 			float density = frontToBackRaymarch(startPos, endPos, outColor);
 			density = clamp(density, 0.0, 1.0);
 
 			vec4 finalColor = vec4(outColor, density);
 
 	#ifdef SPHERE_PROJECTION
+			// Apply atmospheric fog to far away clouds
 			vec4 ambientColor = vec4(mix(horizonColor, zenitColor, 0.15), 0.6);
 
+			// Use current position distance to center as action radius
 			float dist = length(startPos - camPos);
 			float radius = (camPos.y - sphereCenter.y) * 0.3;
 			float alpha = clamp(dist / radius, 0.0, 1.0);

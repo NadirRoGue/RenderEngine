@@ -180,6 +180,7 @@
     <ClInclude Include="include\postprocessprograms\VolumetricCloudProgram.h" />
     <ClInclude Include="include\ProceduralVegetation.h" />
     <ClInclude Include="include\Program.h" />
+    <ClInclude Include="include\programs\CloudShadowProgram.h" />
     <ClInclude Include="include\programs\ProceduralTerrainProgram.h" />
     <ClInclude Include="include\programs\ProceduralWaterProgram.h" />
     <ClInclude Include="include\programs\SkyProgram.h" />
@@ -272,6 +273,7 @@
     <ClCompile Include="src\postprocessprograms\VolumetricCloudProgram.cpp" />
     <ClCompile Include="src\ProceduralVegetation.cpp" />
     <ClCompile Include="src\Program.cpp" />
+    <ClCompile Include="src\programs\CloudShadowProgram.cpp" />
     <ClCompile Include="src\programs\ProceduralTerrainProgram.cpp" />
     <ClCompile Include="src\programs\ProceduralWaterProgram.cpp" />
     <ClCompile Include="src\programs\SkyProgram.cpp" />
@@ -308,6 +310,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\clouds\cloudfilter.frag" />
+    <None Include="shaders\clouds\cloudshadow.frag" />
+    <None Include="shaders\clouds\cloudshadow.vert" />
     <None Include="shaders\clouds\generation\perlinworley.comp" />
     <None Include="shaders\clouds\generation\weather.comp" />
     <None Include="shaders\clouds\generation\worley.comp" />

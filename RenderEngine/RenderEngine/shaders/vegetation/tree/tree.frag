@@ -134,7 +134,7 @@ void main()
 	outColor = vec4(inColor, 1.0);
 	outNormal = vec4(rawNormal, 1);
 	outSpecular = vec4(0,0,0,0);
-	outEmissive = vec4(inEmission.y > 0.0? inColor * 0.2 : vec3(0),1);
+	outEmissive = vec4(inEmission.y > 0.0? inColor * 0.5 : vec3(0),1);
 	outPos = vec4(inPos, 1);
 	outInfo = vec4(0.0, visibility,0,1);
 #endif

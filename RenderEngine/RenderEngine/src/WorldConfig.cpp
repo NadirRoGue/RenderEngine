@@ -35,6 +35,9 @@ float Engine::Settings::cloudType = 0.5f;
 float Engine::Settings::coverageMultiplier = 0.228f;
 glm::vec3 Engine::Settings::cloudColor = glm::vec3(1, 1, 1);
 
+float Engine::Settings::dofFocalDist = 70.0f;
+float Engine::Settings::dofMaxDist = 0.01f;
+
 float Engine::Settings::hdrExposure = 6.0f;
 float Engine::Settings::hdrGamma = 0.368f;
 
@@ -51,6 +54,9 @@ void Engine::Settings::update()
 	realLightColor = lightColor;
 	realLightColor.y *= lightFactor * 0.85f;
 	realLightColor.z *= lightFactor * 0.55f;
+
+	Engine::Settings::hdrExposure = glm::mix(8.5f, 3.235f, lightFactor);
+	Engine::Settings::hdrGamma = glm::mix(0.25f, 0.3f, lightFactor);
 }
 
 // =====================================================================

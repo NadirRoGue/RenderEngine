@@ -110,9 +110,9 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::Separator();
 		ImGui::Spacing(); ImGui::Spacing();
 
-		ImGui::Text("HDR settings");
-		ImGui::SliderFloat("HDR exposure##app", &Engine::Settings::hdrExposure, 0.0f, 10.0f);
-		ImGui::SliderFloat("HDR gamma##app", &Engine::Settings::hdrGamma, 0.0f, 10.0f);
+		ImGui::Text("Depth of Field");
+		ImGui::SliderFloat("Focal distance", &Engine::Settings::dofFocalDist, 0.0f, 100.0f);
+		ImGui::SliderFloat("Max Distance factor", &Engine::Settings::dofMaxDist, 0.0f, 10.0f);
 
 		ImGui::Spacing(); ImGui::Spacing();
 		ImGui::Separator();

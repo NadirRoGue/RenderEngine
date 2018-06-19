@@ -435,6 +435,9 @@
     <ClInclude Include="include\ShadowCaster.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="include\programs\CloudShadowProgram.h">
+      <Filter>Archivos de encabezado\programs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Animation.cpp">
@@ -674,6 +677,9 @@
     <ClCompile Include="src\terraincomponents\WaterComponent.cpp">
       <Filter>Archivos de origen\terraincomponents</Filter>
     </ClCompile>
+    <ClCompile Include="src\programs\CloudShadowProgram.cpp">
+      <Filter>Archivos de origen\programs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\sky\sky.frag">
@@ -776,6 +782,12 @@
       <Filter>shaders\postprocess</Filter>
     </None>
     <None Include="shaders\clouds\cloudfilter.frag">
+      <Filter>shaders\clouds</Filter>
+    </None>
+    <None Include="shaders\clouds\cloudshadow.frag">
+      <Filter>shaders\clouds</Filter>
+    </None>
+    <None Include="shaders\clouds\cloudshadow.vert">
       <Filter>shaders\clouds</Filter>
     </None>
   </ItemGroup>
