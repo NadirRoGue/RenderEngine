@@ -94,7 +94,7 @@ Engine::Mesh * Engine::FractalTree::generate()
 	return tree;
 }
 
-void Engine::FractalTree::processChunk(glm::mat4 & origin, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotation, size_t vOffset, unsigned int depth)
+void Engine::FractalTree::processChunk(glm::mat4 origin, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotation, size_t vOffset, unsigned int depth)
 {
 	if (depth >= treeData.depthStartingLeaf)
 	{
@@ -150,7 +150,7 @@ void Engine::FractalTree::processChunk(glm::mat4 & origin, glm::vec3 scale, glm:
 	}
 }
 
-void Engine::FractalTree::addLeaf(glm::mat4 & origin, glm::vec3 lastScaling, size_t offset, unsigned int depth)
+void Engine::FractalTree::addLeaf(glm::mat4 origin, glm::vec3 lastScaling, size_t offset, unsigned int depth)
 {
 	float maxScale = glm::max(glm::max(lastScaling.x, lastScaling.y), lastScaling.z);
 
@@ -161,7 +161,7 @@ void Engine::FractalTree::addLeaf(glm::mat4 & origin, glm::vec3 lastScaling, siz
 	appendVerticesAndFaces(base, model, glm::vec3(maxScale) * glm::vec3(0.4, 0.3, 0.4), 0, offset, true, true);
 }
 
-void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat4 & model, glm::vec3 scale, unsigned int depth, size_t vOffset, bool keepBase, bool isLeaf)
+void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat4 model, glm::vec3 scale, unsigned int depth, size_t vOffset, bool keepBase, bool isLeaf)
 {
 	// Add faces adding the offset of vertices already added to the main tree
 	const unsigned int * fac = source->getFaces();

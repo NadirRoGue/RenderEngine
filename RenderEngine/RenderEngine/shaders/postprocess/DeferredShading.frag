@@ -4,7 +4,7 @@ layout (location=0) out vec4 outColor;
 layout (location=1) out vec4 outEmission;
 layout (location=2) out vec4 outGodRaysInfo;
 
-in vec2 texCoord;
+layout (location=0) in vec2 texCoord;
 
 uniform sampler2D postProcessing_0; // color
 uniform sampler2D postProcessing_1; // normal

@@ -44,11 +44,11 @@ namespace Engine
 		Mesh * generate();
 	private:
 		// Process a chunk of the tree, adding base shape data according to the growth and stopping at the appropiate depth
-		void processChunk(glm::mat4 & mat, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotation, size_t vOffset, unsigned int depth);
+		void processChunk(glm::mat4 mat, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotation, size_t vOffset, unsigned int depth);
 		// Adds leafs to the final tree data
-		void addLeaf(glm::mat4 & mat, glm::vec3 lastScaling, size_t offset, unsigned int depth);
+		void addLeaf(glm::mat4 mat, glm::vec3 lastScaling, size_t offset, unsigned int depth);
 		// Utility function used to fill the class vectors
-		void appendVerticesAndFaces(Mesh * source, glm::mat4 & model, glm::vec3 scale, unsigned int depth, size_t vOffset, bool keepBase, bool isLeaf = false);
+		void appendVerticesAndFaces(Mesh * source, glm::mat4 model, glm::vec3 scale, unsigned int depth, size_t vOffset, bool keepBase, bool isLeaf = false);
 
 		// Returns a random sign (either positive or negative)
 		float randSign();

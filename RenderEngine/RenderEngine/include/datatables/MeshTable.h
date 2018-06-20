@@ -37,7 +37,7 @@ namespace Engine
 		Mesh * getMesh(std::string fileName);
 
 		// Manually place a mesh into the cache
-		void addMeshToCache(std::string name, Mesh & mesh);
+		void addMeshToCache(std::string name, const Mesh & mesh);
 
 		// Clean all meshes (GPU & CPU)
 		void clean();

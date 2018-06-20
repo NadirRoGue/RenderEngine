@@ -2,8 +2,8 @@
 
 layout (location=0) out vec4 outColor;
 
-in vec2 texCoord;
-in vec3 planePos;
+layout (location=0) in vec2 texCoord;
+layout (location=1) in vec3 planePos;
 
 uniform vec2 screenSize;
 

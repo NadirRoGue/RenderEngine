@@ -37,7 +37,7 @@ namespace Engine
 		std::vector<glm::vec3> splinePoints;
 		glm::vec3 previousPoint;
 	public:
-		CameraBezier(Camera * cam, glm::vec3 & centerOfSpline, float splineRadius, float moveSpeed);
+		CameraBezier(Camera * cam, glm::vec3 centerOfSpline, float splineRadius, float moveSpeed);
 		void update();
 	private:
 		// Generates a square around the rotation point

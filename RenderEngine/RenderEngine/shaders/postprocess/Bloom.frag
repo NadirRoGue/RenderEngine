@@ -6,7 +6,7 @@
 layout (location=0) out vec4 outColor;
 layout (location=1) out vec4 outEmission;
 
-in vec2 texCoord;
+layout (location=0) in vec2 texCoord;
 
 // Input
 uniform sampler2D postProcessing_0;

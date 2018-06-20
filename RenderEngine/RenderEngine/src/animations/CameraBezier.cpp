@@ -3,7 +3,7 @@
 #include "WorldConfig.h"
 #include "TimeAccesor.h"
 
-Engine::CameraBezier::CameraBezier(Engine::Camera * camera, glm::vec3 & centerOfSpline, float splineRadius, float moveSpeed)
+Engine::CameraBezier::CameraBezier(Engine::Camera * camera, glm::vec3 centerOfSpline, float splineRadius, float moveSpeed)
 	:Engine::Animation("CameraBezier", NULL),cam(camera),moveSpeed(moveSpeed),splineRadius(splineRadius),currentIndex(0),alpha(0.0f)
 {
 	alphaStep = 1.0f / (splineRadius);
