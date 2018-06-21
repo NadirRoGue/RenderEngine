@@ -33,6 +33,9 @@ namespace Engine
 		static float worldTileScale;
 		static unsigned int worldRenderRadius;
 
+		static glm::vec3 windDirection;
+		static float windStrength;
+
 		static float terrainAmplitude;
 		static float terrainFrecuency;
 		static float terrainScale;
@@ -51,7 +54,6 @@ namespace Engine
 		static float waterHeight;
 
 		static float cloudType;
-		static float cloudSpeed;
 		static float coverageMultiplier;
 		static glm::vec3 cloudColor;
 

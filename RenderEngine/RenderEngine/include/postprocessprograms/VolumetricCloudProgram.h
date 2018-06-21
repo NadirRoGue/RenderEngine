@@ -53,6 +53,8 @@ namespace Engine
 		unsigned int uCloudType;
 		// Cloud speed id
 		unsigned int uCloudSpeed;
+		// Wind direction id
+		unsigned int uWindDirection;
 		// Coverage multiplier id
 		unsigned int uCoverageMultiplier;
 

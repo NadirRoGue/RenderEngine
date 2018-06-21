@@ -36,6 +36,7 @@ Engine::VolumetricCloudProgram::VolumetricCloudProgram(const Engine::VolumetricC
 	uTime = other.uTime;
 
 	uCloudSpeed = other.uCloudSpeed;
+	uWindDirection = other.uWindDirection;
 	uCloudType = other.uCloudType;
 	uCoverageMultiplier = other.uCoverageMultiplier;
 
@@ -65,6 +66,7 @@ void Engine::VolumetricCloudProgram::configureProgram()
 	uTime = glGetUniformLocation(glProgram, "time");
 
 	uCloudSpeed = glGetUniformLocation(glProgram, "cloudSpeed");
+	uWindDirection = glGetUniformLocation(glProgram, "windDirection");
 	uCloudType = glGetUniformLocation(glProgram, "cloudType");
 	uCoverageMultiplier = glGetUniformLocation(glProgram, "coverageMultiplier");
 
@@ -93,7 +95,8 @@ void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, Engine
 
 	glUniform3fv(uCloudColor, 1, &Engine::Settings::cloudColor[0]);
 	glUniform1f(uTime, Engine::Time::timeSinceBegining);
-	glUniform1f(uCloudSpeed, Engine::Settings::cloudSpeed);
+	glUniform1f(uCloudSpeed, Engine::Settings::windStrength);
+	glUniform3fv(uWindDirection, 1, &Engine::Settings::windDirection[0]);
 	glUniform1f(uCloudType, Engine::Settings::cloudType);
 	glUniform1f(uCoverageMultiplier, Engine::Settings::coverageMultiplier);
 

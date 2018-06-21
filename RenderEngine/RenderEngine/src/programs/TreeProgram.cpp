@@ -2,6 +2,7 @@
 
 #include "WorldConfig.h"
 #include "CascadeShadowMaps.h"
+#include "TimeAccesor.h"
 
 #include <iostream>
 
@@ -37,6 +38,9 @@ Engine::TreeProgram::TreeProgram(const TreeProgram & other)
 	uMaxHeight = other.uMaxHeight;
 	uDepthMap0 = other.uDepthMap0;
 	uDepthMap1 = other.uDepthMap1;
+	uSinTime = other.uSinTime;
+	uWindDir = other.uWindDir;
+	uWindStrength = other.uWindStrength;
 
 	uInPos = other.uInPos;
 	uInColor = other.uInColor;
@@ -106,6 +110,10 @@ void Engine::TreeProgram::configureProgram()
 	uDepthMap1 = glGetUniformLocation(glProgram, "depthTexture1");
 	uWorldScale = glGetUniformLocation(glProgram, "worldScale");
 
+	uSinTime = glGetUniformLocation(glProgram, "sinTime");
+	uWindDir = glGetUniformLocation(glProgram, "windDirection");
+	uWindStrength = glGetUniformLocation(glProgram, "windStrength");
+
 	uInPos = glGetAttribLocation(glProgram, "inPos");
 	uInColor = glGetAttribLocation(glProgram, "inColor");
 	uInNormal = glGetAttribLocation(glProgram, "inNormal");
@@ -168,6 +176,10 @@ void Engine::TreeProgram::applyGlobalUniforms()
 		glm::vec3 ld = glm::normalize(Engine::Settings::lightDirection);
 		glUniform3fv(uLightDir, 1, &ld[0]);
 	}
+
+	glUniform1f(uSinTime, glm::sin(Engine::Time::timeSinceBegining));
+	glUniform3fv(uWindDir, 1, &Engine::Settings::windDirection[0]);
+	glUniform1f(uWindStrength, Engine::Settings::windStrength);
 
 	glUniform1f(uMaxHeight, Engine::Settings::waterHeight + Engine::Settings::vegetationMaxHeight);
 	glUniform1f(uWorldScale, Engine::Settings::worldTileScale);

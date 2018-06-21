@@ -66,6 +66,12 @@ namespace Engine
 		unsigned int uMaxHeight;
 		// World tile scale
 		unsigned int uWorldScale;
+		// Sin of elapsed time since beggining
+		unsigned int uSinTime;
+		// Wind direction vector
+		unsigned int uWindDir;
+		// Wind strength
+		unsigned int uWindStrength;
 
 		// Vetex position attribute id
 		unsigned int uInPos;

@@ -38,6 +38,7 @@ uniform int frame;
 uniform float time;
 uniform float cloudType;
 uniform float cloudSpeed;
+uniform vec3 windDirection;
 uniform float coverageMultiplier;
 
 // Cone sampling random offsets
@@ -62,7 +63,6 @@ uniform float bayerFilter[16u] = float[]
 );
 
 #define CLOUD_TOP_OFFSET 25.0
-#define WIND_DIRECTION vec3(1,-0.2,0)
 
 #define SPHERE_PROJECTION
 
@@ -188,8 +188,8 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive, fl
 	//float heightFraction = getHeightFraction (p);
 
 	// Make clouds evolve with wind
-	p += hf * WIND_DIRECTION * CLOUD_TOP_OFFSET;
-	p += WIND_DIRECTION * time * cloudSpeed;
+	p += hf * windDirection * CLOUD_TOP_OFFSET;
+	p += windDirection * time * cloudSpeed;
 
 	float heightFraction = getHeightFraction(p);
 
@@ -212,7 +212,7 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive, fl
 
 	// Apply density gradient based on cloud type
 	float densityGradient = getDensityForCloud(heightFraction, cloudType);
-	baseCloudShape *= (densityGradient / heightFraction) * (1.0 - heightFraction);
+	baseCloudShape *= (densityGradient / heightFraction);// * (1.0 - heightFraction);
 
 	// Apply coverage
 	float coverage = weatherData.r * coverageMultiplier;

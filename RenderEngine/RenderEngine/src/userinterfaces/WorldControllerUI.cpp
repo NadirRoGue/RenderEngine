@@ -66,6 +66,14 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::Separator();
 		ImGui::Spacing(); ImGui::Spacing();
 
+		ImGui::Text("Wind settings");
+		ImGui::SliderFloat3("Wind direction", &Engine::Settings::windDirection[0], -1.0f, 1.0f);
+		ImGui::SliderFloat("Wind strength", &Engine::Settings::windStrength, 0.0f, 50.0f);
+
+		ImGui::Spacing(); ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing(); ImGui::Spacing();
+
 		ImGui::Text("Terrain settings");
 		ImGui::SliderFloat("Amplitude##app", &Engine::Settings::terrainAmplitude, 0.0f, 2.0f);
 		ImGui::SliderFloat("Frecuency##app",&Engine::Settings::terrainFrecuency, 0.0f, 2.0f);
@@ -103,7 +111,6 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::Text("Cloud settings");
 		ImGui::SliderFloat("Cloud type##app", &Engine::Settings::cloudType, 0.0f, 1.0f);
 		ImGui::SliderFloat("Cloud coverage##app", &Engine::Settings::coverageMultiplier, 0.0f, 1.0f);
-		ImGui::SliderFloat("Cloud speed##app", &Engine::Settings::cloudSpeed, 0.0f, 50.0f);
 		ImGui::ColorEdit3("Cloud Color multiplier##app", &Engine::Settings::cloudColor[0]);
 
 		ImGui::Spacing(); ImGui::Spacing();

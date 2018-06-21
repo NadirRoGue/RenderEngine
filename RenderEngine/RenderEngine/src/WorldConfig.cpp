@@ -13,6 +13,9 @@ glm::vec3 Engine::Settings::lightDirection = glm::vec3(1, 0.515, 0);
 float Engine::Settings::worldTileScale = 7.0f;
 unsigned int Engine::Settings::worldRenderRadius = 12;
 
+glm::vec3 Engine::Settings::windDirection = glm::vec3(1, 0, 0);
+float Engine::Settings::windStrength = 1.0f;
+
 float Engine::Settings::terrainAmplitude = 0.65f;
 float Engine::Settings::terrainFrecuency = 0.5f;
 float Engine::Settings::terrainScale = 0.9f;
@@ -30,7 +33,6 @@ glm::vec3 Engine::Settings::waterColor = glm::vec3(0.06f, 0.52f, 0.337f);
 float Engine::Settings::waterSpeed = 0.0025f;
 float Engine::Settings::waterHeight = 0.09f;
 
-float Engine::Settings::cloudSpeed = 1.0f;
 float Engine::Settings::cloudType = 0.5f;
 float Engine::Settings::coverageMultiplier = 0.228f;
 glm::vec3 Engine::Settings::cloudColor = glm::vec3(1, 1, 1);
