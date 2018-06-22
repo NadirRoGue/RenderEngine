@@ -18,13 +18,9 @@ unsigned int Engine::WaterComponent::getRenderRadius()
 
 void Engine::WaterComponent::initialize()
 {
-	fillShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralWaterProgram>(
-		Engine::ProceduralWaterProgram::PROGRAM_NAME,
-		0);
+	fillShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralWaterProgram>();
 
-	wireShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralWaterProgram>(
-		Engine::ProceduralWaterProgram::PROGRAM_NAME,
-		Engine::ProceduralWaterProgram::WIRE_DRAW_MODE);
+	wireShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralWaterProgram>(Engine::ProceduralWaterProgram::WIRE_DRAW_MODE);
 
 	/*shadowShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralTerrainProgram>(
 		Engine::ProceduralTerrainProgram::PROGRAM_NAME,

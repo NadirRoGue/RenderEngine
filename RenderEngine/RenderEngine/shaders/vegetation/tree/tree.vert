@@ -17,13 +17,19 @@ uniform vec3 windDirection;
 uniform float windStrength;
 uniform vec2 tileUV;
 
+float Random2D(in vec2 st)
+{
+	float val = (sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+	return val < 0.0? -1.0 : 1.0;
+}
+
 void main()
 {
 	// Make wind direction y 0 to avoid stretching and squashing on the trees
 	vec3 wd = vec3(windDirection.x, 0, windDirection.z);
 
 	// Modify base pos by the wind dir/strength, vertex height and some randomness
-	vec3 pos = inPos + sinTime * 0.01 * wd * windStrength * inPos.y;
+	vec3 pos = inPos + sinTime * 0.01 * wd * windStrength * inPos.y * Random2D(tileUV);
 
 	outColor = inColor;
 	outEmission = inEmission;

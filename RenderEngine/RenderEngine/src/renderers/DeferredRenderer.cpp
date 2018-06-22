@@ -81,7 +81,7 @@ void Engine::DeferredRenderer::initialize()
 	forwardPassBuffer->initialize();
 
 	// Instantiate deferred shading program
-	deferredShading = dynamic_cast<Engine::DeferredShadingProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::DeferredShadingProgram::PROGRAM_NAME));
+	deferredShading = Engine::ProgramTable::getInstance().getProgram<Engine::DeferredShadingProgram>();
 	Engine::Mesh * mi = Engine::MeshTable::getInstance().getMesh("plane");
 	deferredShading->configureMeshBuffers(mi);
 	deferredDrawSurface = new Engine::PostProcessObject(mi);
@@ -117,7 +117,7 @@ void Engine::DeferredRenderer::initialize()
 	}
 
 	// Create buffers to screen shader
-	screenOutput = dynamic_cast<Engine::PostProcessProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::PostProcessProgram::PROGRAM_NAME));
+	screenOutput = Engine::ProgramTable::getInstance().getProgram<Engine::PostProcessProgram>();
 	screenOutput->configureMeshBuffers(mi);
 	chainEnd = new Engine::PostProcessObject(mi);
 

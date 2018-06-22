@@ -23,13 +23,9 @@ unsigned int Engine::FlowerComponent::getRenderRadius()
 void Engine::FlowerComponent::initialize()
 {
 	// SHADERS
-	fillShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>(
-		Engine::TreeProgram::PROGRAM_NAME,
-		0);
+	fillShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>();
 
-	wireShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>(
-		Engine::TreeProgram::PROGRAM_NAME,
-		Engine::TreeProgram::WIRE_MODE);
+	wireShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>(Engine::TreeProgram::WIRE_MODE);
 
 	activeShader = fillShader;
 

@@ -39,7 +39,7 @@ namespace Engine
 
 		// Returns a program of the given type already as an instance of such class
 		template<typename T>
-		T * getProgram(std::string name, unsigned long long parameters = 0)
+		T * getProgram(unsigned long long parameters = 0)
 		{
 			Program * p = getProgramByName(T::PROGRAM_NAME, parameters);
 			if (p == NULL) return NULL;

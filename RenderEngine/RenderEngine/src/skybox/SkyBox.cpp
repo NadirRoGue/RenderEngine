@@ -58,7 +58,7 @@ void Engine::SkyBox::render(Engine::Camera * camera)
 void Engine::SkyBox::initialize()
 {
 	// Instance shaders and meshes
-	shader = Engine::ProgramTable::getInstance().getProgram<Engine::SkyProgram>(Engine::SkyProgram::PROGRAM_NAME);
+	shader = Engine::ProgramTable::getInstance().getProgram<Engine::SkyProgram>();
 	Engine::Mesh * mesh = Engine::MeshTable::getInstance().getMesh("cube");
 
 	shader->configureMeshBuffers(mesh);

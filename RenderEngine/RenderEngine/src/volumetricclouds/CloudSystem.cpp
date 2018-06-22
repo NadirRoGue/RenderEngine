@@ -13,9 +13,9 @@ Engine::CloudSystem::VolumetricClouds::VolumetricClouds()
 {
 	//Engine::CascadeShadowMaps::getInstance().registerShadowCaster(this);
 
-	shader = Engine::ProgramTable::getInstance().getProgram<Engine::VolumetricCloudProgram>(Engine::VolumetricCloudProgram::PROGRAM_NAME, 0);
-	filterShader = Engine::ProgramTable::getInstance().getProgram<Engine::CloudFilterProgram>(Engine::CloudFilterProgram::PROGRAM_NAME, 0);
-	shadowShader = Engine::ProgramTable::getInstance().getProgram<Engine::CloudShadowProgram>(Engine::CloudShadowProgram::PROGRAM_NAME, 0);
+	shader = Engine::ProgramTable::getInstance().getProgram<Engine::VolumetricCloudProgram>();
+	filterShader = Engine::ProgramTable::getInstance().getProgram<Engine::CloudFilterProgram>();
+	shadowShader = Engine::ProgramTable::getInstance().getProgram<Engine::CloudShadowProgram>();
 
 	renderPlane = Engine::MeshTable::getInstance().getMesh("plane");
 

@@ -18,16 +18,12 @@ unsigned int Engine::LandscapeComponent::getRenderRadius()
 
 void Engine::LandscapeComponent::initialize()
 {
-	fillShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralTerrainProgram>(
-		Engine::ProceduralTerrainProgram::PROGRAM_NAME, 
-		0);
+	fillShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralTerrainProgram>();
 
 	wireShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralTerrainProgram>(
-		Engine::ProceduralTerrainProgram::PROGRAM_NAME,
 		Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE);
 
 	shadowShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralTerrainProgram>(
-		Engine::ProceduralTerrainProgram::PROGRAM_NAME,
 		Engine::ProceduralTerrainProgram::SHADOW_MAP);
 
 	Engine::Mesh * tile = Engine::MeshTable::getInstance().getMesh("terrain_tile");

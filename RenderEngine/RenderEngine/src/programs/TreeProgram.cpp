@@ -177,7 +177,9 @@ void Engine::TreeProgram::applyGlobalUniforms()
 		glUniform3fv(uLightDir, 1, &ld[0]);
 	}
 
-	glUniform1f(uSinTime, glm::sin(Engine::Time::timeSinceBegining));
+	float sinTime = glm::sin(Engine::Time::timeSinceBegining);
+	sinTime *= sinTime;
+	glUniform1f(uSinTime, sinTime);
 	glUniform3fv(uWindDir, 1, &Engine::Settings::windDirection[0]);
 	glUniform1f(uWindStrength, Engine::Settings::windStrength);
 

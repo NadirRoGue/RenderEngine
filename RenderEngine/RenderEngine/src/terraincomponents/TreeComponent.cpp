@@ -26,17 +26,11 @@ unsigned int Engine::TreeComponent::getRenderRadius()
 void Engine::TreeComponent::initialize()
 {
 	// SHADERS
-	fillShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>(
-		Engine::TreeProgram::PROGRAM_NAME,
-		0);
+	fillShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>();
 
-	wireShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>(
-		Engine::TreeProgram::PROGRAM_NAME,
-		Engine::TreeProgram::WIRE_MODE);
+	wireShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>(Engine::TreeProgram::WIRE_MODE);
 
-	shadowShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>(
-		Engine::TreeProgram::PROGRAM_NAME,
-		Engine::TreeProgram::SHADOW_MAP);
+	shadowShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>(Engine::TreeProgram::SHADOW_MAP);
 
 	activeShader = fillShader;
 

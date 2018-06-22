@@ -254,7 +254,7 @@ Engine::PostProcessChainNode * createSSAANode()
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 
 	// Shader
-	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSAAProgram::PROGRAM_NAME);
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgram<Engine::SSAAProgram>();
 
 	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
@@ -279,7 +279,7 @@ Engine::PostProcessChainNode * createBloomNode()
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 	
 	// Shader
-	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::BloomProgram::PROGRAM_NAME);
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgram<Engine::BloomProgram>();
 
 	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
@@ -305,7 +305,7 @@ Engine::PostProcessChainNode * createSSReflectionNode()
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 
 	// Shader
-	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSReflectionProgram::PROGRAM_NAME);
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgram<Engine::SSReflectionProgram>();
 
 	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
@@ -330,7 +330,7 @@ Engine::PostProcessChainNode * createSSGrassNode()
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 
 	// Shader
-	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSGrassProgram::PROGRAM_NAME);
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgram<Engine::SSGrassProgram>();
 
 	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(2, false);
@@ -356,7 +356,7 @@ Engine::PostProcessChainNode * createHDRNode()
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 
 	// Shader
-	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::HDRToneMappingProgram::PROGRAM_NAME);
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgram<Engine::HDRToneMappingProgram>();
 
 	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
@@ -381,7 +381,7 @@ Engine::PostProcessChainNode * createSSGodRayNode()
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 
 	// Shader
-	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::SSGodRayProgram::PROGRAM_NAME);
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgram<Engine::SSGodRayProgram>();
 
 	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
@@ -406,7 +406,7 @@ Engine::PostProcessChainNode * createDOFNode()
 	Engine::PostProcessChainNode * node = new Engine::PostProcessChainNode;
 
 	// Shader
-	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgramByName(Engine::DepthOfFieldProgram::PROGRAM_NAME);
+	node->postProcessProgram = Engine::ProgramTable::getInstance().getProgram<Engine::DepthOfFieldProgram>();
 
 	// RTT
 	node->renderBuffer = new Engine::DeferredRenderObject(1, false);
