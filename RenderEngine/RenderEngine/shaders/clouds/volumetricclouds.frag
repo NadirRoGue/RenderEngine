@@ -216,21 +216,24 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive, fl
 
 	// Apply coverage
 	float coverage = weatherData.r * coverageMultiplier;
+	// Make sure cloud with less density than actual coverage dissapears
 	float coveragedCloud = remapValue(baseCloudShape, coverage, 1.0, 0.0, 1.0);
 	coveragedCloud *= coverage;
 
 	float finalCloud = coveragedCloud;
 
-	// Only erode the cloud if visible
+	// Only erode the cloud if erosion will be visible (low density sampled until now)
 	if(expensive)
 	{
 		// Build−high frequency Worley noise FBM.
 		vec3 erodeCloudNoise = textureLod(worley, vec3(uv, heightFraction) * 0.1, lod).rgb;
 		float highFreqFBM = (erodeCloudNoise.r * 0.625) + (erodeCloudNoise.g * 0.25) + (erodeCloudNoise.b * 0.125);
 
+		// Recompute height fraction after applying wind and top offset
 		heightFraction = getHeightFraction(p);
 		float highFreqNoiseModifier = mix(highFreqFBM, 1.0 - highFreqFBM, clamp(heightFraction * 1.0, 0.0, 1.0));
 
+		// Actual cloud erosion
 		coveragedCloud = coveragedCloud - highFreqNoiseModifier * (1.0 - coveragedCloud);
 
 		finalCloud = remapValue(coveragedCloud, highFreqNoiseModifier * 0.2, 1.0, 0.0, 1.0);
@@ -245,9 +248,13 @@ float sampleCloudDensity(vec3 p, vec3 weatherData, float lod, bool expensive, fl
 float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 {
 	vec3 startPos = pos;
+	// Modify step size to take as much info as possible in 6 steps
 	vec3 rayStep = lightDir * (stepSize * 5.0);
+	// Starting cone radius. Will increase as we move along it
 	float coneRadius = 1.0;
+	// Sampled density until now
 	float density = 0.0;
+	// Density - transmittance until now
 	float coneDensity = 0.0;
 	float invDepth = 1.0 / (stepSize * 6);
 
@@ -256,7 +263,10 @@ float raymarchToLight(vec3 pos, vec3 d, float stepSize)
 	int i = 0;
 	while(i < 6)
 	{
+		// Get position inside cone
 		vec3 posInCone = startPos + coneRadius * noiseKernel[i] * float(i);
+
+		// By advancing towards the light we might go outside the atmosphere
 		float heightFraction = getHeightFraction(posInCone);
 		if(heightFraction <= 1.0)
 		{

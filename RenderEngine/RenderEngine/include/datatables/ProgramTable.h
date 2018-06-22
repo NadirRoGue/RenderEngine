@@ -41,7 +41,7 @@ namespace Engine
 		template<typename T>
 		T * getProgram(std::string name, unsigned long long parameters = 0)
 		{
-			Program * p = getProgramByName(name, parameters);
+			Program * p = getProgramByName(T::PROGRAM_NAME, parameters);
 			if (p == NULL) return NULL;
 
 			return static_cast<T*>(p);
