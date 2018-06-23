@@ -52,6 +52,8 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 		ImGui::Combo("Drawing method##app", reinterpret_cast< int32_t* >(&Engine::Settings::drawingMethod), "Shaded\0Wireframe\0", 2);
 		ImGui::Spacing();
 		ImGui::Combo("Travel method##app", reinterpret_cast<int32_t*>(&Engine::Settings::travelMethod), "Manual\0Bezier\0Straight", 3);
+		ImGui::Spacing();
+		ImGui::ColorEdit3("Tint", &Engine::Settings::hdrTint[0]);
 
 		ImGui::Spacing(); ImGui::Spacing();
 		ImGui::Separator();

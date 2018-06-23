@@ -8,10 +8,11 @@ uniform sampler2D postProcessing_0;
 
 uniform float exposure;
 uniform float gamma;
+uniform vec3 tint;
 
 void main()
 {
-    vec3 hdrColor = texture(postProcessing_0, texCoord).rgb;
+    vec3 hdrColor = texture(postProcessing_0, texCoord).rgb * tint;
     // Exposure tone mapping
     vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
     // Gamma correction 

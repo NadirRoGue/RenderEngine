@@ -15,6 +15,7 @@ Engine::HDRToneMappingProgram::HDRToneMappingProgram(const Engine::HDRToneMappin
 {
 	uExposure = other.uExposure;
 	uGamma = other.uGamma;
+	uTint = other.uTint;
 }
 
 void Engine::HDRToneMappingProgram::configureProgram()
@@ -23,6 +24,7 @@ void Engine::HDRToneMappingProgram::configureProgram()
 
 	uExposure = glGetUniformLocation(glProgram, "exposure");
 	uGamma = glGetUniformLocation(glProgram, "gamma");
+	uTint = glGetUniformLocation(glProgram, "tint");
 }
 
 void Engine::HDRToneMappingProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
@@ -31,6 +33,7 @@ void Engine::HDRToneMappingProgram::onRenderObject(const Engine::Object * obj, E
 
 	glUniform1f(uExposure, Engine::Settings::hdrExposure);
 	glUniform1f(uGamma, Engine::Settings::hdrGamma);
+	glUniform3fv(uTint, 1, &Engine::Settings::hdrTint[0]);
 }
 
 // =========================================================================================================================

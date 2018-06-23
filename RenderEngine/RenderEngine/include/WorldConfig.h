@@ -59,6 +59,7 @@ namespace Engine
 
 		static float hdrExposure;
 		static float hdrGamma;
+		static glm::vec3 hdrTint;
 
 		static float dofFocalDist;
 		static float dofMaxDist;

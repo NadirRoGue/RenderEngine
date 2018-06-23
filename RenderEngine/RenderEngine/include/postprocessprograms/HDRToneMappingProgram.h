@@ -22,6 +22,8 @@ namespace Engine
 		unsigned int uExposure;
 		// Gamma correction id
 		unsigned int uGamma;
+		// Tint to apply id
+		unsigned int uTint;
 	public:
 		HDRToneMappingProgram(std::string name, unsigned long long params);
 		HDRToneMappingProgram(const HDRToneMappingProgram & other);

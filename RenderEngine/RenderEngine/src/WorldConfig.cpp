@@ -42,6 +42,7 @@ float Engine::Settings::dofMaxDist = 0.01f;
 
 float Engine::Settings::hdrExposure = 6.0f;
 float Engine::Settings::hdrGamma = 0.368f;
+glm::vec3 Engine::Settings::hdrTint = glm::vec3(1.0f);
 
 float Engine::Settings::godRaysDecay = 0.904f;
 float Engine::Settings::godRaysDensity = 0.318f;
