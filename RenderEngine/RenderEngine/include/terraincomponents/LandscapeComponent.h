@@ -21,6 +21,8 @@ namespace Engine
 		ProceduralTerrainProgram * fillShader;
 		// Wireframe mode program
 		ProceduralTerrainProgram * wireShader;
+		// Point mode program
+		ProceduralTerrainProgram * pointShader;
 		// Shadow map render program
 		ProceduralTerrainProgram * shadowShader;
 

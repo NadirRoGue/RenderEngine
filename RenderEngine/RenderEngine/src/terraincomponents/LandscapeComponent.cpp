@@ -23,6 +23,9 @@ void Engine::LandscapeComponent::initialize()
 	wireShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralTerrainProgram>(
 		Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE);
 
+	pointShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralTerrainProgram>(
+		Engine::ProceduralTerrainProgram::POINT_DRAW_MODE);
+
 	shadowShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralTerrainProgram>(
 		Engine::ProceduralTerrainProgram::SHADOW_MAP);
 
@@ -80,6 +83,10 @@ void Engine::LandscapeComponent::notifyRenderModeChange(Engine::RenderMode mode)
 		break;
 	case Engine::RenderMode::RENDER_MODE_WIRE:
 		activeShader = wireShader;
+		break;
+	case Engine::RenderMode::RENDER_MODE_POINT:
+		activeShader = pointShader;
+		break;
 	}
 }
 

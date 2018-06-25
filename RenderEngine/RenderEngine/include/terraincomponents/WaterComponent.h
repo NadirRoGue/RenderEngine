@@ -21,6 +21,8 @@ namespace Engine
 		ProceduralWaterProgram * fillShader;
 		// Wireframe program
 		ProceduralWaterProgram * wireShader;
+		// Point program
+		ProceduralWaterProgram * pointShader;
 		//ProceduralWaterProgram * shadowShader;
 
 		// Active shader

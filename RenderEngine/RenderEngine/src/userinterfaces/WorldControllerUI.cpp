@@ -49,7 +49,7 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 
 		ImGui::Text("Drawing settings");
 		ImGui::PushItemWidth(150.0f);
-		ImGui::Combo("Drawing method##app", reinterpret_cast< int32_t* >(&Engine::Settings::drawingMethod), "Shaded\0Wireframe\0", 2);
+		ImGui::Combo("Drawing method##app", reinterpret_cast< int32_t* >(&Engine::Settings::drawingMethod), "Shaded\0Wireframe\0Points", 3);
 		ImGui::Spacing();
 		ImGui::Combo("Travel method##app", reinterpret_cast<int32_t*>(&Engine::Settings::travelMethod), "Manual\0Bezier\0Straight", 3);
 		ImGui::Spacing();

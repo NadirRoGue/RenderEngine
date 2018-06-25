@@ -10,6 +10,7 @@ const std::string Engine::TreeProgram::PROGRAM_NAME = "TreeProgram";
 
 const unsigned long long Engine::TreeProgram::SHADOW_MAP = 0x01;
 const unsigned long long Engine::TreeProgram::WIRE_MODE = 0x02;
+const unsigned long long Engine::TreeProgram::POINT_MODE = 0x04;
 
 Engine::TreeProgram::TreeProgram(std::string name, unsigned long long params)
 	:Program(name, params)
@@ -61,6 +62,10 @@ void Engine::TreeProgram::initialize()
 	if (parameters & Engine::TreeProgram::WIRE_MODE)
 	{
 		config += "#define WIRE_MODE";
+	}
+	else if (parameters & Engine::TreeProgram::POINT_MODE)
+	{
+		config += "#define POINT_MODE";
 	}
 
 	vShader = loadShader(vShaderFile, GL_VERTEX_SHADER, config);

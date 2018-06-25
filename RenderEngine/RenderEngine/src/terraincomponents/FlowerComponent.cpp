@@ -27,6 +27,8 @@ void Engine::FlowerComponent::initialize()
 
 	wireShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>(Engine::TreeProgram::WIRE_MODE);
 
+	pointShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>(Engine::TreeProgram::POINT_MODE);
+
 	activeShader = fillShader;
 
 	flowersToSpawn = 35;
@@ -116,6 +118,10 @@ void Engine::FlowerComponent::notifyRenderModeChange(Engine::RenderMode mode)
 		break;
 	case Engine::RenderMode::RENDER_MODE_WIRE:
 		activeShader = wireShader;
+		break;
+	case Engine::RenderMode::RENDER_MODE_POINT:
+		activeShader = pointShader;
+		break;
 	}
 }
 

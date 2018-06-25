@@ -21,6 +21,8 @@ namespace Engine
 		TreeProgram * fillShader;
 		// Program version to render as wireframe
 		TreeProgram * wireShader;
+		// Program version to render as points
+		TreeProgram * pointShader;
 
 		// Active render shader
 		TreeProgram * activeShader;

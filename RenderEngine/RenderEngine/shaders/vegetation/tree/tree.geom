@@ -1,8 +1,10 @@
 #version 410 core
 
 layout(triangles) in;
-#ifdef WIRE_MODE
+#if defined WIRE_MODE
 layout(line_strip, max_vertices=3) out;
+#elif defined POINT_MODE
+layout(points, max_vertices=3) out;
 #else
 layout(triangle_strip, max_vertices=3) out;
 #endif

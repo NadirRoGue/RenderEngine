@@ -23,6 +23,8 @@ namespace Engine
 		TreeProgram * fillShader;
 		// Wireframe mode program
 		TreeProgram * wireShader;
+		// Point mode program
+		TreeProgram * pointShader;
 		// Shadow map render program
 		TreeProgram * shadowShader;
 

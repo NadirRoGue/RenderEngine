@@ -22,6 +22,8 @@ void Engine::WaterComponent::initialize()
 
 	wireShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralWaterProgram>(Engine::ProceduralWaterProgram::WIRE_DRAW_MODE);
 
+	pointShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralWaterProgram>(Engine::ProceduralWaterProgram::POINT_DRAW_MODE);
+
 	/*shadowShader = Engine::ProgramTable::getInstance().getProgram<Engine::ProceduralTerrainProgram>(
 		Engine::ProceduralTerrainProgram::PROGRAM_NAME,
 		Engine::ProceduralTerrainProgram::SHADOW_MAP);*/
@@ -85,6 +87,9 @@ void Engine::WaterComponent::notifyRenderModeChange(Engine::RenderMode mode)
 	{
 	case Engine::RenderMode::RENDER_MODE_SHADED:
 		activeShader = fillShader;
+		break;
+	case Engine::RenderMode::RENDER_MODE_POINT:
+		activeShader = pointShader;
 		break;
 	case Engine::RenderMode::RENDER_MODE_WIRE:
 		activeShader = wireShader;

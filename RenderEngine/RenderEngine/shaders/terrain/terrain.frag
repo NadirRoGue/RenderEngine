@@ -253,6 +253,7 @@ void main()
 	float grassData = 0.0;
 	float alpha = 1.0;
 #ifndef WIRE_MODE
+#ifndef POINT_MODE
 
 	// Compute color gradient based on height / slope
 	float tenPerCentGrass = grassCoverage - grassCoverage * 0.1;
@@ -267,6 +268,7 @@ void main()
 	alpha = height <= waterHeight? (height / waterHeight) - 0.4 : 1.0;
 	alpha = clamp(alpha, 0.0, 1.0);
 	heightColor = alpha < 0.95? heightColor + (computeCaustics(inUV + time * 0.007) + computeCaustics(inUV.yx - time * 0.007)) * (0.95 - alpha) : heightColor;
+#endif
 #endif
 
 	// OUTPUT G BUFFERS

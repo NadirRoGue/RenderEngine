@@ -10,7 +10,8 @@
 std::string Engine::ProceduralWaterProgram::PROGRAM_NAME = "ProceduralWaterProgram";
 
 const unsigned long long Engine::ProceduralWaterProgram::WIRE_DRAW_MODE = 0x01;
-const unsigned long long Engine::ProceduralWaterProgram::SHADOW_MAP = 0x02;
+const unsigned long long Engine::ProceduralWaterProgram::POINT_DRAW_MODE = 0x02;
+const unsigned long long Engine::ProceduralWaterProgram::SHADOW_MAP = 0x04;
 
 Engine::ProceduralWaterProgram::ProceduralWaterProgram(std::string name, unsigned long long params)
 	:Engine::Program(name, params)
@@ -55,6 +56,10 @@ void Engine::ProceduralWaterProgram::initialize()
 	if (parameters & Engine::ProceduralWaterProgram::WIRE_DRAW_MODE)
 	{
 		configStr += "#define WIRE_MODE";
+	}
+	else if (parameters & Engine::ProceduralWaterProgram::POINT_DRAW_MODE)
+	{
+		configStr += "#define POINT_MODE";
 	}
 
 	if (parameters & Engine::ProceduralWaterProgram::SHADOW_MAP)

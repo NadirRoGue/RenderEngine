@@ -9,7 +9,8 @@
 const std::string Engine::ProceduralTerrainProgram::PROGRAM_NAME = "ProceduralTerrainProgram";
 
 const unsigned long long Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE = 0x01;
-const unsigned long long Engine::ProceduralTerrainProgram::SHADOW_MAP = 0x02;
+const unsigned long long Engine::ProceduralTerrainProgram::POINT_DRAW_MODE = 0x02;
+const unsigned long long Engine::ProceduralTerrainProgram::SHADOW_MAP = 0x04;
 
 // ==================================================================================
 
@@ -69,6 +70,10 @@ void Engine::ProceduralTerrainProgram::initialize()
 	if (parameters & Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE)
 	{
 		configStr += "#define WIRE_MODE";
+	}
+	else if (parameters & Engine::ProceduralTerrainProgram::POINT_DRAW_MODE)
+	{
+		configStr += "#define POINT_MODE";
 	}
 
 	if (parameters & Engine::ProceduralTerrainProgram::SHADOW_MAP)

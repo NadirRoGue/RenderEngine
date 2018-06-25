@@ -116,7 +116,7 @@ void main()
 {
 #ifndef SHADOW_MAP
 	vec3 rawNormal = normalize(inNormal);
-#ifdef WIRE_MODE
+#if defined WIRE_MODE || defined POINT_MODE
 	outColor = vec4(0,0,0,1);
 	outNormal = vec4(rawNormal, 0);
 	outSpecular = vec4(0,0,0,0);

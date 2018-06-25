@@ -21,6 +21,8 @@ namespace Engine
 		// UBER Shader parameters
 		// Draw as wireframe mode
 		static const unsigned long long WIRE_DRAW_MODE;
+		// Draw as point mode
+		static const unsigned long long POINT_DRAW_MODE;
 		// Render shadow map depth mode (unused, discared to render water shadows)
 		static const unsigned long long SHADOW_MAP;
 	private:

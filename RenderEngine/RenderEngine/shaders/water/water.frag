@@ -141,7 +141,7 @@ void main()
 	lightdepth = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, 1);
 #else
 
-#ifdef WIRE_MODE
+#if defined WIRE_MODE || defined POINT_MODE
 	vec3 rawNormal = vec3(0,1,0);
 #else
 	float u = inUV.x;
@@ -168,7 +168,7 @@ void main()
 	// COMPUTE COLOR
 	// ------------------------------------------------------------------------------
 	float alpha = 1.0;
-#ifdef WIRE_MODE
+#if defined WIRE_MODE || defined POINT_MODE
 	vec3 color = vec3(0);
 #else
 	vec3 color = watercolor;
@@ -185,7 +185,7 @@ void main()
 	outNormal = vec4(n, 1.0);
 	outPos = vec4(inPos, 1.0);
 	outInfo = vec4(0, visibility, 0, alpha);
-#ifdef WIRE_MODE
+#if defined WIRE_MODE || defined POINT_MODE
 	outSpecular = vec4(0);
 	outEmissive = vec4(0);
 #else

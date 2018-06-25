@@ -30,6 +30,8 @@ void Engine::TreeComponent::initialize()
 
 	wireShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>(Engine::TreeProgram::WIRE_MODE);
 
+	pointShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>(Engine::TreeProgram::POINT_MODE);
+
 	shadowShader = Engine::ProgramTable::getInstance().getProgram<Engine::TreeProgram>(Engine::TreeProgram::SHADOW_MAP);
 
 	activeShader = fillShader;
@@ -209,6 +211,10 @@ void Engine::TreeComponent::notifyRenderModeChange(Engine::RenderMode mode)
 		break;
 	case Engine::RenderMode::RENDER_MODE_WIRE:
 		activeShader = wireShader;
+		break;
+	case Engine::RenderMode::RENDER_MODE_POINT:
+		activeShader = pointShader;
+		break;
 	}
 }
 

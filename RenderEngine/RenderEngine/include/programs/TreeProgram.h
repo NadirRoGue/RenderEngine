@@ -23,6 +23,8 @@ namespace Engine
 		const static unsigned long long SHADOW_MAP;
 		// Render as wireframe mode
 		const static unsigned long long WIRE_MODE;
+		// Render as point mode
+		const static unsigned long long POINT_MODE;
 	private:
 		// Geometry shader file path
 		std::string gShaderFile;
