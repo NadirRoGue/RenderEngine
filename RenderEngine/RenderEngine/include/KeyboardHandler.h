@@ -10,7 +10,7 @@
 namespace Engine
 {
 	// =========================================================================
-
+	// Parent class of every class that will handle user input from the keyboard
 	class KeyboardHandler
 	{
 	public:
@@ -18,6 +18,8 @@ namespace Engine
 		static const int MODE_PRESS;
 		static const int MODE_REPEAT;
 	protected:
+		// Keys to which the handler should be linked must be stored in this
+		// list on the handler constructor
 		std::list<unsigned char> usedKeys;
 	public:
 		KeyboardHandler();
@@ -27,7 +29,7 @@ namespace Engine
 
 	// =========================================================================
 	// =========================================================================
-
+	// Holds, updates, and manages in general all keyboard handlers
 	class KeyboardHandlersTable
 	{
 	private:

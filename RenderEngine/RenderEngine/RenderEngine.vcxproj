@@ -213,7 +213,6 @@
     <ClInclude Include="include\vegetation\FractalTree.h" />
     <ClInclude Include="include\volumetricclouds\CloudSystem.h" />
     <ClInclude Include="include\volumetricclouds\NoiseInitializer.h" />
-    <ClInclude Include="include\volumetricclouds\VolumetricClouds.h" />
     <ClInclude Include="include\windowmanagers\GLFWWindow.h" />
     <ClInclude Include="include\windowmanagers\GLUTWindow.h" />
     <ClInclude Include="include\windowmanagers\WindowManager.h" />

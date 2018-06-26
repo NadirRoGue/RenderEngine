@@ -11,6 +11,8 @@ uniform sampler2D postProcessing_0;
 uniform sampler2D grassBuffer;
 uniform sampler2D posBuffer;
 
+// Same remap value function as in the volumetric clouds, returns the valor within a range of 
+// a valor which is mapped to a different range
 float blend(float val , float val0 , float val1 , float res0 , float res1)
 {
 	if( val <= val0 ) return res0;
@@ -23,6 +25,7 @@ void main()
 {
 	float isGrass = texture(grassBuffer, texCoord).x;
 	vec4 backColor = texture(postProcessing_0, texCoord);
+	// Apply the effect only if we are treating a grass pixel
 	if(isGrass > 0.9)
 	{
 		vec3 pos = texture(posBuffer, texCoord).xyz;
@@ -48,6 +51,7 @@ void main()
 		// Make sure we dont paint grass in a zone oclude by non-grass data
 		outColor = offsetPos.z < pos.z? backColor : vec4(mix(backColor.rgb, texture(postProcessing_0, uvOffset).rgb, clamp(1 - yOffset * d / 3.8, 0, 1)), 1.0);
 		/*
+		// This prevents the edges of non-grass objects to be altered, but reduces the impact of the postprocesss
 		if(texture(grassBuffer, uvOffset).x > 0.9)
 		{
 			vec3 offsetPos = texture(posBuffer, uvOffset).xyz;

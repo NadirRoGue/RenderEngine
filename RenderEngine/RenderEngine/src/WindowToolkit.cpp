@@ -33,6 +33,7 @@ void Engine::Window::WindowToolkit::setOGLVersion(unsigned int major, unsigned i
 
 void Engine::Window::WindowToolkit::initGlew()
 {
+	// Initializes glew
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if (GLEW_OK != err)
@@ -47,6 +48,7 @@ void Engine::Window::WindowToolkit::initGlew()
 
 void Engine::Window::WindowToolkit::initializeOGL()
 {
+	// Basic OPENGL Context configuration
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glFrontFace(GL_CCW);
@@ -68,6 +70,7 @@ void Engine::Window::WindowToolkit::addUserInterface(Engine::Window::UserInterfa
 
 void Engine::Window::WindowToolkit::updateUI()
 {
+	// Render all user interfaces registered to this drawing surface
 	if (Engine::Settings::showUI)
 	{
 		for (auto ui : userInterfaces)

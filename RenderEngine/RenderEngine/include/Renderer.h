@@ -10,6 +10,7 @@
 
 namespace Engine
 {
+	// Holds screen dimensions
 	class ScreenManager
 	{
 	public:
@@ -21,7 +22,7 @@ namespace Engine
 	};
 
 	// ==================================================================
-
+	// Parent class of all renderer types presents on the engine
 	class Renderer
 	{
 	protected:
@@ -39,7 +40,7 @@ namespace Engine
 	};	
 
 	// ==================================================================
-
+	// Manages the avaliable renderers at runtime
 	class RenderManager
 	{
 	private:

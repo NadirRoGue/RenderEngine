@@ -22,7 +22,7 @@ uniform sampler2D depthTexture1;
 uniform mat4 normal;
 
 uniform vec3 lightDir;
-
+// Percentage close filter random vector sampling
 uniform vec2 poissonDisk[4] = vec2[](
   vec2( -0.94201624, -0.39906216 ),
   vec2( 0.94558609, -0.76890725 ),
@@ -35,13 +35,18 @@ bool whithinRange(vec2 texCoord)
 	return texCoord.x >= 0.0 && texCoord.x <= 1.0 && texCoord.y >= 0.0 && texCoord.y <= 1.0;
 }
 
+// Looks up the shadow maps, checking if the point is inside of any of the light
+// projection volumes, and returning the visibility. If not inside the volumes, will return visible
 float getShadowVisibility(vec3 rawNormal)
 {
+	// Bias to prevent acne from numerical precission
 	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
+	// Point is visible by default
 	float visibility = 1.0;
 	if(whithinRange(inShadowMapPos.xy))
 	{
 		float curDepth = inShadowMapPos.z - bias;
+		// Percentage close filter
 		for (int i = 0; i < 4; i++)
 		{
 			visibility -= 0.25 * ( texture(depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0).x  <  curDepth? 1.0 : 0.0 );
@@ -50,6 +55,8 @@ float getShadowVisibility(vec3 rawNormal)
 	// Level 2 cascade shadow map is too low res for the high frequency details of the trees
 	else if(whithinRange(inShadowMapPos1.xy))
 	{
+		// Do not apply PCF on level 2 shadow maps for trees, as it produces weird effects given the size
+		// of the trees vs the size of the shadow map texels
 		float curDepth = inShadowMapPos1.z - bias;
 		visibility = texture(depthTexture1, inShadowMapPos1.xy).x < curDepth? 0.0 : 1.0;
 	}
@@ -124,6 +131,8 @@ void main()
 	outPos = vec4(inPos, 1);
 	outInfo = vec4(0);
 #else
+	// Apply leaf effect. If we are treating a leaf (info is crompressed into emission vertex info), compute perlin
+	// map and discard those fragments whose value is below 0.4
 	if(inEmission.x > 0.0 && noise(inTexCoord, Tfrecuency, Tamplitude, Tscale) < 0.4)
 		discard;
 

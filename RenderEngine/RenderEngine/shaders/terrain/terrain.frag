@@ -24,6 +24,8 @@ uniform sampler2D depthTexture;
 uniform sampler2D depthTexture1;
 
 uniform vec3 lightDir;
+
+// Random sample vectors used to apply percentage close filter to casted shadows
 uniform vec2 poissonDisk[4] = vec2[](
   vec2( -0.94201624, -0.39906216 ),
   vec2( 0.94558609, -0.76890725 ),
@@ -153,22 +155,27 @@ bool whithinRange(vec2 texCoord)
 	return texCoord.x >= 0.0 && texCoord.x <= 1.0 && texCoord.y >= 0.0 && texCoord.y <= 1.0;
 }
 
+// Looks up the shadow map to tell wether the fragment is in shadow
+// or should receive full lighting
 float getShadowVisibility(vec3 rawNormal)
 {
 	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
 	float visibility = 1.0;
 
+	// Check first the highest resolution (but smaller) map
 	if(whithinRange(inShadowMapPos.xy))
 	{
 		float curDepth = inShadowMapPos.z - bias;
 		//visibility = texture(depthTexture, inShadowMapPos.xy).x < curDepth? 0.0 : 1.0;
 		
+		// Apply percentage close filter to get rid of the stair effect
 		for (int i = 0; i < 4; i++)
 		{
 			visibility -= 0.25 * ( texture(depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0).x  <  curDepth? 1.0 : 0.0 );
 		}
 		
 	}
+	// If not there, try in the lower resolution (but bigger) map
 	else if(whithinRange(inShadowMapPos1.xy))
 	{
 		float curDepth = inShadowMapPos1.z - bias;
@@ -184,6 +191,8 @@ float getShadowVisibility(vec3 rawNormal)
 	return visibility;
 }
 
+// Computes the normal via finite differences based on the same algorithm as the
+// one used to build the terrain mesh
 vec3 computeNormal()
 {
 	float u = inUV.x;
@@ -197,6 +206,8 @@ vec3 computeNormal()
 	return normalize(vec3(lH - rH, step * step, bH - tH));
 }
 
+// Creates a bump map normal of the given octaves
+// E.G., we use less octaves for sand, to give it a smoother look
 vec3 computeBumpNormal(int octaveCount)
 {
 	float u = inUV.x;

@@ -1,3 +1,7 @@
+/*
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 #include <glm/glm.hpp>
@@ -8,6 +12,7 @@
 
 namespace Engine
 {
+	// Parent class of all terrain components that give a common acess interface
 	class TerrainComponent
 	{
 	protected:

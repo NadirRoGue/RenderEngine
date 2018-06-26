@@ -1,9 +1,14 @@
+/*
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 #include <list>
 
 namespace Engine
 {
+	// All classes that loads/stores/manages objects must implements this class
 	class StorageTable
 	{
 	public:
@@ -11,7 +16,7 @@ namespace Engine
 	};
 
 	// ===================================================================
-
+	// Makes sure all Storage tables release their resources on exit
 	class TableManager
 	{
 	private:

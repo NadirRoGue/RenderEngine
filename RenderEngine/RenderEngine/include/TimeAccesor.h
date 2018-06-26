@@ -1,7 +1,13 @@
+/*
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 namespace Engine
 {
+	// Give access anywhere in the engine to the delta and elapsed time
+	// It also holds information of the current frame number
 	class Time
 	{
 	public:

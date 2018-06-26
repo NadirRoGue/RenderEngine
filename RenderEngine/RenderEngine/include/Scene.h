@@ -30,6 +30,8 @@ namespace Engine
 		ProgramRenderables(Program * prog);
 	};
 
+	// Class that represents a scene. Its the nexus between the objects to be renderer
+	// and the render engine
 	class Scene
 	{
 	private:

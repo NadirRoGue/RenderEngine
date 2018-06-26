@@ -1,5 +1,6 @@
 #version 410 core
 
+// Defines wether to render on wireframe, points, or shaded
 layout(triangles) in;
 #if defined WIRE_MODE
 layout(line_strip, max_vertices=3) out;
@@ -53,8 +54,9 @@ void main()
 
 	outUV = inUV[0];
 	outHeight = height[0];
-	outShadowMapPos = lightDepthMat * a;
-	outShadowMapPos1 = lightDepthMat1 * a;
+	// Cascade shadow maps projections
+	outShadowMapPos = lightDepthMat * a;	// level 0
+	outShadowMapPos1 = lightDepthMat1 * a;	// level 1
 	gl_Position = modelViewProj * a;
 	outPos = (modelView * a).xyz;
 #ifdef POINT_MODE

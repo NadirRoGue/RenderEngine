@@ -12,6 +12,7 @@ uniform vec3 tint;
 
 void main()
 {
+	// Get base color and point it towards wanted tone (tint)
     vec3 hdrColor = texture(postProcessing_0, texCoord).rgb * tint;
     // Exposure tone mapping
     vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);

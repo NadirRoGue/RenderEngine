@@ -387,9 +387,6 @@
     <ClInclude Include="include\postprocessprograms\VolumetricCloudProgram.h">
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>
-    <ClInclude Include="include\volumetricclouds\VolumetricClouds.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="include\postprocessprograms\SSReflectionProgram.h">
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>

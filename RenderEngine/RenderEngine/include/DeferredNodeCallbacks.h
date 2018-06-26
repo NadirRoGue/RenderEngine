@@ -12,6 +12,8 @@
 
 namespace Engine
 {
+	// Parent class to implement custom code to be called for a given post-process program before being
+	// launched into the GPU
 	class DeferredCallback
 	{
 	public:

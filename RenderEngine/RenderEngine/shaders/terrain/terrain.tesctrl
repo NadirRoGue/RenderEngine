@@ -35,6 +35,10 @@ void main()
 		
 		closer = max(closer, 1.0);
 
+		// Apply the LOD factor based on the 2 vertices of each edge, this way
+		// we avoid having cracks between different patches, because they both
+		// will have the same tessellation levels
+
 		float lod0Factor = (la * lc) * (2.0 / worldScale);
 		lod0Factor = max(lod0Factor, 1.0);
 

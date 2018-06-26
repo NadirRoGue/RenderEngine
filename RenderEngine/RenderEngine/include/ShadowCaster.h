@@ -1,3 +1,7 @@
+/*
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 #include <glm/glm.hpp>
@@ -6,6 +10,7 @@
 
 namespace Engine
 {
+	// Class that represents an element that can cast shadows
 	class ShadowCaster
 	{
 	public:

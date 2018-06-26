@@ -1,3 +1,7 @@
+/*
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 #include <vector>
@@ -9,6 +13,8 @@
 
 namespace Engine
 {
+	// Represents the terrain. Manages and renders all terrain
+	// components registered to it
 	class Terrain : public IRenderable, public ShadowCaster
 	{
 	private:

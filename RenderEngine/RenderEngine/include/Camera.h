@@ -10,6 +10,7 @@
 
 namespace Engine
 {
+	// Represents a camera, with its one view and projection matrices
 	class Camera
 	{
 	private:

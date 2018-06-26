@@ -98,8 +98,12 @@ void main()
 	
 	float height = noiseHeight(tileUV);
 
+	// Accept or discard the tree. All tree triangles will return the same height value. If we are not
+	// within the range (waterlevel to waterlevel + max vegetation height), do not emit the vertices, thus
+	// discard the tree
 	if(height > waterHeight && height < maxHeight)
 	{
+		// If accepted, place it in the correct height
 		vec4 displacement = vec4(0, height * 1.5 * worldScale, 0, 0);
 
 		vec4 a = gl_in[0].gl_Position + displacement;

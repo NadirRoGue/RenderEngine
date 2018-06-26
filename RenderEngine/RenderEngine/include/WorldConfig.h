@@ -1,3 +1,7 @@
+/*
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 #define GLM_FORCE_RADIANS
@@ -17,6 +21,8 @@ namespace Engine
 		TRAVEL_STRAIGHT
 	};
 
+	// Holds all the system configuration, given access anywhere in the engine
+	// where it is needed
 	class Settings
 	{
 	public:
