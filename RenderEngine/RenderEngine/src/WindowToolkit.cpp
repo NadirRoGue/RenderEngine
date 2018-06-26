@@ -52,6 +52,7 @@ void Engine::Window::WindowToolkit::initializeOGL()
 	glFrontFace(GL_CCW);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_PROGRAM_POINT_SIZE);
 }
 
 void Engine::Window::WindowToolkit::setContextProfile(unsigned int contxtProfile)

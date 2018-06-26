@@ -46,7 +46,7 @@ void main()
 			illuminationDecay *= decay;
 		}
 		// Blend with color buffer
-		outColor = texture(postProcessing_0, texCoord) + result * exposure * distFactor;
+		outColor = texture(postProcessing_0, texCoord) + result * exposure;// * distFactor;
 		// Transfer emission for bloom post processing
 		outEmission = texture(postProcessing_1, texCoord);
 	}

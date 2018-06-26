@@ -17,7 +17,6 @@ layout (location=1) out vec3 outPos;
 layout (location=2) out float outHeight;
 layout (location=3) out vec4 outShadowMapPos;
 layout (location=4) out vec4 outShadowMapPos1;
-layout (location=5) out vec3 tangentVector;
 
 uniform mat4 modelView;
 uniform mat4 modelViewProj;
@@ -56,27 +55,33 @@ void main()
 	outHeight = height[0];
 	outShadowMapPos = lightDepthMat * a;
 	outShadowMapPos1 = lightDepthMat1 * a;
-	tangentVector = (modelView * vec4(computeTangent(0, 1, 2),1)).xyz;
 	gl_Position = modelViewProj * a;
 	outPos = (modelView * a).xyz;
+#ifdef POINT_MODE
+	gl_PointSize = min(length(outPos) / 10.0, 0.01);
+#endif
 	EmitVertex();
 
 	outUV = inUV[1];
 	outHeight = height[1];
 	outShadowMapPos = lightDepthMat * b;
 	outShadowMapPos1 = lightDepthMat1 * b;
-	tangentVector = (modelView * vec4(computeTangent(1, 0, 2),1)).xyz;
 	gl_Position = modelViewProj * b;
 	outPos = (modelView * b).xyz;
+#ifdef POINT_MODE
+	gl_PointSize = min(length(outPos) / 10.0, 0.01);
+#endif
 	EmitVertex();
 
 	outUV = inUV[2];
 	outHeight = height[2];
 	outShadowMapPos = lightDepthMat * c;
 	outShadowMapPos1 = lightDepthMat1 * c;
-	tangentVector = (modelView * vec4(computeTangent(2, 0, 1),1)).xyz;
 	gl_Position = modelViewProj * c;
 	outPos = (modelView * c).xyz;
+#ifdef POINT_MODE
+	gl_PointSize = min(length(outPos) / 10.0, 0.01);
+#endif
 	EmitVertex();
 
 	EndPrimitive();

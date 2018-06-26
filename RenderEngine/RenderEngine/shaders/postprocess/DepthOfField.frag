@@ -48,6 +48,8 @@ void main()
 	{
 		vec2 iidx = texCoord + texelSize * affectedTexels[i] * dof;
 		float curDepth = texture(depthBuffer, iidx).x;
+
+		// Add blur weighted by the diference of depth between both fragments
 		color += texture(postProcessing_0, iidx, 0.0) * kernel[i] * (1.0 - abs(curDepth - zBufferDepth));
 	}
 

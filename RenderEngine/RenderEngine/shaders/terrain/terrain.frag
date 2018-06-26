@@ -13,7 +13,6 @@ layout (location=1) in vec3 inPos;
 layout (location=2) in float height;
 layout (location=3) in vec4 inShadowMapPos;
 layout (location=4) in vec4 inShadowMapPos1;
-layout (location=5) in vec3 tangentVector;
 
 uniform mat4 normal;
 uniform mat4 modelView;

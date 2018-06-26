@@ -40,9 +40,14 @@ void main()
 
 		y += x * 1000.0;
 
+		// keep only fractional so we skip some places, creating blades of grass instead of a "wall" of grass
 		float yOffset = fract(y * d) / d;
 		vec2 uvOffset = texCoord - vec2(0, yOffset * 2.0 * 1.0/(dist * 0.2));
 
+		vec3 offsetPos = texture(posBuffer, uvOffset).xyz;
+		// Make sure we dont paint grass in a zone oclude by non-grass data
+		outColor = offsetPos.z < pos.z? backColor : vec4(mix(backColor.rgb, texture(postProcessing_0, uvOffset).rgb, clamp(1 - yOffset * d / 3.8, 0, 1)), 1.0);
+		/*
 		if(texture(grassBuffer, uvOffset).x > 0.9)
 		{
 			vec3 offsetPos = texture(posBuffer, uvOffset).xyz;
@@ -52,6 +57,7 @@ void main()
 		{
 			outColor = backColor;
 		}
+		*/
 	}
 	else
 	{
