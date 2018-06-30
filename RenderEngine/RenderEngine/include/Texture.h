@@ -12,6 +12,7 @@
 
 namespace Engine
 {
+	// Base class of all texture types
 	class AbstractTexture
 	{
 	protected:

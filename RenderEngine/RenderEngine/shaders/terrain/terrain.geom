@@ -1,8 +1,11 @@
 #version 410 core
 
+// Defines wether to render on wireframe, points, or shaded
 layout(triangles) in;
-#ifdef WIRE_MODE
+#if defined WIRE_MODE
 layout(line_strip, max_vertices=3) out;
+#elif defined POINT_MODE
+layout(points, max_vertices=3) out;
 #else
 layout(triangle_strip, max_vertices=3) out;
 #endif
@@ -24,6 +27,25 @@ uniform float waterHeight;
 uniform mat4 lightDepthMat;
 uniform mat4 lightDepthMat1;
 
+vec3 computeTangent(int m, int a, int b)
+{
+	vec2 st1 = inUV[a] - inUV[m];
+	vec2 st2 = inUV[b] - inUV[m];
+	vec3 dBA = gl_in[a].gl_Position.xyz - gl_in[m].gl_Position.xyz;
+	vec3 dCA = gl_in[b].gl_Position.xyz - gl_in[m].gl_Position.xyz;
+
+	float div = 1.0 / (st1.x * st2.y - st1.y * st2.x);
+	vec2 row = vec2(st2.y, -st1.y);
+
+	vec2 column1 = vec2(dBA.x, dCA.x);
+	vec2 column2 = vec2(dBA.y, dCA.y);
+	vec2 column3 = vec2(dBA.z, dCA.z);
+
+	vec3 tangent = div * vec3(dot(row, column1), dot(row, column2), dot(row, column3));
+
+	return normalize(tangent);
+}
+
 void main()
 {
 	vec4 a = gl_in[0].gl_Position;
@@ -32,10 +54,14 @@ void main()
 
 	outUV = inUV[0];
 	outHeight = height[0];
-	outShadowMapPos = lightDepthMat * a;
-	outShadowMapPos1 = lightDepthMat1 * a;
+	// Cascade shadow maps projections
+	outShadowMapPos = lightDepthMat * a;	// level 0
+	outShadowMapPos1 = lightDepthMat1 * a;	// level 1
 	gl_Position = modelViewProj * a;
 	outPos = (modelView * a).xyz;
+#ifdef POINT_MODE
+	gl_PointSize = min(length(outPos) / 10.0, 0.01);
+#endif
 	EmitVertex();
 
 	outUV = inUV[1];
@@ -44,6 +70,9 @@ void main()
 	outShadowMapPos1 = lightDepthMat1 * b;
 	gl_Position = modelViewProj * b;
 	outPos = (modelView * b).xyz;
+#ifdef POINT_MODE
+	gl_PointSize = min(length(outPos) / 10.0, 0.01);
+#endif
 	EmitVertex();
 
 	outUV = inUV[2];
@@ -52,6 +81,9 @@ void main()
 	outShadowMapPos1 = lightDepthMat1 * c;
 	gl_Position = modelViewProj * c;
 	outPos = (modelView * c).xyz;
+#ifdef POINT_MODE
+	gl_PointSize = min(length(outPos) / 10.0, 0.01);
+#endif
 	EmitVertex();
 
 	EndPrimitive();

@@ -4,13 +4,22 @@
 #include "datatables/MeshTable.h"
 #include "Scene.h"
 
+#include <iostream>
+
 Engine::SkyBox::SkyBox()
 {
+	// Initialize the skybox parameters
 	initialize();
 
+	// Initialize the clouds. They dont depend on the skybox, but its meaningful to 
+	// render them from the skybox
 	clouds = new Engine::CloudSystem::VolumetricClouds();
 
+	// Default render mode
 	renderMode = GL_TRIANGLES;
+
+	// Register the object to be notified when drawing method changes
+	//Engine::RenderableNotifier::getInstance().registerRenderable(this);
 }
 
 Engine::SkyBox::~SkyBox()
@@ -23,28 +32,33 @@ Engine::SkyBox::~SkyBox()
 
 void Engine::SkyBox::render(Engine::Camera * camera)
 {
+	// Switch to less-equal depth testing to be able to render the skybox
+	// on the max depth, behind everything
 	glDepthFunc(GL_LEQUAL);
 
 	const Engine::Mesh * data = cubeMesh->getMesh();
+	data->use();
 
-	glUseProgram(shader->getProgramId());
-	glBindVertexArray(data->vao);
+	shader->use();
 
+	// Move the skybox with the camera
 	const glm::vec3 pos = camera->getPosition();
-	glm::vec3 cubePos(pos);
-	cubeMesh->setTranslation(cubePos * -1.0f);
-	shader->onRenderObject(cubeMesh, camera->getViewMatrix(), camera->getProjectionMatrix());
+	glm::vec3 cubePos(-pos);
+	cubeMesh->setTranslation(cubePos);
+	shader->onRenderObject(cubeMesh, camera);
 
 	glDrawElements(renderMode, data->getNumFaces() * data->getNumVerticesPerFace(), GL_UNSIGNED_INT, (void*)0);
 
 	glDepthFunc(GL_LESS);
 
+	// Render clouds
 	clouds->render(camera);
 }
 
 void Engine::SkyBox::initialize()
 {
-	shader = dynamic_cast<SkyProgram*>(Engine::ProgramTable::getInstance().getProgramByName(Engine::SkyProgram::PROGRAM_NAME));
+	// Instance shaders and meshes
+	shader = Engine::ProgramTable::getInstance().getProgram<Engine::SkyProgram>();
 	Engine::Mesh * mesh = Engine::MeshTable::getInstance().getMesh("cube");
 
 	shader->configureMeshBuffers(mesh);

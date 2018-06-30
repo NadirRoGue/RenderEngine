@@ -41,6 +41,8 @@ Engine::DeferredRenderObject::DeferredRenderObject(unsigned int numBuffers, bool
 	depthBuffer.texture = 0;
 
 	Engine::DeferredObjectsTable::getInstance().registerDeferredObject(this);
+
+	widthMod = heightMod = 1.0;
 }
 
 Engine::DeferredRenderObject::~DeferredRenderObject()
@@ -187,8 +189,19 @@ void Engine::DeferredRenderObject::initialize()
 	depthBuffer.texture->configureTexture();
 }
 
+void Engine::DeferredRenderObject::setResizeMod(float wm, float hm)
+{
+	widthMod = wm;
+	heightMod = hm;
+}
+
 void Engine::DeferredRenderObject::resizeFBO(unsigned int w, unsigned int h)
 {
+	float moddedW = float(w) * widthMod;
+	float moddedH = float(h) * heightMod;
+	w = (unsigned int)ceil(moddedW);
+	h = (unsigned int)ceil(moddedH);
+
 	for (unsigned int i = 0; i < colorBuffersSize; i++)
 	{
 		colorBuffers[i].texture->resize(w, h);

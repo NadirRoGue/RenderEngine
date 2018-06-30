@@ -75,8 +75,10 @@ void main()
 	float v = gl_TessCoord.y;
 	float w = gl_TessCoord.z;
 
+	// Build the texture coordinates
 	outUV = inUV[0] * w + inUV[1] * u + inUV[2] * v;
 	
+	// Build the vertex position
 	vec3 a = gl_in[0].gl_Position.xyz;
 	vec3 b = gl_in[1].gl_Position.xyz;
 	vec3 c = gl_in[2].gl_Position.xyz;
@@ -87,8 +89,8 @@ void main()
 
 	vec3 final = p0 + p1 + p2;
 	
+	// Mod the patch to build the terrain
 	height = noiseHeight(outUV);
-
 	final.y = height * 1.5;
 
 #ifndef SHADOW_MAP

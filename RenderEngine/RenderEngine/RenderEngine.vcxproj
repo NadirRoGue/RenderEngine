@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClInclude Include="include\Animation.h" />
     <ClInclude Include="include\animations\CameraBezier.h" />
+    <ClInclude Include="include\animations\CameraStraight.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\CascadeShadowMaps.h" />
     <ClInclude Include="include\ComputeProgram.h" />
@@ -170,7 +171,7 @@
     <ClInclude Include="include\postprocessprograms\BloomProgram.h" />
     <ClInclude Include="include\postprocessprograms\DeferredShadingProgram.h" />
     <ClInclude Include="include\postprocessprograms\DepthOfFieldProgram.h" />
-    <ClInclude Include="include\postprocessprograms\GaussianBlurProgram.h" />
+    <ClInclude Include="include\postprocessprograms\CloudFilterProgram.h" />
     <ClInclude Include="include\postprocessprograms\HDRToneMappingProgram.h" />
     <ClInclude Include="include\postprocessprograms\SSAAProgram.h" />
     <ClInclude Include="include\postprocessprograms\SSGodRayProgram.h" />
@@ -179,6 +180,7 @@
     <ClInclude Include="include\postprocessprograms\VolumetricCloudProgram.h" />
     <ClInclude Include="include\ProceduralVegetation.h" />
     <ClInclude Include="include\Program.h" />
+    <ClInclude Include="include\programs\CloudShadowProgram.h" />
     <ClInclude Include="include\programs\ProceduralTerrainProgram.h" />
     <ClInclude Include="include\programs\ProceduralWaterProgram.h" />
     <ClInclude Include="include\programs\SkyProgram.h" />
@@ -188,24 +190,29 @@
     <ClInclude Include="include\renderers\ForwardRenderer.h" />
     <ClInclude Include="include\renderers\SideBySideRenderer.h" />
     <ClInclude Include="include\Scene.h" />
+    <ClInclude Include="include\ShadowCaster.h" />
     <ClInclude Include="include\skybox\AbstractSkyBox.h" />
     <ClInclude Include="include\skybox\DummySkybox.h" />
     <ClInclude Include="include\skybox\SkyBox.h" />
     <ClInclude Include="include\StorageTable.h" />
     <ClInclude Include="include\Terrain.h" />
+    <ClInclude Include="include\TerrainComponent.h" />
+    <ClInclude Include="include\terraincomponents\FlowerComponent.h" />
+    <ClInclude Include="include\terraincomponents\LandscapeComponent.h" />
+    <ClInclude Include="include\terraincomponents\TreeComponent.h" />
+    <ClInclude Include="include\terraincomponents\WaterComponent.h" />
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\textures\Texture2D.h" />
     <ClInclude Include="include\textures\Texture3D.h" />
     <ClInclude Include="include\textures\TextureCubemap.h" />
     <ClInclude Include="include\Threadpool.h" />
-    <ClInclude Include="include\Time.h" />
+    <ClInclude Include="include\TimeAccesor.h" />
     <ClInclude Include="include\UserInterface.h" />
     <ClInclude Include="include\userinterfaces\WorldControllerUI.h" />
     <ClInclude Include="include\util\IOUtils.h" />
     <ClInclude Include="include\vegetation\FractalTree.h" />
     <ClInclude Include="include\volumetricclouds\CloudSystem.h" />
     <ClInclude Include="include\volumetricclouds\NoiseInitializer.h" />
-    <ClInclude Include="include\volumetricclouds\VolumetricClouds.h" />
     <ClInclude Include="include\windowmanagers\GLFWWindow.h" />
     <ClInclude Include="include\windowmanagers\GLUTWindow.h" />
     <ClInclude Include="include\windowmanagers\WindowManager.h" />
@@ -224,6 +231,7 @@
     <ClCompile Include="lib\include\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\Animation.cpp" />
     <ClCompile Include="src\animations\CameraBezier.cpp" />
+    <ClCompile Include="src\animations\CameraStraight.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\CascadeShadowMaps.cpp" />
     <ClCompile Include="src\ComputeProgram.cpp" />
@@ -255,7 +263,7 @@
     <ClCompile Include="src\postprocessprograms\BloomProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\DeferredShadingProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\DepthOfFieldProgram.cpp" />
-    <ClCompile Include="src\postprocessprograms\GaussianBlurProgram.cpp" />
+    <ClCompile Include="src\postprocessprograms\CloudFilterProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\HDRToneMappingProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\SSAAProgram.cpp" />
     <ClCompile Include="src\postprocessprograms\SSGodRayProgram.cpp" />
@@ -264,6 +272,7 @@
     <ClCompile Include="src\postprocessprograms\VolumetricCloudProgram.cpp" />
     <ClCompile Include="src\ProceduralVegetation.cpp" />
     <ClCompile Include="src\Program.cpp" />
+    <ClCompile Include="src\programs\CloudShadowProgram.cpp" />
     <ClCompile Include="src\programs\ProceduralTerrainProgram.cpp" />
     <ClCompile Include="src\programs\ProceduralWaterProgram.cpp" />
     <ClCompile Include="src\programs\SkyProgram.cpp" />
@@ -276,12 +285,16 @@
     <ClCompile Include="src\skybox\SkyBox.cpp" />
     <ClCompile Include="src\StorageTable.cpp" />
     <ClCompile Include="src\Terrain.cpp" />
+    <ClCompile Include="src\terraincomponents\FlowerComponent.cpp" />
+    <ClCompile Include="src\terraincomponents\LandscapeComponent.cpp" />
+    <ClCompile Include="src\terraincomponents\TreeComponent.cpp" />
+    <ClCompile Include="src\terraincomponents\WaterComponent.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\textures\Texture2D.cpp" />
     <ClCompile Include="src\textures\Texture3D.cpp" />
     <ClCompile Include="src\textures\TextureCubemap.cpp" />
     <ClCompile Include="src\Threadpool.cpp" />
-    <ClCompile Include="src\Time.cpp" />
+    <ClCompile Include="src\TimeAccesor.cpp" />
     <ClCompile Include="src\UserInterface.cpp" />
     <ClCompile Include="src\userinterfaces\WorldControllerUI.cpp" />
     <ClCompile Include="src\util\IOUtils.cpp" />
@@ -295,6 +308,9 @@
     <ClCompile Include="src\WorldConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\clouds\cloudfilter.frag" />
+    <None Include="shaders\clouds\cloudshadow.frag" />
+    <None Include="shaders\clouds\cloudshadow.vert" />
     <None Include="shaders\clouds\generation\perlinworley.comp" />
     <None Include="shaders\clouds\generation\weather.comp" />
     <None Include="shaders\clouds\generation\worley.comp" />
@@ -302,7 +318,6 @@
     <None Include="shaders\postprocess\Bloom.frag" />
     <None Include="shaders\postprocess\DeferredShading.frag" />
     <None Include="shaders\postprocess\DepthOfField.frag" />
-    <None Include="shaders\postprocess\GaussianBlur.frag" />
     <None Include="shaders\postprocess\HDRToneMapping.frag" />
     <None Include="shaders\postprocess\PostProcessRender.frag" />
     <None Include="shaders\postprocess\PostProcessRender.vert" />

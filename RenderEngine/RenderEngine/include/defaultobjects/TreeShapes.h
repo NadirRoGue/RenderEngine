@@ -1,9 +1,18 @@
+/**
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
+
 #pragma once
 
 #include "Mesh.h"
 
 namespace Engine
 {
+	/**
+	 * Holds the data needed to create a indexed, open at the bottom, cube
+	 * used as base shape to build the procedural vegetation
+	 */
 	namespace TrunkData
 	{
 		const unsigned int triangleIndex[] = 
@@ -22,20 +31,36 @@ namespace Engine
 
 		const float vertexPos[] = 
 		{
-			//Face y = -1
+			//Face y = 0
 			-1.0f,	0.0f,	 -1.0f, //0
 			1.0f,	0.0f,	 -1.0f, //1
 			-1.0f,	0.0f,	 1.0f, //2
 			1.0f,	0.0f,	 1.0f, //3
 
-			//Face z = -1		   
+			//Face y = 1		   
 			-1.0f,	1.0f,	-1.0f, //4
 			1.0f,	1.0f,	-1.0f, //5
 			-1.0f,	1.0f,	1.0f, //6
 			1.0f,	1.0f,	1.0f, //7
 		};
+
+		const float texCoord[] =
+		{
+			// Face y = 0
+			1.0f, 1.0f,
+			1.0f, 2.0f,
+			2.0f, 1.0f,
+			2.0f, 2.0f,
+
+			// Face y = 1
+			0.0f, 0.0f,
+			0.0f, 1.0f,
+			1.0f, 0.0f,
+			1.0f, 1.0f
+		};
 	}
 
+	// Creates a trunk piece mesh
 	Mesh CreateTrunk()
 	{
 		return Mesh
@@ -46,12 +71,16 @@ namespace Engine
 			TrunkData::vertexPos,
 			0,
 			0,
-			0,
+			TrunkData::texCoord,
 			0,
 			0
 		);
 	}
 
+	/**
+	 * UNUSED - Holds the data to create triangular leafs for
+	 * the procedural vegetation
+	 */
 	namespace LeafData
 	{
 		const unsigned int triangleIndex[] =

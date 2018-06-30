@@ -1,3 +1,7 @@
+/**
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once 
 
 #include "WindowToolkit.h"
@@ -6,12 +10,17 @@ namespace Engine
 {
 	namespace Window
 	{
+		/**
+		 * GLUT driver interface implementation
+		 */
+
 		typedef void(*resizeCallback)(int, int);
 		typedef void(*keyboardCallback)(unsigned char, int, int);
 		typedef void(*mouseCallback)(int, int, int, int);
 		typedef void(*mouseMotionCallback)(int, int);
 		typedef void(*genericCallback)();
 
+		// Default callbacks
 		void defaultResizeCallback(int width, int height);
 		void defaultKeyboardInputCallback(unsigned char key, int x, int y);
 		void defaultMouseInputCallback(int button, int state, int x, int y);
@@ -19,11 +28,17 @@ namespace Engine
 		void defaultRenderLoopCallback();
 		void defaultIdleCallback();
 
+		/**
+		* Class used to create an OpenGL context and window manipulation
+		* using GLUT library
+		*/
 		class GLUTWindow : public WindowToolkit
 		{
 		private:
+			// OpenGL display flags
 			unsigned int displayFlags;
 
+			// Callbacks
 			resizeCallback rszCb;
 			keyboardCallback kbCb;
 			mouseCallback mCb;
@@ -31,6 +46,7 @@ namespace Engine
 			genericCallback renderCb;
 			genericCallback idleCb;
 			
+			// Starting rendering time to compute delta time and passed time
 			double renderStartTime;
 		public:
 			GLUTWindow(std::string title, unsigned int x, unsigned int y, unsigned int width, unsigned int height);

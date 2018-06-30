@@ -1,5 +1,10 @@
 #version 430
 
+/*
+	Fills a 2D texture with a low octave perlin noise to be used
+	in the volumetric clouds as weather map
+*/
+
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 layout (rgba8, binding = 0) uniform image2D outWeatherTex;
@@ -16,9 +21,9 @@ float random2D( in vec2 st )
 // PERLIN NOISE SPECIFIC
 
 uniform float perlinAmplitude = 0.5;
-uniform float perlinFrecuency = 0.5;
-uniform float perlinScale = 128.0;
-uniform int perlinOctaves = 1;
+uniform float perlinFrecuency = 0.8;
+uniform float perlinScale = 100.0;
+uniform int perlinOctaves = 4;
 
 float noiseInterpolation(in vec2 i_coord, in float i_size)
 {
@@ -41,17 +46,17 @@ float noiseInterpolation(in vec2 i_coord, in float i_size)
            ( p3 - p1 ) * ( weights.y * weights.x );    
 }
 
-float perlinNoise(vec2 uv)
+float perlinNoise(vec2 uv, float sc, float f, float a, int o)
 {
     float noiseValue = 0.0;
     
-    float localAplitude  = perlinAmplitude;
-    float localFrecuency = perlinFrecuency;
+    float localAplitude  = a;
+    float localFrecuency = f;
 
-    for( int index = 0; index < perlinOctaves; index++ )
+    for( int index = 0; index < o; index++ )
     {
      	       
-        noiseValue += noiseInterpolation( uv, perlinScale * localFrecuency ) * localAplitude;
+        noiseValue += noiseInterpolation( uv, sc * localFrecuency ) * localAplitude;
     
         localAplitude   *= 0.25;
         localFrecuency  *= 3.0;
@@ -70,7 +75,9 @@ void main()
 	vec2 uv = vec2(float(pixel.x) / 1024.0, float(pixel.y) / 1024.0);
 	vec2 suv = vec2(uv.x + 5.5, uv.y + 5.5);
 
-	vec4 weather = vec4(perlinNoise(uv) * 1.0, perlinNoise(suv) * 1.0, 0, 1);
+	float cloudType = clamp(perlinNoise(suv, perlinScale / 2.0, 0.3, 0.7, 8), 0.0, 1.0);
+
+	vec4 weather = vec4(perlinNoise(uv, perlinScale, perlinFrecuency, perlinAmplitude, perlinOctaves) * 1.0, cloudType, 0, 1);
 
 	imageStore (outWeatherTex, pixel, weather);
 }

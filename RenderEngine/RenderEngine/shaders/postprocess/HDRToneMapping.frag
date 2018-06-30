@@ -2,16 +2,18 @@
 
 layout (location=0) out vec4 outColor;
 
-in vec2 texCoord;
+layout (location=0) in vec2 texCoord;
 
 uniform sampler2D postProcessing_0;
 
 uniform float exposure;
 uniform float gamma;
+uniform vec3 tint;
 
 void main()
 {
-    vec3 hdrColor = texture(postProcessing_0, texCoord).rgb;
+	// Get base color and point it towards wanted tone (tint)
+    vec3 hdrColor = texture(postProcessing_0, texCoord).rgb * tint;
     // Exposure tone mapping
     vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
     // Gamma correction 

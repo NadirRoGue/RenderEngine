@@ -1,5 +1,6 @@
 #include "programs/SkyProgram.h"
 
+#include "WorldConfig.h"
 #include "Scene.h"
 
 std::string Engine::SkyProgram::PROGRAM_NAME = "SkyProgram";
@@ -17,6 +18,9 @@ Engine::SkyProgram::SkyProgram(const Engine::SkyProgram & other)
 	uProjMatrix = other.uProjMatrix;
 	uLightDir = other.uLightDir;
 	uLightColor = other.uLightColor;
+	uSkyHorizonColor = other.uSkyHorizonColor;
+	uSkyZenitColor = other.uSkyZenitColor;
+	uColorFactor = other.uColorFactor;
 	inPos = other.inPos;
 }
 
@@ -25,13 +29,17 @@ void Engine::SkyProgram::configureProgram()
 	uProjMatrix = glGetUniformLocation(glProgram, "proj");
 	uLightDir = glGetUniformLocation(glProgram, "lightDir");
 	uLightColor = glGetUniformLocation(glProgram, "lightColor");
+	uColorFactor = glGetUniformLocation(glProgram, "colorFactor");
+
+	uSkyZenitColor = glGetUniformLocation(glProgram, "zenitColor");
+	uSkyHorizonColor = glGetUniformLocation(glProgram, "horizonColor");
 
 	inPos = glGetAttribLocation(glProgram, "inPos");
 }
 
 void Engine::SkyProgram::configureMeshBuffers(Engine::Mesh * m)
 {
-	glBindVertexArray(m->vao);
+	m->use();
 
 	if (inPos != -1)
 	{
@@ -41,19 +49,19 @@ void Engine::SkyProgram::configureMeshBuffers(Engine::Mesh * m)
 	}
 }
 
-void Engine::SkyProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::SkyProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
-	glm::mat4 modelViewProj = proj * view * obj->getModelMatrix();
+	glm::mat4 modelViewProj = camera->getProjectionMatrix() * camera->getViewMatrix() * obj->getModelMatrix();
 	glUniformMatrix4fv(uProjMatrix, 1, GL_FALSE, &(modelViewProj[0][0]));
 
-	Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
-
-	const glm::mat4 & modelCopy = dl->getModelMatrix();
-	glm::vec3 direction(modelCopy[3][0], modelCopy[3][1], modelCopy[3][2]);
-	direction = -glm::normalize(direction);
+	glm::vec3 direction = -glm::normalize(Engine::Settings::lightDirection);
 	glUniform3fv(uLightDir, 1, &direction[0]);
 
-	glUniform3fv(uLightColor, 1, dl->getData().color);
+	glUniform3fv(uLightColor, 1, &Engine::Settings::realLightColor[0]);
+	glUniform1f(uColorFactor, Engine::Settings::lightFactor);
+
+	glUniform3fv(uSkyZenitColor, 1, &Engine::Settings::skyZenitColor[0]);
+	glUniform3fv(uSkyHorizonColor, 1, &Engine::Settings::skyHorizonColor[0]);
 }
 
 // =====================================================================

@@ -1,3 +1,7 @@
+/*
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 #include <thread>

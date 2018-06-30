@@ -9,6 +9,8 @@
 
 namespace Engine
 {
+	// Utility functions used to compute the tangent vectors of a given mesh
+
 	glm::vec3 voronoiTriangleAreas(const glm::vec3 &A, const glm::vec3 &B, const glm::vec3 &C);
 
 	float cotangent(const glm::vec3 &pivot, const glm::vec3 &a, const glm::vec3 &b);

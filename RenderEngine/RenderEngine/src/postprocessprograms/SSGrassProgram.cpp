@@ -27,9 +27,9 @@ void Engine::SSGrassProgram::configureProgram()
 	uPosBuffer = glGetUniformLocation(glProgram, "posBuffer");
 }
 
-void Engine::SSGrassProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
+void Engine::SSGrassProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
-	Engine::PostProcessProgram::onRenderObject(obj, view, proj);
+	Engine::PostProcessProgram::onRenderObject(obj, camera);
 
 	Engine::DeferredRenderer * dr = static_cast<Engine::DeferredRenderer*>(Engine::RenderManager::getInstance().getRenderer());
 

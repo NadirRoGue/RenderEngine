@@ -1,6 +1,8 @@
 #include "programs/TreeProgram.h"
 
 #include "WorldConfig.h"
+#include "CascadeShadowMaps.h"
+#include "TimeAccesor.h"
 
 #include <iostream>
 
@@ -8,6 +10,7 @@ const std::string Engine::TreeProgram::PROGRAM_NAME = "TreeProgram";
 
 const unsigned long long Engine::TreeProgram::SHADOW_MAP = 0x01;
 const unsigned long long Engine::TreeProgram::WIRE_MODE = 0x02;
+const unsigned long long Engine::TreeProgram::POINT_MODE = 0x04;
 
 Engine::TreeProgram::TreeProgram(std::string name, unsigned long long params)
 	:Program(name, params)
@@ -30,15 +33,21 @@ Engine::TreeProgram::TreeProgram(const TreeProgram & other)
 	uFrecuency = other.uFrecuency;
 	uScale = other.uScale;
 	uOctaves = other.uOctaves;
+	uWorldScale = other.uWorldScale;
 	uLightDir = other.uLightDir;
 	uWaterLevel = other.uWaterLevel;
+	uMaxHeight = other.uMaxHeight;
 	uDepthMap0 = other.uDepthMap0;
 	uDepthMap1 = other.uDepthMap1;
+	uSinTime = other.uSinTime;
+	uWindDir = other.uWindDir;
+	uWindStrength = other.uWindStrength;
 
 	uInPos = other.uInPos;
 	uInColor = other.uInColor;
 	uInNormal = other.uInNormal;
 	uInEmissive = other.uInEmissive;
+	uInUV = other.uInUV;
 }
 
 void Engine::TreeProgram::initialize()
@@ -53,6 +62,10 @@ void Engine::TreeProgram::initialize()
 	if (parameters & Engine::TreeProgram::WIRE_MODE)
 	{
 		config += "#define WIRE_MODE";
+	}
+	else if (parameters & Engine::TreeProgram::POINT_MODE)
+	{
+		config += "#define POINT_MODE";
 	}
 
 	vShader = loadShader(vShaderFile, GL_VERTEX_SHADER, config);
@@ -97,18 +110,25 @@ void Engine::TreeProgram::configureProgram()
 	uLightDepthMat1 = glGetUniformLocation(glProgram, "lightDepthMat1");
 	uLightDir = glGetUniformLocation(glProgram, "lightDir");
 	uWaterLevel = glGetUniformLocation(glProgram, "waterHeight");
+	uMaxHeight = glGetUniformLocation(glProgram, "maxHeight");
 	uDepthMap0 = glGetUniformLocation(glProgram, "depthTexture");
 	uDepthMap1 = glGetUniformLocation(glProgram, "depthTexture1");
+	uWorldScale = glGetUniformLocation(glProgram, "worldScale");
+
+	uSinTime = glGetUniformLocation(glProgram, "sinTime");
+	uWindDir = glGetUniformLocation(glProgram, "windDirection");
+	uWindStrength = glGetUniformLocation(glProgram, "windStrength");
 
 	uInPos = glGetAttribLocation(glProgram, "inPos");
 	uInColor = glGetAttribLocation(glProgram, "inColor");
 	uInNormal = glGetAttribLocation(glProgram, "inNormal");
 	uInEmissive = glGetAttribLocation(glProgram, "inEmission");
+	uInUV = glGetAttribLocation(glProgram, "inTexCoord");
 }
 
 void Engine::TreeProgram::configureMeshBuffers(Mesh * mesh)
 {
-	glBindVertexArray(mesh->vao);
+	mesh->use();
 
 	if (uInPos != -1)
 	{
@@ -137,12 +157,45 @@ void Engine::TreeProgram::configureMeshBuffers(Mesh * mesh)
 		glVertexAttribPointer(uInEmissive, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(uInEmissive);
 	}
+
+	if (uInUV != -1)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, mesh->vboUVs);
+		glVertexAttribPointer(uInUV, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(uInUV);
+	}
 }
 
-void Engine::TreeProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::TreeProgram::applyGlobalUniforms()
 {
-	glm::mat4 modelView = view * obj->getModelMatrix();
-	glm::mat4 modelViewProj = proj * modelView;
+	if (!(parameters & Engine::TreeProgram::SHADOW_MAP))
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, Engine::CascadeShadowMaps::getInstance().getDepthTexture0()->getTexture()->getTextureId());
+		glUniform1i(uDepthMap0, 0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, Engine::CascadeShadowMaps::getInstance().getDepthTexture1()->getTexture()->getTextureId());
+		glUniform1i(uDepthMap1, 1);
+
+		glm::vec3 ld = glm::normalize(Engine::Settings::lightDirection);
+		glUniform3fv(uLightDir, 1, &ld[0]);
+	}
+
+	float sinTime = glm::sin(Engine::Time::timeSinceBegining);
+	sinTime *= sinTime;
+	glUniform1f(uSinTime, sinTime);
+	glUniform3fv(uWindDir, 1, &Engine::Settings::windDirection[0]);
+	glUniform1f(uWindStrength, Engine::Settings::windStrength);
+
+	glUniform1f(uMaxHeight, Engine::Settings::waterHeight + Engine::Settings::vegetationMaxHeight);
+	glUniform1f(uWorldScale, Engine::Settings::worldTileScale);
+}
+
+void Engine::TreeProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
+{
+	glm::mat4 modelView = camera->getViewMatrix() * obj->getModelMatrix();
+	glm::mat4 modelViewProj = camera->getProjectionMatrix() * modelView;
 	glm::mat4 normal = glm::transpose(glm::inverse(modelView));
 
 	glUniformMatrix4fv(uModelViewProj, 1, GL_FALSE, &(modelViewProj[0][0]));
@@ -169,25 +222,6 @@ void Engine::TreeProgram::setUniformLightDepthMat(const glm::mat4 & ldm)
 void Engine::TreeProgram::setUniformLightDepthMat1(const glm::mat4 & ldp)
 {
 	glUniformMatrix4fv(uLightDepthMat1, 1, GL_FALSE, &(ldp[0][0]));
-}
-
-void Engine::TreeProgram::setUniformLightDir(const glm::vec3 & ld)
-{
-	glUniform3fv(uLightDir, 1, &ld[0]);
-}
-
-void Engine::TreeProgram::setUniformDepthMap(const Engine::TextureInstance * ti)
-{
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, ti->getTexture()->getTextureId());
-	glUniform1i(uDepthMap0, 0);
-}
-
-void Engine::TreeProgram::setUniformDepthMap1(const TextureInstance * ti)
-{
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, ti->getTexture()->getTextureId());
-	glUniform1i(uDepthMap1, 1);
 }
 
 void Engine::TreeProgram::destroy()

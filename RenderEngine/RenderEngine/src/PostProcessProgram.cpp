@@ -7,6 +7,8 @@
 
 #include "instances/TextureInstance.h"
 
+#include "volumetricclouds/NoiseInitializer.h"
+
 std::string Engine::PostProcessProgram::PROGRAM_NAME = "PostProcessProgram";
 
 Engine::PostProcessProgram::PostProcessProgram(std::string name, unsigned long long params)
@@ -51,7 +53,7 @@ void Engine::PostProcessProgram::configureProgram()
 
 void Engine::PostProcessProgram::configureMeshBuffers(Engine::Mesh * data)
 {
-	glBindVertexArray(data->vao);
+	data->use();
 	
 	glBindBuffer(GL_ARRAY_BUFFER, data->vboVertices);
 	glVertexAttribPointer(inPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -62,7 +64,7 @@ void Engine::PostProcessProgram::configureMeshBuffers(Engine::Mesh * data)
 	glEnableVertexAttribArray(inTexCoord);
 }
 
-void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
 	
 	std::map<std::string, TextureInstance *> all = ((PostProcessObject*)obj)->getAllCustomTextures();
@@ -83,7 +85,7 @@ void Engine::PostProcessProgram::onRenderObject(const Engine::Object * obj, cons
 	/*
 	glUniform1i(uRenderedTextures[0], 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Engine::CascadeShadowMaps::getInstance().getDepthTexture1()->getTexture()->getTextureId());
+	glBindTexture(GL_TEXTURE_2D, Engine::CloudSystem::NoiseInitializer::getInstance().getWeatherData()->getTexture()->getTextureId());
 	*/
 }
 

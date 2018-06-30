@@ -19,7 +19,7 @@ Engine::BloomProgram::BloomProgram(std::string name, unsigned long long paramete
 	buf[1].pass->addDepthBuffer24(500, 500);
 	buf[1].pass->initialize();
 
-	passes = 10;
+	passes = 8;
 }
 
 Engine::BloomProgram::BloomProgram(const Engine::BloomProgram & other)
@@ -37,9 +37,9 @@ void Engine::BloomProgram::configureProgram()
 	uBlend = glGetUniformLocation(glProgram, "blend");
 }
 
-void Engine::BloomProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::BloomProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
-	Engine::SSAAProgram::onRenderObject(obj, view, proj);
+	Engine::SSAAProgram::onRenderObject(obj, camera);
 
 	int prevFBO;
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFBO);

@@ -3,7 +3,7 @@
 layout (location=0) out vec4 outColor;
 layout (location=1) out vec4 outEmission;
 
-in vec2 texCoord;
+layout (location=0) in vec2 texCoord;
 
 uniform vec2 lightScreenPos;
 uniform float exposure;
@@ -11,6 +11,7 @@ uniform float decay;
 uniform float density;
 uniform float weight;
 uniform bool onlyPass;
+uniform float alpha;
 
 #define NUM_SAMPLES 100
 
@@ -24,8 +25,9 @@ void main()
 	{
 		// compute screen-space displacement based on num of samples and shafts density
 		vec2 deltaTextCoord = vec2(texCoord - lightScreenPos);
+		float distFactor = clamp(1.0 / length(deltaTextCoord), 0.0, 1.0);
 		vec2 uv = texCoord;
-		deltaTextCoord *= 1.0 /  float(NUM_SAMPLES) * density;// * densityMultiplier * 0.5);
+		deltaTextCoord *= 1.0 /  (float(NUM_SAMPLES) * density);
 		float illuminationDecay = 1.0;
 
 		// Start with current's god ray buffer value
@@ -39,13 +41,12 @@ void main()
 			
 			sampl *= illuminationDecay * weight;
 
-			//result += sampl;
 			result += sampl;
 
 			illuminationDecay *= decay;
 		}
 		// Blend with color buffer
-		outColor = texture(postProcessing_0, texCoord) + result * exposure;
+		outColor = texture(postProcessing_0, texCoord) + result * exposure;// * distFactor;
 		// Transfer emission for bloom post processing
 		outEmission = texture(postProcessing_1, texCoord);
 	}

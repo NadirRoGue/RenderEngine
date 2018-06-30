@@ -1,3 +1,7 @@
+/*
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 #include <GL/glew.h>
@@ -10,6 +14,7 @@ namespace Engine
 {
 	namespace Window
 	{
+		// UI Styles based on ImGUI default styles
 		enum UIStyle
 		{
 			CLASSIC,
@@ -17,6 +22,8 @@ namespace Engine
 			LIGHT
 		};
 
+		// Parent class of all the user inferfaces which might be registered
+		// to the engine's window toolkits
 		class UserInterface
 		{
 		private:

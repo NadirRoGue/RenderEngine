@@ -57,7 +57,7 @@ Engine::Mesh * Engine::MeshTable::getMesh(std::string filename)
 	return NULL;
 }
 
-void Engine::MeshTable::addMeshToCache(std::string name, Engine::Mesh & mesh)
+void Engine::MeshTable::addMeshToCache(std::string name, const Engine::Mesh & mesh)
 {
 	std::map<std::string, Engine::Mesh* >::iterator it = meshCache.find(name);
 	if (it == meshCache.end())

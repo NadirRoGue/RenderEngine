@@ -1,3 +1,7 @@
+/**
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma
 
 #include "Scene.h"
@@ -7,13 +11,19 @@ namespace Engine
 {
 	namespace GPU
 	{
+		// Class which manages all light uniform buffer objects. Implements the update
+		// functionality, as well as the partial update functionality
+		// Its also in charge of clean up
 		class LightBufferManager : public StorageTable
 		{
 		private:
 			static LightBufferManager * INSTANCE;
 		private:
+			// Directional light buffer
 			unsigned int gboDL;
+			// Point light buffer
 			unsigned int gboPL;
+			// Spot light buffer
 			unsigned int gboSL;
 		private:
 			LightBufferManager();

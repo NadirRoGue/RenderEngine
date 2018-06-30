@@ -2,6 +2,7 @@
 
 #include "Scene.h"
 #include "LightBufferManager.h"
+#include "WorldConfig.h"
 
 std::string Engine::DeferredShadingProgram::PROGRAM_NAME = "DeferredShadingProgram";
 
@@ -14,18 +15,14 @@ Engine::DeferredShadingProgram::DeferredShadingProgram(std::string name, unsigne
 Engine::DeferredShadingProgram::DeferredShadingProgram(const Engine::DeferredShadingProgram & other)
 	: Engine::PostProcessProgram(other)
 {
-	uDirectionalLightDir = other.uDirectionalLightDir;
-	uDLIa = other.uDLIa;
-	uDLId = other.uDLId;
-	uDLIs = other.uDLIs;
-
 	uDLBuffer = other.uDLBuffer;
 	uPLBuffer = other.uPLBuffer;
 	uSLBuffer = other.uSLBuffer;
 
-	uBackground = other.uBackground;
+	uSkyHorizonColor = other.uSkyHorizonColor;
+	uSkyZenitColor = other.uSkyZenitColor;
 
-	uWorldUp = other.uWorldUp;
+	uColorFactor = other.uColorFactor;
 }
 
 void Engine::DeferredShadingProgram::processDirectionalLights(Engine::DirectionalLight * dl, const glm::mat4 & view)
@@ -42,42 +39,36 @@ void Engine::DeferredShadingProgram::processDirectionalLights(Engine::Directiona
 	dl->clearUpdateFlag();
 }
 
-void Engine::DeferredShadingProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::DeferredShadingProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
-	Engine::PostProcessProgram::onRenderObject(obj, view, proj);
+	Engine::PostProcessProgram::onRenderObject(obj, camera);
 
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
 	if (scene != 0)
 	{
 		Engine::DirectionalLight * dl = scene->getDirectionalLight();
-		processDirectionalLights(dl, view);
+		processDirectionalLights(dl, camera->getViewMatrix());
 	}
 
-	glUniform3fv(uBackground, 1, &scene->getClearColor()[0]);
+	glUniform3fv(uSkyZenitColor, 1, &Engine::Settings::skyZenitColor[0]);
+	glUniform3fv(uSkyHorizonColor, 1, &Engine::Settings::skyHorizonColor[0]);
 
-	glm::vec4 worldUp = view * glm::vec4(0, 1, 0, 0);
-	glUniform3fv(uWorldUp, 1, &worldUp[0]);
-
+	glUniform1f(uColorFactor, Engine::Settings::lightFactor);
 }
 
 void Engine::DeferredShadingProgram::configureProgram()
 {
 	Engine::PostProcessProgram::configureProgram();
 
-	uBackground = glGetUniformLocation(glProgram, "backgroundColor");
+	uSkyHorizonColor = glGetUniformLocation(glProgram, "horizonColor");
+	uSkyZenitColor = glGetUniformLocation(glProgram, "zenitColor");
 
 	uDLBuffer = glGetUniformBlockIndex(glProgram, "DLBuffer");
 	uPLBuffer = glGetUniformBlockIndex(glProgram, "PLBuffer");
 	uSLBuffer = glGetUniformBlockIndex(glProgram, "SLBuffer");
 
-	uDLIa = glGetUniformLocation(glProgram, "DLIa");
-	uDLId = glGetUniformLocation(glProgram, "DLId");
-	uDLIs = glGetUniformLocation(glProgram, "DLIs");
-	uDirectionalLightDir = glGetUniformLocation(glProgram, "DLdir");
-
-	uWorldUp = glGetUniformLocation(glProgram, "worldUp");
+	uColorFactor = glGetUniformLocation(glProgram, "colorFactor");
 }
-
 
 // =====================================================
 
