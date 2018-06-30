@@ -35,13 +35,13 @@ void Engine::SSReflectionProgram::configureProgram()
 	uLightDir = glGetUniformLocation(glProgram, "lightDirection");
 }
 
-void Engine::SSReflectionProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 & proj)
+void Engine::SSReflectionProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
 {
-	Engine::PostProcessProgram::onRenderObject(obj, view, proj);
+	Engine::PostProcessProgram::onRenderObject(obj, camera);
 
 	Engine::DeferredRenderer * deferred = static_cast<Engine::DeferredRenderer*>(Engine::RenderManager::getInstance().getRenderer());
 
-	glUniformMatrix4fv(uProjMat, 1, GL_FALSE, &(proj[0][0]));
+	glUniformMatrix4fv(uProjMat, 1, GL_FALSE, &(camera->getProjectionMatrix()[0][0]));
 	glUniform1i(uPosBuffer, 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, deferred->getGBufferPos()->getTexture()->getTextureId());

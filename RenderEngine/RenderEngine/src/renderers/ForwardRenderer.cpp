@@ -33,7 +33,7 @@ void Engine::ForwardRenderer::doRender()
 		// Stablish program to use
 		// changing program is expensive -> 
 		// https://www.opengl.org/discussion_boards/showthread.php/185615-cheep-expensive-calls
-		glUseProgram(renderableIt->second->program->getProgramId());
+		renderableIt->second->program->use();
 
 		renderProgram(activeCam, renderableIt->second);
 	}
@@ -41,9 +41,6 @@ void Engine::ForwardRenderer::doRender()
 
 void Engine::ForwardRenderer::renderProgram(Engine::Camera * camera, Engine::ProgramRenderables * renderables)
 {
-	glm::mat4 & viewMatrix = camera->getViewMatrix();
-	glm::mat4 & projMatrix = camera->getProjectionMatrix();
-
 	Engine::Program * program = renderables->program;
 
 	std::map<unsigned int, std::list<Engine::Object *>>::const_iterator it;
@@ -58,7 +55,7 @@ void Engine::ForwardRenderer::renderProgram(Engine::Camera * camera, Engine::Pro
 		for (listIt = meshes.begin(); listIt != meshes.end(); listIt++)
 		{
 			Object * objToRender = *listIt;
-			program->onRenderObject(objToRender, viewMatrix, projMatrix);
+			program->onRenderObject(objToRender, camera);
 
 			unsigned int vertexPerFace = objToRender->getMesh()->getNumVerticesPerFace();
 			glDrawElements(objToRender->getRenderMode(), objToRender->getMesh()->getNumFaces() * vertexPerFace, GL_UNSIGNED_INT, (void*)0);

@@ -15,11 +15,17 @@ layout (location=3) in vec4 inShadowMapPos;
 layout (location=4) in vec4 inShadowMapPos1;
 
 uniform mat4 normal;
+uniform mat4 modelView;
+
+uniform float worldScale;
+uniform float renderRadius;
 
 uniform sampler2D depthTexture;
 uniform sampler2D depthTexture1;
 
 uniform vec3 lightDir;
+
+// Random sample vectors used to apply percentage close filter to casted shadows
 uniform vec2 poissonDisk[4] = vec2[](
   vec2( -0.94201624, -0.39906216 ),
   vec2( 0.94558609, -0.76890725 ),
@@ -30,6 +36,8 @@ uniform vec2 poissonDisk[4] = vec2[](
 uniform vec3 rock;
 uniform vec3 grass;
 uniform vec3 sand;
+
+uniform float time;
 
 uniform float waterHeight;
 
@@ -77,7 +85,7 @@ float cellularNoise(vec2 uv, float cellularScale)
     }
     
 	dist0 = clamp(dist0, 0, 1);
-    return 1.0 - dist0;
+    return dist0 * dist0;
 }
 
 float NoiseInterpolation(in vec2 i_coord, in float i_size)
@@ -111,7 +119,6 @@ float noiseHeight(in vec2 pos, float localScale, int octaveCount)
 
 	for (int index = 0; index < octaveCount; index++)
 	{
-
 		noiseValue += NoiseInterpolation(pos, localScale * localFrecuency) * localAplitude;
 
 		localAplitude /= 2.0;
@@ -121,11 +128,24 @@ float noiseHeight(in vec2 pos, float localScale, int octaveCount)
 	return noiseValue * noiseValue * noiseValue * 0.01;
 }
 
-vec2 Curl(float nx1, float nx2, float ny1, float ny2)
+float bumpNoiseHeight(in vec2 pos, float localScale, int octaveCount)
 {
-	float dx = nx1 - nx2;
-	float dy = ny1 - ny2;
-	return vec2(dy, -dx) * 10.0;
+	float noiseValue = 0.0;
+
+	float localAplitude = amplitude;
+	float localFrecuency = frecuency;
+
+	for (int index = 0; index < octaveCount; index++)
+	{
+
+		noiseValue += NoiseInterpolation(pos, localScale * localFrecuency) * localAplitude;
+		noiseValue += NoiseInterpolation(pos.yx, localScale * localFrecuency) * localAplitude;
+
+		localAplitude /= 2.0;
+		localFrecuency *= 2.0;
+	}
+
+	return noiseValue * 0.001;
 }
 
 // =====================================================================
@@ -135,22 +155,27 @@ bool whithinRange(vec2 texCoord)
 	return texCoord.x >= 0.0 && texCoord.x <= 1.0 && texCoord.y >= 0.0 && texCoord.y <= 1.0;
 }
 
+// Looks up the shadow map to tell wether the fragment is in shadow
+// or should receive full lighting
 float getShadowVisibility(vec3 rawNormal)
 {
 	float bias = clamp(0.005 * tan(acos(dot(rawNormal, lightDir))), 0.0, 0.01);
 	float visibility = 1.0;
 
+	// Check first the highest resolution (but smaller) map
 	if(whithinRange(inShadowMapPos.xy))
 	{
 		float curDepth = inShadowMapPos.z - bias;
 		//visibility = texture(depthTexture, inShadowMapPos.xy).x < curDepth? 0.0 : 1.0;
 		
+		// Apply percentage close filter to get rid of the stair effect
 		for (int i = 0; i < 4; i++)
 		{
 			visibility -= 0.25 * ( texture(depthTexture, inShadowMapPos.xy + poissonDisk[i] / 700.0).x  <  curDepth? 1.0 : 0.0 );
 		}
 		
 	}
+	// If not there, try in the lower resolution (but bigger) map
 	else if(whithinRange(inShadowMapPos1.xy))
 	{
 		float curDepth = inShadowMapPos1.z - bias;
@@ -166,6 +191,43 @@ float getShadowVisibility(vec3 rawNormal)
 	return visibility;
 }
 
+// Computes the normal via finite differences based on the same algorithm as the
+// one used to build the terrain mesh
+vec3 computeNormal()
+{
+	float u = inUV.x;
+	float v = inUV.y;
+	float step = 0.01;
+	float tH = noiseHeight(vec2(u, v + step), scale, octaves); 
+	float bH = noiseHeight(vec2(u, v - step), scale, octaves);
+	float rH = noiseHeight(vec2(u + step, v), scale, octaves);
+	float lH = noiseHeight(vec2(u - step, v), scale, octaves); 
+
+	return normalize(vec3(lH - rH, step * step, bH - tH));
+}
+
+// Creates a bump map normal of the given octaves
+// E.G., we use less octaves for sand, to give it a smoother look
+vec3 computeBumpNormal(int octaveCount)
+{
+	float u = inUV.x;
+	float v = inUV.y;
+	float step = 0.0025;
+	float slope = 2.0;
+	float tH = bumpNoiseHeight(vec2(u, v + step), scale * slope, octaveCount); 
+	float bH = bumpNoiseHeight(vec2(u, v - step), scale * slope, octaveCount);
+	float rH = bumpNoiseHeight(vec2(u + step, v), scale * slope, octaveCount);
+	float lH = bumpNoiseHeight(vec2(u - step, v), scale * slope, octaveCount); 
+
+	return normalize(vec3(lH - rH, step * step, bH - tH));
+}
+
+vec3 computeCaustics(vec2 uv)
+{
+	float val = cellularNoise(uv, 150.0);
+	return vec3(val * val * 2.0);
+}
+
 #else
 layout (location=0) out vec4 lightdepth;
 #endif
@@ -179,45 +241,13 @@ void main()
 #else
 	// COMPUTE NORMAL FROM HEIGHTMAP
 	// ------------------------------------------------------------------------------
-	float u = inUV.x;
-	float v = inUV.y;
-	float step = 0.01;
-	float tH = noiseHeight(vec2(u, v + step), scale, octaves); 
-	float bH = noiseHeight(vec2(u, v - step), scale, octaves);
-	float rH = noiseHeight(vec2(u + step, v), scale, octaves);
-	float lH = noiseHeight(vec2(u - step, v), scale, octaves); 
-
-	vec3 rawNormal = normalize(vec3(lH - rH, step * step, bH - tH));
-
+	// Compute vertex normal
+	vec3 rawNormal = computeNormal();
 	vec3 up = vec3(0, 1, 0);
 	float cosV = abs(dot(rawNormal, up));
 
-	bool sandP = height < waterHeight + 0.01;
-	bool rockP = cosV <= grassCoverage;
-	if(sandP)
-	{
-		float bumptH = noiseHeight(vec2(u, v + step), 500.0, 2);
-		float bumpbH = noiseHeight(vec2(u, v - step), 500.0, 2);
-		float bumprH = noiseHeight(vec2(2 * u + step, v), 500.0, 2);
-		float bumplH = noiseHeight(vec2(2 * u - step, v), 500.0, 2);
-		vec3 correct = vec3(0, 3.0, 0);
-		vec3 bumpNormal = normalize(vec3(bumplH - bumprH, step * step, bumpbH - bumptH));
-		rawNormal = correct + bumpNormal;
-		rawNormal = normalize(rawNormal);
-	}
-	else if(rockP)
-	{
-		float nx1 = noiseHeight(vec2(u - step, v),  200.0, octaves);
-		float nx2 = noiseHeight(vec2(u + step, v),  200.0, octaves);
-		float ny1 = noiseHeight(vec2(u, v - step),  200.0, octaves);
-		float ny2 = noiseHeight(vec2(u, v + step),  200.0, octaves);
-		
-		vec2 curlV = Curl(nx1, nx2, ny1, ny2) * 10.0;
-		vec3 apply = cross(vec3(0,1,0), rawNormal) * (curlV.x - curlV.y); 
-		rawNormal += apply;
-		rawNormal = normalize(rawNormal);
-	}
-	
+	// Compute bump normal
+	rawNormal = length(inPos) < float(renderRadius * worldScale) / 1.5? (height < waterHeight + 0.01? computeBumpNormal(8) : computeBumpNormal(octaves)) : rawNormal;
 
 	// Correct normal if we have pass from +X to -X, from +Z to -Z, viceversa, or both
 	int xSign = sign(gridPos.x);
@@ -231,24 +261,33 @@ void main()
 	vec3 heightColor = vec3(0);
 	float visibility = 1.0;
 	float grassData = 0.0;
+	float alpha = 1.0;
 #ifndef WIRE_MODE
+#ifndef POINT_MODE
 
 	// Compute color gradient based on height / slope
-	heightColor = height <= waterHeight + 0.01? sand : cosV > grassCoverage? grass : rock;
+	float tenPerCentGrass = grassCoverage - grassCoverage * 0.1;
+	heightColor = height <= waterHeight + 0.01? sand : height <= waterHeight + 0.015? mix(sand, grass, (height - waterHeight - 0.01) / 0.005) : cosV > grassCoverage? grass : cosV > tenPerCentGrass? mix(rock, vec3(0.15,0.1,0.05), (cosV - tenPerCentGrass) / (grassCoverage * 0.1)) : rock;
 	
 	grassData = heightColor == grass? 1.0 : 0.0;
 	// APPLY SHADOW MAP
 	// ------------------------------------------------------------------------------
 	visibility = getShadowVisibility(rawNormal);
+
+	// Depth for below-water level areas
+	alpha = height <= waterHeight? (height / waterHeight) - 0.4 : 1.0;
+	alpha = clamp(alpha, 0.0, 1.0);
+	heightColor = alpha < 0.95? heightColor + (computeCaustics(inUV + time * 0.007) + computeCaustics(inUV.yx - time * 0.007)) * (0.95 - alpha) : heightColor;
+#endif
 #endif
 
 	// OUTPUT G BUFFERS
 	// ------------------------------------------------------------------------------
-	outColor = vec4(heightColor, visibility);
+	outColor = vec4(heightColor, 1.0);
 	outNormal = vec4(normalize(n), 1.0);
 	outPos = vec4(inPos, 1.0);
-	outSpecular = vec4(0,0,0,0);
+	outSpecular = vec4(0);
 	outEmissive = vec4(0,0,0,0);
-	outInfo = vec4(grassData, 0, 0, 0);
+	outInfo = vec4(grassData, visibility, alpha, 0);
 #endif
 }

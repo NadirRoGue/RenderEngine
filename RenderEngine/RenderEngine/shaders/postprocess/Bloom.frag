@@ -6,7 +6,7 @@
 layout (location=0) out vec4 outColor;
 layout (location=1) out vec4 outEmission;
 
-in vec2 texCoord;
+layout (location=0) in vec2 texCoord;
 
 // Input
 uniform sampler2D postProcessing_0;
@@ -21,6 +21,7 @@ uniform float weight[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.0
 
 void main()
 {
+	// Apply bluring horizontally or vertically depending on what is setted (more eficent than matrix kernel)
 	vec3 result = texture(postProcessing_1, texCoord).rgb * weight[0]; // current fragment's contribution
     if(horizontal)
     {
@@ -43,6 +44,7 @@ void main()
 
 	vec4 inColor = texture(postProcessing_0, texCoord);
 	
+	// If its the last pass, we will blend the result with the color texture
 	vec3 finalColor = blend? inColor.rgb + result : inColor.rgb;
 
 	outColor = vec4(finalColor, 1.0);

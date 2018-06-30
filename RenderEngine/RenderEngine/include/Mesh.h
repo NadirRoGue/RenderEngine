@@ -9,6 +9,9 @@
 
 namespace Engine
 {
+	// Represents a triangle mesh
+	// Is also in charge of syncing and releasing CPU and GPU resources
+	// related to the mesh
 	class Mesh
 	{
 	private:
@@ -61,6 +64,8 @@ namespace Engine
 
 		void releaseGPU();
 		void releaseCPU();
+
+		void use() const;
 	private:
 		void extractTopology(aiMesh * mesh);
 		void extractGeometry(aiMesh * mesh);

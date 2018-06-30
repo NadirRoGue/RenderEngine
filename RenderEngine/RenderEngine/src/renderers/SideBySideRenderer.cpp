@@ -50,7 +50,7 @@ void Engine::SideBySideRenderer::initialize()
 
 	initialized = true;
 
-	Engine::Program * sourcePostProcess = Engine::ProgramTable::getInstance().getProgramByName("post_processing_program");
+	Engine::Program * sourcePostProcess = Engine::ProgramTable::getInstance().getProgram<Engine::PostProcessProgram>();
 	Engine::Mesh * miL = Engine::MeshTable::getInstance().getMesh("leftplane");
 
 	leftRenderer->initialize();

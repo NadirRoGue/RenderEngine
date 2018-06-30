@@ -11,7 +11,7 @@
 namespace Engine
 {
 	// ==================================================
-
+	// Base class of all per-frame updateable animations (such as the automatic camera movement)
 	class Animation
 	{
 	private:
@@ -27,12 +27,12 @@ namespace Engine
 	};
 
 	// ==================================================
-
+	// Will hold all the animations and will handle updating them
 	class AnimationTable
 	{
 	private:
+		// Animation list
 		std::map<std::string, Animation *> animationTable;
-
 	public:
 		AnimationTable();
 		~AnimationTable();

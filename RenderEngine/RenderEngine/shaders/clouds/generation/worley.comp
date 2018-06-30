@@ -1,5 +1,10 @@
 #version 430
 
+/*
+	Fills a 3D texture with WORLEY noise to be used in the volumetric
+	clouds as shape eroder
+*/
+
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 layout (rgba8, binding = 0) uniform image3D outVolTex;

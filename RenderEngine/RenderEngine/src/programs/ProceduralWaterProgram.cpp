@@ -1,13 +1,17 @@
 #include "programs/ProceduralWaterProgram.h"
 
 #include "WorldConfig.h"
+#include "TimeAccesor.h"
+#include "renderers/DeferredRenderer.h"
+#include "CascadeShadowMaps.h"
 
 #include <iostream>
 
 std::string Engine::ProceduralWaterProgram::PROGRAM_NAME = "ProceduralWaterProgram";
 
 const unsigned long long Engine::ProceduralWaterProgram::WIRE_DRAW_MODE = 0x01;
-const unsigned long long Engine::ProceduralWaterProgram::SHADOW_MAP = 0x02;
+const unsigned long long Engine::ProceduralWaterProgram::POINT_DRAW_MODE = 0x02;
+const unsigned long long Engine::ProceduralWaterProgram::SHADOW_MAP = 0x04;
 
 Engine::ProceduralWaterProgram::ProceduralWaterProgram(std::string name, unsigned long long params)
 	:Engine::Program(name, params)
@@ -32,6 +36,9 @@ Engine::ProceduralWaterProgram::ProceduralWaterProgram(const Engine::ProceduralW
 	uDepthTexture1 = other.uDepthTexture1;
 	uLightDirection = other.uLightDirection;
 
+	uInInfo = other.uInInfo;
+	uScreenSize = other.uScreenSize;
+
 	uTime = other.uTime;
 	uWaterColor = other.uWaterColor;
 	uWaterSpeed = other.uWaterSpeed;
@@ -49,6 +56,10 @@ void Engine::ProceduralWaterProgram::initialize()
 	if (parameters & Engine::ProceduralWaterProgram::WIRE_DRAW_MODE)
 	{
 		configStr += "#define WIRE_MODE";
+	}
+	else if (parameters & Engine::ProceduralWaterProgram::POINT_DRAW_MODE)
+	{
+		configStr += "#define POINT_MODE";
 	}
 
 	if (parameters & Engine::ProceduralWaterProgram::SHADOW_MAP)
@@ -105,6 +116,9 @@ void Engine::ProceduralWaterProgram::configureProgram()
 	uDepthTexture = glGetUniformLocation(glProgram, "depthTexture");
 	uDepthTexture1 = glGetUniformLocation(glProgram, "depthTexture1");
 	uLightDirection = glGetUniformLocation(glProgram, "lightDir");
+
+	uInInfo = glGetUniformLocation(glProgram, "inInfo");
+	uScreenSize = glGetUniformLocation(glProgram, "screenSize");
 	
 	uWaterColor = glGetUniformLocation(glProgram, "watercolor");
 	uWaterSpeed = glGetUniformLocation(glProgram, "waterspeed");
@@ -112,11 +126,6 @@ void Engine::ProceduralWaterProgram::configureProgram()
 
 	uInPos = glGetAttribLocation(glProgram, "inPos");
 	uInUV = glGetAttribLocation(glProgram, "inUV");
-}
-
-void Engine::ProceduralWaterProgram::setTimeUniform(float sinTime)
-{
-	glUniform1f(uTime, sinTime);
 }
 
 void Engine::ProceduralWaterProgram::setUniformGridPosition(unsigned int i, unsigned int j)
@@ -134,42 +143,48 @@ void Engine::ProceduralWaterProgram::setUniformLightDepthMatrix1(const glm::mat4
 	glUniformMatrix4fv(uLightDepthMatrix1, 1, GL_FALSE, &(ldm[0][0]));
 }
 
-void Engine::ProceduralWaterProgram::setUniformDepthTexture(const Engine::TextureInstance * depthTexture)
+void Engine::ProceduralWaterProgram::applyGlobalUniforms()
 {
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, depthTexture->getTexture()->getTextureId());
-	glUniform1i(uDepthTexture, 0);
+	//if (!(parameters & Engine::ProceduralWaterProgram::SHADOW_MAP))
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, Engine::CascadeShadowMaps::getInstance().getDepthTexture0()->getTexture()->getTextureId());
+		glUniform1i(uDepthTexture, 0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, Engine::CascadeShadowMaps::getInstance().getDepthTexture1()->getTexture()->getTextureId());
+		glUniform1i(uDepthTexture1, 1);
+
+		glm::vec3 ld = glm::normalize(Engine::Settings::lightDirection);
+		glUniform3fv(uLightDirection, 1, &ld[0]);
+
+		glUniform1f(uTime, Engine::Time::timeSinceBegining);
+
+		Engine::DeferredRenderer * dr = static_cast<Engine::DeferredRenderer*>(Engine::RenderManager::getInstance().getRenderer());
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, dr->getGBufferInfo()->getTexture()->getTextureId());
+		glUniform1i(uInInfo, 2);
+		glUniform2f(uScreenSize, float(Engine::ScreenManager::SCREEN_WIDTH), float(Engine::ScreenManager::SCREEN_HEIGHT));
+
+		glUniform1f(uWaterSpeed, Engine::Settings::waterSpeed);
+		glUniform3fv(uWaterColor, 1, &Engine::Settings::waterColor[0]);
+	}
 }
 
-void Engine::ProceduralWaterProgram::setUniformDepthTexture1(const Engine::TextureInstance * dt)
+void Engine::ProceduralWaterProgram::onRenderObject(const Object * obj, Engine::Camera * camera)
 {
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, dt->getTexture()->getTextureId());
-	glUniform1i(uDepthTexture1, 1);
-}
-
-void Engine::ProceduralWaterProgram::setUniformLightDirection(const glm::vec3 & lightDir)
-{
-	glUniform3fv(uLightDirection, 1, &lightDir[0]);
-}
-
-void Engine::ProceduralWaterProgram::onRenderObject(const Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
-{
-	glm::mat4 modelView = view * obj->getModelMatrix();
-	glm::mat4 modelViewProj = proj * view * obj->getModelMatrix();
+	glm::mat4 modelView = camera->getViewMatrix() * obj->getModelMatrix();
+	glm::mat4 modelViewProj = camera->getProjectionMatrix() * modelView;
 	glm::mat4 normal = glm::transpose(glm::inverse(modelView));
 
 	glUniformMatrix4fv(uModelView, 1, GL_FALSE, &(modelView[0][0]));
 	glUniformMatrix4fv(uModelViewProj, 1, GL_FALSE, &(modelViewProj[0][0]));
 	glUniformMatrix4fv(uNormal, 1, GL_FALSE, &(normal[0][0]));
-
-	glUniform1f(uWaterSpeed, Engine::Settings::waterSpeed);
-	glUniform3fv(uWaterColor, 1, &Engine::Settings::waterColor[0]);
 }
 
 void Engine::ProceduralWaterProgram::configureMeshBuffers(Engine::Mesh * data)
 {
-	glBindVertexArray(data->vao);
+	data->use();
 
 	if (uInPos != -1)
 	{

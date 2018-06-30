@@ -29,7 +29,7 @@ Engine::FractalTree::FractalTree(const TreeGenerationData & data) :Engine::Proce
 Engine::Mesh * Engine::FractalTree::generate()
 {
 	// Initial data to start growin the tree
-	glm::vec3 scale = glm::vec3(0.04f, 0.2f, 0.04f);
+	glm::vec3 scale = glm::vec3(0.04f, 0.2f, 0.04f) * treeData.scalingFactor;
 	glm::vec3 translation(0, 0, 0);
 	glm::vec3 rotation;
 
@@ -52,6 +52,7 @@ Engine::Mesh * Engine::FractalTree::generate()
 	float * newVertices = new float[vertices.size() * 3];
 	float * newColors = new float[vertices.size() * 3];
 	float * newEmission = new float[vertices.size() * 3];
+	float * newUVs = new float[vertices.size() * 2];
 	for (size_t i = 0; i < vertices.size(); i++)
 	{
 		size_t index = i * 3;
@@ -70,6 +71,11 @@ Engine::Mesh * Engine::FractalTree::generate()
 		newEmission[index] = e.x;
 		newEmission[index + 1] = e.y;
 		newEmission[index + 2] = e.z;
+
+		size_t uvIndex = i * 2;
+		glm::vec2 & uv = uvs[i];
+		newUVs[uvIndex] = uv.x;
+		newUVs[uvIndex + 1] = uv.y;
 	}
 
 	unsigned int * newFaces = new unsigned int[faces.size() * 3];
@@ -83,14 +89,14 @@ Engine::Mesh * Engine::FractalTree::generate()
 	}
 
 	// Generate new mesh. Normals are automatically computed if not present in the constructor
-	Engine::Mesh * tree = new Engine::Mesh(unsigned int(faces.size()), unsigned int(vertices.size()), newFaces, newVertices, newColors, 0, 0, 0, newEmission);
+	Engine::Mesh * tree = new Engine::Mesh(unsigned int(faces.size()), unsigned int(vertices.size()), newFaces, newVertices, newColors, 0, newUVs, 0, newEmission);
 
 	return tree;
 }
 
-void Engine::FractalTree::processChunk(glm::mat4 & origin, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotation, size_t vOffset, unsigned int depth)
+void Engine::FractalTree::processChunk(glm::mat4 origin, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotation, size_t vOffset, unsigned int depth)
 {
-	if (depth >= treeData.maxDepth - 1)
+	if (depth >= treeData.depthStartingLeaf)
 	{
 		addLeaf(origin, scale / treeData.scalingFactor, vOffset, depth);
 		if(depth >= treeData.maxDepth)
@@ -144,17 +150,18 @@ void Engine::FractalTree::processChunk(glm::mat4 & origin, glm::vec3 scale, glm:
 	}
 }
 
-void Engine::FractalTree::addLeaf(glm::mat4 & origin, glm::vec3 lastScaling, size_t offset, unsigned int depth)
+void Engine::FractalTree::addLeaf(glm::mat4 origin, glm::vec3 lastScaling, size_t offset, unsigned int depth)
 {
 	float maxScale = glm::max(glm::max(lastScaling.x, lastScaling.y), lastScaling.z);
 
 	glm::vec3 translation(0, maxScale, 0);
 	glm::mat4 model = origin * glm::translate(glm::mat4(1.0f), translation);
 
-	appendVerticesAndFaces(base, model, glm::vec3(maxScale) * glm::vec3(0.15, 0.6, 0.15), 0, offset, true, true);
+	//0.4 0.3 0.4
+	appendVerticesAndFaces(base, model, glm::vec3(maxScale) * glm::vec3(0.4, 0.3, 0.4), 0, offset, true, true);
 }
 
-void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat4 & model, glm::vec3 scale, unsigned int depth, size_t vOffset, bool keepBase, bool isLeaf)
+void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat4 model, glm::vec3 scale, unsigned int depth, size_t vOffset, bool keepBase, bool isLeaf)
 {
 	// Add faces adding the offset of vertices already added to the main tree
 	const unsigned int * fac = source->getFaces();
@@ -187,6 +194,18 @@ void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat
 	// Add new vertices applying the transformations
 	const float * verts = source->getVertices();
 	unsigned int start = keepBase ? 0 : source->getNumVertices() / 2;
+	float highestY = -99999.9f, lowestY = 99999.9f;
+	for (unsigned int i = start; i < source->getNumVertices(); i++)
+	{
+		unsigned int index = (i * 3) + 1;
+
+		if (verts[index] > highestY)
+			highestY = verts[index];
+		if (verts[index] < lowestY)
+			lowestY = verts[index];
+	}
+	float delta = highestY - lowestY;
+
 	for (unsigned int i = start; i < source->getNumVertices(); i++)
 	{
 		unsigned int index = i * 3;
@@ -195,6 +214,12 @@ void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat
 		float z = verts[index + 2] * scale.z;
 		glm::vec4 v(x, y, z, 1.0);
 
+		unsigned int uvIndex = i * 2;
+		float s = source->getUVs()[uvIndex] +  - 4;
+		float t = source->getUVs()[uvIndex + 1] + vOffset - 4;
+		glm::vec2 uv(s, t);
+		uvs.push_back(uv);
+
 		glm::vec4 transformedV = model * v;
 
 		vertices.push_back(glm::vec3(transformedV.x, transformedV.y, transformedV.z));
@@ -202,21 +227,18 @@ void Engine::FractalTree::appendVerticesAndFaces(Engine::Mesh * source, glm::mat
 		if (!isLeaf)
 		{
 			// Add color gradient based on depth + vertex height
-			colors.push_back(lerpColor(treeData.startTrunkColor, treeData.endTrunkColor, depth * 2.0f + y));
+			colors.push_back(glm::mix(treeData.startTrunkColor, treeData.endTrunkColor, depth * 2.0f + y));
 			emission.push_back(glm::vec3(0, 0, 0));
 		}
 		else
 		{
+			glm::vec3 color = glm::mix(treeData.leafStartColor, treeData.leafEndColor, verts[index + 1] / delta);
 			// Add leaf color and possible emission
-			if (treeData.emissiveLeaf)
-			{
-				emission.push_back(treeData.leafColor);
-			}
-			else
-			{
-				emission.push_back(glm::vec3(0, 0, 0));
-			}
-			colors.push_back(treeData.leafColor);
+			glm::vec3 data;
+			data.x = 1.0f;
+			data.y = treeData.emissiveLeaf ? 1.0f : 0.0f;
+			emission.push_back(data);
+			colors.push_back(color);
 		}
 	}
 }
@@ -233,13 +255,4 @@ float Engine::FractalTree::randSign()
 float Engine::FractalTree::randInInterval(float a, float b)
 {
 	return a + (b - a) * randGen(randEngine);
-}
-
-glm::vec3 Engine::FractalTree::lerpColor(const glm::vec3 & a, const glm::vec3 & b, float alpha)
-{
-	glm::vec3 result;
-	result.x = a.x + (b.x - a.x) * alpha;
-	result.y = a.y + (b.y - a.y) * alpha;
-	result.z = a.z + (b.z - a.z) * alpha;
-	return result;
 }

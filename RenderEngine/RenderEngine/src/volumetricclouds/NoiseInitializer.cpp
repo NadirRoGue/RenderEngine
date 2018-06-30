@@ -81,8 +81,8 @@ void Engine::CloudSystem::NoiseInitializer::initTextures()
 	PerlinWorleyFBM->setRComponentWrapType(GL_REPEAT);
 	PerlinWorleyFBM->setSComponentWrapType(GL_REPEAT);
 	PerlinWorleyFBM->setTComponentWrapType(GL_REPEAT);
-	PerlinWorleyFBM->setMagnificationFilterType(GL_LINEAR_MIPMAP_LINEAR);
-	PerlinWorleyFBM->setMinificationFilterType(GL_LINEAR_MIPMAP_LINEAR);
+	PerlinWorleyFBM->setMagnificationFilterType(GL_LINEAR);
+	PerlinWorleyFBM->setMinificationFilterType(GL_LINEAR);
 	PerlinWorleyFBM->generateTexture();
 	PerlinWorleyFBM->uploadTexture();
 	//PerlinWorleyFBM->configureTexture();
@@ -98,8 +98,8 @@ void Engine::CloudSystem::NoiseInitializer::initTextures()
 	WorleyFBM->setRComponentWrapType(GL_REPEAT);
 	WorleyFBM->setSComponentWrapType(GL_REPEAT);
 	WorleyFBM->setTComponentWrapType(GL_REPEAT);
-	WorleyFBM->setMagnificationFilterType(GL_LINEAR_MIPMAP_LINEAR);
-	WorleyFBM->setMinificationFilterType(GL_LINEAR_MIPMAP_LINEAR);
+	WorleyFBM->setMagnificationFilterType(GL_LINEAR);
+	WorleyFBM->setMinificationFilterType(GL_LINEAR);
 	WorleyFBM->generateTexture();
 	WorleyFBM->uploadTexture();
 	//WorleyFBM->configureTexture();

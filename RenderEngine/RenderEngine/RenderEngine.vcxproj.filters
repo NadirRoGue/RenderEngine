@@ -157,6 +157,12 @@
     <Filter Include="shaders\clouds\generation">
       <UniqueIdentifier>{88f7877e-7163-466a-b888-edcd5aa6ed49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de encabezado\terraincomponents">
+      <UniqueIdentifier>{a60fb81d-3372-420b-8d53-56da91140dec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\terraincomponents">
+      <UniqueIdentifier>{2e6fac4e-4f04-4d7c-b1f1-b07a09e87828}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Animation.h">
@@ -270,9 +276,6 @@
     <ClInclude Include="include\postprocessprograms\DepthOfFieldProgram.h">
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>
-    <ClInclude Include="include\postprocessprograms\GaussianBlurProgram.h">
-      <Filter>Archivos de encabezado\postprocessprograms</Filter>
-    </ClInclude>
     <ClInclude Include="include\StorageTable.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
@@ -330,9 +333,6 @@
     <ClInclude Include="include\datatables\DeferredObjectsTable.h">
       <Filter>Archivos de encabezado\datatables</Filter>
     </ClInclude>
-    <ClInclude Include="include\Time.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="include\animations\CameraBezier.h">
       <Filter>Archivos de encabezado\animations</Filter>
     </ClInclude>
@@ -387,9 +387,6 @@
     <ClInclude Include="include\postprocessprograms\VolumetricCloudProgram.h">
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>
-    <ClInclude Include="include\volumetricclouds\VolumetricClouds.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="include\postprocessprograms\SSReflectionProgram.h">
       <Filter>Archivos de encabezado\postprocessprograms</Filter>
     </ClInclude>
@@ -407,6 +404,36 @@
     </ClInclude>
     <ClInclude Include="include\CascadeShadowMaps.h">
       <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TimeAccesor.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\animations\CameraStraight.h">
+      <Filter>Archivos de encabezado\animations</Filter>
+    </ClInclude>
+    <ClInclude Include="include\postprocessprograms\CloudFilterProgram.h">
+      <Filter>Archivos de encabezado\postprocessprograms</Filter>
+    </ClInclude>
+    <ClInclude Include="include\terraincomponents\FlowerComponent.h">
+      <Filter>Archivos de encabezado\terraincomponents</Filter>
+    </ClInclude>
+    <ClInclude Include="include\terraincomponents\LandscapeComponent.h">
+      <Filter>Archivos de encabezado\terraincomponents</Filter>
+    </ClInclude>
+    <ClInclude Include="include\terraincomponents\TreeComponent.h">
+      <Filter>Archivos de encabezado\terraincomponents</Filter>
+    </ClInclude>
+    <ClInclude Include="include\terraincomponents\WaterComponent.h">
+      <Filter>Archivos de encabezado\terraincomponents</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TerrainComponent.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ShadowCaster.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="include\programs\CloudShadowProgram.h">
+      <Filter>Archivos de encabezado\programs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -518,9 +545,6 @@
     <ClCompile Include="src\postprocessprograms\DepthOfFieldProgram.cpp">
       <Filter>Archivos de origen\postprocessprograms</Filter>
     </ClCompile>
-    <ClCompile Include="src\postprocessprograms\GaussianBlurProgram.cpp">
-      <Filter>Archivos de origen\postprocessprograms</Filter>
-    </ClCompile>
     <ClCompile Include="src\StorageTable.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
@@ -565,9 +589,6 @@
     </ClCompile>
     <ClCompile Include="src\datatables\DeferredObjectsTable.cpp">
       <Filter>Archivos de origen\datatables</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Time.cpp">
-      <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="src\animations\CameraBezier.cpp">
       <Filter>Archivos de origen\animatios</Filter>
@@ -631,6 +652,30 @@
     </ClCompile>
     <ClCompile Include="src\CascadeShadowMaps.cpp">
       <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TimeAccesor.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\animations\CameraStraight.cpp">
+      <Filter>Archivos de origen\animatios</Filter>
+    </ClCompile>
+    <ClCompile Include="src\postprocessprograms\CloudFilterProgram.cpp">
+      <Filter>Archivos de origen\postprocessprograms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\terraincomponents\FlowerComponent.cpp">
+      <Filter>Archivos de origen\terraincomponents</Filter>
+    </ClCompile>
+    <ClCompile Include="src\terraincomponents\LandscapeComponent.cpp">
+      <Filter>Archivos de origen\terraincomponents</Filter>
+    </ClCompile>
+    <ClCompile Include="src\terraincomponents\TreeComponent.cpp">
+      <Filter>Archivos de origen\terraincomponents</Filter>
+    </ClCompile>
+    <ClCompile Include="src\terraincomponents\WaterComponent.cpp">
+      <Filter>Archivos de origen\terraincomponents</Filter>
+    </ClCompile>
+    <ClCompile Include="src\programs\CloudShadowProgram.cpp">
+      <Filter>Archivos de origen\programs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -715,9 +760,6 @@
     <None Include="shaders\postprocess\DepthOfField.frag">
       <Filter>shaders\postprocess</Filter>
     </None>
-    <None Include="shaders\postprocess\GaussianBlur.frag">
-      <Filter>shaders\postprocess</Filter>
-    </None>
     <None Include="shaders\postprocess\PostProcessRender.frag">
       <Filter>shaders\postprocess</Filter>
     </None>
@@ -735,6 +777,15 @@
     </None>
     <None Include="shaders\postprocess\SSGodRays.frag">
       <Filter>shaders\postprocess</Filter>
+    </None>
+    <None Include="shaders\clouds\cloudfilter.frag">
+      <Filter>shaders\clouds</Filter>
+    </None>
+    <None Include="shaders\clouds\cloudshadow.frag">
+      <Filter>shaders\clouds</Filter>
+    </None>
+    <None Include="shaders\clouds\cloudshadow.vert">
+      <Filter>shaders\clouds</Filter>
     </None>
   </ItemGroup>
 </Project>

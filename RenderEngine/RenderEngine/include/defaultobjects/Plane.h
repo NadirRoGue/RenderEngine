@@ -1,9 +1,19 @@
+/**
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
+
 #pragma once
 
 #include "Mesh.h"
 
 namespace Engine
 {
+	/**
+	 * Holds the data to build different type of planes
+	 * - Vertical plane used for deferred rendering
+	 * - Half vertical plane (left and right) used for side-by-side rendering
+	 */
 	namespace PlaneData
 	{
 		const unsigned int planeNVertex = 4;
@@ -40,16 +50,19 @@ namespace Engine
 		};
 	}
 
+	// Creates a full screen quad for deferred rendering
 	Mesh CreatePlane()
 	{
 		return Mesh(0, PlaneData::planeNVertex, 0, PlaneData::planeVertexPos, 0, 0, PlaneData::planeUVs, 0);
 	}
 
+	// Creates a left half screen quad for side-by-side rendering
 	Mesh CreateLeftPlane()
 	{
 		return Mesh(0, PlaneData::planeNVertex, 0, PlaneData::leftSmallPlaneVertex, 0, 0, PlaneData::planeUVs, 0);
 	}
 
+	// Creates a right half screen quad for side-by-side rendering
 	Mesh CreateRightPlane()
 	{
 		return Mesh(0, PlaneData::planeNVertex, 0, PlaneData::rightSmallPlaneVertex, 0, 0, PlaneData::planeUVs, 0);

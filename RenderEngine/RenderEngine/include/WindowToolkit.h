@@ -1,3 +1,7 @@
+/*
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 #include <GL/glew.h>
@@ -11,6 +15,9 @@ namespace Engine
 {
 	namespace Window
 	{
+		// Parent class of all window toolkits avaliable on the engine
+		// Gives a common interface to access them, and holds common
+		// code, such as the basic OpenGL context configuration
 		class WindowToolkit
 		{
 		protected:

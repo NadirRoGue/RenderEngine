@@ -26,8 +26,8 @@ void Engine::CascadeShadowMaps::init()
 	);
 
 	// Initialize shadow maps
-	initializeShadowMap(0, -5.0f, 5.0f, -5.0f, 5.0f, 0.1f, 50.0f);
-	initializeShadowMap(1, -20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 100.0f);
+	initializeShadowMap(0, -5.0f, 5.0f, -5.0f, 5.0f, 0.1f, 70.0f);
+	initializeShadowMap(1, -40.0f, 40.0f, -40.0f, 40.0f, 0.1f, 120.0f);
 }
 
 void Engine::CascadeShadowMaps::initializeShadowMap(int level, float minX, float maxX, float minY, float maxY, float minZ, float maxZ)
@@ -43,17 +43,14 @@ void Engine::CascadeShadowMaps::initializeFrame(Engine::Camera * eye)
 	Engine::DirectionalLight * dl = Engine::SceneManager::getInstance().getActiveScene()->getDirectionalLight();
 	const glm::vec3 & cameraPosition = eye->getPosition();
 	glm::vec3 target = glm::vec3(-cameraPosition.x, 0, -cameraPosition.z);
-	glm::mat4 depthViewMatrix = glm::lookAt(target + (dl->getDirection() * 30.0f), target, glm::vec3(0, 1, 0));
+	glm::mat4 depthViewMatrix = glm::lookAt(target + (dl->getDirection() * 50.0f), target, glm::vec3(0, 1, 0));
 
 	for (unsigned int i = 0; i < getCascadeLevels(); i++)
 	{
 		shadowMaps[i].depth = shadowMaps[i].proj * depthViewMatrix;
 	}
-}
 
-void Engine::CascadeShadowMaps::saveCurrentFBO()
-{
-	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFrameBuffer);
+	renderShadows(eye);
 }
 
 void Engine::CascadeShadowMaps::beginShadowRender(int level)
@@ -66,7 +63,6 @@ void Engine::CascadeShadowMaps::beginShadowRender(int level)
 void Engine::CascadeShadowMaps::endShadowRender()
 {
 	shadowMaps[currentLevel].depth = biasMatrix * shadowMaps[currentLevel].depth;
-	glBindFramebuffer(GL_FRAMEBUFFER, previousFrameBuffer);
 }
 
 const glm::mat4 & Engine::CascadeShadowMaps::getBiasMat()
@@ -102,4 +98,28 @@ const Engine::TextureInstance * Engine::CascadeShadowMaps::getDepthTexture0()
 const Engine::TextureInstance * Engine::CascadeShadowMaps::getDepthTexture1()
 {
 	return shadowMaps[1].shadowMap;
+}
+
+void Engine::CascadeShadowMaps::registerShadowCaster(Engine::ShadowCaster * caster)
+{
+	shadowCasters.push_back(caster);
+}
+
+void Engine::CascadeShadowMaps::renderShadows(Engine::Camera * cam)
+{
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFrameBuffer);
+
+	for (unsigned int i = 0; i < getCascadeLevels(); i++)
+	{
+		beginShadowRender(i);
+
+		for (auto & v : shadowCasters)
+		{
+			v->renderShadow(cam, getShadowProjectionMat());
+		}
+
+		endShadowRender();
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, previousFrameBuffer);
 }

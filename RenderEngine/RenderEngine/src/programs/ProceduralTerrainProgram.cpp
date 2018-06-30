@@ -3,11 +3,14 @@
 #include <iostream>
 
 #include "WorldConfig.h"
+#include "TimeAccesor.h"
+#include "CascadeShadowMaps.h"
 
 const std::string Engine::ProceduralTerrainProgram::PROGRAM_NAME = "ProceduralTerrainProgram";
 
 const unsigned long long Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE = 0x01;
-const unsigned long long Engine::ProceduralTerrainProgram::SHADOW_MAP = 0x02;
+const unsigned long long Engine::ProceduralTerrainProgram::POINT_DRAW_MODE = 0x02;
+const unsigned long long Engine::ProceduralTerrainProgram::SHADOW_MAP = 0x04;
 
 // ==================================================================================
 
@@ -33,6 +36,8 @@ Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerra
 	uNormal = other.uNormal;
 
 	uWaterLevel = other.uWaterLevel;
+	uWorldScale = other.uWorldScale;
+	uRenderRadius = other.uRenderRadius;
 
 	uLightDepthMatrix = other.uLightDepthMatrix;
 	uLightDepthMatrix1 = other.uLightDepthMatrix1;
@@ -50,6 +55,8 @@ Engine::ProceduralTerrainProgram::ProceduralTerrainProgram(const ProceduralTerra
 
 	uGridPos = other.uGridPos;
 
+	uTime = other.uTime;
+
 	uGrassCoverage = other.uGrassCoverage;
 	uGrassColor = other.uGrassColor;
 	uSandColor = other.uSandColor;
@@ -63,6 +70,10 @@ void Engine::ProceduralTerrainProgram::initialize()
 	if (parameters & Engine::ProceduralTerrainProgram::WIRE_DRAW_MODE)
 	{
 		configStr += "#define WIRE_MODE";
+	}
+	else if (parameters & Engine::ProceduralTerrainProgram::POINT_DRAW_MODE)
+	{
+		configStr += "#define POINT_MODE";
 	}
 
 	if (parameters & Engine::ProceduralTerrainProgram::SHADOW_MAP)
@@ -126,6 +137,8 @@ void Engine::ProceduralTerrainProgram::configureProgram()
 	uDepthTexture1 = glGetUniformLocation(glProgram, "depthTexture1");
 
 	uWaterLevel = glGetUniformLocation(glProgram, "waterHeight");
+	uWorldScale = glGetUniformLocation(glProgram, "worldScale");
+	uRenderRadius = glGetUniformLocation(glProgram, "renderRadius");
 
 	uAmplitude = glGetUniformLocation(glProgram, "amplitude");
 	uFrecuency = glGetUniformLocation(glProgram, "frecuency");
@@ -136,6 +149,7 @@ void Engine::ProceduralTerrainProgram::configureProgram()
 	uGrassColor = glGetUniformLocation(glProgram, "grass");
 	uRockColor = glGetUniformLocation(glProgram, "rock");
 	uSandColor = glGetUniformLocation(glProgram, "sand");
+	uTime = glGetUniformLocation(glProgram, "time");
 
 	uInPos = glGetAttribLocation(glProgram, "inPos");
 	uInUV = glGetAttribLocation(glProgram, "inUV");
@@ -143,7 +157,7 @@ void Engine::ProceduralTerrainProgram::configureProgram()
 
 void Engine::ProceduralTerrainProgram::configureMeshBuffers(Engine::Mesh * data)
 {
-	glBindVertexArray(data->vao);
+	data->use();
 
 	if (uInPos != -1)
 	{
@@ -160,10 +174,44 @@ void Engine::ProceduralTerrainProgram::configureMeshBuffers(Engine::Mesh * data)
 	}
 }
 
-void Engine::ProceduralTerrainProgram::onRenderObject(const Engine::Object * obj, const glm::mat4 & view, const glm::mat4 &proj)
+void Engine::ProceduralTerrainProgram::applyGlobalUniforms()
 {
-	glm::mat4 modelView = view * obj->getModelMatrix();
-	glm::mat4 modelViewProj = proj * modelView;
+	if (!(parameters & Engine::ProceduralTerrainProgram::SHADOW_MAP))
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, Engine::CascadeShadowMaps::getInstance().getDepthTexture0()->getTexture()->getTextureId());
+		glUniform1i(uDepthTexture, 0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, Engine::CascadeShadowMaps::getInstance().getDepthTexture1()->getTexture()->getTextureId());
+		glUniform1i(uDepthTexture1, 1);
+
+		glm::vec3 ld = glm::normalize(Engine::Settings::lightDirection);
+		glUniform3fv(uLightDirection, 1, &ld[0]);
+
+		glUniform1f(uGrassCoverage, 1.0f - Engine::Settings::grassCoverage);
+		glUniform3fv(uGrassColor, 1, &Engine::Settings::grassColor[0]);
+		glUniform3fv(uRockColor, 1, &Engine::Settings::rockColor[0]);
+		glUniform3fv(uSandColor, 1, &Engine::Settings::sandColor[0]);
+
+		glUniform1f(uTime, Engine::Time::timeSinceBegining);
+
+		glUniform1f(uWorldScale, Engine::Settings::worldTileScale);
+		glUniform1f(uRenderRadius, (float)Engine::Settings::worldRenderRadius);
+	}
+
+	glUniform1f(uWorldScale, Engine::Settings::worldTileScale);
+	glUniform1f(uAmplitude, Engine::Settings::terrainAmplitude);
+	glUniform1f(uFrecuency, Engine::Settings::terrainFrecuency);
+	glUniform1f(uScale, Engine::Settings::terrainScale);
+	glUniform1i(uOctaves, Engine::Settings::terrainOctaves);
+	glUniform1f(uWaterLevel, Engine::Settings::waterHeight);
+}
+
+void Engine::ProceduralTerrainProgram::onRenderObject(const Engine::Object * obj, Engine::Camera * camera)
+{
+	glm::mat4 modelView = camera->getViewMatrix() * obj->getModelMatrix();
+	glm::mat4 modelViewProj = camera->getProjectionMatrix() * modelView;
 	glm::mat4 normal = glm::transpose(glm::inverse(modelView));
 
 	glUniformMatrix4fv(uModelView, 1, GL_FALSE, &(modelView[0][0]));
@@ -172,17 +220,6 @@ void Engine::ProceduralTerrainProgram::onRenderObject(const Engine::Object * obj
 
 	unsigned int vertexPerFace = obj->getMesh()->getNumVerticesPerFace();
 	glPatchParameteri(GL_PATCH_VERTICES, vertexPerFace);
-
-	glUniform1f(uAmplitude, Engine::Settings::terrainAmplitude);
-	glUniform1f(uFrecuency, Engine::Settings::terrainFrecuency);
-	glUniform1f(uScale, Engine::Settings::terrainScale);
-	glUniform1i(uOctaves, Engine::Settings::terrainOctaves);
-	glUniform1f(uWaterLevel, Engine::Settings::waterHeight);
-
-	glUniform1f(uGrassCoverage, 1.0f - Engine::Settings::grassCoverage);
-	glUniform3fv(uGrassColor, 1, &Engine::Settings::grassColor[0]);
-	glUniform3fv(uRockColor, 1, &Engine::Settings::rockColor[0]);
-	glUniform3fv(uSandColor, 1, &Engine::Settings::sandColor[0]);
 }
 
 void Engine::ProceduralTerrainProgram::setUniformGridPosition(unsigned int i, unsigned int j)
@@ -198,25 +235,6 @@ void Engine::ProceduralTerrainProgram::setUniformLightDepthMatrix(const glm::mat
 void Engine::ProceduralTerrainProgram::setUniformLightDepthMatrix1(const glm::mat4 & ldm)
 {
 	glUniformMatrix4fv(uLightDepthMatrix1, 1, GL_FALSE, &(ldm[0][0]));
-}
-
-void Engine::ProceduralTerrainProgram::setUniformDepthTexture(const Engine::TextureInstance * depthTexture)
-{
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, depthTexture->getTexture()->getTextureId());
-	glUniform1i(uDepthTexture, 0);
-}
-
-void Engine::ProceduralTerrainProgram::setUniformDepthTexture1(const Engine::TextureInstance * depthTexture)
-{
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, depthTexture->getTexture()->getTextureId());
-	glUniform1i(uDepthTexture1, 1);
-}
-
-void Engine::ProceduralTerrainProgram::setUniformLightDirection(const glm::vec3 & lightDir)
-{
-	glUniform3fv(uLightDirection, 1, &lightDir[0]);
 }
 
 void Engine::ProceduralTerrainProgram::destroy()

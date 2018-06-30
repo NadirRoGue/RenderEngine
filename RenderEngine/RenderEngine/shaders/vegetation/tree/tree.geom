@@ -1,8 +1,10 @@
 #version 410 core
 
 layout(triangles) in;
-#ifdef WIRE_MODE
+#if defined WIRE_MODE
 layout(line_strip, max_vertices=3) out;
+#elif defined POINT_MODE
+layout(points, max_vertices=3) out;
 #else
 layout(triangle_strip, max_vertices=3) out;
 #endif
@@ -11,6 +13,7 @@ layout(triangle_strip, max_vertices=3) out;
 layout (location=0) in vec3 inColor[];
 layout (location=1) in vec3 inNormal[];
 layout (location=2) in vec3 inEmission[];
+layout (location=3) in vec2 inTexCoord[];
 
 layout (location=0) out vec3 outPos;
 layout (location=1) out vec3 outColor;
@@ -18,6 +21,7 @@ layout (location=2) out vec3 outNormal;
 layout (location=3) out vec3 outEmission;
 layout (location=4) out vec3 lightDepth;
 layout (location=5) out vec3 lightDepth1;
+layout (location=6) out vec2 outTexCoord;
 
 uniform mat4 normal;
 uniform mat4 modelView;
@@ -25,11 +29,14 @@ uniform mat4 modelViewProj;
 #endif
 
 uniform float waterHeight;
+uniform float maxHeight;
 
 uniform mat4 lightDepthMat;
 uniform mat4 lightDepthMat1;
 
 uniform vec2 tileUV;
+
+uniform float worldScale;
 
 // ===============================================================================
 
@@ -91,15 +98,20 @@ void main()
 	
 	float height = noiseHeight(tileUV);
 
-	if(height > waterHeight && height < waterHeight + 0.1)
+	// Accept or discard the tree. All tree triangles will return the same height value. If we are not
+	// within the range (waterlevel to waterlevel + max vegetation height), do not emit the vertices, thus
+	// discard the tree
+	if(height > waterHeight && height < maxHeight)
 	{
-		vec4 displacement = vec4(0, height * 1.5 * 5.0, 0, 0);
+		// If accepted, place it in the correct height
+		vec4 displacement = vec4(0, height * 1.5 * worldScale, 0, 0);
 
 		vec4 a = gl_in[0].gl_Position + displacement;
 		vec4 b = gl_in[1].gl_Position + displacement;
 		vec4 c = gl_in[2].gl_Position + displacement;
 
 #ifndef SHADOW_MAP
+		outTexCoord = inTexCoord[0];
 		outColor = inColor[0];
 		outEmission = inEmission[0];
 		outNormal = (normal * vec4(inNormal[0], 0)).xyz;
@@ -109,6 +121,7 @@ void main()
 		gl_Position = modelViewProj * a;
 		EmitVertex();
 
+		outTexCoord = inTexCoord[1];
 		outColor = inColor[1];
 		outEmission = inEmission[1];
 		outNormal = (normal * vec4(inNormal[1], 0)).xyz;
@@ -118,6 +131,7 @@ void main()
 		gl_Position = modelViewProj * b;
 		EmitVertex();
 
+		outTexCoord = inTexCoord[2];
 		outColor = inColor[2];
 		outEmission = inEmission[2];
 		outNormal = (normal * vec4(inNormal[2], 0)).xyz;

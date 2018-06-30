@@ -16,6 +16,8 @@
 
 namespace Engine
 {
+	// Represents a basic instantiated element in the engine
+	// TODO: Requires huge redesign together with UBER Shaders and introduction of material classes
 	class Object : public IRenderable
 	{
 	public:

@@ -4,7 +4,7 @@ layout (location=0) out vec4 outColor;
 layout (location=1) out vec4 outEmission;
 layout (location=2) out vec4 outGodRaysInfo;
 
-in vec2 texCoord;
+layout (location=0) in vec2 texCoord;
 
 uniform sampler2D postProcessing_0; // color
 uniform sampler2D postProcessing_1; // normal
@@ -15,10 +15,11 @@ uniform sampler2D postProcessing_5; // info
 uniform sampler2D postProcessing_6; // depth
 
 // ===============================================
-// back ground color, used for fog effect
-uniform vec3 backgroundColor;
+// back ground color, used for fog effect and ambient lighting
+uniform vec3 zenitColor;
+uniform vec3 horizonColor;
 
-uniform vec3 worldUp;
+uniform float colorFactor;
 
 // Different lights data
 
@@ -27,9 +28,9 @@ uniform int numPointLights;
 
 layout(std140, binding = 0) uniform DLBuffer
 {
-	vec4 DLdirection [];
-	vec4 DLcolor [];
-	vec4 DLkFactors [];
+	vec4 DLdirection [1];
+	vec4 DLcolor [1];
+	vec4 DLkFactors [1];
 };
 
 /*
@@ -61,7 +62,7 @@ vec3 Ke;
 vec3 N;
 float depth;
 float alpha = 50.0;
-float colorFactor;
+vec3 ambientColor;
 
 // ================================================================================
 // SHADING FUNCTIONALITY
@@ -89,19 +90,23 @@ vec3 diffuseLambert(vec3 dl, vec3 albedo)
 
 vec3 processDirectionalLight(in float visibility)
 {
-	colorFactor = clamp(dot(worldUp, DLdirection[0].xyz), 0.0, 1.0);
 	vec3 c = vec3(0,0,0);
+	// Minimun visibility is 0.1 in shadow places to avoid unlit shading look in shadowed zones
+	visibility = max(visibility, 0.1);
 
 	vec3 L = DLdirection[0].xyz;
 	vec3 lightColor = DLcolor[0].rgb;
+	lightColor.y *= colorFactor * 1.5;
+	lightColor.z *= colorFactor;
+
 	vec3 Kfactors = DLkFactors[0].xyz;
 
 	// Ambient
-	c += lightColor * Kfactors.x * Ka;
+	c += ambientColor * Kfactors.x * Ka;
 
 	// Diffuse
 	c += diffuseLambert(L, lightColor * Kfactors.y * Kd) * visibility;
-	//c += diffuseOrenNayar(L, 1.0, Kd * Kfactors.y * lightColor) * visibility;
+	//c += diffuseOrenNayar(L, 1.0, Kd * Kfactors.y * lightColor) * visibility; // too dark
 
 	// Specular
 	vec3 R = normalize(reflect(-L, N));
@@ -115,20 +120,22 @@ vec3 processDirectionalLight(in float visibility)
 vec3 processAtmosphericFog(in vec3 shadedColor)
 {
 	float d = length(pos);
-	float lerpVal = 1.0 / exp(0.001 * d * d);
+	d -= 15.0;
+	float lerpVal = d > 0.0? 1.0 / exp(0.002 * d * d) : 1.0;
 	
-	return mix(backgroundColor * colorFactor * 0.95, shadedColor, lerpVal);
+	return mix(ambientColor * colorFactor, shadedColor, lerpVal);
 }
 
 // ================================================================================
 
 void main()
 {
-	vec4 gbuffercolor =		texture(postProcessing_0,  texCoord);
+	vec4 gbuffercolor =		texture(postProcessing_0, texCoord);
 	vec4 gbuffernormal =	texture(postProcessing_1, texCoord);
 	vec4 gbufferspec =		texture(postProcessing_2, texCoord);
 	vec4 gbufferemissive =	texture(postProcessing_3, texCoord);
 	vec4 gbufferpos =		texture(postProcessing_4, texCoord);
+	vec4 gbufferinfo =		texture(postProcessing_5, texCoord);
 	depth =					texture(postProcessing_6, texCoord).x;
 
 	N = gbuffernormal.xyz;
@@ -138,11 +145,13 @@ void main()
 	Ks = gbufferspec.rgb;
 	Ke = gbufferemissive.rgb;
 
-	vec3 shaded = processDirectionalLight(gbuffercolor.w);
+	ambientColor = mix(horizonColor, zenitColor, 0.2);
+
+	vec3 shaded = processDirectionalLight(gbufferinfo.y);
 	shaded = processAtmosphericFog(shaded);
 
 	outColor = vec4(shaded, 1.0);
 	outEmission = gbufferemissive;
-	outGodRaysInfo = depth < 1.0? vec4(0,0,0,1) : vec4(0);
+	outGodRaysInfo = vec4(0);
 	gl_FragDepth = depth;
 }

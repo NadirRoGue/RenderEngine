@@ -1,9 +1,17 @@
+/**
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
+
 #pragma once
 
 #include "Mesh.h"
 
 namespace Engine
 {
+	/**
+	 * Holds the data to build a non-indexed cube
+	 */
 	namespace CubeData
 	{
 		const int cubeNVertex = 24; 
@@ -221,6 +229,7 @@ namespace Engine
 		};
 	}
 
+	// Generates a mesh instance using the cube data
 	Mesh CreateCube()
 	{
 		return Mesh

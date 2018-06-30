@@ -2,17 +2,14 @@
 
 #define MASK_MAX_SIZE 64u
 
-//Color de salida
 layout (location=0) out vec4 outColor;
-layout (location=1) out vec4 outDepth;
 
-//Variables Variantes
-in vec2 texCoord;
+layout (location=0) in vec2 texCoord;
 
-//Textura
+// Input color
 uniform sampler2D postProcessing_0;
-uniform sampler2D postProcessing_1;
 
+// 1.0 / screenResolution
 uniform vec2 texelSize;
 
 // Masks are fixed, there is no need to uplaod them from the shader
@@ -76,7 +73,4 @@ void main()
 	}
 
 	outColor = vec4(color.rgb, 1);
-	float depth = texture(postProcessing_1, texCoord).x;
-	outDepth = vec4(depth, 0, 0, 1);
-	gl_FragDepth = depth;
 }

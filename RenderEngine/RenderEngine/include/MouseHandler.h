@@ -11,12 +11,14 @@
 namespace Engine
 {
 	// =========================================================================
-
+	// Parent class of the classes which implements the mouse button handling functionality
 	class MouseHandler
 	{
 	private:
 		std::string name;
 	protected:
+		// The list of mouse buttons to which this handler should be attached
+		// must be stored on this list on handlers constructor
 		std::list<int> usedButtons;
 	public:
 		MouseHandler(std::string nam);
@@ -29,7 +31,7 @@ namespace Engine
 	};
 
 	// =========================================================================
-
+	// Parent class of the classes which implements the mouse movement handling functionality
 	class MouseMotionHandler
 	{
 	private:
@@ -48,7 +50,7 @@ namespace Engine
 	};
 
 	// =========================================================================
-
+	// Stores, updates, and manages both mouse button and mouse movement handlers
 	class MouseEventManager
 	{
 	private:

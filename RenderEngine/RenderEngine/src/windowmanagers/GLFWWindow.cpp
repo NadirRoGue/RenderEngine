@@ -9,7 +9,7 @@
 
 #include "userinterfaces/WorldControllerUI.h"
 #include "WorldConfig.h"
-#include "Time.h"
+#include "TimeAccesor.h"
 
 double lastMouseXPos = 0.0, lastMouseYPos = 0.0;
 
@@ -115,7 +115,7 @@ void Engine::Window::GLFWWindow::initializeContext()
 
 	glfwSetWindowPos(window, windowPosX, windowPosY);
 
-	glfwSwapInterval(1);
+	glfwSwapInterval(2);
 
 	initGlew();
 
@@ -126,6 +126,9 @@ void Engine::Window::GLFWWindow::mainLoop()
 {
 	while (!glfwWindowShouldClose(window))
 	{
+		// Update secondary settings based on main settings changes
+		Engine::Settings::update();
+
 		// Render scene
 		Engine::RenderManager::getInstance().doRender();
 

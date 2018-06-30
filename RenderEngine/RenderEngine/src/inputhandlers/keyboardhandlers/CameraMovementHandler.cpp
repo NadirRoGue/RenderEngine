@@ -1,7 +1,7 @@
 #include "inputhandlers/keyboardhandlers/CameraMovementHandler.h"
 
 #include "WorldConfig.h"
-#include "Time.h"
+#include "TimeAccesor.h"
 
 const float Engine::CameraMovement::MOVE_SPEED = 10.0f;
 

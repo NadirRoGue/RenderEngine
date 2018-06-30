@@ -1,3 +1,7 @@
+/**
+* @author Nadir Román Guerrero
+* @email nadir.ro.gue@gmail.com
+*/
 #pragma once
 
 #include "computeprograms/VolumeTextureProgram.h"
@@ -7,6 +11,11 @@ namespace Engine
 {
 	namespace CloudSystem
 	{
+		/**
+		 * Class in charge of filling the cloud's noise volume textures
+		 * as well as to generate the weather data texture and give access
+		 * to it
+		 */
 		class NoiseInitializer
 		{
 		public:
