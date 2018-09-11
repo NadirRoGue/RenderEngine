@@ -13,3 +13,5 @@ A 3D Render engine built on top of OpenGL, using C++, featuring a fully procedur
 - Screen Space reflections
 - HDR Tone mapping
 - Depth of Field
+
+![Screenshot of the procedural world](https://image.ibb.co/n2SsC9/procedural_world_ss.png)
