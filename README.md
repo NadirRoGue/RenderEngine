@@ -14,4 +14,10 @@ A 3D Render engine built on top of OpenGL, using C++, featuring a fully procedur
 - HDR Tone mapping
 - Depth of Field
 
+NOTE: Generation of procedural noise for the clouds is made using compute shaders. Depending on the GPU being used, this process can take more than 2 seconds (default maximun time a program is allowed to be executed on GPU on Windows). If this time is surpassed, the program behaviour is undetermined (crash / wrong execution).
+To avoid this problem, the maximun time a program can run on GPU can be modified by editing the windows registry.
+
+Showcase video (Old, engine has suffered changes since recording)
+https://www.youtube.com/watch?v=U1VEJsVS7eE
+
 ![Screenshot of the procedural world](https://image.ibb.co/n2SsC9/procedural_world_ss.png)
