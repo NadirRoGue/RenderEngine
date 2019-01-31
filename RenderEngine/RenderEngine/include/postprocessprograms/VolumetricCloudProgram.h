@@ -32,7 +32,18 @@ namespace Engine
 		unsigned int uResolution;
 		// Camera field of view id
 		unsigned int uFov;
+		unsigned int uProjView;
 
+		unsigned int uSphereCenter;
+		unsigned int uInnerSphereRadius;
+		unsigned int uOuterSphereRadius;
+		unsigned int uMaxDrawDistance;
+		unsigned int uTopOffset;
+		unsigned int uWeatherScale;
+		unsigned int uBaseNoiseScale;
+		unsigned int uHighFreqNoiseScale;
+		unsigned int uHighFreqNoiseUVScale;
+		unsigned int uHighFreqNoiseHScale;
 		// Camera position id
 		unsigned int uCamPos;
 		// Light direction id

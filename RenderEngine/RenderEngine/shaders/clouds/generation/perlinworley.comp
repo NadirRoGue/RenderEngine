@@ -300,8 +300,11 @@ vec4 stackable3DNoise(ivec3 pixel)
 	//float worleyFBM2 = worleyNoise3*0.625f + worleyNoise4*0.25f + worleyNoise5*0.125f;
 	float worleyFBM2 = worleyNoise3*0.75f + worleyNoise4*0.25f; 
 	// cellCount=4 -> worleyNoise5 is just noise due to sampling frequency=texel frequency. So only take into account 2 frequencies for FBM
-
+#ifdef CLAMPRESULT
+	return clamp(vec4(PerlinWorleyNoise * PerlinWorleyNoise, worleyFBM0, worleyFBM1, worleyFBM2), 0.0, 1.0);
+#else
 	return vec4(PerlinWorleyNoise * PerlinWorleyNoise, worleyFBM0, worleyFBM1, worleyFBM2);
+#endif
 }
 
 void main()

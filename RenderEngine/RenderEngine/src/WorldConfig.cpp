@@ -8,16 +8,16 @@ unsigned int Engine::Settings::travelMethod = 0;
 glm::vec3 Engine::Settings::lightColor = glm::vec3(1, 1, 1);
 float Engine::Settings::lightFactor = 1.0f;
 glm::vec3 Engine::Settings::realLightColor = glm::vec3(1, 1, 1);
-glm::vec3 Engine::Settings::lightDirection = glm::vec3(1, 0.515, 0);
+glm::vec3 Engine::Settings::lightDirection = glm::vec3(1, 1, 0);
 
 float Engine::Settings::worldTileScale = 7.0f;
 unsigned int Engine::Settings::worldRenderRadius = 12;
 
 glm::vec3 Engine::Settings::windDirection = glm::vec3(1, 0, 0);
-float Engine::Settings::windStrength = 1.0f;
+float Engine::Settings::windStrength = 0.5f;
 
-float Engine::Settings::terrainAmplitude = 0.65f;
-float Engine::Settings::terrainFrecuency = 0.5f;
+float Engine::Settings::terrainAmplitude = 0.732f;
+float Engine::Settings::terrainFrecuency = 0.244f;
 float Engine::Settings::terrainScale = 0.9f;
 unsigned int Engine::Settings::terrainOctaves = 10;
 float Engine::Settings::vegetationMaxHeight = 0.1f;
@@ -34,7 +34,17 @@ float Engine::Settings::waterSpeed = 0.0025f;
 float Engine::Settings::waterHeight = 0.09f;
 
 float Engine::Settings::cloudType = 0.5f;
-float Engine::Settings::coverageMultiplier = 0.228f;
+float Engine::Settings::coverageMultiplier = 1.0f;
+float Engine::Settings::innerSphereRadius	= 10000000.0f * 2.0;
+float Engine::Settings::outerSphereRadius	= 10900000.0f * 2.0;
+float Engine::Settings::sphereYOffset		= -9600000.0f * 2.0;
+float Engine::Settings::cloudMaxRenderDistance = 6000000.0f;
+float Engine::Settings::cloudTopOffset = 0.0f;
+float Engine::Settings::weatherTextureScale = 1.0f;
+float Engine::Settings::baseNoiseScale = 1.0f;
+float Engine::Settings::highFrequencyNoiseScale = 1.0f;
+float Engine::Settings::highFrequencyNoiseUVScale = 150.0f;
+float Engine::Settings::highFrequencyNoiseHScale = 4.0f;
 glm::vec3 Engine::Settings::cloudColor = glm::vec3(1, 1, 1);
 
 float Engine::Settings::dofFocalDist = 70.0f;

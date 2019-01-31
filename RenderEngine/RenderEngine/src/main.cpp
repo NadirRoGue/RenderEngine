@@ -104,7 +104,7 @@ int main(int argc, char** argv)
 	// Clean up
 	destroy();
 
-	system("Pause");
+	system("pause");
 
 	return 0;
 }
@@ -125,8 +125,9 @@ void initOpenGL()
 // Creates a new scene and activates it
 void initScene()
 {
-	Engine::Camera * camera = new Engine::Camera(0.5f, 75.0f, 35.0f);
-	camera->translateView(glm::vec3(-197.0f, -10.0f, -130.0f));
+	Engine::Camera * camera = new Engine::Camera(0.5f, 1000.0f, 35.0f);
+	
+	camera->translateView(glm::vec3(0.0f, -7.0f, 0.0f));
 
 	Engine::Scene * scene = new Engine::Scene();
 	scene->setCamera(camera);

@@ -61,6 +61,16 @@ namespace Engine
 
 		static float cloudType;
 		static float coverageMultiplier;
+		static float innerSphereRadius;
+		static float outerSphereRadius;
+		static float sphereYOffset;
+		static float cloudMaxRenderDistance;
+		static float cloudTopOffset;
+		static float weatherTextureScale;
+		static float baseNoiseScale;
+		static float highFrequencyNoiseScale;
+		static float highFrequencyNoiseUVScale;
+		static float highFrequencyNoiseHScale;
 		static glm::vec3 cloudColor;
 
 		static float hdrExposure;

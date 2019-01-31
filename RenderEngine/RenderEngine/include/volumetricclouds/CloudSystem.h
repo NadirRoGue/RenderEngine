@@ -40,6 +40,7 @@ namespace Engine
 			DeferredRenderObject * reprojectionBuffer[4];
 			// Texture instances holding the previous frames
 			TextureInstance * reproBuffer[4];
+			TextureInstance * pixelVelocityMap[4];
 		public:
 			VolumetricClouds();
 			void render(Camera * cam);

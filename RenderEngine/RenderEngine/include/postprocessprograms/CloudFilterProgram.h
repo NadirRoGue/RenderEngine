@@ -28,6 +28,13 @@ namespace Engine
 		unsigned int uRepro3;
 		unsigned int uRepro4;
 
+		unsigned int uVel1, uVel2, uVel3, uVel4;
+
+		unsigned int uFrameIter;
+		unsigned int uOldProjView;
+
+		glm::mat4 oldView;
+
 	public:
 		CloudFilterProgram(std::string name, unsigned long long params);
 		CloudFilterProgram(const CloudFilterProgram & other);
@@ -37,6 +44,7 @@ namespace Engine
 		virtual void onRenderObject(const Object * obj, Camera * camera);
 		
 		void setBufferInput(TextureInstance ** buffers);
+		void setVelocityInput(TextureInstance ** velocities);
 	};
 
 	// ========================================================================

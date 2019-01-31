@@ -56,7 +56,12 @@ void Engine::VolumetricCloudProgram::configureProgram()
 	uWorley = glGetUniformLocation(glProgram, "worley");
 	uWeather = glGetUniformLocation(glProgram, "weather");
 
+	uProjView = glGetUniformLocation(glProgram, "projView");
+
 	uCamPos = glGetUniformLocation(glProgram, "camPos");
+	uSphereCenter = glGetUniformLocation(glProgram, "sphereCenter");
+	uInnerSphereRadius = glGetUniformLocation(glProgram, "innerSphereRadius");
+	uOuterSphereRadius = glGetUniformLocation(glProgram, "outerSphereRadius");
 	uLightDir = glGetUniformLocation(glProgram, "lightDir");
 	uLightColor = glGetUniformLocation(glProgram, "realLightColor");
 	uLightFactor = glGetUniformLocation(glProgram, "lightFactor");
@@ -70,9 +75,18 @@ void Engine::VolumetricCloudProgram::configureProgram()
 	uCloudType = glGetUniformLocation(glProgram, "cloudType");
 	uCoverageMultiplier = glGetUniformLocation(glProgram, "coverageMultiplier");
 
+	uTopOffset = glGetUniformLocation(glProgram, "cloudTopOffset");
+
+	uWeatherScale = glGetUniformLocation(glProgram, "weatherScale");
+	uBaseNoiseScale = glGetUniformLocation(glProgram, "baseNoiseScale");
+	uHighFreqNoiseScale = glGetUniformLocation(glProgram, "highFreqNoiseScale");
+	uHighFreqNoiseUVScale = glGetUniformLocation(glProgram, "highFreqNoiseUVScale");
+	uHighFreqNoiseHScale = glGetUniformLocation(glProgram, "highFreqNoiseHScale");
+
 	uCurrentDepth = glGetUniformLocation(glProgram, "currentPixelDepth");
 
 	uFrame = glGetUniformLocation(glProgram, "frame");
+	uMaxDrawDistance = glGetUniformLocation(glProgram, "maxRenderDist");
 }
 
 void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, Engine::Camera * camera)
@@ -80,10 +94,26 @@ void Engine::VolumetricCloudProgram::onRenderObject(Engine::Object * obj, Engine
 	glm::mat4 invView = glm::inverse(camera->getViewMatrix());
 	glUniformMatrix4fv(uInvView, 1, GL_FALSE, &(invView[0][0]));
 
+	glm::mat4 pV = camera->getProjectionMatrix() * camera->getViewMatrix();
+	glUniformMatrix4fv(uProjView, 1, GL_FALSE, &(pV[0][0]));
+
 	Engine::Scene * scene = Engine::SceneManager::getInstance().getActiveScene();
 	Engine::Camera * cam = scene->getCamera();
 	glm::vec3 camPos = -cam->getPosition();
 	glUniform3fv(uCamPos, 1, &camPos[0]);
+
+	glm::vec4 spherePos = glm::vec4(camPos[0], Settings::sphereYOffset, camPos[2], 1.0f);
+	glUniform3fv(uSphereCenter, 1, &spherePos[0]);
+
+	glUniform1f(uInnerSphereRadius, Settings::innerSphereRadius);
+	glUniform1f(uOuterSphereRadius, Settings::outerSphereRadius);
+	glUniform1f(uMaxDrawDistance, Settings::cloudMaxRenderDistance);
+	glUniform1f(uTopOffset, Settings::cloudTopOffset);
+	glUniform1f(uWeatherScale, Settings::weatherTextureScale);
+	glUniform1f(uBaseNoiseScale, Settings::baseNoiseScale);
+	glUniform1f(uHighFreqNoiseScale, Settings::highFrequencyNoiseScale);
+	glUniform1f(uHighFreqNoiseUVScale, Settings::highFrequencyNoiseUVScale);
+	glUniform1f(uHighFreqNoiseHScale, Settings::highFrequencyNoiseHScale);
 
 	glm::vec3 normLightDir = glm::normalize(Engine::Settings::lightDirection);
 	glUniform3fv(uLightDir, 1, &normLightDir[0]);

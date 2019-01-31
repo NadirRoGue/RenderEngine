@@ -26,6 +26,7 @@ namespace Engine
 
 		glm::mat4 invViewMatrix;
 		glm::mat4 transposeInvViewMatrix;
+		glm::mat4 oldViewMatrix;
 
 		glm::vec3 forward;
 
@@ -42,6 +43,7 @@ namespace Engine
 		glm::mat4 & getViewMatrix();
 		glm::mat4 & getInvViewMatrix();
 		glm::mat4 & getTransposeInvViewMatrix();
+		glm::mat4 & getOldViewMatrix();
 
 		void setPosition(glm::vec3 pos);
 		void translateView(glm::vec3 translation);

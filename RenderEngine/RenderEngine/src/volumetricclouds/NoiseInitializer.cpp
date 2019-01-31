@@ -81,8 +81,8 @@ void Engine::CloudSystem::NoiseInitializer::initTextures()
 	PerlinWorleyFBM->setRComponentWrapType(GL_REPEAT);
 	PerlinWorleyFBM->setSComponentWrapType(GL_REPEAT);
 	PerlinWorleyFBM->setTComponentWrapType(GL_REPEAT);
-	PerlinWorleyFBM->setMagnificationFilterType(GL_LINEAR);
-	PerlinWorleyFBM->setMinificationFilterType(GL_LINEAR);
+	PerlinWorleyFBM->setMagnificationFilterType(GL_NEAREST);
+	PerlinWorleyFBM->setMinificationFilterType(GL_NEAREST);
 	PerlinWorleyFBM->generateTexture();
 	PerlinWorleyFBM->uploadTexture();
 	//PerlinWorleyFBM->configureTexture();
@@ -120,7 +120,7 @@ void Engine::CloudSystem::NoiseInitializer::initTextures()
 	CurlNoise->uploadTexture();
 	CurlNoise->configureTexture();
 
-	Engine::Texture2D * weather = new Engine::Texture2D("weather", 0, 1024, 1024);
+	Engine::Texture2D * weather = new Engine::Texture2D("weather", 0, 2048, 2048);
 	weather->setGenerateMipMaps(false);
 	weather->setMemoryLayoutFormat(GL_RGBA8);
 	weather->setImageFormatType(GL_RGBA);
@@ -128,8 +128,8 @@ void Engine::CloudSystem::NoiseInitializer::initTextures()
 
 	WeatherData = new Engine::TextureInstance(weather);
 	WeatherData->setAnisotropicFilterEnabled(false);
-	WeatherData->setSComponentWrapType(GL_CLAMP_TO_EDGE);
-	WeatherData->setTComponentWrapType(GL_CLAMP_TO_EDGE);
+	WeatherData->setSComponentWrapType(GL_MIRRORED_REPEAT);
+	WeatherData->setTComponentWrapType(GL_MIRRORED_REPEAT);
 	WeatherData->setMagnificationFilterType(GL_LINEAR);
 	WeatherData->setMinificationFilterType(GL_LINEAR);
 	WeatherData->generateTexture();
@@ -180,7 +180,7 @@ void Engine::CloudSystem::NoiseInitializer::render()
 	std::cout << "Generating Weather texture (1024x1024)..." << std::endl;
 	glUseProgram(weatherGen->getProgramId());
 	weatherGen->bindOutput(WeatherData);
-	weatherGen->dispatch(1024, 1024, 1, GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+	weatherGen->dispatch(2048, 2048, 1, GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 	std::cout << "Done!" << std::endl;
 	//clean();
 }

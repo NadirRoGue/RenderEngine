@@ -48,6 +48,7 @@ void Engine::Camera::initProjectionMatrix()
 void Engine::Camera::initViewMatrix()
 {
 	updateViewMatrix();
+	oldViewMatrix = viewMatrix;
 }
 
 void Engine::Camera::setPosition(glm::vec3 pos)
@@ -75,6 +76,7 @@ void Engine::Camera::translateView(glm::vec3 t)
 
 void Engine::Camera::setLookAt(glm::vec3 eye, glm::vec3 target)
 {
+	oldViewMatrix = viewMatrix;
 	viewMatrix = glm::lookAt(eye, target, glm::vec3(0, 1, 0));
 	translation = -eye;
 	forward = glm::normalize(glm::vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]));
@@ -88,6 +90,7 @@ void Engine::Camera::rotateView(glm::vec3 rot)
 
 void Engine::Camera::updateViewMatrix()
 {
+	oldViewMatrix = viewMatrix;
 	glm::mat4 identity(1.0f);
 
 	glm::quat yawQ = glm::quat(glm::vec3(0.0f, rotation.y, 0.0f));
@@ -149,6 +152,11 @@ glm::mat4 & Engine::Camera::getInvViewMatrix()
 glm::mat4 & Engine::Camera::getTransposeInvViewMatrix()
 {
 	return transposeInvViewMatrix;
+}
+
+glm::mat4 & Engine::Camera::getOldViewMatrix()
+{
+	return oldViewMatrix;
 }
 
 float Engine::Camera::getFOV()
