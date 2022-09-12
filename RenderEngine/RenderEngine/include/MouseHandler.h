@@ -7,6 +7,7 @@
 
 #include <map>
 #include <list>
+#include <iostream>
 
 namespace Engine
 {
