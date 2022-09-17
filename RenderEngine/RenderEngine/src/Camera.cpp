@@ -1,5 +1,5 @@
 /*
-* @author Nadir Román Guerrero
+* @author Nadir Romï¿½n Guerrero
 * @email nadir.ro.gue@gmail.com
 */
 
@@ -85,6 +85,13 @@ void Engine::Camera::setLookAt(glm::vec3 eye, glm::vec3 target)
 void Engine::Camera::rotateView(glm::vec3 rot)
 {
 	rotation += rot;
+
+	if (rotation.x <= -1.8f)
+		rotation.x = -1.8f;
+
+	else if (rotation.x >= 1.8f)
+		rotation.x = 1.8f;
+
 	updateViewMatrix();
 }
 
