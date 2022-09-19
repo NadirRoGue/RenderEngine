@@ -86,11 +86,7 @@ void Engine::Camera::rotateView(glm::vec3 rot)
 {
 	rotation += rot;
 
-	if (rotation.x <= -1.8f)
-		rotation.x = -1.8f;
-
-	else if (rotation.x >= 1.8f)
-		rotation.x = 1.8f;
+	rotation.x = glm::clamp(rotation.x, -1.8f, 1.8f);
 
 	updateViewMatrix();
 }
