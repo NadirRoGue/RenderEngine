@@ -1,5 +1,5 @@
 /*
-* @author Nadir Rom·n Guerrero
+* @author Nadir Rom√°n Guerrero
 * @email nadir.ro.gue@gmail.com
 */
 
@@ -85,6 +85,9 @@ void Engine::Camera::setLookAt(glm::vec3 eye, glm::vec3 target)
 void Engine::Camera::rotateView(glm::vec3 rot)
 {
 	rotation += rot;
+
+	rotation.x = glm::clamp(rotation.x, -1.8f, 1.8f);
+
 	updateViewMatrix();
 }
 
