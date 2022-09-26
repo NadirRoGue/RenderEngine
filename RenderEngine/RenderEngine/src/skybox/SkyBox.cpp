@@ -51,8 +51,11 @@ void Engine::SkyBox::render(Engine::Camera * camera)
 
 	glDepthFunc(GL_LESS);
 
-	// Render clouds
-	clouds->render(camera);
+	if (Engine::Settings::drawClouds == 0)
+	{
+		// Render clouds
+		clouds->render(camera);
+	}
 }
 
 void Engine::SkyBox::initialize()

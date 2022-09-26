@@ -59,6 +59,7 @@ namespace Engine
 		static float waterSpeed;
 		static float waterHeight;
 
+		static unsigned int drawClouds;
 		static float cloudType;
 		static float coverageMultiplier;
 		static float innerSphereRadius;

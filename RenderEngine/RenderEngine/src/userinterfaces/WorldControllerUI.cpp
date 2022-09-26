@@ -96,6 +96,7 @@ void Engine::Window::WorldControllerUI::drawGraphics()
 
 		if(ImGui::CollapsingHeader("Cloud settings"))
 		{
+			ImGui::Combo("Draw clouds", reinterpret_cast<int32_t*>(&Engine::Settings::drawClouds), "Enable\0Disable", 3);
 			ImGui::InputFloat("Cloud type", &Engine::Settings::cloudType, 0.1f, 0.3f);
 			ImGui::InputFloat("Cloud coverage", &Engine::Settings::coverageMultiplier, 0.1f, 0.3f);
 			ImGui::InputFloat("Cloud max render dist", &Engine::Settings::cloudMaxRenderDistance, 100.0f, 100.0f);
