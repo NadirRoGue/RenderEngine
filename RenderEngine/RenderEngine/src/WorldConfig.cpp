@@ -33,6 +33,7 @@ glm::vec3 Engine::Settings::waterColor = glm::vec3(0.06f, 0.52f, 0.337f);
 float Engine::Settings::waterSpeed = 0.0025f;
 float Engine::Settings::waterHeight = 0.09f;
 
+unsigned int Engine::Settings::drawClouds = 0;
 float Engine::Settings::cloudType = 0.5f;
 float Engine::Settings::coverageMultiplier = 1.0f;
 float Engine::Settings::innerSphereRadius	= 10000000.0f * 2.0;
