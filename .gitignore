@@ -1,6 +1,3 @@
-.vs/
-Release/
-Debug/
-RenderEngine/Debug/
-RenderEngine/Release/
-RenderEngine/x64/
+build/
+debug/
+.vscode/
