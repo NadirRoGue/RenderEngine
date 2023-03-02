@@ -19,16 +19,8 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "VulkanFunctions.h"
+#pragma once
 
-namespace engine
-{
-#define EXPORTED_VULKAN_FUNCTION(name) PFN_##name name;
-#define GLOBAL_VULKAN_FUNCTION(name) PFN_##name name;
-#define INSTANCE_VULKAN_FUNCTION(name) PFN_##name name;
-#define INSTANCE_EXTENSION_VULKAN_FUNCTION(name, extension) PFN_##name name;
-#define DEVICE_VULKAN_FUNCTION(name) PFN_##name name;
-#define DEVICE_EXTENSION_VULKAN_FUNCTION(name, extension) PFN_##name name;
+#include <engine/vulkan/VulkanInclude.h>
 
-#include "VulkanFunctions.inl"
-}
+#include <GLFW/glfw3.h>

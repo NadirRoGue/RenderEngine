@@ -19,28 +19,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// From "Vulkan Cookbook"
-
 #pragma once
 
-#define VK_NO_PROTOTYPES
-#include <vulkan/vulkan.h>
-
-#ifdef _WIN32
-    #include <vulkan/vulkan_win32.h>
-#else
-    #include <X11/Xlib.h>
-    #include <vulkan/vulkan_xlib.h>
-#endif
-
-namespace engine
-{
-#define EXPORTED_VULKAN_FUNCTION(name) extern PFN_##name name;
-#define GLOBAL_VULKAN_FUNCTION(name) extern PFN_##name name;
-#define INSTANCE_VULKAN_FUNCTION(name) extern PFN_##name name;
-#define INSTANCE_EXTENSION_VULKAN_FUNCTION(name, extension) extern PFN_##name name;
-#define DEVICE_VULKAN_FUNCTION(name) extern PFN_##name name;
-#define DEVICE_EXTENSION_VULKAN_FUNCTION(name, extension) extern PFN_##name name;
-
-#include "VulkanFunctions.inl"
-}
+#define VULKAN_HPP_NO_DEFAULT_DISPATCHER
+#include <vulkan/vulkan_raii.hpp>

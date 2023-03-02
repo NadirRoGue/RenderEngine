@@ -21,6 +21,9 @@
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/proceduralworld)
 
-add_executable(ProceduralWorld ProceduralWorld.cpp)
+file(GLOB_RECURSE PW_HEADERS RELATIVE ${CMAKE_CURRENT_LIST_DIR} *.h)
+file(GLOB_RECURSE PW_SOURCES RELATIVE ${CMAKE_CURRENT_LIST_DIR} *.cpp)
 
-target_link_libraries(ProceduralWorld PRIVATE RenderEngine glm)
+add_executable(ProceduralWorld ${PW_HEADERS} ${PW_SOURCES})
+
+target_link_libraries(ProceduralWorld PRIVATE RenderEngine)

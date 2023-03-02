@@ -19,22 +19,9 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <engine/Window.h>
-
 #include "DeviceSelector.h"
 
-int main(int argc, char **argv)
+engine::WindowVulkanDevice DeviceSelector::select(const std::vector<engine::WindowVulkanPhysicalDevice> &devices)
 {
-    (void)argc;
-    (void)argv;
-
-    auto vulkanInstance = engine::WindowVulkanInstance({});
-    auto physicalDevices = vulkanInstance.getAvailableDevices();
-    auto device = DeviceSelector::select(physicalDevices);
-    auto context = engine::WindowVulkanContext(std::move(vulkanInstance), std::move(device));
-
-    auto window = engine::Window(std::move(context), "Procedural world", 800, 600);
-    window.renderLoop([] {});
-
-    return 0;
+    auto features = vk::PhysicalDeviceFeatures();
 }

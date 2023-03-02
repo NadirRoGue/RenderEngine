@@ -21,26 +21,59 @@
 
 #pragma once
 
-#include "VulkanFunctions.h"
-#include "detail/VulkanLoader.h"
-
-#include <string_view>
+#include "vulkan/VulkanInclude.h"
 
 namespace engine
 {
-class VulkanInstance
+class WindowVulkanPhysicalDevice
 {
 public:
-    VulkanInstance() = delete;
-    ~VulkanInstance();
+    const vk::raii::PhysicalDevice &getDevice() const noexcept;
 
 private:
-    friend class Window;
+    friend class WindowVulkanInstance;
 
-    VulkanInstance(std::string_view appliactionName);
+    WindowVulkanPhysicalDevice(vk::raii::PhysicalDevice device);
+
+    vk::raii::PhysicalDevice _device;
+};
+
+class WindowVulkanInstance
+{
+public:
+    explicit WindowVulkanInstance(const std::vector<std::string> &extensions);
+
+    std::vector<WindowVulkanPhysicalDevice> getAvailableDevices() const;
 
 private:
-    detail::VulkanLoader _loader;
-    VkInstance _instance;
+    friend class WindowVulkanContext;
+
+    vk::raii::Context _context;
+    vk::raii::Instance _instance;
+};
+
+class WindowVulkanDevice
+{
+public:
+    WindowVulkanDevice(const WindowVulkanPhysicalDevice &physicalDevice, const vk::DeviceCreateInfo &createInfo);
+
+private:
+    friend class WindowVulkanContext;
+
+    vk::raii::Device _device;
+};
+
+class WindowVulkanContext
+{
+public:
+    WindowVulkanContext(WindowVulkanInstance instance, WindowVulkanDevice device);
+
+    const vk::raii::Instance &getInstance() const noexcept;
+    const vk::raii::Device &getDevice() const noexcept;
+
+private:
+    vk::raii::Context _context;
+    vk::raii::Instance _instance;
+    vk::raii::Device _device;
 };
 }

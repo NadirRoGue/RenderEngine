@@ -19,27 +19,28 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <engine/VulkanFunctions.h>
-
 #pragma once
+
+#include "GlfwInclude.h"
 
 namespace engine::detail
 {
-class VulkanLoader
+class GlfwVulkanExtensionList
 {
 public:
-    VulkanLoader();
-    ~VulkanLoader();
+    static std::vector<std::string> compile();
+};
 
-    void loadInstanceFunctions(VkInstance instance);
-    void loadDeviceFunctions(VkDevice device);
+class GlfwWindowFactory
+{
+public:
+    static GLFWwindow *create(const std::string &title, uint16_t width, uint16_t height);
+    static void destroy(GLFWwindow *window);
+};
 
-private:
-    void _loadLib();
-    void _loadExportedFunctions();
-    void _loadGlobalFunctions();
-
-private:
-    void *_vulkan = nullptr;
+class GlfwSurfaceFactory
+{
+public:
+    static vk::raii::SurfaceKHR create(const vk::raii::Instance &instance, GLFWwindow *window);
 };
 }

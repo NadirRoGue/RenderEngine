@@ -21,16 +21,20 @@
 
 #include "Window.h"
 
+#include "detail/GlfwUtils.h"
+
 namespace engine
 {
-Window::Window(std::string_view title, uint16_t width, uint16_t height)
-    : _instance(title)
-    , _window(_instance._instance, title, width, height)
+Window::Window(WindowVulkanContext context, const std::string &title, uint16_t width, uint16_t height)
+    : _context(std::move(context))
+    , _windowStorage{detail::GlfwWindowFactory::create(title, width, height)}
+    , _surface(detail::GlfwSurfaceFactory::create(_context.getInstance(), _windowStorage.window))
 {
 }
 
-VulkanInstance &Window::getInstance() noexcept
+Window::WindowStorage::~WindowStorage()
 {
-    return _instance;
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
 }

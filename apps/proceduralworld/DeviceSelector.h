@@ -21,12 +21,10 @@
 
 #pragma once
 
-#ifdef _WIN32
-    #include <iostream>
-#else
-    #include "X11Window.h"
-namespace engine::detail
+#include <engine/WindowVulkanContext.h>
+
+class DeviceSelector
 {
-using WindowImpl = X11Window;
+public:
+    static engine::WindowVulkanDevice select(const std::vector<engine::WindowVulkanPhysicalDevice> &devices);
 };
-#endif

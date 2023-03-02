@@ -21,31 +21,38 @@
 
 #pragma once
 
-#include "VulkanFunctions.h"
-#include "VulkanInstance.h"
-#include "detail/VulkanLoader.h"
+#include "WindowVulkanContext.h"
+#include "detail/GlfwInclude.h"
 
-#include "detail/WindowImpl.h"
-
-#include <string_view>
+#include <string>
 
 namespace engine
 {
 class Window
 {
 public:
-    Window(std::string_view title, uint16_t width, uint16_t height);
-
-    VulkanInstance &getInstance() noexcept;
+    Window(WindowVulkanContext context, const std::string &title, uint16_t width, uint16_t height);
 
     template<typename Callable>
     void renderLoop(Callable &&callable)
     {
-        _window.renderLoop(std::forward<Callable>(callable));
+        while (!glfwWindowShouldClose(_windowStorage.window))
+        {
+            glfwPollEvents();
+            callable();
+        }
     }
 
 private:
-    VulkanInstance _instance;
-    detail::WindowImpl _window;
+    struct WindowStorage
+    {
+        GLFWwindow *window;
+        ~WindowStorage();
+    };
+
+private:
+    WindowVulkanContext _context;
+    WindowStorage _windowStorage;
+    vk::raii::SurfaceKHR _surface;
 };
 }

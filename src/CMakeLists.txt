@@ -24,20 +24,9 @@ configure_file(engine/Version.h.in ${CMAKE_BINARY_DIR}/include/engine/Version.h)
 file(GLOB_RECURSE ENGINE_HEADERS RELATIVE ${CMAKE_CURRENT_LIST_DIR} *.h)
 file(GLOB_RECURSE ENGINE_SOURCES RELATIVE ${CMAKE_CURRENT_LIST_DIR} *.cpp)
 
-if(WIN32)
-    list(REMOVE_ITEM ENGINE_HEADERS "engine/detail/X11Window.h")
-    list(REMOVE_ITEM ENGINE_SOURCES "engine/detail/X11Window.cpp")
-elseif(UNIX)
-    list(REMOVE_ITEM ENGINE_HEADERS "engine/detail/Win32Window.h")
-    list(REMOVE_ITEM ENGINE_SOURCES "engine/detail/Win32Window.cpp")
-endif()
-
 add_library(RenderEngine STATIC ${ENGINE_HEADERS} ${ENGINE_SOURCES})
-
-target_link_libraries(RenderEngine PUBLIC Vulkan)
-target_link_libraries(RenderEngine PRIVATE ${WINDOW_SYSTEM_LIBS} ${CMAKE_DL_LIBS})
-target_include_directories(RenderEngine PRIVATE SYSTEM ${WINDOW_SYSTEM_INCLUDES})
-
+target_link_libraries(RenderEngine PUBLIC glfw Vulkan imgui)
+target_compile_definitions(RenderEngine PUBLIC VK_NO_PROTOTYPES)
 set(BUILD_INCUDE_DIRS ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_BINARY_DIR}/include)
 target_include_directories(RenderEngine PUBLIC
     "$<BUILD_INTERFACE:${BUILD_INCUDE_DIRS}>"

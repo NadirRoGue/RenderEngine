@@ -21,55 +21,18 @@
 
 #pragma once
 
-#include <engine/VulkanFunctions.h>
+#include "VulkanInclude.h"
 
-#include <X11/Xlib.h>
-#include <X11/Xos.h>
-#include <X11/Xutil.h>
+#include <string>
+#include <vector>
 
-#include <string_view>
-
-namespace engine::detail
+namespace engine
 {
-class X11Surface
+class VulkanInstanceUtils
 {
 public:
-    X11Surface(VkInstance instance, Display *display, Window window);
-    ~X11Surface();
-
-private:
-    VkInstance _instance;
-    VkSurfaceKHR _surface;
+    static vk::raii::Instance createInstance(
+        const vk::raii::Context &context,
+        const std::vector<std::string> &extensions = {});
 };
-
-class X11Window
-{
-public:
-    X11Window(VkInstance instance, std::string_view title, uint16_t width, uint16_t height);
-    ~X11Window();
-
-    template<typename Callable>
-    void renderLoop(Callable &&callable)
-    {
-        const Atom deleteWindowEvent = XInternAtom(_display, "WM_DELETE_WINDOW", False);
-        while (true)
-        {
-            callable();
-
-            auto event = XEvent();
-            XNextEvent(_display, &event);
-
-            if (event.type == ClientMessage
-                && (static_cast<unsigned int>(event.xclient.data.l[0]) == deleteWindowEvent))
-            {
-                break;
-            }
-        }
-    }
-
-private:
-    Display *_display;
-    Window _window;
-    X11Surface _surface;
-};
-};
+}
