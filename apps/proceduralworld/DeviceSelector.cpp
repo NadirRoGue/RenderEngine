@@ -21,7 +21,66 @@
 
 #include "DeviceSelector.h"
 
+#include <engine/vulkan/VulkanPhysicalDeviceUtils.h>
+
+#include <iostream>
+
 engine::WindowVulkanDevice DeviceSelector::select(const std::vector<engine::WindowVulkanPhysicalDevice> &devices)
 {
     auto features = vk::PhysicalDeviceFeatures();
+    features.drawIndirectFirstInstance = true;
+    features.fillModeNonSolid = true;
+    features.fullDrawIndexUint32 = true;
+    features.imageCubeArray = true;
+    features.multiDrawIndirect = true;
+    // features.sampleRateShading = true;
+    // features.samplerAnisotropy = true;
+    features.shaderResourceMinLod = true;
+    // features.tessellationShader = true;
+    // features.wideLines = true;
+
+    auto extensions = std::vector<const char *>{VK_KHR_SHADER_CLOCK_EXTENSION_NAME};
+
+    auto queueFlags = vk::QueueFlagBits::eCompute | vk::QueueFlagBits::eGraphics | vk::QueueFlagBits::eTransfer;
+    auto queueCount = 2u;
+
+    const engine::WindowVulkanPhysicalDevice *selected = nullptr;
+    int selectedQueueFamily = -1;
+    for (auto &device : devices)
+    {
+        auto &vkDevice = device.getDevice();
+
+        if (!engine::PhysicalDeviceFeaturesChecker::satisfies(vkDevice, features))
+        {
+            continue;
+        }
+
+        selectedQueueFamily = engine::QueueFamilySearcher::find(vkDevice, queueFlags, queueCount);
+        if (selectedQueueFamily == -1)
+        {
+            continue;
+        }
+
+        if (!engine::PhysicalDeviceExtensionChecker::satisfies(vkDevice, extensions))
+        {
+            continue;
+        }
+
+        selected = &device;
+    }
+
+    if (!selected)
+    {
+        throw std::runtime_error("Cannot find suitable device");
+    }
+
+    auto queuePriorities = std::vector<float>{1.f, 1.f};
+    auto queueCreateInfo = vk::DeviceQueueCreateInfo(
+        vk::DeviceQueueCreateFlags{0},
+        static_cast<uint32_t>(selectedQueueFamily),
+        queuePriorities);
+    auto createInfo = vk::DeviceCreateInfo(vk::DeviceCreateFlags{0}, queueCreateInfo, {}, extensions, &features);
+
+    auto device = engine::WindowVulkanDevice(*selected, createInfo);
+    return device;
 }
